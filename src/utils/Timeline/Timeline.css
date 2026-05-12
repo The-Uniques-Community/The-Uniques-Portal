@@ -1,0 +1,253 @@
+.timeline-container {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+  
+  /* Timeline items */
+  .timeline-item-wrapper {
+    position: relative;
+    margin-bottom: 20px;
+    width: 100%;
+  }
+  
+  .timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+    width: 100%;
+  }
+  
+  .timeline-item::after {
+    content: '';
+    display: table;
+    clear: both;
+  }
+  
+  /* Content positioning */
+  .timeline-left .timeline-content {
+    padding-right: 50px;
+    text-align: right;
+    margin-right: 50%;
+  }
+  
+  .timeline-right .timeline-content {
+    padding-left: 50px;
+    text-align: left;
+    margin-left: 50%;
+  }
+  
+  /* Content areas */
+  .timeline-content {
+    position: relative;
+    width: 50%;
+    padding: 15px 0;
+  }
+  
+  /* Dots/markers on the timeline */
+  .timeline-dot {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 50%;
+    margin-left: -10px;
+    top: 20px;
+    z-index: 10;
+  }
+  
+  .timeline-circle {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: #f31c1c;
+    border-radius: 50%;
+    top: 0;
+    left: 0;
+  }
+  
+  /* Connector styling - the curved lines between points */
+  .timeline-connector {
+    position: relative;
+    height: 60px;
+    z-index: 1;
+  }
+  
+  .connector-line {
+    position: absolute;
+    width: calc(25% - 10px);
+    height: 60px;
+    border: 4px solid #f31c1c;
+    border-top: none;
+  }
+  
+  /* Right curved connector */
+  .connector-right .connector-line {
+    left: 50%;
+    margin-left: -2px;
+    border-right: none;
+    border-radius: 0 0 0 20px;
+  }
+  
+  /* Left curved connector */
+  .connector-left .connector-line {
+    right: 50%;
+    margin-right: -2px;
+    border-left: none;
+    border-radius: 0 0 20px 0;
+  }
+  
+  /* Year styles */
+  .timeline-year {
+    position: absolute;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    left: 35px;
+    top: -10px;
+  }
+  
+  .timeline-year-tilted {
+    position: absolute;
+    font-size: 3rem;
+    font-weight: 900;
+    color: #333;
+    transform-origin: left center;
+  }
+  
+  .timeline-year-tilted.first {
+    transform: rotate(-90deg) translate(-100%, 0);
+    left: -40px;
+    top: -20px;
+  }
+  
+  .timeline-year-tilted.last {
+    transform: rotate(-90deg) translate(-100%, 0);
+    left: -40px;
+    top: -20px;
+  }
+  
+  /* Content styling */
+  .timeline-image-container {
+    margin-bottom: 15px;
+    overflow: hidden;
+  }
+  
+  .timeline-left .timeline-image-container {
+    float: right;
+  }
+  
+  .timeline-right .timeline-image-container {
+    float: left;
+  }
+  
+  .timeline-image {
+    max-width: 250px;
+    height: auto;
+    display: block;
+    border-radius: 6px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .timeline-heading {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+    color: #333;
+  }
+  
+  .timeline-subheading {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 10px;
+    color: #666;
+  }
+  
+  .timeline-brief {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #444;
+  }
+  
+  .timeline-quote {
+    margin: 20px 0;
+    padding-left: 15px;
+    border-left: 3px solid #f31c1c;
+    font-style: italic;
+    color: #0051b9;
+  }
+  
+  .timeline-quote p {
+    margin: 0 0 5px 0;
+  }
+  
+  .timeline-quote cite {
+    font-weight: 500;
+    font-style: normal;
+  }
+  
+  /* Responsive adjustments */
+  @media screen and (max-width: 768px) {
+    .timeline-item {
+      width: 100%;
+      margin-bottom: 40px;
+    }
+    
+    .timeline-dot {
+      left: 40px;
+      margin-left: -10px;
+    }
+    
+    .timeline-content {
+      width: calc(100% - 80px);
+      padding: 0 0 0 70px;
+      text-align: left;
+      margin-left: 0;
+      margin-right: 0;
+    }
+    
+    .timeline-left .timeline-content,
+    .timeline-right .timeline-content {
+      padding: 0 0 0 70px;
+      text-align: left;
+      margin-left: 0;
+      margin-right: 0;
+    }
+    
+    .timeline-year,
+    .timeline-year-tilted {
+      left: 70px;
+      transform: none !important;
+    }
+    
+    .timeline-left .timeline-image-container,
+    .timeline-right .timeline-image-container {
+      float: none;
+      margin-bottom: 15px;
+    }
+    
+    .timeline-image {
+      max-width: 100%;
+    }
+    
+    /* Adjust connectors for mobile */
+    .timeline-connector {
+      height: 40px;
+    }
+    
+    .connector-line {
+      left: 40px !important;
+      right: auto !important;
+      margin: 0 !important;
+      height: 40px;
+      width: 20px;
+      border-radius: 0 !important;
+      border: 4px solid #f31c1c;
+      border-left: none;
+      border-top: none;
+    }
+    
+    .connector-left .connector-line,
+    .connector-right .connector-line {
+      border-left: none;
+      border-radius: 0 0 20px 0;
+    }
+  }

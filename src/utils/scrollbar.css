@@ -1,0 +1,51 @@
+/* custom-simplebar.css */
+/* custom-simplebar.css */
+.custom-simplebar .simplebar-scrollbar:before {
+    background-color: #ca0019 !important;
+    border-radius: 9999px !important;
+    opacity: 1 !important;
+    width: 12px !important;
+    /* Full width of the thumb */
+    content: "" !important;
+    position: absolute !important;
+    top: 2px !important;
+    bottom: 2px !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+
+.custom-simplebar .simplebar-track.simplebar-vertical {
+    background: #d1d5db !important;
+    border-radius: 9999px !important;
+    width: 2px !important;
+    /* Keep track thin */
+    margin: 6px 0 6px 3px !important;
+    /* Adjusted margin for left side */
+    left: 4px !important;
+    /* Position track closer to left edge */
+}
+
+/* Hide scrollbar buttons */
+.custom-simplebar .simplebar-scrollbar-button {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* Force thumb visibility */
+.custom-simplebar .simplebar-scrollbar {
+    right: -5px !important;
+    /* Shift to extend beyond track */
+    left: -5px !important;
+    /* Shift to extend beyond track */
+    width: 12px !important;
+    /* Make actual element wider */
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Force bar to display at all times */
+.custom-simplebar[data-simplebar-force-visible="true"] .simplebar-scrollbar {
+    visibility: visible !important;
+    opacity: 1 !important;
+}

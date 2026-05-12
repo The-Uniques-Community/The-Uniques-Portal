@@ -1,0 +1,19 @@
+.svg-shaped-div {
+    position: relative;
+    width: 100%;
+    margin-top: 20px;
+    height: 80vh;
+    /* Full viewport height */
+    background: #e8e8e2;
+    clip-path: url(#heroClip);
+    -webkit-clip-path: url(#heroClip);
+    overflow: hidden;
+}
+
+@media screen and (max-width: 768px) {
+    .svg-shaped-div {
+        height: 50vh;
+        width: 100%;
+    }
+
+}

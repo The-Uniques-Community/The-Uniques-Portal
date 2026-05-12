@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Contact Form Submission</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background-color: #f9f9f9; color: #333; }
+        .container { max-width: 600px; margin: 20px auto; padding: 24px; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border-top: 8px solid #ca0019; border-radius: 8px; }
+        .header { text-align: center; padding-bottom: 20px; border-bottom: 2px solid #424e53; }
+        .header h1 { color: #ca0019; font-size: 24px; margin-bottom: 10px; }
+        .header p { font-size: 14px; color: #424e53; }
+        .notification-banner { text-align: center; padding: 16px; background-color: #003366; color: white; border-radius: 6px; margin-top: 20px; }
+        .notification-banner h2 { font-size: 20px; font-weight: bold; }
+        .message-body { padding: 20px 0; color: #424e53; font-size: 16px; line-height: 1.6; }
+        .contact-box { background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin: 20px 0; }
+        .contact-box h3 { color: #ca0019; margin-bottom: 12px; font-size: 18px; }
+        .contact-item { margin-bottom: 8px; }
+        .contact-label { font-weight: bold; display: inline-block; width: 120px; }
+        .message-box { background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin: 20px 0; }
+        .message-box h3 { color: #ca0019; margin-bottom: 12px; font-size: 18px; }
+        .services-box { background-color: #edf7ed; border: 1px solid #c3e6cb; border-radius: 6px; padding: 15px; margin: 15px 0; }
+        .services-title { font-weight: bold; margin-bottom: 10px; color: #28a745; }
+        .service-tag { display: inline-block; background-color: #28a745; color: white; padding: 4px 10px; border-radius: 16px; font-size: 12px; margin-right: 6px; margin-bottom: 6px; }
+        .cta-button { display: block; width: 200px; margin: 24px auto; padding: 12px 24px; background-color: #ca0019; color: white; text-decoration: none; text-align: center; border-radius: 4px; font-weight: bold; }
+        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; border-top: 1px solid #eee; padding-top: 20px; }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>New Contact Form Submission</h1>
+            <p>A visitor has submitted the contact form on The Uniques Community website.</p>
+        </div>
+        
+        <div class="notification-banner">
+            <h2>New Enquiry Received</h2>
+        </div>
+        
+        <div class="message-body">
+            <p>A new contact form has been submitted with the following details:</p>
+            
+            <div class="contact-box">
+                <h3>Contact Information</h3>
+                <div class="contact-item"><span class="contact-label">Name:</span> ${firstName} ${lastName}</div>
+                <div class="contact-item"><span class="contact-label">Email:</span> ${email}</div>
+                <div class="contact-item"><span class="contact-label">Phone:</span> ${phone || 'Not provided'}</div>
+            </div>
+            
+            ${services && services.length > 0 ? `
+            <div class="services-box">
+                <p class="services-title">Interested Services:</p>
+                <div>
+                    ${services.map(service => `<span class="service-tag">${service}</span>`).join(' ')}
+                </div>
+            </div>
+            ` : ''}
+            
+            <div class="message-box">
+                <h3>Message</h3>
+                <p style="white-space: pre-line;">${message}</p>
+            </div>
+            
+            <p>Please respond to this inquiry as soon as possible.</p>
+            
+            <a href="mailto:${email}" class="cta-button">Reply to ${firstName}</a>
+        </div>
+        
+        <div class="footer">
+            <p>This is an automated message from The Uniques Community website contact form.</p>
+            <p>&copy; ${new Date().getFullYear()} The Uniques Community. All Rights Reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
+        

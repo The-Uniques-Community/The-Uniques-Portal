@@ -1,0 +1,33 @@
+.svg-shaped-div {
+    position: relative;
+    width: 100%;
+    margin-top: 20px;
+    height: 80vh;
+    /* Full viewport height */
+    background: #e8e8e2;
+    clip-path: url(#heroClip);
+    -webkit-clip-path: url(#heroClip);
+    overflow: hidden;
+}
+
+@media screen and (max-width: 768px) {
+    .svg-shaped-div {
+        height: 50vh;
+        width: 100%;
+    }
+
+}
+
+g {
+    clip-path: url(#clip0_242_492);
+    transform: matrix(-0.62105, 0.32296, -0.32296, -0.62105, 34.693, 19.3954);
+}
+
+.st0 {
+    fill: none;
+    stroke: #ececec;
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-miterlimit: 6;
+}
