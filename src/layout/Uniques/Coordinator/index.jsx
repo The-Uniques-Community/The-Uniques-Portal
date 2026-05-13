@@ -24,6 +24,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import GroupIcon from "@mui/icons-material/Group";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import LogoutIcon from "@mui/icons-material/Logout";
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { toast } from "react-toastify";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
@@ -44,6 +45,7 @@ const STUDENT_NAVIGATION = [
   { segment: "events-overview", title: "Events", icon: <EventIcon /> },
   { segment: "accounts", title: "Accounts", icon: <AccountBalance/> },
   { segment: "enquiry", title: "Enquiry", icon: <AnnouncementIcon/> },
+  { segment: "leave-management", title: "Leave Management", icon: <CalendarMonthIcon /> },
   { segment: "profile", title: "Profile", icon: <UserIcon/> },
   { segment: "trainers", title: "Trainers", icon: <SchoolIcon /> },
   { segment: "uniques360", title: "Uniques 360", icon: <AssignmentTurnedInIcon /> },

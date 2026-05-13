@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import memberRoute from "./routes/member/memberRoute.js";
 import adminRoute from "./routes/admin/adminRoute.js";
 import blogRouter from "./routes/member/blogRoute.js";
+import leaveRoute from "./routes/member/leaveRoute.js";
 import passport from './config/passport.js';
 import authRoutes from './routes/Authentication/auth.routes.js';
 import passwordResetRoutes from './routes/member/otpRoute.js'
@@ -43,6 +44,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/member", memberRoute);
+app.use("/api/leave", leaveRoute);
 app.use("/api/fine", memberFineRoute)
 app.use("/api/admin", adminRoute);
 app.use("/api/admin/member",memberAdminRouter)
