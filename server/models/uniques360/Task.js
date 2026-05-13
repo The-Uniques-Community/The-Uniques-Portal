@@ -42,6 +42,13 @@ const taskSchema = new mongoose.Schema({
     type: String,
     default: "General",
   }
+  ,
+  completedBy: {
+    type: String, // store user id (string) who marked completed
+  },
+  completedAt: {
+    type: Date,
+  }
 }, { timestamps: true });
 
 const Task = mongoose.model("Task", taskSchema);

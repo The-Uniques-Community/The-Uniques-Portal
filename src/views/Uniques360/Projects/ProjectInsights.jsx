@@ -63,6 +63,18 @@ const ProjectInsights = () => {
     fetchProjectTasks();
   }, []);
 
+  const handleMarkComplete = async (taskId) => {
+    if (!window.confirm("Mark this task as completed?")) return;
+    try {
+      await axios.patch(`${BASE_URL}/api/uniques360/tasks/${taskId}`, { status: "completed" }, { withCredentials: true });
+      toast.success("Task marked completed");
+      fetchProjectTasks();
+    } catch (error) {
+      console.error("Error marking task completed:", error);
+      toast.error("Failed to mark task completed");
+    }
+  };
+
   const stats = {
     total: tasks.length,
     ongoing: tasks.filter(t => t.status === "in-progress" || t.status === "pending").length,
@@ -214,9 +226,16 @@ const ProjectInsights = () => {
                       </Typography>
                     </TableCell>
                     <TableCell align="right">
-                      <IconButton size="small">
-                        <OpenIcon fontSize="small" sx={{ color: themeColors.gray }} />
-                      </IconButton>
+                      <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                        {task.status !== 'completed' && (
+                          <IconButton size="small" onClick={() => handleMarkComplete(task._id)} title="Mark complete">
+                            <CompletedIcon fontSize="small" sx={{ color: themeColors.red }} />
+                          </IconButton>
+                        )}
+                        <IconButton size="small">
+                          <OpenIcon fontSize="small" sx={{ color: themeColors.gray }} />
+                        </IconButton>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ))}

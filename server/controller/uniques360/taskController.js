@@ -63,11 +63,42 @@ export const updateTaskStatus = async (req, res) => {
     const { taskId } = req.params;
     const { status } = req.body;
 
-    const task = await Task.findByIdAndUpdate(taskId, { status }, { new: true });
-    if (!task) {
-      return res.status(404).json({ message: "Task not found" });
+    const task = await Task.findById(taskId);
+    if (!task) return res.status(404).json({ message: "Task not found" });
+
+    const requesterId = req.user.id || req.user._id;
+
+    // If marking as completed, allow assigned member(s) or the coordinator who assigned it
+    if (status === "completed") {
+      // Normalize assignedTo to array of strings
+      let team = [];
+      if (Array.isArray(task.assignedTo)) {
+        team = task.assignedTo.map(id => id ? id.toString() : null).filter(Boolean);
+      } else if (task.assignedTo) {
+        team = [task.assignedTo.toString()];
+      }
+
+      const isAssigned = team.includes(requesterId);
+      const isCoordinator = task.assignedBy && task.assignedBy.toString() === requesterId;
+
+      if (!isAssigned && !isCoordinator) {
+        return res.status(403).json({ message: "Unauthorized to mark this task completed" });
+      }
+
+      task.status = "completed";
+      task.completedBy = requesterId.toString();
+      task.completedAt = new Date();
+      await task.save();
+      return res.status(200).json({ message: "Task marked completed", task });
     }
 
+    // For other status updates, only allow coordinator (assignedBy)
+    if (task.assignedBy && task.assignedBy.toString() !== requesterId) {
+      return res.status(403).json({ message: "Unauthorized to update task status" });
+    }
+
+    task.status = status;
+    await task.save();
     res.status(200).json({ message: "Task status updated", task });
   } catch (error) {
     res.status(500).json({ message: "Error updating task", error: error.message });
