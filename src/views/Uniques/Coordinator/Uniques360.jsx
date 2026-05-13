@@ -374,7 +374,7 @@ const Uniques360Coordinator = () => {
                     label="Filter by Batch"
                     onChange={(e) => {
                       setSelectedBatch(e.target.value);
-                      setNewTask({ ...newTask, assignedTo: "" }); // Reset selected member when batch changes
+                      setNewTask({ ...newTask, assignedTo: [] }); // Reset selected member when batch changes
                     }}
                   >
                     <MenuItem value=""><em>All Batches</em></MenuItem>
