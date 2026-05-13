@@ -32,9 +32,9 @@ import {
   Card,
   CardContent,
 } from "@mui/material";
-import { 
-  Add as AddIcon, 
-  Visibility as ViewIcon, 
+import {
+  Add as AddIcon,
+  Visibility as ViewIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   CheckCircle as CompleteIcon,
@@ -65,7 +65,7 @@ const Uniques360Coordinator = () => {
     taskType: "project",
   });
   const [selectedBatch, setSelectedBatch] = useState("");
-  
+
   // New States
   const [reportsOpen, setReportsOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
@@ -107,7 +107,7 @@ const Uniques360Coordinator = () => {
     init();
   }, []);
 
-  const filteredMembers = selectedBatch 
+  const filteredMembers = selectedBatch
     ? members.filter(member => member.batch === selectedBatch)
     : members;
 
@@ -212,23 +212,23 @@ const Uniques360Coordinator = () => {
   const { isDarkMode } = useThemeContext();
 
   if (loading) return (
-    <Box sx={{ 
-      display: 'flex', 
+    <Box sx={{
+      display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'center', 
+      justifyContent: 'center',
       alignItems: 'center',
       height: '80vh',
       gap: 3
     }}>
-      <Box 
-        component="img" 
-        src={isDarkMode ? logoWhite : logoCommunity} 
+      <Box
+        component="img"
+        src={isDarkMode ? logoWhite : logoCommunity}
         alt="The Uniques Logo"
         sx={{ height: isDarkMode ? 60 : 80, mb: 1, filter: isDarkMode ? "none" : "drop-shadow(0px 2px 4px rgba(0,0,0,0.1))" }}
       />
       <Box sx={{ width: '300px' }}>
-        <LinearProgress sx={{ 
-          height: 3, 
+        <LinearProgress sx={{
+          height: 3,
           borderRadius: 1,
           bgcolor: isDarkMode ? "#333" : "#f0f0f0",
           "& .MuiLinearProgress-bar": { bgcolor: "#ca0019" }
@@ -250,7 +250,7 @@ const Uniques360Coordinator = () => {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => setOpen(true)}
-          sx={{ bgcolor: "#ca0019", "&:hover": { bgcolor: "#a30014" }, borderRadius: 2 }}
+          sx={{ bgcolor: "#ca0019", "&:hover": { bgcolor: "#a30014" }, borderRadius: 1 }}
         >
           Assign New Task
         </Button>
@@ -259,14 +259,14 @@ const Uniques360Coordinator = () => {
       {/* Navigation Insights Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6}>
-          <Card 
-            sx={{ 
-              cursor: "pointer", 
-              bgcolor: "#ca0019", 
-              color: "white", 
-              borderRadius: 3,
+          <Card
+            sx={{
+              cursor: "pointer",
+              bgcolor: "#ca0019",
+              color: "white",
+              borderRadius: 1.5,
               transition: "transform 0.2s",
-              "&:hover": { transform: "scale(1.02)" }
+              // "&:hover": { transform: "scale(1.02)" }
             }}
             onClick={() => window.location.href = "/coordinator/project-insights"}
           >
@@ -282,14 +282,14 @@ const Uniques360Coordinator = () => {
           </Card>
         </Grid>
         <Grid item xs={12} sm={6}>
-          <Card 
-            sx={{ 
-              cursor: "pointer", 
-              bgcolor: "#1a1a1a", 
-              color: "white", 
-              borderRadius: 3,
+          <Card
+            sx={{
+              cursor: "pointer",
+              bgcolor: "#1a1a1a",
+              color: "white",
+              borderRadius: 1.5,
               transition: "transform 0.2s",
-              "&:hover": { transform: "scale(1.02)" }
+              // "&:hover": { transform: "scale(1.02)" }
             }}
             onClick={() => window.location.href = "/coordinator/event-insights"}
           >
@@ -334,8 +334,8 @@ const Uniques360Coordinator = () => {
                 </TableCell>
                 <TableCell>
                   <Box sx={{ display: "flex", gap: 0.5 }}>
-                    <IconButton 
-                      color="primary" 
+                    <IconButton
+                      color="primary"
                       size="small"
                       title="View Reports"
                       onClick={() => {
@@ -346,8 +346,8 @@ const Uniques360Coordinator = () => {
                     >
                       <ViewIcon fontSize="small" />
                     </IconButton>
-                    <IconButton 
-                      color="secondary" 
+                    <IconButton
+                      color="secondary"
                       size="small"
                       title="Edit Task"
                       onClick={() => {
@@ -360,7 +360,7 @@ const Uniques360Coordinator = () => {
                     >
                       <EditIcon fontSize="small" />
                     </IconButton>
-                    <IconButton 
+                    <IconButton
                       size="small"
                       title="Manage Team"
                       onClick={() => {
@@ -371,8 +371,8 @@ const Uniques360Coordinator = () => {
                       <TeamIcon fontSize="small" />
                     </IconButton>
                     {task.status !== "completed" && (
-                      <IconButton 
-                        color="success" 
+                      <IconButton
+                        color="success"
                         size="small"
                         title="Mark Complete"
                         onClick={() => handleStatusUpdate(task._id, "completed")}
@@ -380,8 +380,8 @@ const Uniques360Coordinator = () => {
                         <CompleteIcon fontSize="small" />
                       </IconButton>
                     )}
-                    <IconButton 
-                      color="error" 
+                    <IconButton
+                      color="error"
                       size="small"
                       title="Delete Task"
                       onClick={() => handleDeleteTask(task._id)}
@@ -417,7 +417,7 @@ const Uniques360Coordinator = () => {
               onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
               required
             />
-            
+
             <FormControl fullWidth required>
               <InputLabel>Task Category</InputLabel>
               <Select
@@ -429,7 +429,7 @@ const Uniques360Coordinator = () => {
                 <MenuItem value="event">Event Assignment</MenuItem>
               </Select>
             </FormControl>
-            
+
             <Grid container spacing={2}>
               <Grid item xs={6}>
                 <FormControl fullWidth>
@@ -439,7 +439,7 @@ const Uniques360Coordinator = () => {
                     label="Filter by Batch"
                     onChange={(e) => {
                       setSelectedBatch(e.target.value);
-                      setNewTask({ ...newTask, assignedTo: "" }); // Reset selected member when batch changes
+                      setNewTask({ ...newTask, assignedTo: [] }); // Reset selected member when batch changes
                     }}
                   >
                     <MenuItem value=""><em>All Batches</em></MenuItem>
@@ -560,12 +560,12 @@ const Uniques360Coordinator = () => {
 
       {/* View Reports Dialog */}
       <Dialog open={reportsOpen} onClose={() => setReportsOpen(false)} fullWidth maxWidth="md">
-        <DialogTitle sx={{ 
-          fontWeight: "bold", 
-          borderBottom: 1, 
-          borderColor: "divider", 
-          display: "flex", 
-          justifyContent: "space-between", 
+        <DialogTitle sx={{
+          fontWeight: "bold",
+          borderBottom: 1,
+          borderColor: "divider",
+          display: "flex",
+          justifyContent: "space-between",
           alignItems: "center",
           bgcolor: "#f8f9fa"
         }}>
@@ -586,10 +586,10 @@ const Uniques360Coordinator = () => {
           ) : (
             <Box sx={{ display: "flex", flexDirection: "column", p: 2 }}>
               {reports.map((report) => (
-                <Box key={report._id} sx={{ 
-                  display: "flex", 
-                  gap: 2, 
-                  p: 2, 
+                <Box key={report._id} sx={{
+                  display: "flex",
+                  gap: 2,
+                  p: 2,
                   "&:hover": { bgcolor: "#f8f9fa" },
                   borderRadius: 1,
                   transition: "background 0.2s"
@@ -632,9 +632,9 @@ const Uniques360Coordinator = () => {
                     <Typography variant="body2" sx={{ fontWeight: "bold" }}>{member.fullName}</Typography>
                     <Typography variant="caption" color="text.secondary">{member.email}</Typography>
                   </Box>
-                  <IconButton 
-                    edge="end" 
-                    color="error" 
+                  <IconButton
+                    edge="end"
+                    color="error"
                     size="small"
                     onClick={() => handleRemoveMember(selectedTask._id, member._id)}
                     disabled={selectedTask.assignedTo.length <= 1}
