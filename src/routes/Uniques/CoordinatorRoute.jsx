@@ -33,7 +33,9 @@ const EventBudget = Loader(lazy(() => import("@/views/Uniques/Coordinator/Events
 const EventView = Loader(lazy(() => import("@/views/Uniques/Coordinator/Events/View")));
 const Enquiry = Loader(lazy(() => import("@/views/Uniques/Coordinator/Enquiry")));
 const Trainers = Loader(lazy(() => import("@/views/Uniques/Coordinator/Trainers")));
-const Uniques360 = Loader(lazy(() => import("@/views/Uniques/Coordinator/Uniques360/uniques360")));
+const Uniques360 = Loader(lazy(() => import("@/views/Uniques/Coordinator/Uniques360")));
+const ProjectInsights = Loader(lazy(() => import("@/views/Uniques360/Projects/ProjectInsights")));
+const EventInsights = Loader(lazy(() => import("@/views/Uniques360/Events/EventInsights")));
 
 const CoordinatorRoute = {
   path: "/coordinator",
@@ -82,6 +84,14 @@ const CoordinatorRoute = {
     {
       path: "/coordinator/uniques360",
       element: <Uniques360 />,
+    },
+    {
+      path: "/coordinator/project-insights",
+      element: <ProjectInsights />,
+    },
+    {
+      path: "/coordinator/event-insights",
+      element: <EventInsights />,
     }
   ],
 };

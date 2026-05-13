@@ -7,6 +7,8 @@ const MemberLayout = Loader(lazy(() => import("@/layout/Uniques/Member")));
 const MemberDashboard = Loader(lazy(() => import("@/views/Uniques/Member")));
 const CreateBlog = Loader(lazy(() => import("@/views/Uniques/Member/Blog")));
 const Uniques360 = Loader(lazy(() => import("@/views/Uniques/Member/Uniques360")));
+const ProjectInsights = Loader(lazy(() => import("@/views/Uniques360/Projects/ProjectInsights")));
+const EventInsights = Loader(lazy(() => import("@/views/Uniques360/Events/EventInsights")));
 const MemberRoutes = {
   path: "/member",
   element: <ProtectedRoute role={'member'} element={<MemberLayout />} />,
@@ -22,6 +24,14 @@ const MemberRoutes = {
     {
       path: "/member/uniques360",
       element: <Uniques360 />,
+    },
+    {
+      path: "/member/project-insights",
+      element: <ProjectInsights />,
+    },
+    {
+      path: "/member/event-insights",
+      element: <EventInsights />,
     }
   ],
 };

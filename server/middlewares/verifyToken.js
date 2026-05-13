@@ -16,9 +16,11 @@ const verifyToken = (req, res, next) => {
 
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) {
+      console.error("JWT Verification Error:", err.message);
       return res.status(401).json({ error: 'Invalid token' });
     }
     
+    console.log("Decoded Token Payload:", decoded);
     req.user = decoded; // Attach decoded token (including role) to the request
     next(); // Proceed to the next middleware/route handler
   });

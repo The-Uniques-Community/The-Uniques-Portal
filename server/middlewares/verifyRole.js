@@ -13,11 +13,15 @@ const verifyRole = (roles) => {
       });
     }
 
-    // Convert single role to array for consistent handling
-    const allowedRoles = Array.isArray(roles) ? roles : [roles];
+    // Convert single role to array for consistent handling and make them lowercase
+    const allowedRoles = (Array.isArray(roles) ? roles : [roles]).map(r => r.toLowerCase());
     
+    const userRole = req.user.role ? req.user.role.toLowerCase() : '';
+    console.log(`Checking authorization. User role: ${userRole}, Allowed roles: ${allowedRoles}`);
+
     // Check if user has one of the allowed roles
-    if (!allowedRoles.includes(req.user.role)) {
+    if (!allowedRoles.includes(userRole)) {
+      console.log(`Authorization failed for user role: ${userRole}`);
       return res.status(403).json({ 
         success: false, 
         message: `Unauthorized: You need ${allowedRoles.length > 1 ? 'one of these roles' : 'the role'}: ${allowedRoles.join(', ')}` 

@@ -19,14 +19,18 @@ const ProtectedRoute = ({ role, element, redirectPath = "/401" }) => {
   useEffect(() => {
     const verifyUserRole = async () => {
       try {
+        console.log(`Verifying role: ${role}`);
         if (role) {
           // Call the backend endpoint that verifies the role using the verifyRole middleware
-          await axios.get(`http://localhost:5000/auth/verify_role?role=${role}`, {
+          const response = await axios.get(`http://localhost:5000/auth/verify_role?role=${role}`, {
             withCredentials: true,
           });
+          console.log("Verification successful:", response.data);
         }
         setAuthorized(true);
       } catch (error) {
+        console.error("Authorization failed detailed:", error.response?.data);
+        console.error("Authorization failed message:", error.message);
         // If the error is due to token expiry or invalid token, automatically log out
         if (error.response && error.response.status === 401) {
           await logout();

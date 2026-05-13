@@ -9,24 +9,32 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 let auth;
-if (process.env.NODE_ENV === 'production') {
-  // Load credentials from environment variable
-  const serviceAccount = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT);
-  serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n'); 
-  auth = new google.auth.GoogleAuth({
-    credentials: serviceAccount,
-    scopes: SCOPES,
-  });
-} else {
-  // Load credentials from a local service.json file for development
-  const KEYFILEPATH = path.join(__dirname, '../service.json');
-  auth = new google.auth.GoogleAuth({
-    keyFile: KEYFILEPATH,
-    scopes: SCOPES,
-  });
+try {
+  if (process.env.NODE_ENV === 'production' && process.env.GOOGLE_SERVICE_ACCOUNT) {
+    // Load credentials from environment variable
+    const serviceAccount = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT);
+    serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n'); 
+    auth = new google.auth.GoogleAuth({
+      credentials: serviceAccount,
+      scopes: SCOPES,
+    });
+  } else {
+    // Load credentials from a local service.json file for development
+    const KEYFILEPATH = path.join(__dirname, '../service.json');
+    if (fs.existsSync(KEYFILEPATH)) {
+      auth = new google.auth.GoogleAuth({
+        keyFile: KEYFILEPATH,
+        scopes: SCOPES,
+      });
+    } else {
+      console.warn('Warning: Google Drive credentials (service.json or GOOGLE_SERVICE_ACCOUNT) not found. Drive features will be disabled.');
+    }
+  }
+} catch (error) {
+  console.error('Error initializing Google Drive service:', error);
 }
 
-const drive = google.drive({ version: 'v3', auth });
+const drive = auth ? google.drive({ version: 'v3', auth }) : null;
 
 /**
  * Create a folder on Google Drive.
@@ -37,6 +45,10 @@ export async function createFolder(name, parentId = null) {
     mimeType: 'application/vnd.google-apps.folder',
     ...(parentId && { parents: [parentId] }),
   };
+
+  if (!drive) {
+    throw new Error('Google Drive service not initialized. Check credentials.');
+  }
 
   const folder = await drive.files.create({
     resource: fileMetadata,
@@ -53,6 +65,10 @@ export async function findFolder(name, parentId = null) {
   if (parentId) {
     query += ` and '${parentId}' in parents`;
   }
+  if (!drive) {
+    throw new Error('Google Drive service not initialized. Check credentials.');
+  }
+
   const res = await drive.files.list({
     q: query,
     fields: 'files(id, name)',
@@ -139,6 +155,10 @@ export async function uploadFile(filePath, destinationFolderId, options = {}) {
   const media = {
     body: fs.createReadStream(filePath),
   };
+
+  if (!drive) {
+    throw new Error('Google Drive service not initialized. Check credentials.');
+  }
 
   // Upload the file
   const file = await drive.files.create({

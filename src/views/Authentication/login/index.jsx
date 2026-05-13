@@ -163,22 +163,28 @@ const Login = () => {
               });
               const data = await res.json();
               if (res.ok) {
+                console.log("Login successful, role received:", data.role);
                 toast.success("Logged in successfully");
                 // Use the role from the response to navigate accordingly
                 switch (data.role) {
                   case "member":
+                    console.log("Navigating to /member");
                     navigate("/member");
                     break;
                   case "coordinator":
+                    console.log("Navigating to /coordinator");
                     navigate("/coordinator");
                     break;
                   case "communityadmin":
+                    console.log("Navigating to /community");
                     navigate("/community");
                     break;
                   case "admin":
+                    console.log("Navigating to /admin");
                     navigate("/admin");
                     break;
                   default:
+                    console.log("Navigating to / (default)");
                     navigate("/");
                 }
               } else {
