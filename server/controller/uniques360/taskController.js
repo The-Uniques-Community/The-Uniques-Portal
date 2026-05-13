@@ -1,5 +1,6 @@
 import Task from "../../models/uniques360/Task.js";
 import Member from "../../models/member/memberModel.js";
+import Report from "../../models/uniques360/Report.js";
 
 // Create a new task (Coordinator/Admin only)
 export const createTask = async (req, res) => {
@@ -49,8 +50,37 @@ export const getCoordinatorTasks = async (req, res) => {
   try {
     const { coordinatorId } = req.params;
     const id = coordinatorId === "current" ? req.user.id : coordinatorId;
-    const tasks = await Task.find({ assignedBy: id }).populate("assignedTo", "fullName email").sort({ createdAt: -1 });
-    res.status(200).json(tasks);
+    const tasks = await Task.find({ assignedBy: id })
+      .populate("assignedTo", "fullName email")
+      .sort({ createdAt: -1 });
+
+    const taskIds = tasks.map((task) => task._id);
+    const reports = await Report.find({ taskId: { $in: taskIds } })
+      .select("taskId reportContent submissionDate")
+      .sort({ submissionDate: -1 });
+
+    const progressByTask = new Map();
+
+    for (const report of reports) {
+      const taskId = report.taskId?.toString();
+      if (!taskId || progressByTask.has(taskId)) continue;
+
+      const match = report.reportContent?.match(/(\d{1,3})\s*%/);
+      if (!match) continue;
+
+      const value = Number(match[1]);
+      if (Number.isNaN(value)) continue;
+
+      progressByTask.set(taskId, Math.max(0, Math.min(100, value)));
+    }
+
+    const enrichedTasks = tasks.map((task) => {
+      const plainTask = task.toObject();
+      plainTask.progressPercent = progressByTask.get(task._id.toString()) ?? null;
+      return plainTask;
+    });
+
+    res.status(200).json(enrichedTasks);
   } catch (error) {
     res.status(500).json({ message: "Error fetching tasks", error: error.message });
   }
@@ -90,14 +120,14 @@ export const addMemberToTask = async (req, res) => {
       team = [task.assignedTo.toString()];
     }
 
-    // Check if the current user is already assigned to this task
+    // Coordinator can manage their own task team, and existing members can invite as well.
     const currentUserId = req.user.id || req.user._id;
+    const isCoordinator = task.assignedBy?.toString() === currentUserId;
     const isMember = team.includes(currentUserId);
     
-    if (!isMember) {
+    if (!isCoordinator && !isMember) {
       return res.status(403).json({ 
-        message: "Unauthorized: You are not a member of this project",
-        debug: { userId: currentUserId, team: team }
+        message: "Unauthorized to manage this project team",
       });
     }
 
@@ -159,7 +189,7 @@ export const addMemberToTask = async (req, res) => {
 export const updateTask = async (req, res) => {
   try {
     const { taskId } = req.params;
-    const { title, description, deadline, priority, projectCategory } = req.body;
+    const { title, description, deadline, priority, projectCategory, status, assignedTo } = req.body;
 
     const task = await Task.findById(taskId);
     if (!task) return res.status(404).json({ message: "Task not found" });
@@ -169,11 +199,36 @@ export const updateTask = async (req, res) => {
       return res.status(403).json({ message: "Unauthorized to update this task" });
     }
 
-    const updatedTask = await Task.findByIdAndUpdate(
-      taskId,
-      { title, description, deadline, priority, projectCategory },
-      { new: true }
-    ).populate("assignedTo", "fullName email");
+    const updatePayload = {
+      title,
+      description,
+      deadline,
+      priority,
+      projectCategory,
+      status,
+    };
+
+    if (Array.isArray(assignedTo)) {
+      const memberIds = assignedTo.filter(Boolean);
+      const members = await Member.find({ _id: { $in: memberIds } }).select("_id");
+
+      if (members.length !== memberIds.length) {
+        return res.status(404).json({ message: "One or more assigned members not found" });
+      }
+
+      updatePayload.assignedTo = memberIds;
+    }
+
+    Object.keys(updatePayload).forEach((key) => {
+      if (updatePayload[key] === undefined) {
+        delete updatePayload[key];
+      }
+    });
+
+    const updatedTask = await Task.findByIdAndUpdate(taskId, updatePayload, {
+      new: true,
+      runValidators: true,
+    }).populate("assignedTo", "fullName email");
 
     res.status(200).json({ message: "Task updated successfully", task: updatedTask });
   } catch (error) {
