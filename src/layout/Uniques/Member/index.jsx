@@ -17,6 +17,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import GroupIcon from "@mui/icons-material/Group";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import LogoutIcon from "@mui/icons-material/Logout";
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { toast } from "react-toastify";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
@@ -33,6 +34,7 @@ const STUDENT_NAVIGATION = [
   { segment: "", title: "Dashboard", icon: <DashboardIcon /> },
   { segment: "createBlog", title: "Create Blog", icon: <BookIcon /> },
   { segment: "uniques360", title: "Uniques 360", icon: <AssignmentTurnedInIcon /> },
+  { segment: "leaveManagement", title: "Leave Management", icon: <CalendarMonthIcon/> },
 
   // { segment: "JobPosting", title: "Post Job", icon: <PublishIcon /> },
   // { segment: "profile", title: "Profile", icon: <AccountCircleIcon /> },

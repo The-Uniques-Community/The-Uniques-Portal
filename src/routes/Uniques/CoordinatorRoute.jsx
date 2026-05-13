@@ -34,6 +34,7 @@ const EventView = Loader(lazy(() => import("@/views/Uniques/Coordinator/Events/V
 const Enquiry = Loader(lazy(() => import("@/views/Uniques/Coordinator/Enquiry")));
 const Trainers = Loader(lazy(() => import("@/views/Uniques/Coordinator/Trainers")));
 const Uniques360 = Loader(lazy(() => import("@/views/Uniques/Coordinator/Uniques360/uniques360")));
+const LeaveManagement = Loader(lazy(() => import("@/views/Uniques/Coordinator/LeaveManagement")));
 
 const CoordinatorRoute = {
   path: "/coordinator",
@@ -82,6 +83,10 @@ const CoordinatorRoute = {
     {
       path: "/coordinator/uniques360",
       element: <Uniques360 />,
+    },
+    {
+      path: "/coordinator/leave-management",
+      element: <LeaveManagement />,
     }
   ],
 };
