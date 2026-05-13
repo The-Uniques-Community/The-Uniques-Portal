@@ -40,7 +40,9 @@ import {
   CheckCircle as CompleteIcon,
   People as TeamIcon,
   Close as CloseIcon,
-  History as HistoryIcon
+  History as HistoryIcon,
+  Assignment as ProjectIcon,
+  Timeline as TimelineIcon
 } from "@mui/icons-material";
 import axios from "axios";
 import { BASE_URL } from "@/config";
@@ -60,6 +62,7 @@ const Uniques360Coordinator = () => {
     assignedTo: [],
     deadline: "",
     priority: "medium",
+    taskType: "project",
   });
   const [selectedBatch, setSelectedBatch] = useState("");
   
@@ -120,7 +123,7 @@ const Uniques360Coordinator = () => {
       toast.success("Task assigned successfully");
       setOpen(false);
       fetchTasks();
-      setNewTask({ title: "", description: "", assignedTo: [], deadline: "", priority: "medium" });
+      setNewTask({ title: "", description: "", assignedTo: [], deadline: "", priority: "medium", taskType: "project" });
       setSelectedBatch("");
     } catch (error) {
       toast.error("Error creating task");
@@ -247,11 +250,61 @@ const Uniques360Coordinator = () => {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => setOpen(true)}
-          sx={{ bgcolor: "#ca0019", "&:hover": { bgcolor: "#a30014" } }}
+          sx={{ bgcolor: "#ca0019", "&:hover": { bgcolor: "#a30014" }, borderRadius: 2 }}
         >
           Assign New Task
         </Button>
       </Box>
+
+      {/* Navigation Insights Cards */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} sm={6}>
+          <Card 
+            sx={{ 
+              cursor: "pointer", 
+              bgcolor: "#ca0019", 
+              color: "white", 
+              borderRadius: 3,
+              transition: "transform 0.2s",
+              "&:hover": { transform: "scale(1.02)" }
+            }}
+            onClick={() => window.location.href = "/coordinator/project-insights"}
+          >
+            <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <Box sx={{ p: 1, bgcolor: "rgba(255,255,255,0.2)", borderRadius: "50%" }}>
+                <ProjectIcon fontSize="large" />
+              </Box>
+              <Box>
+                <Typography variant="h5" sx={{ fontWeight: "bold" }}>Project Insights</Typography>
+                <Typography variant="body2">View detailed project analytics and team progress</Typography>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <Card 
+            sx={{ 
+              cursor: "pointer", 
+              bgcolor: "#1a1a1a", 
+              color: "white", 
+              borderRadius: 3,
+              transition: "transform 0.2s",
+              "&:hover": { transform: "scale(1.02)" }
+            }}
+            onClick={() => window.location.href = "/coordinator/event-insights"}
+          >
+            <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <Box sx={{ p: 1, bgcolor: "rgba(255,255,255,0.1)", borderRadius: "50%" }}>
+                <TimelineIcon fontSize="large" sx={{ color: "#ca0019" }} />
+              </Box>
+              <Box>
+                <Typography variant="h5" sx={{ fontWeight: "bold" }}>Event Insights</Typography>
+                <Typography variant="body2">Track event tasks and student assignments</Typography>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
       <TableContainer component={Paper} elevation={3} sx={{ borderRadius: 2 }}>
         <Table>
@@ -364,6 +417,18 @@ const Uniques360Coordinator = () => {
               onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
               required
             />
+            
+            <FormControl fullWidth required>
+              <InputLabel>Task Category</InputLabel>
+              <Select
+                value={newTask.taskType}
+                label="Task Category"
+                onChange={(e) => setNewTask({ ...newTask, taskType: e.target.value })}
+              >
+                <MenuItem value="project">Project Assignment</MenuItem>
+                <MenuItem value="event">Event Assignment</MenuItem>
+              </Select>
+            </FormControl>
             
             <Grid container spacing={2}>
               <Grid item xs={6}>

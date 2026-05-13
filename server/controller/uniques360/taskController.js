@@ -4,7 +4,7 @@ import Member from "../../models/member/memberModel.js";
 // Create a new task (Coordinator/Admin only)
 export const createTask = async (req, res) => {
   try {
-    const { title, description, assignedTo, deadline, priority, projectCategory } = req.body;
+    const { title, description, assignedTo, deadline, priority, projectCategory, taskType } = req.body;
     
     // Check if assignedTo is an array, if not make it one
     const memberIds = Array.isArray(assignedTo) ? assignedTo : [assignedTo];
@@ -22,6 +22,7 @@ export const createTask = async (req, res) => {
       assignedBy: req.user.id, // Assuming req.user is set by auth middleware
       deadline,
       priority,
+      taskType,
       projectCategory
     });
 
@@ -159,7 +160,7 @@ export const addMemberToTask = async (req, res) => {
 export const updateTask = async (req, res) => {
   try {
     const { taskId } = req.params;
-    const { title, description, deadline, priority, projectCategory } = req.body;
+    const { title, description, deadline, priority, projectCategory, taskType } = req.body;
 
     const task = await Task.findById(taskId);
     if (!task) return res.status(404).json({ message: "Task not found" });
@@ -171,7 +172,7 @@ export const updateTask = async (req, res) => {
 
     const updatedTask = await Task.findByIdAndUpdate(
       taskId,
-      { title, description, deadline, priority, projectCategory },
+      { title, description, deadline, priority, projectCategory, taskType },
       { new: true }
     ).populate("assignedTo", "fullName email");
 

@@ -5,10 +5,10 @@ import Admin from "../../models/admin/adminModel.js";
 import bcrypt from "bcrypt";
 import CommunityAdmin from "../../models/community/communityAdmin.js";
 
-const generateToken = (member) => {
+const generateToken = (member, fallbackRole) => {
   const payload = {
-    id: member._id,
-    role: member.role,
+    id: member._id || member.id,
+    role: member.role || fallbackRole,
     batch: member.batch || null,
   };
   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1d" });
@@ -21,7 +21,7 @@ export const googleCallback = (req, res, next) => {
   }
 
   // Generate token for the authenticated user
-  const token = generateToken(req.user);
+  const token = generateToken(req.user, req.user.role);
   // Extract the user role from req.user
   const userRole = req.user.role;
 
@@ -137,7 +137,7 @@ export const emailLogin = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials." });
     }
 
-    const token = generateToken(member);
+    const token = generateToken(member, role);
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -146,7 +146,7 @@ export const emailLogin = async (req, res) => {
 
     return res.json({
       message: "Logged in successfully.",
-      role: member.role,
+      role: member.role || role,
       member,
     });
   } catch (error) {

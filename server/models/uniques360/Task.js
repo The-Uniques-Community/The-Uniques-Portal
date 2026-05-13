@@ -32,6 +32,12 @@ const taskSchema = new mongoose.Schema({
     enum: ["low", "medium", "high"],
     default: "medium",
   },
+  taskType: {
+    type: String,
+    enum: ["project", "event"],
+    default: "project",
+    required: true,
+  },
   projectCategory: {
     type: String,
     default: "General",
