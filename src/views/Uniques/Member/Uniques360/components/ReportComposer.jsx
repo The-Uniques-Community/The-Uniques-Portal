@@ -28,7 +28,7 @@ const ReportComposer = ({ selectedTask, newReport, setNewReport, progressPercent
           }}
         />
 
-          <IconButton color="primary" onClick={onSubmit} disabled={!newReport.trim() || sending}>
+          <IconButton color="primary" onClick={onSubmit} disabled={(!newReport.trim() && progressPercent === "") || sending}>
             {sending ? <CircularProgress size={20} /> : <SendIcon />}
           </IconButton>
         </Box>

@@ -15,6 +15,12 @@ const reportSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  progressPercent: {
+    type: Number,
+    min: 0,
+    max: 100,
+    default: null,
+  },
   attachments: [{
     type: String, // URLs to files/images
   }],

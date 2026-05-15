@@ -13,6 +13,10 @@ import {
   CircularProgress,
   LinearProgress,
   Avatar,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 
 import {
@@ -24,6 +28,7 @@ import {
   People as TeamIcon,
   Close as CloseIcon,
   History as HistoryIcon,
+  Refresh as RefreshIcon,
 } from "@mui/icons-material";
 
 import axios from "axios";
@@ -42,6 +47,7 @@ const Uniques360Coordinator = () => {
   const [tasks, setTasks] = useState([]);
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [tasksLoading, setTasksLoading] = useState(false);
 
   const [submitting, setSubmitting] = useState(false);
 
@@ -86,6 +92,7 @@ const Uniques360Coordinator = () => {
 
   const fetchTasks = async () => {
     try {
+      setTasksLoading(true);
       const response = await axios.get(
         `${BASE_URL}/api/uniques360/tasks/coordinator/current`,
         {
@@ -93,12 +100,17 @@ const Uniques360Coordinator = () => {
         }
       );
 
-      setTasks(response.data || []);
+      const tasksData = Array.isArray(response.data) ? response.data : response.data?.tasks || response.data || [];
+      setTasks(tasksData);
+      console.log("Tasks fetched successfully:", tasksData);
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching tasks:", error);
       toast.error(
         error.response?.data?.message || "Failed to fetch tasks"
       );
+      setTasks([]);
+    } finally {
+      setTasksLoading(false);
     }
   };
 
@@ -129,10 +141,14 @@ const Uniques360Coordinator = () => {
       try {
         setLoading(true);
 
-        await Promise.all([
-          fetchTasks(),
-          fetchMembers(),
-        ]);
+        // Fetch tasks first to ensure they are loaded
+        await fetchTasks();
+        
+        // Then fetch members
+        await fetchMembers();
+      } catch (error) {
+        console.error("Error initializing:", error);
+        toast.error("Failed to load dashboard");
       } finally {
         setLoading(false);
       }
@@ -175,13 +191,8 @@ const Uniques360Coordinator = () => {
 
       toast.success("Task assigned successfully");
 
-      const createdTask = response.data?.task;
-      if (createdTask) {
-        setTasks((prev) => [createdTask, ...(Array.isArray(prev) ? prev : [])]);
-      }
-
+      // Reset form
       setOpen(false);
-
       setNewTask({
         title: "",
         description: "",
@@ -191,16 +202,14 @@ const Uniques360Coordinator = () => {
         taskType: "project",
       });
       setNewTaskRoles({});
-
       setSelectedBatch("");
 
-      fetchTasks();
+      // Fetch updated tasks from server to ensure consistency
+      await fetchTasks();
     } catch (error) {
-      console.error(error);
-
+      console.error("Error creating task:", error);
       toast.error(
-        error.response?.data?.message ||
-          "Error creating task"
+        error.response?.data?.message || "Error creating task"
       );
     } finally {
       setSubmitting(false);
@@ -209,10 +218,7 @@ const Uniques360Coordinator = () => {
 
   // ================= UPDATE STATUS =================
 
-  const handleStatusUpdate = async (
-    taskId,
-    newStatus
-  ) => {
+  const handleStatusUpdate = async (taskId, newStatus) => {
     try {
       await axios.patch(
         `${BASE_URL}/api/uniques360/tasks/${taskId}`,
@@ -224,13 +230,12 @@ const Uniques360Coordinator = () => {
 
       toast.success(`Task marked as ${newStatus}`);
 
-      fetchTasks();
+      // Fetch updated tasks to ensure consistency
+      await fetchTasks();
     } catch (error) {
-      console.error(error);
-
+      console.error("Error updating status:", error);
       toast.error(
-        error.response?.data?.message ||
-          "Error updating status"
+        error.response?.data?.message || "Error updating status"
       );
     }
   };
@@ -373,6 +378,15 @@ const Uniques360Coordinator = () => {
     }
   };
 
+  // ================= TASK STATISTICS =================
+
+  const taskStats = {
+    total: tasks.length,
+    pending: tasks.filter((t) => t.status === "pending").length,
+    inProgress: tasks.filter((t) => t.status === "in-progress").length,
+    completed: tasks.filter((t) => t.status === "completed").length,
+  };
+
   const filteredTasks = tasks.filter((task) => {
     const typeOk = taskTypeFilter === "all" || task.taskType === taskTypeFilter;
     const statusOk = statusFilter === "all" || task.status === statusFilter;
@@ -464,7 +478,125 @@ const Uniques360Coordinator = () => {
         </Button>
       </Box>
 
-      <Box sx={{ mb: 3, display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" }, gap: 2 }}>
+      {/* TASK STATUS SUMMARY */}
+
+      <Box sx={{ mb: 4, display: "grid", gridTemplateColumns: { xs: "1fr 1fr", md: "repeat(4, 1fr)" }, gap: 2 }}>
+        <Paper
+          sx={{
+            p: 2.5,
+            textAlign: "center",
+            bgcolor: "background.paper",
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: 2,
+            transition: "all 0.3s ease",
+            "&:hover": {
+              boxShadow: 3,
+              borderColor: "#ca0019",
+            },
+          }}
+        >
+          <Typography variant="body2" color="textSecondary" sx={{ mb: 0.5 }}>
+            Total Tasks
+          </Typography>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: "bold",
+              color: "#ca0019",
+            }}
+          >
+            {taskStats.total}
+          </Typography>
+        </Paper>
+
+        <Paper
+          sx={{
+            p: 2.5,
+            textAlign: "center",
+            bgcolor: "background.paper",
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: 2,
+            transition: "all 0.3s ease",
+            "&:hover": {
+              boxShadow: 3,
+              borderColor: "#FFA500",
+            },
+          }}
+        >
+          <Typography variant="body2" color="textSecondary" sx={{ mb: 0.5 }}>
+            Pending
+          </Typography>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: "bold",
+              color: "#FFA500",
+            }}
+          >
+            {taskStats.pending}
+          </Typography>
+        </Paper>
+
+        <Paper
+          sx={{
+            p: 2.5,
+            textAlign: "center",
+            bgcolor: "background.paper",
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: 2,
+            transition: "all 0.3s ease",
+            "&:hover": {
+              boxShadow: 3,
+              borderColor: "#2196F3",
+            },
+          }}
+        >
+          <Typography variant="body2" color="textSecondary" sx={{ mb: 0.5 }}>
+            In Progress
+          </Typography>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: "bold",
+              color: "#2196F3",
+            }}
+          >
+            {taskStats.inProgress}
+          </Typography>
+        </Paper>
+
+        <Paper
+          sx={{
+            p: 2.5,
+            textAlign: "center",
+            bgcolor: "background.paper",
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: 2,
+            transition: "all 0.3s ease",
+            "&:hover": {
+              boxShadow: 3,
+              borderColor: "#4CAF50",
+            },
+          }}
+        >
+          <Typography variant="body2" color="textSecondary" sx={{ mb: 0.5 }}>
+            Completed
+          </Typography>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: "bold",
+              color: "#4CAF50",
+            }}
+          >
+            {taskStats.completed}
+          </Typography>
+        </Paper>
+      </Box>
         <FormControl fullWidth size="small">
           <InputLabel>Filter by Type</InputLabel>
           <Select value={taskTypeFilter} label="Filter by Type" onChange={(e) => setTaskTypeFilter(e.target.value)}>
@@ -478,7 +610,7 @@ const Uniques360Coordinator = () => {
           <InputLabel>Filter by Status</InputLabel>
           <Select value={statusFilter} label="Filter by Status" onChange={(e) => setStatusFilter(e.target.value)}>
             <MenuItem value="all">All Status</MenuItem>
-            <MenuItem value="pending">Todo</MenuItem>
+            <MenuItem value="pending">Pending</MenuItem>
             <MenuItem value="in-progress">In Progress</MenuItem>
             <MenuItem value="completed">Completed</MenuItem>
           </Select>
@@ -495,68 +627,96 @@ const Uniques360Coordinator = () => {
         </FormControl>
       </Box>
 
-          <Box sx={{ mb: 3, display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" }, gap: 2 }}>
-            <FormControl fullWidth size="small">
-              <InputLabel>Filter by Type</InputLabel>
-              <Select value={taskTypeFilter} label="Filter by Type" onChange={(e) => setTaskTypeFilter(e.target.value)}>
-                <MenuItem value="all">All Tasks</MenuItem>
-                <MenuItem value="project">Project</MenuItem>
-                <MenuItem value="event">Event</MenuItem>
-              </Select>
-            </FormControl>
+      {tasksLoading && (
+        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+          <CircularProgress size={50} />
+        </Box>
+      )}
 
-            <FormControl fullWidth size="small">
-              <InputLabel>Filter by Status</InputLabel>
-              <Select value={statusFilter} label="Filter by Status" onChange={(e) => setStatusFilter(e.target.value)}>
-                <MenuItem value="all">All Status</MenuItem>
-                <MenuItem value="pending">Todo</MenuItem>
-                <MenuItem value="in-progress">In Progress</MenuItem>
-                <MenuItem value="completed">Completed</MenuItem>
-              </Select>
-            </FormControl>
+      {!tasksLoading && tasks.length === 0 && (
+        <Paper sx={{ p: 4, textAlign: "center", bgcolor: "background.paper" }}>
+          <Typography variant="h6" color="textSecondary" sx={{ mb: 2 }}>
+            No tasks assigned yet
+          </Typography>
+          <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
+            Click "Assign New Task" button to create your first task assignment
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setOpen(true)}
+            sx={{
+              bgcolor: "#ca0019",
+              "&:hover": {
+                bgcolor: "#a30014",
+              },
+            }}
+          >
+            Assign First Task
+          </Button>
+        </Paper>
+      )}
 
-            <FormControl fullWidth size="small">
-              <InputLabel>Filter by Member</InputLabel>
-              <Select value={memberFilter} label="Filter by Member" onChange={(e) => setMemberFilter(e.target.value)}>
-                <MenuItem value="all">All Members</MenuItem>
-                {members.map((member) => (
-                  <MenuItem key={member._id} value={member._id}>{member.fullName}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
+      {!tasksLoading && tasks.length > 0 && filteredTasks.length === 0 && (
+        <Paper sx={{ p: 4, textAlign: "center", bgcolor: "background.paper" }}>
+          <Typography variant="h6" color="textSecondary">
+            No tasks match the selected filters
+          </Typography>
+          <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+            Try adjusting your filter criteria
+          </Typography>
+        </Paper>
+      )}
+
+      {!tasksLoading && filteredTasks.length > 0 && (
+        <Box sx={{ mb: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Typography variant="body2" color="textSecondary">
+            Showing {filteredTasks.length} of {tasks.length} {tasks.length === 1 ? "task" : "tasks"}
+          </Typography>
+          <Button
+            size="small"
+            startIcon={<RefreshIcon />}
+            onClick={fetchTasks}
+            sx={{ textTransform: "none" }}
+          >
+            Refresh
+          </Button>
+        </Box>
+      )}
 
       {/* TABLE */}
 
-      <TaskTable
-            tasks={filteredTasks}
-        getStatusColor={getStatusColor}
-        onViewReports={(task) => {
-          setSelectedTask(task);
-          setReportsOpen(true);
-          fetchReports(task._id);
-        }}
-        onEdit={(task) => {
-          setSelectedTask({
-            ...task,
-            assignedTo: task.assignedTo?.map((item) => {
-              const inner = item && item.member ? item.member : item;
-              return inner?._id || inner?.id || inner;
-            }) || [],
-          });
+      {!tasksLoading && filteredTasks.length > 0 && (
+        <TaskTable
+          tasks={filteredTasks}
+          getStatusColor={getStatusColor}
+          onViewReports={(task) => {
+            setSelectedTask(task);
+            setReportsOpen(true);
+            fetchReports(task._id);
+          }}
+          onEdit={(task) => {
+            setSelectedTask({
+              ...task,
+              assignedTo: task.assignedTo?.map((item) => {
+                const inner = item && item.member ? item.member : item;
+                return inner?._id || inner?.id || inner;
+              }) || [],
+            });
 
-          setEditOpen(true);
-        }}
-        onManageTeam={(task) => {
-          setSelectedTask(task);
-          setTeamSelectedBatch("");
-          setTeamSelectedMember("");
-          setTeamSelectedRole("");
-          setTeamOpen(true);
-        }}
-        onMarkComplete={handleStatusUpdate}
-        onDelete={handleDeleteTask}
-      />
+            setEditOpen(true);
+          }}
+          onManageTeam={(task) => {
+            setSelectedTask(task);
+            setTeamSelectedBatch("");
+            setTeamSelectedMember("");
+            setTeamSelectedRole("");
+            setTeamOpen(true);
+          }}
+          onMarkComplete={handleStatusUpdate}
+          onDelete={handleDeleteTask}
+        />
+      )}
 
       {/* CREATE TASK DIALOG */}
 

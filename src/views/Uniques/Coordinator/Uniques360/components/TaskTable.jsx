@@ -124,7 +124,7 @@ const TaskTable = ({
                 <TableCell>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
                     <Chip
-                      label={task.status === "pending" ? "todo" : task.status}
+                      label={task.status === "pending" ? "Pending" : task.status}
                       size="small"
                       color={getStatusColor(task.status)}
                     />

@@ -103,6 +103,11 @@ const EventInsights = () => {
     }
   };
 
+  const getTaskProgress = (task) => {
+    if (typeof task.progressPercent === "number") return task.progressPercent;
+    return getProgressValue(task.status);
+  };
+
   const getInitials = (fullName) => {
     if (!fullName) return "?";
     return fullName
@@ -216,20 +221,22 @@ const EventInsights = () => {
                     </TableCell>
                     <TableCell>
                       <AvatarGroup max={4} sx={{ justifyContent: "flex-end" }}>
-                        {task.assignedTo?.map((member, i) => (
-                          <Avatar key={i} sx={{ bgcolor: "#cfd3d8", color: "#555", width: 32, height: 32, fontSize: 12 }}>
-                            {getInitials(member.fullName)}
-                          </Avatar>
-                          {task.assignedTo?.map((item, i) => {
-                            const inner = item && item.member ? item.member : item;
-                            return <Avatar sx={{ width: 32, height: 32 }} key={i}>{inner.fullName?.charAt(0)}</Avatar>;
-                          })}
+                        {task.assignedTo?.map((item, i) => {
+                          const inner = item && item.member ? item.member : item;
+                          return (
+                            <Avatar key={inner?._id || i} sx={{ bgcolor: "#cfd3d8", color: "#555", width: 32, height: 32, fontSize: 12 }}>
+                              {getInitials(inner?.fullName || inner?.email)}
+                            </Avatar>
+                          );
+                        })}
+                      </AvatarGroup>
+                    </TableCell>
                     <TableCell>
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         <Box sx={{ width: "100%" }}>
                           <LinearProgress 
                             variant="determinate" 
-                            value={getProgressValue(task.status)} 
+                            value={getTaskProgress(task)} 
                             sx={{ 
                               height: 6, 
                               borderRadius: 10, 
@@ -238,7 +245,7 @@ const EventInsights = () => {
                             }} 
                           />
                         </Box>
-                        <Typography variant="caption">{getProgressValue(task.status)}%</Typography>
+                        <Typography variant="caption">{getTaskProgress(task)}%</Typography>
                       </Box>
                     </TableCell>
                     <TableCell>

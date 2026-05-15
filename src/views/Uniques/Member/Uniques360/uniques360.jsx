@@ -42,9 +42,14 @@ const Uniques360Member = () => {
   const fetchTasks = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/api/uniques360/tasks/member/me`, { withCredentials: true });
-      const fetchedTasks = response.data || [];
+      const fetchedTasks = Array.isArray(response.data) ? response.data : [];
       setTasks(fetchedTasks);
-      if (fetchedTasks.length > 0 && !selectedTask) setSelectedTask(fetchedTasks[0]);
+      if (fetchedTasks.length > 0) {
+        setSelectedTask((current) => {
+          if (!current) return fetchedTasks[0];
+          return fetchedTasks.find((task) => task._id === current._id) || fetchedTasks[0];
+        });
+      }
     } catch (error) {
       console.error(error);
       toast.error(error.response?.data?.message || "Error fetching tasks");
@@ -90,10 +95,10 @@ const Uniques360Member = () => {
       .filter((m) => !selectedTask?.assignedTo?.some((at) => ((at.member && at.member._id) || at._id) === m._id));
   }, [members, selectedBatch, selectedTask]);
 
-  const taskStatusLabel = (status) => (status === "pending" ? "todo" : status);
+  const taskStatusLabel = (status) => (status === "pending" ? "Pending" : status);
 
   const handleSubmitReport = async () => {
-    if (!newReport.trim() || !selectedTask) return;
+    if ((!newReport.trim() && progressPercent === "") || !selectedTask) return;
     try {
       setSending(true);
       await axios.post(
@@ -104,7 +109,7 @@ const Uniques360Member = () => {
       toast.success("Daily report submitted");
       setNewReport("");
       setProgressPercent("");
-      fetchReports(selectedTask._id);
+      await Promise.all([fetchReports(selectedTask._id), fetchTasks()]);
     } catch (error) {
       console.error(error);
       toast.error(error.response?.data?.message || "Error submitting report");
@@ -165,6 +170,9 @@ const Uniques360Member = () => {
                     </Button>
                   )}
                   <Chip label={taskStatusLabel(selectedTask.status)} color={selectedTask.status === "completed" ? "success" : selectedTask.status === "in-progress" ? "warning" : "info"} />
+                  {typeof selectedTask.progressPercent === "number" && (
+                    <Chip label={`${selectedTask.progressPercent}% progress`} variant="outlined" color="primary" />
+                  )}
                   {selectedTask.deadline && (
                     <Chip label={`Due ${new Date(selectedTask.deadline).toLocaleDateString()}`} variant="outlined" />
                   )}

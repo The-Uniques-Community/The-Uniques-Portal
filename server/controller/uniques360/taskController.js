@@ -1,8 +1,57 @@
 import Task from "../../models/uniques360/Task.js";
 import Member from "../../models/member/memberModel.js";
 import Report from "../../models/uniques360/Report.js";
+import mongoose from "mongoose";
 
 const getRequesterId = (req) => req.user?.id || req.user?._id || req.user?.userId || req.user?.sub || null;
+
+// Convert string ID to ObjectId safely
+const toObjectId = (id) => {
+  if (!id) return null;
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    return new mongoose.Types.ObjectId(id);
+  }
+  return id;
+};
+
+// Safe ID comparison function
+const idsEqual = (id1, id2) => {
+  const str1 = id1?.toString?.() || String(id1);
+  const str2 = id2?.toString?.() || String(id2);
+  return str1 === str2;
+};
+
+const toPlainTask = (task) => task?.toObject ? task.toObject() : task;
+
+const populateTaskProgress = async (tasks) => {
+  const plainTasks = (tasks || []).map(toPlainTask).filter(Boolean);
+  const taskIds = plainTasks.map((task) => task._id).filter(Boolean);
+
+  if (!taskIds.length) return plainTasks;
+
+  const reports = await Report.find({ taskId: { $in: taskIds } })
+    .select("taskId reportContent progressPercent submissionDate")
+    .sort({ submissionDate: -1 });
+
+  const progressByTask = new Map();
+
+  for (const report of reports) {
+    const taskId = report.taskId?.toString();
+    if (!taskId || progressByTask.has(taskId)) continue;
+
+    const value = typeof report.progressPercent === "number"
+      ? report.progressPercent
+      : Number(report.reportContent?.match(/(\d{1,3})\s*%/)?.[1]);
+    if (Number.isNaN(value)) continue;
+
+    progressByTask.set(taskId, Math.max(0, Math.min(100, value)));
+  }
+
+  return plainTasks.map((task) => ({
+    ...task,
+    progressPercent: progressByTask.get(task._id.toString()) ?? null,
+  }));
+};
 
 // Create a new task (Coordinator/Admin only)
 export const createTask = async (req, res) => {
@@ -34,7 +83,7 @@ export const createTask = async (req, res) => {
       title,
       description,
       assignedTo: assignedArray,
-      assignedBy: getRequesterId(req),
+      assignedBy: toObjectId(getRequesterId(req)),
       deadline,
       priority,
       taskType,
@@ -53,7 +102,7 @@ export const createTask = async (req, res) => {
 export const getMemberTasks = async (req, res) => {
   try {
     const { memberId } = req.params;
-    const id = memberId === "me" ? getRequesterId(req) : memberId;
+    const id = toObjectId(memberId === "me" ? getRequesterId(req) : memberId);
     let tasks = await Task.find({ 'assignedTo.member': id }).populate('assignedTo.member', 'fullName email').sort({ createdAt: -1 });
     // Backwards compatibility: if no tasks found using new shape, try legacy shape
     if (!tasks.length) {
@@ -70,7 +119,8 @@ export const getMemberTasks = async (req, res) => {
         });
       }
     }
-    res.status(200).json(tasks);
+    const enrichedTasks = await populateTaskProgress(tasks);
+    res.status(200).json(enrichedTasks);
   } catch (error) {
     res.status(500).json({ message: "Error fetching tasks", error: error.message });
   }
@@ -80,10 +130,19 @@ export const getMemberTasks = async (req, res) => {
 export const getCoordinatorTasks = async (req, res) => {
   try {
     const { coordinatorId } = req.params;
-    const id = coordinatorId === "current" ? getRequesterId(req) : coordinatorId;
-    let tasks = await Task.find({ assignedBy: id })
-      .populate('assignedTo.member', 'fullName email')
-      .sort({ createdAt: -1 });
+    const requesterId = getRequesterId(req);
+    const id = toObjectId(coordinatorId === "current" ? requesterId : coordinatorId);
+    const isCurrentCoordinatorView = coordinatorId === "current";
+    const requesterRole = req.user?.role?.toLowerCase?.();
+    const canSeeCoordinatorTasks = ["admin", "coordinator", "communityadmin"].includes(requesterRole);
+
+    const taskQuery = isCurrentCoordinatorView && canSeeCoordinatorTasks
+      ? {}
+      : { assignedBy: id };
+
+    let tasks = await Task.find(taskQuery)
+        .populate('assignedTo.member', 'fullName email')
+        .sort({ createdAt: -1 });
 
     // Normalize legacy assignedTo arrays (ObjectId[]) into { member, role } objects
     if (tasks.length) {
@@ -103,32 +162,7 @@ export const getCoordinatorTasks = async (req, res) => {
       }
     }
 
-    const taskIds = tasks.map((task) => task._id);
-    const reports = await Report.find({ taskId: { $in: taskIds } })
-      .select("taskId reportContent submissionDate")
-      .sort({ submissionDate: -1 });
-
-    const progressByTask = new Map();
-
-    for (const report of reports) {
-      const taskId = report.taskId?.toString();
-      if (!taskId || progressByTask.has(taskId)) continue;
-
-      const match = report.reportContent?.match(/(\d{1,3})\s*%/);
-      if (!match) continue;
-
-      const value = Number(match[1]);
-      if (Number.isNaN(value)) continue;
-
-      progressByTask.set(taskId, Math.max(0, Math.min(100, value)));
-    }
-
-    const enrichedTasks = tasks.map((task) => {
-      const plainTask = task.toObject();
-      plainTask.progressPercent = progressByTask.get(task._id.toString()) ?? null;
-      return plainTask;
-    });
-
+    const enrichedTasks = await populateTaskProgress(tasks);
     res.status(200).json(enrichedTasks);
   } catch (error) {
     res.status(500).json({ message: "Error fetching tasks", error: error.message });
@@ -151,22 +185,22 @@ export const updateTaskStatus = async (req, res) => {
       // Normalize assignedTo to array of member ids
       const team = Array.isArray(task.assignedTo) ? task.assignedTo.map(a => a.member ? a.member.toString() : null).filter(Boolean) : [];
 
-      const isAssigned = team.includes(requesterId);
-      const isCoordinator = task.assignedBy && task.assignedBy.toString() === requesterId;
+      const isAssigned = team.some(memberId => idsEqual(memberId, requesterId));
+      const isCoordinator = idsEqual(task.assignedBy, requesterId);
 
       if (!isAssigned && !isCoordinator) {
         return res.status(403).json({ message: "Unauthorized to mark this task completed" });
       }
 
       task.status = "completed";
-      task.completedBy = requesterId.toString();
+      task.completedBy = toObjectId(requesterId);
       task.completedAt = new Date();
       await task.save();
       return res.status(200).json({ message: "Task marked completed", task });
     }
 
     // For other status updates, only allow coordinator (assignedBy)
-    if (task.assignedBy && task.assignedBy.toString() !== requesterId) {
+    if (task.assignedBy && !idsEqual(task.assignedBy, requesterId)) {
       return res.status(403).json({ message: "Unauthorized to update task status" });
     }
 
@@ -192,8 +226,8 @@ export const addMemberToTask = async (req, res) => {
 
     // Coordinator can manage their own task team, and existing members can invite as well.
     const currentUserId = getRequesterId(req);
-    const isCoordinator = task.assignedBy?.toString() === currentUserId;
-    const isMember = team.includes(currentUserId);
+    const isCoordinator = idsEqual(task.assignedBy, currentUserId);
+    const isMember = team.some(memberId => idsEqual(memberId, currentUserId));
     
     if (!isCoordinator && !isMember) {
       return res.status(403).json({ 
@@ -239,7 +273,7 @@ export const updateTask = async (req, res) => {
     if (!task) return res.status(404).json({ message: "Task not found" });
 
     // Check if user is the one who assigned the task
-    if (task.assignedBy.toString() !== getRequesterId(req)) {
+    if (!idsEqual(task.assignedBy, getRequesterId(req))) {
       return res.status(403).json({ message: "Unauthorized to update this task" });
     }
 
@@ -298,7 +332,7 @@ export const deleteTask = async (req, res) => {
     if (!task) return res.status(404).json({ message: "Task not found" });
 
     // Check if user is the one who assigned the task
-    if (task.assignedBy.toString() !== getRequesterId(req)) {
+    if (!idsEqual(task.assignedBy, getRequesterId(req))) {
       return res.status(403).json({ message: "Unauthorized to delete this task" });
     }
 
@@ -320,8 +354,8 @@ export const removeMemberFromTask = async (req, res) => {
 
     // Check authorization: Must be the coordinator OR an existing team member
     const requesterId = getRequesterId(req);
-    const isCoordinator = task.assignedBy.toString() === requesterId;
-    const isTeamMember = task.assignedTo.some(a => a.member && a.member.toString() === requesterId);
+    const isCoordinator = idsEqual(task.assignedBy, requesterId);
+    const isTeamMember = task.assignedTo.some(a => idsEqual(a.member, requesterId));
 
     if (!isCoordinator && !isTeamMember) {
       return res.status(403).json({ message: "Unauthorized to manage this team" });

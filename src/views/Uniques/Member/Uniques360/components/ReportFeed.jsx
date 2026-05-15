@@ -1,6 +1,6 @@
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Avatar, Box, CircularProgress, Paper, Typography } from "@mui/material";
+import { Avatar, Box, Chip, CircularProgress, Paper, Typography } from "@mui/material";
 import { History as HistoryIcon } from "@mui/icons-material";
 
 const ReportFeed = ({ reports, reportsLoading, scrollRef }) => {
@@ -23,6 +23,15 @@ const ReportFeed = ({ reports, reportsLoading, scrollRef }) => {
                   <Typography variant="caption" color="text.secondary">
                     {report.submissionDate ? new Date(report.submissionDate).toLocaleString() : "No date"}
                   </Typography>
+                  {typeof report.progressPercent === "number" && (
+                    <Chip
+                      label={`${report.progressPercent}% progress`}
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                      sx={{ ml: 1 }}
+                    />
+                  )}
                   <Typography sx={{ mt: 1 }}>{report.reportContent}</Typography>
                 </Paper>
               </Box>

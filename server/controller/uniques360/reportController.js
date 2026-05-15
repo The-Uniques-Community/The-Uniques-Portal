@@ -19,6 +19,7 @@ const isAssignedMember = (task, userId) => {
 export const submitReport = async (req, res) => {
   try {
     const { taskId, reportContent, attachments, progressPercent } = req.body;
+    const trimmedContent = reportContent?.trim?.() || "";
 
     // Verify task exists and is assigned to this member
     const task = await Task.findById(taskId);
@@ -38,14 +39,17 @@ export const submitReport = async (req, res) => {
 
     const safeProgress = Number.isFinite(normalizedProgress) ? Math.max(0, Math.min(100, normalizedProgress)) : null;
 
-    const contentWithProgress = safeProgress === null
-      ? reportContent
-      : `${reportContent}\n\nProgress: ${safeProgress}%`;
+    if (!trimmedContent && safeProgress === null) {
+      return res.status(400).json({ message: "Add a report message or progress percentage" });
+    }
+
+    const contentWithProgress = trimmedContent || `Progress updated to ${safeProgress}%`;
 
     const newReport = new Report({
       taskId,
       studentId: requesterId,
       reportContent: contentWithProgress,
+      progressPercent: safeProgress,
       attachments
     });
 

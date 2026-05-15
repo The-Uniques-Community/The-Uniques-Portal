@@ -17,6 +17,9 @@ const EventView = Loader(lazy(() => import("@/views/Admin/Events/View")));
 const Enquiry = Loader(lazy(() => import("@/views/Admin/Enquiry")));
 const Trainers = Loader(lazy(() => import("@/views/Admin/Trainers")));
 const LeaveManagement = Loader(lazy(() => import("@/views/Uniques/Admin/LeaveManagement")));
+const Uniques360 = Loader(lazy(() => import("@/views/Uniques/Coordinator/Uniques360")));
+const ProjectInsights = Loader(lazy(() => import("@/views/Uniques360/Projects/ProjectInsights")));
+const EventInsights = Loader(lazy(() => import("@/views/Uniques360/Events/EventInsights")));
 const AdminRoutes = {
   path: "/admin",
   element: <ProtectedRoute role={"admin"} element={<AdminLayout />} />,
@@ -64,6 +67,18 @@ const AdminRoutes = {
     {
       path: "/admin/leave-management",
       element: <LeaveManagement />
+    },
+    {
+      path: "/admin/uniques360",
+      element: <Uniques360 />,
+    },
+    {
+      path: "/admin/project-insights",
+      element: <ProjectInsights />,
+    },
+    {
+      path: "/admin/event-insights",
+      element: <EventInsights />,
     }
   ],
 };

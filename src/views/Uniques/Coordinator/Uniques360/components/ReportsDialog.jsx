@@ -2,6 +2,7 @@ import React from "react";
 import {
   Avatar,
   Box,
+  Chip,
   CircularProgress,
   Dialog,
   DialogContent,
@@ -41,6 +42,16 @@ const ReportsDialog = ({ open, onClose, task, reports, loading }) => {
                         ? new Date(report.submissionDate).toLocaleString()
                         : "No date"}
                     </Typography>
+
+                    {typeof report.progressPercent === "number" && (
+                      <Chip
+                        label={`${report.progressPercent}% progress`}
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                        sx={{ ml: 1 }}
+                      />
+                    )}
 
                     <Typography sx={{ mt: 1 }}>{report.reportContent}</Typography>
                   </Box>

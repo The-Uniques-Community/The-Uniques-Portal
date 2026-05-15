@@ -8,14 +8,14 @@ const TaskSidebar = ({ tasks, selectedTask, onSelectTask, isDarkMode }) => {
     const taskList = Array.isArray(tasks) ? tasks : [];
 
     return {
-      todo: taskList.filter((task) => task.status === "pending"),
+      pending: taskList.filter((task) => task.status === "pending"),
       inProgress: taskList.filter((task) => task.status === "in-progress"),
       completed: taskList.filter((task) => task.status === "completed"),
     };
   }, [tasks]);
 
   const sections = [
-    { key: "todo", label: "Todo", color: "#ca0019" },
+    { key: "pending", label: "Pending", color: "#ca0019" },
     { key: "inProgress", label: "In Progress", color: "#f59e0b" },
     { key: "completed", label: "Completed", color: "#16a34a" },
   ];
@@ -51,10 +51,17 @@ const TaskSidebar = ({ tasks, selectedTask, onSelectTask, isDarkMode }) => {
             }).join(', ') || 'No one assigned'}
           </Typography>
           <Chip
-            label={task.status === "pending" ? "todo" : task.status}
+            label={task.status === "pending" ? "Pending" : task.status}
             size="small"
             sx={{ mt: 0.75, bgcolor: "rgba(255,255,255,0.14)", color: "white" }}
           />
+          {typeof task.progressPercent === "number" && (
+            <Chip
+              label={`${task.progressPercent}%`}
+              size="small"
+              sx={{ mt: 0.75, ml: 0.75, bgcolor: "rgba(255,255,255,0.14)", color: "white" }}
+            />
+          )}
         </Box>
       </ListItemButton>
     </motion.div>

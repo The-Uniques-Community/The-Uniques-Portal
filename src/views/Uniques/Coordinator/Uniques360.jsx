@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -53,6 +54,8 @@ import logoCommunity from "@/assets/logos/theuniquesCommunity.png";
 import logoWhite from "@/assets/logos/uniqueswhite.png";
 
 const Uniques360Coordinator = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [tasks, setTasks] = useState([]);
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -84,18 +87,18 @@ const Uniques360Coordinator = () => {
   const batches = ["The Uniques 1.0", "The Uniques 2.0", "The Uniques 3.0", "The Uniques 4.0"];
 
   const taskGroups = useMemo(() => ({
-    todo: tasks.filter((task) => task.status === "pending"),
+    pending: tasks.filter((task) => task.status === "pending"),
     inProgress: tasks.filter((task) => task.status === "in-progress"),
     completed: tasks.filter((task) => task.status === "completed"),
   }), [tasks]);
 
   const taskStatusSummary = [
     {
-      key: "todo",
-      label: "Todo",
+      key: "pending",
+      label: "Pending",
       helper: "Pending work waiting to be picked up",
       color: "#ca0019",
-      value: taskGroups.todo.length,
+      value: taskGroups.pending.length,
     },
     {
       key: "inProgress",
@@ -132,7 +135,7 @@ const Uniques360Coordinator = () => {
   }, [tasks, taskTypeFilter, statusFilter, memberFilter]);
 
   const visibleTaskGroups = useMemo(() => ({
-    todo: visibleTasks.filter((task) => task.status === "pending"),
+    pending: visibleTasks.filter((task) => task.status === "pending"),
     inProgress: visibleTasks.filter((task) => task.status === "in-progress"),
     completed: visibleTasks.filter((task) => task.status === "completed"),
   }), [visibleTasks]);
@@ -142,9 +145,14 @@ const Uniques360Coordinator = () => {
       const response = await axios.get(`${BASE_URL}/api/uniques360/tasks/coordinator/current`, {
         withCredentials: true,
       });
-      setTasks(response.data);
+      const tasksData = Array.isArray(response.data)
+        ? response.data
+        : response.data?.tasks || [];
+      setTasks(tasksData);
     } catch (error) {
       console.error("Error fetching tasks:", error);
+      toast.error(error.response?.data?.message || "Failed to fetch tasks");
+      setTasks([]);
     }
   };
 
@@ -202,7 +210,7 @@ const Uniques360Coordinator = () => {
         setTasks((prev) => [created, ...(Array.isArray(prev) ? prev : [])]);
       }
       // Refresh from server to ensure consistency
-      fetchTasks();
+      await fetchTasks();
       setNewTask({ title: "", description: "", assignedTo: [], deadline: "", priority: "medium", taskType: "project" });
       setNewTaskRoles({});
       setSelectedBatch("");
@@ -317,6 +325,7 @@ const Uniques360Coordinator = () => {
   };
 
   const { isDarkMode } = useThemeContext();
+  const dashboardBasePath = location.pathname.startsWith("/admin") ? "/admin" : "/coordinator";
 
   if (loading) return (
     <Box sx={{
@@ -375,7 +384,7 @@ const Uniques360Coordinator = () => {
               transition: "transform 0.2s",
               // "&:hover": { transform: "scale(1.02)" }
             }}
-            onClick={() => window.location.href = "/coordinator/project-insights"}
+            onClick={() => navigate(`${dashboardBasePath}/project-insights`)}
           >
             <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
               <Box sx={{ p: 1, bgcolor: "rgba(255,255,255,0.2)", borderRadius: "50%" }}>
@@ -398,7 +407,7 @@ const Uniques360Coordinator = () => {
               transition: "transform 0.2s",
               // "&:hover": { transform: "scale(1.02)" }
             }}
-            onClick={() => window.location.href = "/coordinator/event-insights"}
+            onClick={() => navigate(`${dashboardBasePath}/event-insights`)}
           >
             <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
               <Box sx={{ p: 1, bgcolor: "rgba(255,255,255,0.1)", borderRadius: "50%" }}>
@@ -457,7 +466,7 @@ const Uniques360Coordinator = () => {
                 <InputLabel>Filter by Status</InputLabel>
                 <Select value={statusFilter} label="Filter by Status" onChange={(e) => setStatusFilter(e.target.value)}>
                   <MenuItem value="all">All Status</MenuItem>
-                  <MenuItem value="pending">Todo</MenuItem>
+                  <MenuItem value="pending">Pending</MenuItem>
                   <MenuItem value="in-progress">In Progress</MenuItem>
                   <MenuItem value="completed">Completed</MenuItem>
                 </Select>
@@ -480,9 +489,9 @@ const Uniques360Coordinator = () => {
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
         <TaskTable
-          title="Todo"
+          title="Pending"
           description="Pending work waiting to be assigned or started"
-          tasks={visibleTaskGroups.todo}
+          tasks={visibleTaskGroups.pending}
           getStatusColor={getStatusColor}
           onViewReports={(task) => {
             setSelectedTask(task);
@@ -801,6 +810,14 @@ const Uniques360Coordinator = () => {
                       <Typography variant="caption" color="text.secondary">
                         {new Date(report.submissionDate || report.createdAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
                       </Typography>
+                      {typeof report.progressPercent === "number" && (
+                        <Chip
+                          label={`${report.progressPercent}% progress`}
+                          size="small"
+                          color="primary"
+                          variant="outlined"
+                        />
+                      )}
                     </Box>
                     <Typography variant="body2" sx={{ color: "#1d1c1d", lineHeight: 1.5, whiteSpace: "pre-line" }}>
                       {report.reportContent}

@@ -76,7 +76,10 @@ const TeamDialog = ({
             </Typography>
             <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 1 }}>
               <Chip label={`Members: ${assignedMembers.length}`} size="small" />
-              <Chip label={task.status === "pending" ? "todo" : task.status} size="small" color={task.status === "completed" ? "success" : task.status === "in-progress" ? "warning" : "info"} />
+              <Chip label={task.status === "pending" ? "Pending" : task.status} size="small" color={task.status === "completed" ? "success" : task.status === "in-progress" ? "warning" : "info"} />
+              {typeof task.progressPercent === "number" && (
+                <Chip label={`${task.progressPercent}% progress`} size="small" variant="outlined" />
+              )}
             </Box>
           </Box>
 
