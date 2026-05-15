@@ -29,6 +29,7 @@ import Brightness4Icon from "@mui/icons-material/Brightness4"; // Dark Mode Icon
 import Brightness7Icon from "@mui/icons-material/Brightness7"; // Light Mode Icon
 import AnnouncementIcon from '@mui/icons-material/Announcement';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 // Navigation items with full paths
 const ADMIN_NAVIGATION = [
   { segment: "", title: "Dashboard", icon: <DashboardIcon /> },
@@ -36,6 +37,7 @@ const ADMIN_NAVIGATION = [
   { segment: "events-overview", title: "Events", icon: <EventIcon /> },
   { segment: "accounts", title: "Accounts", icon: <AccountBalance /> },
   { segment: "enquiry", title: "Enquiry", icon: <AnnouncementIcon /> },
+  { segment: "leave-management", title: "Leave Management", icon: <CalendarMonthIcon /> },
 ];
 
 function Branding() {

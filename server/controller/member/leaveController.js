@@ -1,5 +1,10 @@
 import Leave from "../../models/member/leaveModel.js";
 import Member from "../../models/member/memberModel.js";
+import {
+  sendLeaveSubmissionNotification,
+  sendLeaveApprovalNotification,
+  sendLeaveRejectionNotification,
+} from "../../services/leaveEmailService.js";
 
 // Member Controllers
 
@@ -52,6 +57,9 @@ export const submitLeaveRequest = async (req, res) => {
     });
 
     await newLeave.save();
+
+    // Send notification emails to admin and coordinator
+    await sendLeaveSubmissionNotification(newLeave);
 
     res.status(201).json({
       message: "Leave request submitted successfully",
@@ -203,6 +211,7 @@ export const approveLeave = async (req, res) => {
   try {
     const { id } = req.params;
     const { approvedBy } = req.body;
+    const approverEmail = req.user?.email;
 
     const leave = await Leave.findById(id);
     if (!leave) {
@@ -219,6 +228,11 @@ export const approveLeave = async (req, res) => {
 
     await leave.save();
 
+    // Send notification emails to member, admin and coordinator (excluding approver)
+    if (approverEmail) {
+      await sendLeaveApprovalNotification(leave, approverEmail);
+    }
+
     res.status(200).json({
       message: "Leave approved successfully",
       leave,
@@ -233,6 +247,7 @@ export const rejectLeave = async (req, res) => {
   try {
     const { id } = req.params;
     const { rejectionReason, rejectedBy } = req.body;
+    const rejectorEmail = req.user?.email;
 
     if (!rejectionReason) {
       return res.status(400).json({ message: "Rejection reason is required" });
@@ -253,6 +268,11 @@ export const rejectLeave = async (req, res) => {
     leave.rejectedDate = new Date();
 
     await leave.save();
+
+    // Send notification emails to member, admin and coordinator (excluding rejector)
+    if (rejectorEmail) {
+      await sendLeaveRejectionNotification(leave, rejectorEmail);
+    }
 
     res.status(200).json({
       message: "Leave rejected successfully",

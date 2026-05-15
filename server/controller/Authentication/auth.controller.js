@@ -8,6 +8,7 @@ import CommunityAdmin from "../../models/community/communityAdmin.js";
 const generateToken = (member, fallbackRole) => {
   const payload = {
     id: member._id || member.id,
+    email: member.email,
     role: member.role || fallbackRole,
     batch: member.batch || null,
   };

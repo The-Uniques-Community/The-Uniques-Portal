@@ -16,6 +16,7 @@ const EventBudget = Loader(lazy(() => import("@/views/Admin/Events/Budget")));
 const EventView = Loader(lazy(() => import("@/views/Admin/Events/View")));
 const Enquiry = Loader(lazy(() => import("@/views/Admin/Enquiry")));
 const Trainers = Loader(lazy(() => import("@/views/Admin/Trainers")));
+const LeaveManagement = Loader(lazy(() => import("@/views/Uniques/Admin/LeaveManagement")));
 const AdminRoutes = {
   path: "/admin",
   element: <ProtectedRoute role={"admin"} element={<AdminLayout />} />,
@@ -59,6 +60,10 @@ const AdminRoutes = {
     {
       path: "/admin/trainers",
       element: <Trainers />,
+    },
+    {
+      path: "/admin/leave-management",
+      element: <LeaveManagement />
     }
   ],
 };
