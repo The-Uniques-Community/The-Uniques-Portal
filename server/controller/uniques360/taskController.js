@@ -2,33 +2,48 @@ import Task from "../../models/uniques360/Task.js";
 import Member from "../../models/member/memberModel.js";
 import Report from "../../models/uniques360/Report.js";
 
+const getRequesterId = (req) => req.user?.id || req.user?._id || req.user?.userId || req.user?.sub || null;
+
 // Create a new task (Coordinator/Admin only)
 export const createTask = async (req, res) => {
   try {
     const { title, description, assignedTo, deadline, priority, projectCategory, taskType } = req.body;
-    
-    // Check if assignedTo is an array, if not make it one
-    const memberIds = Array.isArray(assignedTo) ? assignedTo : [assignedTo];
-    
-    // Check if all members exist
-    const members = await Member.find({ _id: { $in: memberIds } });
-    if (members.length !== memberIds.length) {
-      return res.status(404).json({ message: "One or more members not found" });
+
+    // Normalize assignedTo into array of { member, role }
+    const assignedArray = Array.isArray(assignedTo)
+      ? assignedTo.map((item) => {
+          if (item && typeof item === 'object' && (item.member || item.member === 0)) {
+            return { member: item.member, role: item.role || null };
+          }
+          return { member: item, role: null };
+        })
+      : assignedTo
+      ? [{ member: assignedTo, role: null }]
+      : [];
+
+    const memberIds = assignedArray.map(a => a.member).filter(Boolean);
+    // Validate members exist
+    if (memberIds.length) {
+      const membersFound = await Member.find({ _id: { $in: memberIds } }).select('_id');
+      if (membersFound.length !== memberIds.length) {
+        return res.status(404).json({ message: 'One or more members not found' });
+      }
     }
 
     const newTask = new Task({
       title,
       description,
-      assignedTo: memberIds,
-      assignedBy: req.user.id, // Assuming req.user is set by auth middleware
+      assignedTo: assignedArray,
+      assignedBy: getRequesterId(req),
       deadline,
       priority,
       taskType,
-      projectCategory
+      projectCategory,
     });
 
     await newTask.save();
-    res.status(201).json({ message: "Task created successfully", task: newTask });
+    const populated = await Task.findById(newTask._id).populate('assignedTo.member', 'fullName email');
+    res.status(201).json({ message: 'Task created successfully', task: populated });
   } catch (error) {
     res.status(500).json({ message: "Error creating task", error: error.message });
   }
@@ -38,8 +53,23 @@ export const createTask = async (req, res) => {
 export const getMemberTasks = async (req, res) => {
   try {
     const { memberId } = req.params;
-    const id = memberId === "me" ? req.user.id : memberId;
-    const tasks = await Task.find({ assignedTo: id }).populate("assignedTo", "fullName email").sort({ createdAt: -1 });
+    const id = memberId === "me" ? getRequesterId(req) : memberId;
+    let tasks = await Task.find({ 'assignedTo.member': id }).populate('assignedTo.member', 'fullName email').sort({ createdAt: -1 });
+    // Backwards compatibility: if no tasks found using new shape, try legacy shape
+    if (!tasks.length) {
+      const legacyTasks = await Task.find({ assignedTo: id }).sort({ createdAt: -1 });
+      if (legacyTasks.length) {
+        // populate member objects
+        const memberIds = legacyTasks.flatMap(t => Array.isArray(t.assignedTo) ? t.assignedTo : []).filter(Boolean);
+        const members = await Member.find({ _id: { $in: memberIds } }).select('fullName email');
+        const membersById = new Map(members.map(m => [m._id.toString(), m]));
+        tasks = legacyTasks.map(t => {
+          const plain = t.toObject();
+          plain.assignedTo = (plain.assignedTo || []).map(idVal => ({ member: membersById.get(idVal.toString()) || idVal, role: null }));
+          return plain;
+        });
+      }
+    }
     res.status(200).json(tasks);
   } catch (error) {
     res.status(500).json({ message: "Error fetching tasks", error: error.message });
@@ -50,10 +80,28 @@ export const getMemberTasks = async (req, res) => {
 export const getCoordinatorTasks = async (req, res) => {
   try {
     const { coordinatorId } = req.params;
-    const id = coordinatorId === "current" ? req.user.id : coordinatorId;
-    const tasks = await Task.find({ assignedBy: id })
-      .populate("assignedTo", "fullName email")
+    const id = coordinatorId === "current" ? getRequesterId(req) : coordinatorId;
+    let tasks = await Task.find({ assignedBy: id })
+      .populate('assignedTo.member', 'fullName email')
       .sort({ createdAt: -1 });
+
+    // Normalize legacy assignedTo arrays (ObjectId[]) into { member, role } objects
+    if (tasks.length) {
+      const needsMigration = tasks.some(t => t.assignedTo?.length && t.assignedTo[0] && !t.assignedTo[0].member);
+      if (needsMigration) {
+        // collect all member ids
+        const allIds = tasks.flatMap(t => (Array.isArray(t.assignedTo) ? t.assignedTo : [])).filter(Boolean);
+        const members = await Member.find({ _id: { $in: allIds } }).select('fullName email');
+        const membersById = new Map(members.map(m => [m._id.toString(), m]));
+        tasks = tasks.map(t => {
+          const plain = t.toObject();
+          if (plain.assignedTo?.length && plain.assignedTo[0] && !plain.assignedTo[0].member) {
+            plain.assignedTo = (plain.assignedTo || []).map(idVal => ({ member: membersById.get(idVal.toString()) || idVal, role: null }));
+          }
+          return plain;
+        });
+      }
+    }
 
     const taskIds = tasks.map((task) => task._id);
     const reports = await Report.find({ taskId: { $in: taskIds } })
@@ -96,17 +144,12 @@ export const updateTaskStatus = async (req, res) => {
     const task = await Task.findById(taskId);
     if (!task) return res.status(404).json({ message: "Task not found" });
 
-    const requesterId = req.user.id || req.user._id;
+    const requesterId = getRequesterId(req);
 
     // If marking as completed, allow assigned member(s) or the coordinator who assigned it
     if (status === "completed") {
-      // Normalize assignedTo to array of strings
-      let team = [];
-      if (Array.isArray(task.assignedTo)) {
-        team = task.assignedTo.map(id => id ? id.toString() : null).filter(Boolean);
-      } else if (task.assignedTo) {
-        team = [task.assignedTo.toString()];
-      }
+      // Normalize assignedTo to array of member ids
+      const team = Array.isArray(task.assignedTo) ? task.assignedTo.map(a => a.member ? a.member.toString() : null).filter(Boolean) : [];
 
       const isAssigned = team.includes(requesterId);
       const isCoordinator = task.assignedBy && task.assignedBy.toString() === requesterId;
@@ -139,21 +182,16 @@ export const updateTaskStatus = async (req, res) => {
 export const addMemberToTask = async (req, res) => {
   try {
     const { taskId } = req.params;
-    const { newMemberId } = req.body;
+    const { newMemberId, role } = req.body;
 
     const task = await Task.findById(taskId);
     if (!task) return res.status(404).json({ message: "Task not found" });
 
-    // Ensure assignedTo is an array (handle legacy data)
-    let team = [];
-    if (Array.isArray(task.assignedTo)) {
-      team = task.assignedTo.map(id => id ? id.toString() : null).filter(Boolean);
-    } else if (task.assignedTo) {
-      team = [task.assignedTo.toString()];
-    }
+    // Normalize existing team member ids
+    const team = Array.isArray(task.assignedTo) ? task.assignedTo.map(a => a.member ? a.member.toString() : null).filter(Boolean) : [];
 
     // Coordinator can manage their own task team, and existing members can invite as well.
-    const currentUserId = req.user.id || req.user._id;
+    const currentUserId = getRequesterId(req);
     const isCoordinator = task.assignedBy?.toString() === currentUserId;
     const isMember = team.includes(currentUserId);
     
@@ -173,41 +211,15 @@ export const addMemberToTask = async (req, res) => {
 
     // Add member if not already present
     if (team.includes(newMemberId)) {
-      return res.status(400).json({ message: "Member is already part of this project" });
+      return res.status(400).json({ message: 'Member is already part of this project' });
     }
 
-    // 1. Force conversion of assignedTo to an array if it's not one (atomic)
-    await Task.updateOne(
-      { _id: taskId },
-      [
-        {
-          $set: {
-            assignedTo: {
-              $cond: {
-                if: { $isArray: "$assignedTo" },
-                then: "$assignedTo",
-                else: { 
-                  $cond: {
-                    if: { $eq: [{ $type: "$assignedTo" }, "missing"] },
-                    then: [],
-                    else: ["$assignedTo"]
-                  }
-                }
-              }
-            }
-          }
-        }
-      ]
-    );
+    // Push new subdocument { member, role }
+    task.assignedTo.push({ member: newMemberId, role: role || null });
+    await task.save();
 
-    // 2. Now safely add the member using $addToSet
-    const updatedTask = await Task.findByIdAndUpdate(
-      taskId,
-      { $addToSet: { assignedTo: newMemberId } },
-      { new: true, runValidators: false }
-    ).populate("assignedTo", "fullName email");
-
-    res.status(200).json({ message: "Member added to project successfully", task: updatedTask });
+    const updatedTask = await Task.findById(taskId).populate('assignedTo.member', 'fullName email');
+    res.status(200).json({ message: 'Member added to project successfully', task: updatedTask });
   } catch (error) {
     console.error("Error in addMemberToTask:", error);
     res.status(500).json({ 
@@ -227,7 +239,7 @@ export const updateTask = async (req, res) => {
     if (!task) return res.status(404).json({ message: "Task not found" });
 
     // Check if user is the one who assigned the task
-    if (task.assignedBy.toString() !== req.user.id) {
+    if (task.assignedBy.toString() !== getRequesterId(req)) {
       return res.status(403).json({ message: "Unauthorized to update this task" });
     }
 
@@ -242,14 +254,22 @@ export const updateTask = async (req, res) => {
     };
 
     if (Array.isArray(assignedTo)) {
-      const memberIds = assignedTo.filter(Boolean);
-      const members = await Member.find({ _id: { $in: memberIds } }).select("_id");
+      // assignedTo may be array of ids or array of { member, role }
+      const normalized = assignedTo.map((item) => {
+        if (item && typeof item === 'object' && (item.member || item.member === 0)) {
+          return { member: item.member, role: item.role || null };
+        }
+        return { member: item, role: null };
+      }).filter(Boolean);
 
-      if (members.length !== memberIds.length) {
-        return res.status(404).json({ message: "One or more assigned members not found" });
+      const memberIds = normalized.map(a => a.member).filter(Boolean);
+      const members = memberIds.length ? await Member.find({ _id: { $in: memberIds } }).select('_id') : [];
+
+      if (memberIds.length && members.length !== memberIds.length) {
+        return res.status(404).json({ message: 'One or more assigned members not found' });
       }
 
-      updatePayload.assignedTo = memberIds;
+      updatePayload.assignedTo = normalized;
     }
 
     Object.keys(updatePayload).forEach((key) => {
@@ -261,7 +281,7 @@ export const updateTask = async (req, res) => {
     const updatedTask = await Task.findByIdAndUpdate(taskId, updatePayload, {
       new: true,
       runValidators: true,
-    }).populate("assignedTo", "fullName email");
+    }).populate('assignedTo.member', 'fullName email');
 
     res.status(200).json({ message: "Task updated successfully", task: updatedTask });
   } catch (error) {
@@ -278,7 +298,7 @@ export const deleteTask = async (req, res) => {
     if (!task) return res.status(404).json({ message: "Task not found" });
 
     // Check if user is the one who assigned the task
-    if (task.assignedBy.toString() !== req.user.id) {
+    if (task.assignedBy.toString() !== getRequesterId(req)) {
       return res.status(403).json({ message: "Unauthorized to delete this task" });
     }
 
@@ -299,8 +319,9 @@ export const removeMemberFromTask = async (req, res) => {
     if (!task) return res.status(404).json({ message: "Task not found" });
 
     // Check authorization: Must be the coordinator OR an existing team member
-    const isCoordinator = task.assignedBy.toString() === req.user.id;
-    const isTeamMember = task.assignedTo.some(id => id && id.toString() === req.user.id);
+    const requesterId = getRequesterId(req);
+    const isCoordinator = task.assignedBy.toString() === requesterId;
+    const isTeamMember = task.assignedTo.some(a => a.member && a.member.toString() === requesterId);
 
     if (!isCoordinator && !isTeamMember) {
       return res.status(403).json({ message: "Unauthorized to manage this team" });
@@ -311,9 +332,9 @@ export const removeMemberFromTask = async (req, res) => {
 
     const updatedTask = await Task.findByIdAndUpdate(
       taskId,
-      { $pull: { assignedTo: memberIdToRemove } },
+      { $pull: { assignedTo: { member: memberIdToRemove } } },
       { new: true }
-    ).populate("assignedTo", "fullName email");
+    ).populate('assignedTo.member', 'fullName email');
 
     res.status(200).json({ message: "Member removed from project successfully", task: updatedTask });
   } catch (error) {

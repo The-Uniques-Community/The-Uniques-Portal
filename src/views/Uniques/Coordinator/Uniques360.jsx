@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -48,6 +48,7 @@ import axios from "axios";
 import { BASE_URL } from "@/config";
 import { toast } from "react-toastify";
 import { useThemeContext } from "@/theme/ThemeProvider";
+import TaskTable from "./Uniques360/components/TaskTable";
 import logoCommunity from "@/assets/logos/theuniquesCommunity.png";
 import logoWhite from "@/assets/logos/uniqueswhite.png";
 
@@ -73,8 +74,68 @@ const Uniques360Coordinator = () => {
   const [reportsLoading, setReportsLoading] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [teamOpen, setTeamOpen] = useState(false);
+  const [newMemberToAdd, setNewMemberToAdd] = useState("");
+  const [newMemberRole, setNewMemberRole] = useState("");
+  const [newTaskRoles, setNewTaskRoles] = useState({});
+  const [taskTypeFilter, setTaskTypeFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [memberFilter, setMemberFilter] = useState("all");
 
   const batches = ["The Uniques 1.0", "The Uniques 2.0", "The Uniques 3.0", "The Uniques 4.0"];
+
+  const taskGroups = useMemo(() => ({
+    todo: tasks.filter((task) => task.status === "pending"),
+    inProgress: tasks.filter((task) => task.status === "in-progress"),
+    completed: tasks.filter((task) => task.status === "completed"),
+  }), [tasks]);
+
+  const taskStatusSummary = [
+    {
+      key: "todo",
+      label: "Todo",
+      helper: "Pending work waiting to be picked up",
+      color: "#ca0019",
+      value: taskGroups.todo.length,
+    },
+    {
+      key: "inProgress",
+      label: "In Progress",
+      helper: "Tasks actively being worked on",
+      color: "#f59e0b",
+      value: taskGroups.inProgress.length,
+    },
+    {
+      key: "completed",
+      label: "Completed",
+      helper: "Finished tasks and closed work",
+      color: "#16a34a",
+      value: taskGroups.completed.length,
+    },
+  ];
+
+  const matchesMemberFilter = (task, memberId) => {
+    if (memberId === "all") return true;
+    return (task.assignedTo || []).some((item) => {
+      const inner = item && item.member ? item.member : item;
+      const id = inner?._id || inner?.id || inner;
+      return id?.toString?.() === memberId;
+    });
+  };
+
+  const visibleTasks = useMemo(() => {
+    return tasks.filter((task) => {
+      const typeOk = taskTypeFilter === "all" || task.taskType === taskTypeFilter;
+      const statusOk = statusFilter === "all" || task.status === statusFilter;
+      const memberOk = matchesMemberFilter(task, memberFilter);
+      return typeOk && statusOk && memberOk;
+    });
+  }, [tasks, taskTypeFilter, statusFilter, memberFilter]);
+
+  const visibleTaskGroups = useMemo(() => ({
+    todo: visibleTasks.filter((task) => task.status === "pending"),
+    inProgress: visibleTasks.filter((task) => task.status === "in-progress"),
+    completed: visibleTasks.filter((task) => task.status === "completed"),
+  }), [visibleTasks]);
 
   const fetchTasks = async () => {
     try {
@@ -113,17 +174,37 @@ const Uniques360Coordinator = () => {
 
   const handleCreateTask = async () => {
     try {
-      if (!newTask.title || !newTask.assignedTo) {
+      if (!newTask.title || !newTask.assignedTo || newTask.assignedTo.length === 0) {
         toast.error("Please fill in required fields");
         return;
       }
-      await axios.post(`${BASE_URL}/api/uniques360/tasks`, newTask, {
+      const assignedPayload = newTask.assignedTo.map((id) => ({ member: id, role: newTaskRoles[id] || null }));
+
+      const payload = {
+        title: newTask.title,
+        description: newTask.description,
+        assignedTo: assignedPayload,
+        deadline: newTask.deadline,
+        priority: newTask.priority,
+        taskType: newTask.taskType,
+        projectCategory: newTask.projectCategory,
+      };
+
+      const resp = await axios.post(`${BASE_URL}/api/uniques360/tasks`, payload, {
         withCredentials: true,
       });
+      const created = resp.data?.task || null;
+      console.log('Task create response:', resp.data);
       toast.success("Task assigned successfully");
       setOpen(false);
+      if (created) {
+        // Prepend created task so it appears immediately in the UI
+        setTasks((prev) => [created, ...(Array.isArray(prev) ? prev : [])]);
+      }
+      // Refresh from server to ensure consistency
       fetchTasks();
       setNewTask({ title: "", description: "", assignedTo: [], deadline: "", priority: "medium", taskType: "project" });
+      setNewTaskRoles({});
       setSelectedBatch("");
     } catch (error) {
       toast.error("Error creating task");
@@ -194,10 +275,35 @@ const Uniques360Coordinator = () => {
       // Update selected task in state to reflect change in team modal
       setSelectedTask(prev => ({
         ...prev,
-        assignedTo: prev.assignedTo.filter(m => m._id !== memberId)
+        assignedTo: prev.assignedTo.filter(m => {
+          const innerId = m && m.member ? (m.member._id || m.member) : (m._id || m);
+          return innerId !== memberId;
+        })
       }));
     } catch (error) {
       toast.error("Error removing member");
+    }
+  };
+
+  const handleAddMember = async () => {
+    if (!selectedTask || !newMemberToAdd) return;
+    try {
+      const response = await axios.post(`${BASE_URL}/api/uniques360/tasks/${selectedTask._id}/members`, {
+        newMemberId: newMemberToAdd,
+        role: newMemberRole || null,
+      }, { withCredentials: true });
+
+      toast.success("Member added to project");
+      // Update local selectedTask and refresh tasks
+      const updatedTask = response.data.task;
+      setSelectedTask(updatedTask);
+      fetchTasks();
+      setNewMemberToAdd("");
+      setNewMemberRole("");
+    } catch (error) {
+      console.error("Error adding member:", error);
+      const msg = error?.response?.data?.message || "Error adding member";
+      toast.error(msg);
     }
   };
 
@@ -205,6 +311,7 @@ const Uniques360Coordinator = () => {
     switch (status) {
       case "completed": return "success";
       case "in-progress": return "warning";
+      case "pending": return "info";
       default: return "default";
     }
   };
@@ -306,95 +413,159 @@ const Uniques360Coordinator = () => {
         </Grid>
       </Grid>
 
-      <TableContainer component={Paper} elevation={3} sx={{ borderRadius: 2 }}>
-        <Table>
-          <TableHead sx={{ bgcolor: "#f5f5f5" }}>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>Task Title</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Assigned To</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Priority</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Deadline</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Status</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {tasks.map((task) => (
-              <TableRow key={task._id} hover>
-                <TableCell>{task.title}</TableCell>
-                <TableCell>
-                  {task.assignedTo?.map(m => m.fullName).join(", ") || "No one assigned"}
-                </TableCell>
-                <TableCell>
-                  <Chip label={task.priority} size="small" color={task.priority === "high" ? "error" : "default"} />
-                </TableCell>
-                <TableCell>{task.deadline ? new Date(task.deadline).toLocaleDateString() : "No deadline"}</TableCell>
-                <TableCell>
-                  <Chip label={task.status} size="small" color={getStatusColor(task.status)} />
-                </TableCell>
-                <TableCell>
-                  <Box sx={{ display: "flex", gap: 0.5 }}>
-                    <IconButton
-                      color="primary"
-                      size="small"
-                      title="View Reports"
-                      onClick={() => {
-                        setSelectedTask(task);
-                        setReportsOpen(true);
-                        fetchReports(task._id);
-                      }}
-                    >
-                      <ViewIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      color="secondary"
-                      size="small"
-                      title="Edit Task"
-                      onClick={() => {
-                        setSelectedTask({
-                          ...task,
-                          assignedTo: task.assignedTo.map(m => m._id) // Convert to IDs for Select
-                        });
-                        setEditOpen(true);
-                      }}
-                    >
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      title="Manage Team"
-                      onClick={() => {
-                        setSelectedTask(task);
-                        setTeamOpen(true);
-                      }}
-                    >
-                      <TeamIcon fontSize="small" />
-                    </IconButton>
-                    {task.status !== "completed" && (
-                      <IconButton
-                        color="success"
-                        size="small"
-                        title="Mark Complete"
-                        onClick={() => handleStatusUpdate(task._id, "completed")}
-                      >
-                        <CompleteIcon fontSize="small" />
-                      </IconButton>
-                    )}
-                    <IconButton
-                      color="error"
-                      size="small"
-                      title="Delete Task"
-                      onClick={() => handleDeleteTask(task._id)}
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        {taskStatusSummary.map((item) => (
+          <Grid item xs={12} md={4} key={item.key}>
+            <Card
+              sx={{
+                borderRadius: 2,
+                borderLeft: `6px solid ${item.color}`,
+                boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+              }}
+            >
+              <CardContent>
+                <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+                  {item.label}
+                </Typography>
+                <Typography variant="h4" sx={{ fontWeight: 800, color: item.color }}>
+                  {item.value}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  {item.helper}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+
+      <Card sx={{ mb: 3, borderRadius: 2, boxShadow: "0 4px 20px rgba(0,0,0,0.06)" }}>
+        <CardContent>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={4}>
+              <FormControl fullWidth size="small">
+                <InputLabel>Filter by Type</InputLabel>
+                <Select value={taskTypeFilter} label="Filter by Type" onChange={(e) => setTaskTypeFilter(e.target.value)}>
+                  <MenuItem value="all">All Tasks</MenuItem>
+                  <MenuItem value="project">Project</MenuItem>
+                  <MenuItem value="event">Event</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <FormControl fullWidth size="small">
+                <InputLabel>Filter by Status</InputLabel>
+                <Select value={statusFilter} label="Filter by Status" onChange={(e) => setStatusFilter(e.target.value)}>
+                  <MenuItem value="all">All Status</MenuItem>
+                  <MenuItem value="pending">Todo</MenuItem>
+                  <MenuItem value="in-progress">In Progress</MenuItem>
+                  <MenuItem value="completed">Completed</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <FormControl fullWidth size="small">
+                <InputLabel>Filter by Member</InputLabel>
+                <Select value={memberFilter} label="Filter by Member" onChange={(e) => setMemberFilter(e.target.value)}>
+                  <MenuItem value="all">All Members</MenuItem>
+                  {members.map((member) => (
+                    <MenuItem key={member._id} value={member._id}>{member.fullName}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
+
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+        <TaskTable
+          title="Todo"
+          description="Pending work waiting to be assigned or started"
+          tasks={visibleTaskGroups.todo}
+          getStatusColor={getStatusColor}
+          onViewReports={(task) => {
+            setSelectedTask(task);
+            setReportsOpen(true);
+            fetchReports(task._id);
+          }}
+          onEdit={(task) => {
+            setSelectedTask({
+              ...task,
+              assignedTo: task.assignedTo?.map((it) => (it && it.member ? { member: it.member._id || it.member, role: it.role || null } : { member: it._id || it, role: it.role || null })) || [],
+            });
+            setEditOpen(true);
+          }}
+          onAddUser={(task) => {
+            setSelectedTask(task);
+            setTeamOpen(true);
+          }}
+          onManageTeam={(task) => {
+            setSelectedTask(task);
+            setTeamOpen(true);
+          }}
+          onMarkComplete={handleStatusUpdate}
+          onDelete={handleDeleteTask}
+        />
+
+        <TaskTable
+          title="In Progress"
+          description="Tasks currently being worked on"
+          tasks={visibleTaskGroups.inProgress}
+          getStatusColor={getStatusColor}
+          onViewReports={(task) => {
+            setSelectedTask(task);
+            setReportsOpen(true);
+            fetchReports(task._id);
+          }}
+          onEdit={(task) => {
+            setSelectedTask({
+              ...task,
+              assignedTo: task.assignedTo?.map((it) => (it && it.member ? { member: it.member._id || it.member, role: it.role || null } : { member: it._id || it, role: it.role || null })) || [],
+            });
+            setEditOpen(true);
+          }}
+          onAddUser={(task) => {
+            setSelectedTask(task);
+            setTeamOpen(true);
+          }}
+          onManageTeam={(task) => {
+            setSelectedTask(task);
+            setTeamOpen(true);
+          }}
+          onMarkComplete={handleStatusUpdate}
+          onDelete={handleDeleteTask}
+        />
+
+        <TaskTable
+          title="Completed"
+          description="Finished tasks and closed work"
+          tasks={visibleTaskGroups.completed}
+          getStatusColor={getStatusColor}
+          onViewReports={(task) => {
+            setSelectedTask(task);
+            setReportsOpen(true);
+            fetchReports(task._id);
+          }}
+          onEdit={(task) => {
+            setSelectedTask({
+              ...task,
+              assignedTo: task.assignedTo?.map((it) => (it && it.member ? { member: it.member._id || it.member, role: it.role || null } : { member: it._id || it, role: it.role || null })) || [],
+            });
+            setEditOpen(true);
+          }}
+          onAddUser={(task) => {
+            setSelectedTask(task);
+            setTeamOpen(true);
+          }}
+          onManageTeam={(task) => {
+            setSelectedTask(task);
+            setTeamOpen(true);
+          }}
+          onMarkComplete={handleStatusUpdate}
+          onDelete={handleDeleteTask}
+        />
+      </Box>
 
       {/* Create Task Dialog */}
       <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
@@ -457,8 +628,13 @@ const Uniques360Coordinator = () => {
                     value={newTask.assignedTo}
                     label="Assign To Member(s)"
                     onChange={(e) => {
-                      const value = e.target.value;
-                      setNewTask({ ...newTask, assignedTo: typeof value === 'string' ? value.split(',') : value });
+                      const value = typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value;
+                      setNewTask({ ...newTask, assignedTo: value });
+                      setNewTaskRoles((prev) => {
+                        const next = {};
+                        value.forEach((id) => { next[id] = prev[id] || ""; });
+                        return next;
+                      });
                     }}
                     disabled={!filteredMembers.length && selectedBatch}
                     renderValue={(selected) => (
@@ -477,6 +653,26 @@ const Uniques360Coordinator = () => {
                     ))}
                   </Select>
                 </FormControl>
+                {newTask.assignedTo?.length > 0 && (
+                  <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    {newTask.assignedTo.map((id) => {
+                      const member = members.find(m => m._id === id);
+                      return (
+                        <Box key={id} sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                          <Typography sx={{ minWidth: 160 }}>{member?.fullName || id}</Typography>
+                          <TextField
+                            label="Role (admin input)"
+                            size="small"
+                            value={newTaskRoles[id] || ""}
+                            onChange={(e) => setNewTaskRoles(prev => ({ ...prev, [id]: e.target.value }))}
+                            placeholder="e.g. frontend, backend"
+                            sx={{ minWidth: 200 }}
+                          />
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                )}
               </Grid>
             </Grid>
             <TextField
@@ -625,26 +821,66 @@ const Uniques360Coordinator = () => {
         <DialogTitle sx={{ fontWeight: "bold" }}>Manage Project Team</DialogTitle>
         <DialogContent>
           <List sx={{ mt: 1 }}>
-            {selectedTask?.assignedTo?.map((member) => (
-              <ListItem key={member._id} disablePadding sx={{ mb: 1 }}>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", p: 1, border: 1, borderColor: "divider", borderRadius: 1 }}>
-                  <Box>
-                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>{member.fullName}</Typography>
-                    <Typography variant="caption" color="text.secondary">{member.email}</Typography>
+            {selectedTask?.assignedTo?.map((item) => {
+              const inner = item && item.member ? item.member : item;
+              const role = item && item.role ? item.role : null;
+              const memberId = inner?._id || inner?._id;
+              return (
+                <ListItem key={memberId} disablePadding sx={{ mb: 1 }}>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", p: 1, border: 1, borderColor: "divider", borderRadius: 1 }}>
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>{inner?.fullName}</Typography>
+                      <Typography variant="caption" color="text.secondary">{inner?.email}{role ? ` • ${role}` : ''}</Typography>
+                    </Box>
+                    <IconButton
+                      edge="end"
+                      color="error"
+                      size="small"
+                      onClick={() => handleRemoveMember(selectedTask._id, memberId)}
+                      disabled={selectedTask.assignedTo.length <= 1}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
                   </Box>
-                  <IconButton
-                    edge="end"
-                    color="error"
-                    size="small"
-                    onClick={() => handleRemoveMember(selectedTask._id, member._id)}
-                    disabled={selectedTask.assignedTo.length <= 1}
-                  >
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
-                </Box>
-              </ListItem>
-            ))}
+                </ListItem>
+              );
+            })}
           </List>
+          <Box sx={{ mt: 2, display: "flex", gap: 1, alignItems: "center" }}>
+            <FormControl sx={{ minWidth: 220 }}>
+              <InputLabel>Add member</InputLabel>
+              <Select
+                value={newMemberToAdd}
+                label="Add member"
+                onChange={(e) => setNewMemberToAdd(e.target.value)}
+              >
+                <MenuItem value=""><em>Select member</em></MenuItem>
+                {members
+                  .filter(m => !selectedTask?.assignedTo?.some(at => ((at.member && at.member._id) || at._id) === m._id))
+                  .map((m) => (
+                    <MenuItem key={m._id} value={m._id}>{m.fullName} ({m.admno || m.email})</MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+
+            <TextField
+              label="Role (admin input)"
+              size="small"
+              value={newMemberRole}
+              onChange={(e) => setNewMemberRole(e.target.value)}
+              placeholder="e.g. frontend, backend, UI"
+              sx={{ minWidth: 200 }}
+            />
+
+            <Button
+              variant="contained"
+              onClick={handleAddMember}
+              disabled={!newMemberToAdd}
+              sx={{ bgcolor: "#ca0019", whiteSpace: "nowrap" }}
+            >
+              Add
+            </Button>
+          </Box>
           {selectedTask?.assignedTo?.length <= 1 && (
             <Typography variant="caption" color="error" sx={{ mt: 1, display: "block" }}>
               * Cannot remove the last member. Use delete task instead.
@@ -660,3 +896,5 @@ const Uniques360Coordinator = () => {
 };
 
 export default Uniques360Coordinator;
+
+

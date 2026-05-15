@@ -53,7 +53,9 @@ const Uniques360Coordinator = () => {
     assignedTo: [],
     deadline: "",
     priority: "medium",
+    taskType: "project",
   });
+  const [newTaskRoles, setNewTaskRoles] = useState({});
 
   const [selectedBatch, setSelectedBatch] = useState("");
 
@@ -63,6 +65,10 @@ const Uniques360Coordinator = () => {
   const [reportsLoading, setReportsLoading] = useState(false);
   const [teamSelectedBatch, setTeamSelectedBatch] = useState("");
   const [teamSelectedMember, setTeamSelectedMember] = useState("");
+  const [teamSelectedRole, setTeamSelectedRole] = useState("");
+  const [taskTypeFilter, setTaskTypeFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [memberFilter, setMemberFilter] = useState("all");
 
   const [editOpen, setEditOpen] = useState(false);
   const [teamOpen, setTeamOpen] = useState(false);
@@ -151,15 +157,28 @@ const Uniques360Coordinator = () => {
 
       setSubmitting(true);
 
-      await axios.post(
+      const assignedTo = newTask.assignedTo.map((memberId) => ({
+        member: memberId,
+        role: newTaskRoles[memberId] || null,
+      }));
+
+      const response = await axios.post(
         `${BASE_URL}/api/uniques360/tasks`,
-        newTask,
+        {
+          ...newTask,
+          assignedTo,
+        },
         {
           withCredentials: true,
         }
       );
 
       toast.success("Task assigned successfully");
+
+      const createdTask = response.data?.task;
+      if (createdTask) {
+        setTasks((prev) => [createdTask, ...(Array.isArray(prev) ? prev : [])]);
+      }
 
       setOpen(false);
 
@@ -169,7 +188,9 @@ const Uniques360Coordinator = () => {
         assignedTo: [],
         deadline: "",
         priority: "medium",
+        taskType: "project",
       });
+      setNewTaskRoles({});
 
       setSelectedBatch("");
 
@@ -321,9 +342,11 @@ const Uniques360Coordinator = () => {
 
       setSelectedTask((prev) => ({
         ...prev,
-        assignedTo: prev.assignedTo.filter(
-          (m) => m._id !== memberId
-        ),
+        assignedTo: (prev.assignedTo || []).filter((m) => {
+          const inner = m && m.member ? m.member : m;
+          const id = inner?._id || inner?.id || inner;
+          return id?.toString?.() !== memberId;
+        }),
       }));
     } catch (error) {
       console.error(error);
@@ -349,6 +372,17 @@ const Uniques360Coordinator = () => {
         return "default";
     }
   };
+
+  const filteredTasks = tasks.filter((task) => {
+    const typeOk = taskTypeFilter === "all" || task.taskType === taskTypeFilter;
+    const statusOk = statusFilter === "all" || task.status === statusFilter;
+    const memberOk = memberFilter === "all" || (task.assignedTo || []).some((item) => {
+      const inner = item && item.member ? item.member : item;
+      const id = inner?._id || inner?.id || inner;
+      return id?.toString?.() === memberFilter;
+    });
+    return typeOk && statusOk && memberOk;
+  });
 
   // ================= LOADING =================
 
@@ -430,10 +464,72 @@ const Uniques360Coordinator = () => {
         </Button>
       </Box>
 
+      <Box sx={{ mb: 3, display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" }, gap: 2 }}>
+        <FormControl fullWidth size="small">
+          <InputLabel>Filter by Type</InputLabel>
+          <Select value={taskTypeFilter} label="Filter by Type" onChange={(e) => setTaskTypeFilter(e.target.value)}>
+            <MenuItem value="all">All Tasks</MenuItem>
+            <MenuItem value="project">Project</MenuItem>
+            <MenuItem value="event">Event</MenuItem>
+          </Select>
+        </FormControl>
+
+        <FormControl fullWidth size="small">
+          <InputLabel>Filter by Status</InputLabel>
+          <Select value={statusFilter} label="Filter by Status" onChange={(e) => setStatusFilter(e.target.value)}>
+            <MenuItem value="all">All Status</MenuItem>
+            <MenuItem value="pending">Todo</MenuItem>
+            <MenuItem value="in-progress">In Progress</MenuItem>
+            <MenuItem value="completed">Completed</MenuItem>
+          </Select>
+        </FormControl>
+
+        <FormControl fullWidth size="small">
+          <InputLabel>Filter by Member</InputLabel>
+          <Select value={memberFilter} label="Filter by Member" onChange={(e) => setMemberFilter(e.target.value)}>
+            <MenuItem value="all">All Members</MenuItem>
+            {members.map((member) => (
+              <MenuItem key={member._id} value={member._id}>{member.fullName}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
+
+          <Box sx={{ mb: 3, display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" }, gap: 2 }}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Filter by Type</InputLabel>
+              <Select value={taskTypeFilter} label="Filter by Type" onChange={(e) => setTaskTypeFilter(e.target.value)}>
+                <MenuItem value="all">All Tasks</MenuItem>
+                <MenuItem value="project">Project</MenuItem>
+                <MenuItem value="event">Event</MenuItem>
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth size="small">
+              <InputLabel>Filter by Status</InputLabel>
+              <Select value={statusFilter} label="Filter by Status" onChange={(e) => setStatusFilter(e.target.value)}>
+                <MenuItem value="all">All Status</MenuItem>
+                <MenuItem value="pending">Todo</MenuItem>
+                <MenuItem value="in-progress">In Progress</MenuItem>
+                <MenuItem value="completed">Completed</MenuItem>
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth size="small">
+              <InputLabel>Filter by Member</InputLabel>
+              <Select value={memberFilter} label="Filter by Member" onChange={(e) => setMemberFilter(e.target.value)}>
+                <MenuItem value="all">All Members</MenuItem>
+                {members.map((member) => (
+                  <MenuItem key={member._id} value={member._id}>{member.fullName}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+
       {/* TABLE */}
 
       <TaskTable
-        tasks={tasks}
+            tasks={filteredTasks}
         getStatusColor={getStatusColor}
         onViewReports={(task) => {
           setSelectedTask(task);
@@ -443,7 +539,10 @@ const Uniques360Coordinator = () => {
         onEdit={(task) => {
           setSelectedTask({
             ...task,
-            assignedTo: task.assignedTo?.map((member) => member._id) || [],
+            assignedTo: task.assignedTo?.map((item) => {
+              const inner = item && item.member ? item.member : item;
+              return inner?._id || inner?.id || inner;
+            }) || [],
           });
 
           setEditOpen(true);
@@ -452,6 +551,7 @@ const Uniques360Coordinator = () => {
           setSelectedTask(task);
           setTeamSelectedBatch("");
           setTeamSelectedMember("");
+          setTeamSelectedRole("");
           setTeamOpen(true);
         }}
         onMarkComplete={handleStatusUpdate}
@@ -471,6 +571,8 @@ const Uniques360Coordinator = () => {
         setSelectedBatch={setSelectedBatch}
         batches={batches}
         members={members}
+        newTaskRoles={newTaskRoles}
+        setNewTaskRoles={setNewTaskRoles}
       />
 
       <ReportsDialog
@@ -509,6 +611,7 @@ const Uniques360Coordinator = () => {
               `${BASE_URL}/api/uniques360/tasks/${selectedTask._id}/members`,
               {
                 newMemberId: teamSelectedMember,
+                role: teamSelectedRole || null,
               },
               {
                 withCredentials: true,
@@ -518,6 +621,7 @@ const Uniques360Coordinator = () => {
             toast.success("Member added");
             setTeamSelectedMember("");
             setTeamSelectedBatch("");
+            setTeamSelectedRole("");
             fetchTasks();
             setSelectedTask((prev) => ({
               ...prev,
@@ -534,6 +638,8 @@ const Uniques360Coordinator = () => {
         onRemoveMember={async (memberId) => {
           await handleRemoveMember(selectedTask._id, memberId);
         }}
+        selectedRole={teamSelectedRole}
+        onSelectedRoleChange={setTeamSelectedRole}
       />
     </Box>
   );

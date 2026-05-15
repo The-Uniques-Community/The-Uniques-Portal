@@ -19,9 +19,14 @@ const verifyToken = (req, res, next) => {
       console.error("JWT Verification Error:", err.message);
       return res.status(401).json({ error: 'Invalid token' });
     }
-    
+
     console.log("Decoded Token Payload:", decoded);
-    req.user = decoded; // Attach decoded token (including role) to the request
+    // Normalize common id fields so downstream controllers can rely on req.user.id
+    req.user = {
+      ...decoded,
+      id: decoded.id || decoded._id || decoded.userId || decoded.sub || null,
+      _id: decoded._id || decoded.id || decoded.userId || decoded.sub || null,
+    };
     next(); // Proceed to the next middleware/route handler
   });
 };

@@ -195,13 +195,16 @@ const ProjectInsights = () => {
                     </TableCell>
                     <TableCell>
                       <AvatarGroup max={3}>
-                        {task.assignedTo?.map((member, i) => (
-                          <Tooltip title={member.fullName} key={i}>
-                            <Avatar sx={{ width: 30, height: 30, fontSize: "0.8rem" }}>
-                              {member.fullName?.charAt(0)}
-                            </Avatar>
-                          </Tooltip>
-                        ))}
+                        {task.assignedTo?.map((item, i) => {
+                          const inner = item && item.member ? item.member : item;
+                          return (
+                            <Tooltip title={inner.fullName} key={i}>
+                              <Avatar sx={{ width: 30, height: 30, fontSize: "0.8rem" }}>
+                                {inner.fullName?.charAt(0)}
+                              </Avatar>
+                            </Tooltip>
+                          );
+                        })}
                       </AvatarGroup>
                     </TableCell>
                     <TableCell sx={{ width: 150 }}>
