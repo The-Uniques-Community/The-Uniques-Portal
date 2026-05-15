@@ -220,9 +220,10 @@ const EventInsights = () => {
                           <Avatar key={i} sx={{ bgcolor: "#cfd3d8", color: "#555", width: 32, height: 32, fontSize: 12 }}>
                             {getInitials(member.fullName)}
                           </Avatar>
-                        ))}
-                      </AvatarGroup>
-                    </TableCell>
+                          {task.assignedTo?.map((item, i) => {
+                            const inner = item && item.member ? item.member : item;
+                            return <Avatar sx={{ width: 32, height: 32 }} key={i}>{inner.fullName?.charAt(0)}</Avatar>;
+                          })}
                     <TableCell>
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         <Box sx={{ width: "100%" }}>

@@ -9,11 +9,19 @@ const taskSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  assignedTo: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Member",
-    required: true,
-  }],
+  assignedTo: [
+    {
+      member: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Member",
+        required: true,
+      },
+      role: {
+        type: String,
+        default: null,
+      }
+    }
+  ],
   assignedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Admin", // Assuming coordinators are also in Admin model or there's a specific role

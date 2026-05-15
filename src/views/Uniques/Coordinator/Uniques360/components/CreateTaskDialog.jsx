@@ -22,6 +22,8 @@ const CreateTaskDialog = ({
   submitting,
   newTask,
   setNewTask,
+  newTaskRoles,
+  setNewTaskRoles,
   selectedBatch,
   setSelectedBatch,
   batches,
@@ -35,17 +37,10 @@ const CreateTaskDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Assign New Project/Task</DialogTitle>
+      <DialogTitle>Assign New Task</DialogTitle>
 
       <DialogContent>
-        <Box
-          sx={{
-            mt: 2,
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-          }}
-        >
+        <Box sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 2 }}>
           <TextField
             label="Task Title"
             fullWidth
@@ -87,6 +82,23 @@ const CreateTaskDialog = ({
                       ...newTask,
                       assignedTo: [],
                     });
+
+                  <FormControl fullWidth>
+                    <InputLabel>Task Type</InputLabel>
+                    <Select
+                      value={newTask.taskType || "project"}
+                      label="Task Type"
+                      onChange={(e) =>
+                        setNewTask({
+                          ...newTask,
+                          taskType: e.target.value,
+                        })
+                      }
+                    >
+                      <MenuItem value="project">Project</MenuItem>
+                      <MenuItem value="event">Event</MenuItem>
+                    </Select>
+                  </FormControl>
                   }}
                 >
                   <MenuItem value="">All Batches</MenuItem>
@@ -118,21 +130,10 @@ const CreateTaskDialog = ({
                         typeof value === "string" ? value.split(",") : value,
                     });
                   }}
-                  renderValue={(selected) => (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        gap: 0.5,
-                      }}
-                    >
-                      {selected.map((id) => {
-                        const member = members.find((item) => item._id === id);
-
-                        return <Chip key={id} label={member?.fullName || id} size="small" />;
-                      })}
-                    </Box>
-                  )}
+                  renderValue={(selected) => <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>{selected.map((id) => {
+                    const member = members.find((item) => item._id === id);
+                    return <Chip key={id} label={member?.fullName || id} size="small" />;
+                  })}</Box>}
                 >
                   {filteredMembers.map((member) => (
                     <MenuItem key={member._id} value={member._id}>
@@ -141,6 +142,34 @@ const CreateTaskDialog = ({
                   ))}
                 </Select>
               </FormControl>
+
+              {newTask.assignedTo?.length > 0 && (
+                <Box sx={{ mt: 1.5, display: "flex", flexDirection: "column", gap: 1.25 }}>
+                  {newTask.assignedTo.map((memberId) => {
+                    const member = members.find((item) => item._id === memberId);
+                    return (
+                      <Box key={memberId} sx={{ display: "flex", gap: 1.25, alignItems: "center", flexWrap: "wrap" }}>
+                        <Box sx={{ minWidth: 180 }}>
+                          <Chip label={member?.fullName || memberId} size="small" />
+                        </Box>
+                        <TextField
+                          label="Role (admin input)"
+                          size="small"
+                          fullWidth
+                          value={newTaskRoles?.[memberId] || ""}
+                          onChange={(e) =>
+                            setNewTaskRoles((prev) => ({
+                              ...prev,
+                              [memberId]: e.target.value,
+                            }))
+                          }
+                          placeholder="frontend, backend, ui, etc."
+                        />
+                      </Box>
+                    );
+                  })}
+                </Box>
+              )}
             </Grid>
           </Grid>
 
