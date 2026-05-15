@@ -17,6 +17,9 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Card,
+  CardContent,
+  Grid,
 } from "@mui/material";
 
 import {
@@ -597,36 +600,46 @@ const Uniques360Coordinator = () => {
           </Typography>
         </Paper>
       </Box>
-        <FormControl fullWidth size="small">
-          <InputLabel>Filter by Type</InputLabel>
-          <Select value={taskTypeFilter} label="Filter by Type" onChange={(e) => setTaskTypeFilter(e.target.value)}>
-            <MenuItem value="all">All Tasks</MenuItem>
-            <MenuItem value="project">Project</MenuItem>
-            <MenuItem value="event">Event</MenuItem>
-          </Select>
-        </FormControl>
+        <Card sx={{ mb: 3, borderRadius: 2, boxShadow: "0 4px 20px rgba(0,0,0,0.06)" }}>
+          <CardContent>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={4}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Filter by Type</InputLabel>
+                  <Select value={taskTypeFilter} label="Filter by Type" onChange={(e) => setTaskTypeFilter(e.target.value)}>
+                    <MenuItem value="all">All Tasks</MenuItem>
+                    <MenuItem value="project">Project</MenuItem>
+                    <MenuItem value="event">Event</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
 
-        <FormControl fullWidth size="small">
-          <InputLabel>Filter by Status</InputLabel>
-          <Select value={statusFilter} label="Filter by Status" onChange={(e) => setStatusFilter(e.target.value)}>
-            <MenuItem value="all">All Status</MenuItem>
-            <MenuItem value="pending">Pending</MenuItem>
-            <MenuItem value="in-progress">In Progress</MenuItem>
-            <MenuItem value="completed">Completed</MenuItem>
-          </Select>
-        </FormControl>
+              <Grid item xs={12} md={4}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Filter by Status</InputLabel>
+                  <Select value={statusFilter} label="Filter by Status" onChange={(e) => setStatusFilter(e.target.value)}>
+                    <MenuItem value="all">All Status</MenuItem>
+                    <MenuItem value="pending">Pending</MenuItem>
+                    <MenuItem value="in-progress">In Progress</MenuItem>
+                    <MenuItem value="completed">Completed</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
 
-        <FormControl fullWidth size="small">
-          <InputLabel>Filter by Member</InputLabel>
-          <Select value={memberFilter} label="Filter by Member" onChange={(e) => setMemberFilter(e.target.value)}>
-            <MenuItem value="all">All Members</MenuItem>
-            {members.map((member) => (
-              <MenuItem key={member._id} value={member._id}>{member.fullName}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
-
+              <Grid item xs={12} md={4}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Filter by Member</InputLabel>
+                  <Select value={memberFilter} label="Filter by Member" onChange={(e) => setMemberFilter(e.target.value)}>
+                    <MenuItem value="all">All Members</MenuItem>
+                    {members.map((member) => (
+                      <MenuItem key={member._id} value={member._id}>{member.fullName}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
       {tasksLoading && (
         <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
           <CircularProgress size={50} />

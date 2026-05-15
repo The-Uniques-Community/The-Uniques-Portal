@@ -12,6 +12,7 @@ import {
   TableHead,
   TableRow,
   Typography,
+  LinearProgress,
 } from "@mui/material";
 import {
   Visibility as ViewIcon,
@@ -30,7 +31,6 @@ const TaskTable = ({
   onViewReports,
   onEdit,
   onManageTeam,
-  onAddUser,
   onMarkComplete,
   onDelete,
 }) => {
@@ -51,23 +51,23 @@ const TaskTable = ({
         </Box>
       )}
 
-      <TableContainer>
-        <Table>
-          <TableHead sx={{ bgcolor: "#f5f5f5" }}>
+      <TableContainer sx={{ maxHeight: 520 }}>
+        <Table stickyHeader>
+          <TableHead sx={{ bgcolor: "background.paper" }}>
             <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>Task Title</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Assigned To</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Priority</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Assigned Date</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Deadline</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Status</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Actions</TableCell>
+              <TableCell sx={{ fontWeight: 800, textTransform: "uppercase", fontSize: "0.75rem" }}>Task Title</TableCell>
+              <TableCell sx={{ fontWeight: 800, textTransform: "uppercase", fontSize: "0.75rem" }}>Assigned To</TableCell>
+              <TableCell sx={{ fontWeight: 800, textTransform: "uppercase", fontSize: "0.75rem" }}>Priority</TableCell>
+              <TableCell sx={{ fontWeight: 800, textTransform: "uppercase", fontSize: "0.75rem" }}>Assigned</TableCell>
+              <TableCell sx={{ fontWeight: 800, textTransform: "uppercase", fontSize: "0.75rem" }}>Deadline</TableCell>
+              <TableCell sx={{ fontWeight: 800, textTransform: "uppercase", fontSize: "0.75rem" }}>Status</TableCell>
+              <TableCell sx={{ fontWeight: 800, textTransform: "uppercase", fontSize: "0.75rem" }}>Actions</TableCell>
             </TableRow>
           </TableHead>
 
           <TableBody>
             {tasks.map((task) => (
-              <TableRow key={task._id} hover>
+              <TableRow key={task._id} hover sx={{ '&:hover': { backgroundColor: 'action.hover' } }}>
                 <TableCell>
                   <Stack spacing={0.5}>
                     <Typography sx={{ fontWeight: 700 }}>{task.title}</Typography>
@@ -130,12 +130,10 @@ const TaskTable = ({
                     />
 
                     {typeof task.progressPercent === "number" && (
-                      <Chip
-                        label={`${task.progressPercent}%`}
-                        size="small"
-                        variant="outlined"
-                        color="info"
-                      />
+                      <Box sx={{ width: 120 }}>
+                        <LinearProgress variant="determinate" value={Math.min(Math.max(task.progressPercent, 0), 100)} sx={{ height: 8, borderRadius: 2 }} />
+                        <Typography variant="caption" sx={{ ml: 0.5 }}>{`${task.progressPercent}%`}</Typography>
+                      </Box>
                     )}
                   </Box>
                 </TableCell>
@@ -158,14 +156,6 @@ const TaskTable = ({
                       title="Edit task"
                     >
                       <EditIcon fontSize="small" />
-                    </IconButton>
-
-                    <IconButton
-                      size="small"
-                      onClick={() => onAddUser?.(task)}
-                      title="Add user"
-                    >
-                      <AddUserIcon fontSize="small" />
                     </IconButton>
 
                     <IconButton

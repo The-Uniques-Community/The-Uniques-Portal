@@ -34,7 +34,7 @@ const EventView = Loader(lazy(() => import("@/views/Uniques/Coordinator/Events/V
 const Enquiry = Loader(lazy(() => import("@/views/Uniques/Coordinator/Enquiry")));
 const Trainers = Loader(lazy(() => import("@/views/Uniques/Coordinator/Trainers")));
 const LeaveManagement = Loader(lazy(() => import("@/views/Uniques/Coordinator/LeaveManagement")));
-const Uniques360 = Loader(lazy(() => import("@/views/Uniques/Coordinator/Uniques360")));
+const Uniques360 = Loader(lazy(() => import("@/views/Uniques360/Coordinator360/Uniques360")));
 const ProjectInsights = Loader(lazy(() => import("@/views/Uniques360/Projects/ProjectInsights")));
 const EventInsights = Loader(lazy(() => import("@/views/Uniques360/Events/EventInsights")));
 
