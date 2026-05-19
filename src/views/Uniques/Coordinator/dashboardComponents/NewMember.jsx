@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTheme } from "@mui/material/styles";
 import {
   Button,
   Card,
@@ -43,11 +44,12 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 import axios from "axios";
-import { BASE_URL } from "@/config";
 import userIcon from "@/assets/img/user-icon.png";
 import tu from "@/assets/logos/tu.png";
 
 export const NewMember = ({ user, refreshData }) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
   const [open, setOpen] = useState(false);
   const [tabValue, setTabValue] = useState(0);
   const [expandedSemesters, setExpandedSemesters] = useState({});
@@ -80,7 +82,7 @@ export const NewMember = ({ user, refreshData }) => {
 
   const getProxyImageUrl = (fileId) => {
     if (!fileId) return "/placeholder.svg"; // Fallback image
-    return `${BASE_URL}/api/image-proxy/${fileId}`;
+    return `http://localhost:5000/api/image-proxy/${fileId}`;
   };
   // Get status badge color
   const getStatusColor = (status) => {
@@ -105,7 +107,7 @@ export const NewMember = ({ user, refreshData }) => {
 
       // API call to toggle block status
       const response = await axios.patch(
-        `${BASE_URL}/api/admin/member/${user._id}/block`
+        `http://localhost:5000/api/admin/member/${user._id}/block`
       );
 
       // Show success message
@@ -157,7 +159,7 @@ export const NewMember = ({ user, refreshData }) => {
 
       // API call to toggle suspend status
       const response = await axios.patch(
-        `${BASE_URL}/api/admin/member/${user._id}/suspend`,
+        `http://localhost:5000/api/admin/member/${user._id}/suspend`,
         {
           reason: suspendReason,
         }
@@ -224,7 +226,7 @@ export const NewMember = ({ user, refreshData }) => {
 
       // API call to impose fine
       const response = await axios.post(
-        `${BASE_URL}/api/admin/fine/members/${user._id}/fines`,
+        `http://localhost:5000/api/admin/fine/members/${user._id}/fines`,
         {
           amount: Number(fineAmount),
           reason: fineReason.trim(),
@@ -261,10 +263,16 @@ export const NewMember = ({ user, refreshData }) => {
   return (
     <>
       {/* User Card */}
-      <Card className="rounded-2xl shadow-lg border border-slate-200 bg-white p-4 xl:max-w-[30px] xl:min-w-[350px] max-w-80 min-w-80">
+      <Card 
+        style={{
+          backgroundColor: theme.palette.background.paper,
+          borderColor: theme.palette.divider,
+        }}
+        className="rounded-2xl shadow-lg border p-4 xl:max-w-[30px] xl:min-w-[350px] max-w-80 min-w-80"
+      >
         <CardContent className="flex flex-col gap-2">
           {/* Status Tags */}
-          <div className="flex justify-between items-center my-4">
+          <div style={{ color: theme.palette.text.secondary }} className="flex justify-between items-center my-4">
             <div>
               <img
                 src={tu}
@@ -292,21 +300,21 @@ export const NewMember = ({ user, refreshData }) => {
                   : userIcon
               }
               alt={user.fullName}
-              sx={{
-                width: 60,
-                height: 60,
-                border: "4px solid #f5f5f5",
-                boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-                cursor: "pointer",
-                transition: "transform 0.2s",
-                "&:hover": {
-                  transform: "scale(1.05)",
-                },
+              sx={{ 
+                width: 60, 
+                height: 60, 
+                border: `4px solid ${isDark ? 'rgba(255,255,255,0.05)' : '#f5f5f5'}`,
+                boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+                cursor: 'pointer',
+                transition: 'transform 0.2s',
+                '&:hover': {
+                  transform: 'scale(1.05)'
+                }
               }}
             />
             <div>
-              <h2 className="text-lg font-semibold">{user.fullName}</h2>
-              <p className="text-gray-500 text-sm">
+              <h2 style={{ color: theme.palette.text.primary }} className="text-lg font-semibold">{user.fullName}</h2>
+              <p style={{ color: theme.palette.text.secondary }} className="text-sm">
                 {user.bio ? user.bio.slice(0, 36) + "..." : "No bio available"}
               </p>
             </div>
@@ -326,22 +334,28 @@ export const NewMember = ({ user, refreshData }) => {
 
       {/* Modal */}
       <Modal open={open} onClose={() => setOpen(false)}>
-        <Box className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-xl border border-slate-200 p-6 w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto">
+        <Box 
+          style={{
+            backgroundColor: theme.palette.background.paper,
+            borderColor: theme.palette.divider,
+            color: theme.palette.text.primary,
+          }}
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-2xl shadow-xl border p-6 w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto"
+        >
           {/* Profile Header */}
           <div className="flex items-center flex-wrap gap-y-5 justify-between mb-4">
             <div className="flex items-center gap-4">
               <img
-                src={
-                  user?.profilePic?.fileId
-                    ? getProxyImageUrl(user.profilePic.fileId)
-                    : userIcon
+                src={user?.profilePic?.fileId ? 
+                  getProxyImageUrl(user.profilePic.fileId) : 
+                  userIcon
                 }
                 alt={user.fullName}
                 className="w-16 h-16 rounded-full object-cover"
               />
               <div>
-                <h2 className="text-xl font-semibold">{user.fullName}</h2>
-                <p className="text-gray-500 text-sm">{user.email}</p>
+                <h2 style={{ color: theme.palette.text.primary }} className="text-xl font-semibold">{user.fullName}</h2>
+                <p style={{ color: theme.palette.text.secondary }} className="text-sm">{user.email}</p>
                 <div className="flex items-center gap-2 mt-1">
                   <Chip
                     label={user.batch}
@@ -409,46 +423,76 @@ export const NewMember = ({ user, refreshData }) => {
           {tabValue === 0 && (
             <div className="space-y-3">
               <div>
-                <span className="text-xs text-slate-500 px-1">
+                <span style={{ color: theme.palette.text.secondary }} className="text-xs px-1">
                   <InfoIcon style={{ fontSize: "14px" }} /> BIO
                 </span>
-                <div className="bg-slate-100 text-sm p-2 rounded-lg">
+                <div 
+                  style={{
+                    backgroundColor: isDark ? "rgba(255, 255, 255, 0.05)" : "#f1f5f9",
+                    color: theme.palette.text.primary
+                  }} 
+                  className="text-sm p-2 rounded-lg"
+                >
                   {user.bio || "No bio available"}
                 </div>
               </div>
 
               <div className="grid lg:grid-cols-3 md:grid-cols-3 sm:grid-cols-3 grid-cols-2 gap-4">
                 <div>
-                  <span className="text-xs inline-block mt-2 text-slate-500 px-1">
+                  <span style={{ color: theme.palette.text.secondary }} className="text-xs inline-block mt-2 px-1">
                     <CallIcon style={{ fontSize: "14px" }} /> CONTACT
                   </span>
-                  <div className="bg-slate-100 text-sm p-2 rounded-lg">
+                  <div 
+                    style={{
+                      backgroundColor: isDark ? "rgba(255, 255, 255, 0.05)" : "#f1f5f9",
+                      color: theme.palette.text.primary
+                    }} 
+                    className="text-sm p-2 rounded-lg"
+                  >
                     {user.contact || "Not provided"}
                   </div>
                 </div>
                 <div>
-                  <span className="text-xs inline-block mt-2 text-slate-500 px-1">
+                  <span style={{ color: theme.palette.text.secondary }} className="text-xs inline-block mt-2 px-1">
                     <WhatsAppIcon style={{ fontSize: "14px" }} /> WHATSAPP
                   </span>
-                  <div className="bg-slate-100 text-sm p-2 rounded-lg">
+                  <div 
+                    style={{
+                      backgroundColor: isDark ? "rgba(255, 255, 255, 0.05)" : "#f1f5f9",
+                      color: theme.palette.text.primary
+                    }} 
+                    className="text-sm p-2 rounded-lg"
+                  >
                     {user.whatsappContact || "Not provided"}
                   </div>
                 </div>
                 <div>
-                  <span className="text-xs inline-block mt-2 text-slate-500 px-1">
+                  <span style={{ color: theme.palette.text.secondary }} className="text-xs inline-block mt-2 px-1">
                     <PushPinIcon style={{ fontSize: "14px" }} /> CITY
                   </span>
-                  <div className="bg-slate-100 text-sm p-2 rounded-lg">
+                  <div 
+                    style={{
+                      backgroundColor: isDark ? "rgba(255, 255, 255, 0.05)" : "#f1f5f9",
+                      color: theme.palette.text.primary
+                    }} 
+                    className="text-sm p-2 rounded-lg"
+                  >
                     {user.city || "Not provided"}
                   </div>
                 </div>
               </div>
 
               <div>
-                <span className="text-xs text-slate-500 px-1">
+                <span style={{ color: theme.palette.text.secondary }} className="text-xs px-1">
                   <InfoIcon style={{ fontSize: "14px" }} /> ADDRESS
                 </span>
-                <div className="bg-slate-100 text-sm p-2 rounded-lg">
+                <div 
+                  style={{
+                    backgroundColor: isDark ? "rgba(255, 255, 255, 0.05)" : "#f1f5f9",
+                    color: theme.palette.text.primary
+                  }} 
+                  className="text-sm p-2 rounded-lg"
+                >
                   {user.address
                     ? `${user.address}, ${user.city || ""}, ${user.state || ""}`
                     : "Address not provided"}
@@ -525,7 +569,13 @@ export const NewMember = ({ user, refreshData }) => {
           {tabValue === 1 && (
             <div className="space-y-4">
               {/* CGPA */}
-              <div className="bg-blue-50 p-3 rounded-lg flex justify-between items-center">
+              <div 
+                style={{
+                  backgroundColor: isDark ? "rgba(33, 150, 243, 0.15)" : "#eff6ff",
+                  borderColor: theme.palette.divider
+                }}
+                className="p-3 rounded-lg flex justify-between items-center border"
+              >
                 <div className="flex items-center gap-2">
                   <SchoolIcon className="text-blue-600" />
                   <span className="font-medium">CGPA</span>
@@ -557,7 +607,11 @@ export const NewMember = ({ user, refreshData }) => {
                       .map((sem) => (
                         <div
                           key={sem.semester}
-                          className="bg-slate-100 p-2 rounded-lg"
+                          style={{
+                            backgroundColor: isDark ? "rgba(255, 255, 255, 0.05)" : "#f1f5f9",
+                            color: theme.palette.text.primary
+                          }}
+                          className="p-2 rounded-lg"
                         >
                           <div className="flex justify-between items-center">
                             <span className="font-medium">
@@ -581,7 +635,7 @@ export const NewMember = ({ user, refreshData }) => {
                       ))}
                   </div>
                 ) : (
-                  <div className="text-gray-500 text-sm">
+                  <div style={{ color: theme.palette.text.secondary }} className="text-sm">
                     No SGPA records available
                   </div>
                 )}
@@ -600,7 +654,11 @@ export const NewMember = ({ user, refreshData }) => {
                       .map((sem) => (
                         <div
                           key={sem.semester}
-                          className="bg-slate-100 p-2 rounded-lg"
+                          style={{
+                            backgroundColor: isDark ? "rgba(255, 255, 255, 0.05)" : "#f1f5f9",
+                            color: theme.palette.text.primary
+                          }}
+                          className="p-2 rounded-lg"
                         >
                           <div
                             className="flex justify-between items-center cursor-pointer"
@@ -668,7 +726,7 @@ export const NewMember = ({ user, refreshData }) => {
             <div className="space-y-4">
               {/* Skills */}
               <div>
-                <span className="text-xs text-slate-500 px-1">
+                <span style={{ color: theme.palette.text.secondary }} className="text-xs px-1">
                   <CodeIcon style={{ fontSize: "14px" }} /> SKILLS
                 </span>
                 <div className="flex flex-wrap gap-1 mt-1">
@@ -676,13 +734,16 @@ export const NewMember = ({ user, refreshData }) => {
                     user.skills.map((skill, index) => (
                       <Chip
                         key={index}
-                        label={typeof skill === "string" ? skill : skill.name} // Access the correct property
+                        label={typeof skill === "string" ? skill : skill.name}
                         size="small"
-                        className="bg-blue-100 text-blue-800"
+                        style={{
+                          backgroundColor: isDark ? "rgba(33, 150, 243, 0.15)" : "#eff6ff",
+                          color: isDark ? "#90caf9" : "#1e40af"
+                        }}
                       />
                     ))
                   ) : (
-                    <span className="text-gray-500 text-sm">
+                    <span style={{ color: theme.palette.text.secondary }} className="text-sm">
                       No skills listed
                     </span>
                   )}
@@ -691,17 +752,22 @@ export const NewMember = ({ user, refreshData }) => {
 
               {/* Projects */}
               <div>
-                <span className="text-xs text-slate-500 px-1">
+                <span style={{ color: theme.palette.text.secondary }} className="text-xs px-1">
                   <CodeIcon style={{ fontSize: "14px" }} /> PROJECTS
                 </span>
                 {user.projects && user.projects.length > 0 ? (
                   <div className="space-y-2 mt-1">
                     {user.projects.map((project, index) => (
-                      <div key={index} className="bg-slate-100 p-2 rounded-lg">
-                        <div className="font-medium">
-                          {project.title || project.name}
-                        </div>
-                        <div className="text-sm text-gray-600">
+                      <div 
+                        key={index} 
+                        style={{
+                          backgroundColor: isDark ? "rgba(255, 255, 255, 0.05)" : "#f1f5f9",
+                          color: theme.palette.text.primary
+                        }}
+                        className="p-2 rounded-lg"
+                      >
+                        <div className="font-medium">{project.title || project.name}</div>
+                        <div style={{ color: theme.palette.text.secondary }} className="text-sm">
                           {project.description}
                         </div>
                         {project.link && (
@@ -718,7 +784,7 @@ export const NewMember = ({ user, refreshData }) => {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-gray-500 text-sm">
+                  <div style={{ color: theme.palette.text.secondary }} className="text-sm">
                     No projects listed
                   </div>
                 )}
@@ -726,25 +792,32 @@ export const NewMember = ({ user, refreshData }) => {
 
               {/* Internships */}
               <div>
-                <span className="text-xs text-slate-500 px-1">
+                <span style={{ color: theme.palette.text.secondary }} className="text-xs px-1">
                   <WorkIcon style={{ fontSize: "14px" }} /> INTERNSHIPS
                 </span>
                 {user.internships && user.internships.length > 0 ? (
                   <div className="space-y-2 mt-1">
                     {user.internships.map((internship, index) => (
-                      <div key={index} className="bg-slate-100 p-2 rounded-lg">
+                      <div 
+                        key={index} 
+                        style={{
+                          backgroundColor: isDark ? "rgba(255, 255, 255, 0.05)" : "#f1f5f9",
+                          color: theme.palette.text.primary
+                        }}
+                        className="p-2 rounded-lg"
+                      >
                         <div className="font-medium">{internship.company}</div>
-                        <div className="text-sm text-gray-600">
+                        <div style={{ color: theme.palette.text.secondary }} className="text-sm">
                           {internship.role}
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div style={{ color: theme.palette.text.secondary }} className="text-sm">
                           {internship.duration} | {internship.year}
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-gray-500 text-sm">
+                  <div style={{ color: theme.palette.text.secondary }} className="text-sm">
                     No internships listed
                   </div>
                 )}
@@ -752,22 +825,26 @@ export const NewMember = ({ user, refreshData }) => {
 
               {/* Achievements */}
               <div>
-                <span className="text-xs text-slate-500 px-1">
+                <span style={{ color: theme.palette.text.secondary }} className="text-xs px-1">
                   <EmojiEventsIcon style={{ fontSize: "14px" }} /> ACHIEVEMENTS
                 </span>
                 {user.achievements && user.achievements.length > 0 ? (
                   <div className="space-y-1 mt-1">
                     {user.achievements.map((achievement, index) => (
-                      <div key={index} className="bg-slate-100 p-2 rounded-lg">
-                        {typeof achievement === "string"
-                          ? achievement
-                          : achievement.title}{" "}
-                        {/* Access title */}
+                      <div 
+                        key={index} 
+                        style={{
+                          backgroundColor: isDark ? "rgba(255, 255, 255, 0.05)" : "#f1f5f9",
+                          color: theme.palette.text.primary
+                        }}
+                        className="p-2 rounded-lg"
+                      >
+                        {typeof achievement === "string" ? achievement : achievement.title}
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-gray-500 text-sm">
+                  <div style={{ color: theme.palette.text.secondary }} className="text-sm">
                     No achievements listed
                   </div>
                 )}
@@ -779,23 +856,23 @@ export const NewMember = ({ user, refreshData }) => {
           {tabValue === 3 && (
             <div className="space-y-4">
               <div>
-                <span className="text-xs text-slate-500 px-1">
+                <span style={{ color: theme.palette.text.secondary }} className="text-xs px-1">
                   EVENT PARTICIPATION
                 </span>
                 {user.event_participation &&
                 user.event_participation.length > 0 ? (
-                  <div className="text-gray-500 text-sm">
+                  <div style={{ color: theme.palette.text.primary }} className="text-sm">
                     {user.event_participation.length} events participated
                   </div>
                 ) : (
-                  <div className="text-gray-500 text-sm">
+                  <div style={{ color: theme.palette.text.secondary }} className="text-sm">
                     No event participation records
                   </div>
                 )}
               </div>
 
               <div>
-                <span className="text-xs text-slate-500 px-1">
+                <span style={{ color: theme.palette.text.secondary }} className="text-xs px-1">
                   CONTRIBUTION TYPES
                 </span>
                 <div className="flex flex-wrap gap-1 mt-1">
@@ -806,11 +883,14 @@ export const NewMember = ({ user, refreshData }) => {
                         key={index}
                         label={type}
                         size="small"
-                        className="bg-purple-100 text-purple-800"
+                        style={{
+                          backgroundColor: isDark ? "rgba(156, 39, 176, 0.15)" : "#f3e5f5",
+                          color: isDark ? "#e040fb" : "#7b1fa2"
+                        }}
                       />
                     ))
                   ) : (
-                    <span className="text-gray-500 text-sm">
+                    <span style={{ color: theme.palette.text.secondary }} className="text-sm">
                       No contribution types recorded
                     </span>
                   )}

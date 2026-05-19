@@ -1,3 +1,4 @@
+import { useTheme } from '@mui/material/styles';
 import React, { useState, useEffect } from "react";
 import { NewMember } from "./dashboardComponents/NewMember";
 import StatCard from "./dashboardComponents/StatCard";
@@ -78,6 +79,7 @@ const FinePaymentModal = ({
   fine,
   onPaymentComplete,
 }) => {
+  const theme = useTheme();
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("upi");
@@ -374,6 +376,7 @@ const FinePaymentModal = ({
 
 // Receipt Preview Modal Component
 const ReceiptPreviewModal = ({ open, onClose, receiptUrl }) => {
+  const theme = useTheme();
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>
@@ -394,7 +397,7 @@ const ReceiptPreviewModal = ({ open, onClose, receiptUrl }) => {
                   width="100%"
                   height="500px"
                   title="PDF Receipt"
-                  style={{ border: "1px solid #ddd" }}
+                  style={{ border: "1px solid", borderColor: theme.palette.divider }}
                 />
               </Box>
             ) : (
@@ -425,6 +428,7 @@ const ReceiptPreviewModal = ({ open, onClose, receiptUrl }) => {
 
 // Add this component inside the index.jsx file
 const FineDetailsModal = ({ open, onClose, selectedFine, onPayFine, loading }) => {
+  const theme = useTheme();
   const [activeTab, setActiveTab] = useState(0);
 
   if (!selectedFine) return null;
@@ -495,7 +499,7 @@ const FineDetailsModal = ({ open, onClose, selectedFine, onPayFine, loading }) =
         {/* Fine List */}
         <TableContainer component={Paper} variant="outlined">
           <Table size="small">
-            <TableHead sx={{ bgcolor: 'grey.50' }}>
+            <TableHead sx={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'grey.50' }}>
               <TableRow>
                 <TableCell>Date</TableCell>
                 <TableCell>Reason</TableCell>
@@ -584,6 +588,7 @@ const FineDetailsModal = ({ open, onClose, selectedFine, onPayFine, loading }) =
 };
 
 const index = () => {
+  const theme = useTheme();
   // State for storing fetched data
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -922,7 +927,7 @@ const index = () => {
           </div>
 
           <div className="px-1 py-5 my-5">
-            <h2 className="text-2xl font-bold text-slate-800 mb-5">
+            <h2 className="text-2xl font-bold mb-5" style={{ color: theme.palette.text.primary }}>
               Newly Added Members
             </h2>
             {loading ? (
@@ -969,7 +974,7 @@ const index = () => {
 
       {/* Member Filters Section */}
       <div className="mx-3 mb-10">
-        <h2 className="text-2xl font-bold text-slate-800 mb-3">
+        <h2 className="text-2xl font-bold mb-3" style={{ color: theme.palette.text.primary }}>
           Member Filters
         </h2>
 
@@ -1005,7 +1010,7 @@ const index = () => {
                 className="shadow-md rounded-md"
               >
                 <Table>
-                  <TableHead className="bg-gray-100">
+                  <TableHead sx={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#f3f4f6' }}>
                     <TableRow>
                       <TableCell>Member</TableCell>
                       <TableCell>Admission No</TableCell>
@@ -1101,7 +1106,7 @@ const index = () => {
                 className="shadow-md rounded-md"
               >
                 <Table>
-                  <TableHead className="bg-gray-100">
+                  <TableHead sx={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#f3f4f6' }}>
                     <TableRow>
                       <TableCell>Member</TableCell>
                       <TableCell>Admission No</TableCell>

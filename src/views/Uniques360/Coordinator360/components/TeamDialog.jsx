@@ -20,6 +20,7 @@ import {
   InputLabel,
   TextField,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
 
@@ -38,6 +39,9 @@ const TeamDialog = ({
   onAddMember,
   onRemoveMember,
 }) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+
   if (!task) return null;
 
   const assignedIds = (task.assignedTo || []).map((member) => {
@@ -67,7 +71,7 @@ const TeamDialog = ({
 
       <DialogContent>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
-          <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: "#f7f7f7", border: "1px solid #ececec" }}>
+          <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: isDark ? "rgba(255, 255, 255, 0.05)" : "#f7f7f7", border: "1px solid", borderColor: "divider" }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
               Assignment overview
             </Typography>

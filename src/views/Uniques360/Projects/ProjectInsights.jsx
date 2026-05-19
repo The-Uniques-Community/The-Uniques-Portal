@@ -19,6 +19,7 @@ import {
   IconButton,
   Tooltip,
   CircularProgress,
+  useTheme,
 } from "@mui/material";
 import {
   Assignment as ProjectIcon,
@@ -35,12 +36,14 @@ import { toast } from "react-toastify";
 const ProjectInsights = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
   const themeColors = {
     red: "#ca0019",
-    black: "#111111",
-    charcoal: "#1f1f1f",
+    black: isDark ? "#ffffff" : "#111111",
+    charcoal: isDark ? "#ffffff" : "#1f1f1f",
     gray: "#757575",
-    lightGray: "#f3f3f3",
+    lightGray: isDark ? "rgba(255, 255, 255, 0.08)" : "#f3f3f3",
   };
 
   const fetchProjectTasks = async () => {
@@ -105,7 +108,7 @@ const ProjectInsights = () => {
   }
 
   return (
-    <Box sx={{ p: 4, bgcolor: "#fafafa", minHeight: "100vh" }}>
+    <Box sx={{ p: 4, bgcolor: isDark ? "background.default" : "#fafafa", minHeight: "100vh" }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: "bold", color: themeColors.black, mb: 1 }}>

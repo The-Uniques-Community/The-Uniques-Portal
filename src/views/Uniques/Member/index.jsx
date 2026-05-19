@@ -1672,7 +1672,7 @@ const Index = () => {
                 sx={{
                   width: 120,
                   height: 120,
-                  border: "4px solid #f5f5f5",
+                  border: "4px solid", borderColor: "divider",
                   boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
                   cursor: "pointer",
                   transition: "transform 0.2s",
@@ -1846,7 +1846,7 @@ const Index = () => {
           </Grid>
 
           <Grid item xs={12} md={6} lg={7}>
-            <Box sx={{ pl: { md: 3 }, borderLeft: { md: "1px solid #eee" } }}>
+            <Box sx={{ pl: { md: 3 }, borderLeft: { md: "1px solid" }, borderColor: "divider" }}>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
@@ -2101,11 +2101,11 @@ const Index = () => {
                 <Card
                   sx={{
                     mb: 2,
-                    bgcolor: "white",
+                    bgcolor: "background.paper",
                     boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
                     borderRadius: 2,
                     overflow: "hidden",
-                    border: "1px solid #f0f0f0",
+                    border: "1px solid", borderColor: "divider",
                   }}
                 >
                   <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
@@ -2149,7 +2149,7 @@ const Index = () => {
                         height: 8,
                         borderRadius: 5,
                         mt: 1,
-                        backgroundColor: "rgba(0,0,0,0.05)",
+                        backgroundColor: theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.08)" : "rgba(0,0,0,0.05)",
                         "& .MuiLinearProgress-bar": {
                           backgroundColor: "#ca0019",
                         },
@@ -2162,10 +2162,10 @@ const Index = () => {
               {user.skills && user.skills.length > 0 && (
                 <Card
                   sx={{
-                    bgcolor: "white",
+                    bgcolor: "background.paper",
                     boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
                     borderRadius: 2,
-                    border: "1px solid #f0f0f0",
+                    border: "1px solid", borderColor: "divider",
                   }}
                 >
                   <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
@@ -2291,7 +2291,7 @@ const Index = () => {
             <Grid item xs={12} md={7}>
               <Paper
                 elevation={2}
-                sx={{ p: 3, borderRadius: 2, bgcolor: "white" }}
+                sx={{ p: 3, borderRadius: 2, bgcolor: "background.paper" }}
               >
                 <Box
                   sx={{
@@ -2329,10 +2329,10 @@ const Index = () => {
                     sx={{
                       height: 300,
                       mb: 3,
-                      bgcolor: "white",
+                      bgcolor: "background.paper",
                       p: 2,
                       borderRadius: 2,
-                      border: "1px solid #f0f0f0",
+                      border: "1px solid", borderColor: "divider",
                     }}
                   >
                     <ResponsiveContainer width="100%" height="100%">
@@ -2420,7 +2420,7 @@ const Index = () => {
                               sx={{
                                 height: 8,
                                 borderRadius: 5,
-                                backgroundColor: "rgba(0,0,0,0.05)",
+                                backgroundColor: theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.08)" : "rgba(0,0,0,0.05)",
                                 "& .MuiLinearProgress-bar": {
                                   backgroundColor: "#ca0019",
                                 },
@@ -2443,7 +2443,7 @@ const Index = () => {
               {/* Skills Distribution */}
               <Paper
                 elevation={2}
-                sx={{ p: 3, borderRadius: 2, mb: 4, bgcolor: "white" }}
+                sx={{ p: 3, borderRadius: 2, mb: 4, bgcolor: "background.paper" }}
               >
                 <Box
                   sx={{
@@ -2468,10 +2468,10 @@ const Index = () => {
                       height: 250,
                       display: "flex",
                       justifyContent: "center",
-                      bgcolor: "white",
+                      bgcolor: "background.paper",
                       p: 2,
                       borderRadius: 2,
-                      border: "1px solid #f0f0f0",
+                      border: "1px solid", borderColor: "divider",
                     }}
                   >
                     <ResponsiveContainer width="100%" height="100%">
@@ -2605,7 +2605,7 @@ const Index = () => {
               {/* Bio Section */}
               <Paper
                 elevation={2}
-                sx={{ p: 3, borderRadius: 2, mb: 4, bgcolor: "white" }}
+                sx={{ p: 3, borderRadius: 2, mb: 4, bgcolor: "background.paper" }}
               >
                 <Box
                   sx={{
@@ -2693,7 +2693,7 @@ const Index = () => {
                 user.semesterSupplementary.length > 0 && (
                   <Paper
                     elevation={2}
-                    sx={{ p: 3, borderRadius: 2, bgcolor: "white" }}
+                    sx={{ p: 3, borderRadius: 2, bgcolor: "background.paper" }}
                   >
                     <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                       <ErrorIcon sx={{ color: "#ca0019", mr: 1 }} />
@@ -2812,7 +2812,7 @@ const Index = () => {
                         transform: "translateY(-4px)",
                         boxShadow: 4,
                       },
-                      bgcolor: "white",
+                      bgcolor: "background.paper",
                     }}
                   >
                     <Box sx={{ position: "relative" }}>
@@ -2879,7 +2879,7 @@ const Index = () => {
                 p: 4,
                 textAlign: "center",
                 borderRadius: 2,
-                bgcolor: "white",
+                bgcolor: "background.paper",
               }}
             >
               <Typography variant="body1" color="text.secondary" paragraph>
@@ -2940,7 +2940,7 @@ const Index = () => {
             sx={{
               p: 4,
               borderRadius: 2,
-              bgcolor: "white",
+              bgcolor: "background.paper",
             }}
           >
             {editMode.bio ? (
@@ -3033,7 +3033,7 @@ const Index = () => {
               sx={{
                 p: 3,
                 borderRadius: 2,
-                bgcolor: "white",
+                bgcolor: "background.paper",
               }}
             >
               <Box
@@ -3202,7 +3202,7 @@ const Index = () => {
                         transform: "translateY(-4px)",
                         boxShadow: 4,
                       },
-                      bgcolor: "white",
+                      bgcolor: "background.paper",
                     }}
                   >
                     <Box sx={{ position: "relative" }}>
@@ -3282,7 +3282,7 @@ const Index = () => {
                 p: 4,
                 textAlign: "center",
                 borderRadius: 2,
-                bgcolor: "white",
+                bgcolor: "background.paper",
               }}
             >
               <Typography variant="body1" color="text.secondary" paragraph>
@@ -3348,7 +3348,7 @@ const Index = () => {
                         transform: "translateY(-4px)",
                         boxShadow: 4,
                       },
-                      bgcolor: "white",
+                      bgcolor: "background.paper",
                     }}
                   >
                     <Box sx={{ position: "relative" }}>
@@ -3440,7 +3440,7 @@ const Index = () => {
                 p: 4,
                 textAlign: "center",
                 borderRadius: 2,
-                bgcolor: "white",
+                bgcolor: "background.paper",
               }}
             >
               <Typography variant="body1" color="text.secondary" paragraph>
@@ -3503,7 +3503,7 @@ const Index = () => {
                       borderRadius: 2,
                       height: "100%",
                       position: "relative",
-                      bgcolor: "white",
+                      bgcolor: "background.paper",
                       transition: "transform 0.2s, box-shadow 0.2s",
                       "&:hover": {
                         transform: "translateY(-4px)",
@@ -3624,7 +3624,7 @@ const Index = () => {
                 p: 4,
                 textAlign: "center",
                 borderRadius: 2,
-                bgcolor: "white",
+                bgcolor: "background.paper",
               }}
             >
               <Typography variant="body1" color="text.secondary" paragraph>
@@ -3691,7 +3691,7 @@ const Index = () => {
                       height: "100%",
                       position: "relative",
                       borderTop: `4px solid #ca0019`,
-                      bgcolor: "white",
+                      bgcolor: "background.paper",
                       transition: "transform 0.2s, box-shadow 0.2s",
                       "&:hover": {
                         transform: "translateY(-4px)",
@@ -3785,7 +3785,7 @@ const Index = () => {
                 p: 4,
                 textAlign: "center",
                 borderRadius: 2,
-                bgcolor: "white",
+                bgcolor: "background.paper",
               }}
             >
               <Typography variant="body1" color="text.secondary" paragraph>
@@ -3818,7 +3818,7 @@ const Index = () => {
         fullWidth
         maxWidth="sm"
       >
-        <DialogTitle sx={{ borderBottom: "1px solid #eee", fontWeight: 500 }}>
+        <DialogTitle sx={{ borderBottom: "1px solid", borderColor: "divider", fontWeight: 500 }}>
           Impose Fine on {user.fullName}
         </DialogTitle>
 
@@ -3945,7 +3945,7 @@ const Index = () => {
                 width: 150,
                 height: 150,
                 mb: 2,
-                border: "4px solid #f5f5f5",
+                border: "4px solid", borderColor: "divider",
                 boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
               }}
             />
