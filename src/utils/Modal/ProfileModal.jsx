@@ -17,6 +17,7 @@ import {
   CircularProgress,
   Typography,
   Avatar,
+  useTheme,
 } from "@mui/material";
 import axios from "axios";
 import { BASE_URL } from "@/config";
@@ -85,6 +86,8 @@ function a11yProps(index) {
 }
 
 const ProfileModal = ({ open, handleClose, user, refreshData }) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
   const [blockLoading, setBlockLoading] = React.useState(false);
   const [value, setValue] = React.useState(0);
   const [fineModalOpen, setFineModalOpen] = React.useState(false);
@@ -246,12 +249,22 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
   return (
     <>
       <Modal open={open} onClose={handleClose}>
-        <div className="h-screen overflow-y-scroll bg-white p-4">
+        <div 
+          style={{
+            backgroundColor: theme.palette.background.paper,
+            color: theme.palette.text.primary,
+          }}
+          className="h-screen overflow-y-scroll p-4"
+        >
           <div className="flex justify-end py-2 mb-3">
             <Tooltip title="Close" arrow>
               <div
                 onClick={handleClose}
-                className="p-3 w-12 h-12 rounded-full cursor-pointer flex items-center justify-center hover:bg-slate-200"
+                style={{ 
+                  color: theme.palette.text.primary,
+                  backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)' 
+                }}
+                className="p-3 w-12 h-12 rounded-full cursor-pointer flex items-center justify-center hover:opacity-80"
               >
                 <CloseIcon fontSize="large" />
               </div>
@@ -259,7 +272,10 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
           </div>
           <div className="grid xl:grid-cols-4 lg:grid-cols-3 col-span-1 mb-7 gap-x-6 gap-y-5">
             <div className="xl:col-span-1 lg:col-span-1 col-span-1 flex gap-x-5 items-center">
-              <div className="bg-black w-36 h-36 overflow-hidden rounded-full relative">
+              <div 
+                style={{ backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#000000' }}
+                className="w-36 h-36 overflow-hidden rounded-full relative border border-slate-200"
+              >
                 <img
                   src={
                     user?.profilePic?.fileId
@@ -270,7 +286,10 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                   className="w-full h-full object-contain"
                 />
                 {user?.isVerified && (
-                  <div className="absolute bottom-1 right-1 bg-white rounded-full p-1">
+                  <div 
+                    style={{ backgroundColor: theme.palette.background.paper }}
+                    className="absolute bottom-1 right-1 rounded-full p-1"
+                  >
                     <VerifiedIcon color="primary" />
                   </div>
                 )}
@@ -278,12 +297,12 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
 
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-500">
+                  <span style={{ color: theme.palette.text.secondary }} className="text-xs">
                     //{user.role || "member"}
                   </span>
                   {getStatusBadge()}
                 </div>
-                <p className="text-3xl font-medium">{user.fullName}</p>
+                <p style={{ color: theme.palette.text.primary }} className="text-3xl font-medium">{user.fullName}</p>
                 <div className="flex justify-start gap-x-4 mt-3">
                   {user.githubProfile && (
                     <Link to={user.githubProfile || ""}>
@@ -342,28 +361,31 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                 </div>
               </div>
             </div>
-            <div className="border-l p-5 xl:col-span-2 lg:col-span-1 col-span-1">
+            <div 
+              style={{ borderColor: theme.palette.divider }}
+              className="border-l p-5 xl:col-span-2 lg:col-span-1 col-span-1"
+            >
               <div className="flex items-center justify-start gap-x-3 mb-3">
                 <img src={tu} className="h-7 w-7 object-contain" alt="" />
-                <p className="text-slate-500">
+                <p style={{ color: theme.palette.text.secondary }}>
                   <span className="font-medium">Batch:</span> {user.batch}
                 </p>
               </div>
               <div className="flex items-center gap-x-3 mb-4">
-                <AutoStoriesIcon fontSize="medium" className="text-slate-500" />
-                <p className="text-slate-500">
+                <AutoStoriesIcon fontSize="medium" style={{ color: theme.palette.text.secondary }} />
+                <p style={{ color: theme.palette.text.secondary }}>
                   <span className="font-medium">Course:</span> {user.course}
                 </p>
               </div>
               <div className="flex items-center gap-x-3 mb-4">
-                <LabelIcon fontSize="medium" className="text-slate-500" />
-                <p className="text-slate-500">
+                <LabelIcon fontSize="medium" style={{ color: theme.palette.text.secondary }} />
+                <p style={{ color: theme.palette.text.secondary }}>
                   <span className="font-medium">Admn No:</span> {user.admno}
                 </p>
               </div>
               <div className="flex items-center gap-x-3 mb-4">
-                <BusinessIcon fontSize="medium" className="text-slate-500" />
-                <p className="text-slate-500">
+                <BusinessIcon fontSize="medium" style={{ color: theme.palette.text.secondary }} />
+                <p style={{ color: theme.palette.text.secondary }}>
                   <span className="font-medium">Placement:</span>{" "}
                   {user.isPlaced === true ? "Placed" : "Not Placed"}
                 </p>
@@ -381,8 +403,8 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                 </div>
               )}
               <div className="flex items-center justify-end gap-x-3 mb-4">
-                <LoginIcon fontSize="small" className="text-slate-500" />
-                <p className="text-slate-500 text-sm">
+                <LoginIcon fontSize="small" style={{ color: theme.palette.text.secondary }} />
+                <p style={{ color: theme.palette.text.secondary }} className="text-sm">
                   <span className="font-medium">User joined on:</span>{" "}
                   {formatDate(user.createdAt)}
                 </p>
@@ -423,19 +445,25 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
           </div>
           <div className="mt-4 grid grid-cols-4 gap-4">
             <div className="lg:col-span-1 col-span-4">
-              <h3 className="text-xl font-medium">Overview</h3>
+              <h3 style={{ color: theme.palette.text.primary }} className="text-xl font-medium">Overview</h3>
               <div className="my-3 ">
                 <div>
                   <p className="bg-black p-1 px-2 rounded-tr-full text-white">
                     BIO
                   </p>
-                  <div className="py-3 px-2 bg-slate-50 border border-slate-200 rounded-b-md">
+                  <div 
+                    style={{ 
+                      backgroundColor: isDark ? "rgba(255, 255, 255, 0.03)" : "#f8fafc",
+                      borderColor: theme.palette.divider
+                    }}
+                    className="py-3 px-2 border rounded-b-md"
+                  >
                     <div className="flex items-start mb-2 gap-x-3">
                       <BookmarkIcon
                         fontSize="small"
-                        className="text-slate-500"
+                        style={{ color: theme.palette.text.secondary }}
                       />
-                      <p className="text-slate-500 text-sm">
+                      <p style={{ color: theme.palette.text.secondary }} className="text-sm">
                         {user.bio || "No bio available"}
                       </p>
                     </div>
@@ -447,18 +475,24 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                   <p className="bg-black p-1 px-2 rounded-tr-full text-white">
                     CONTACT INFORMATION
                   </p>
-                  <div className="py-3 px-2 bg-slate-50 border border-slate-200 rounded-b-md">
+                  <div 
+                    style={{ 
+                      backgroundColor: isDark ? "rgba(255, 255, 255, 0.03)" : "#f8fafc",
+                      borderColor: theme.palette.divider
+                    }}
+                    className="py-3 px-2 border rounded-b-md"
+                  >
                     <div className="flex items-center mb-2 gap-x-3">
-                      <EmailIcon fontSize="small" className="text-slate-500" />
-                      <p className="text-slate-500 text-sm">{user.email}</p>
+                      <EmailIcon fontSize="small" style={{ color: theme.palette.text.secondary }} />
+                      <p style={{ color: theme.palette.text.secondary }} className="text-sm">{user.email}</p>
                     </div>
                     {user.contact && (
                       <div className="flex items-center mb-2 gap-x-3">
                         <PhoneIcon
                           fontSize="small"
-                          className="text-slate-500"
+                          style={{ color: theme.palette.text.secondary }}
                         />
-                        <p className="text-slate-500 text-sm">
+                        <p style={{ color: theme.palette.text.secondary }} className="text-sm">
                           <Link to={`tel:${user.contact}`}>{user.contact}</Link>
                         </p>
                       </div>
@@ -467,9 +501,9 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                       <div className="flex items-start mb-2 gap-x-3">
                         <LocationOnIcon
                           fontSize="small"
-                          className="text-slate-500"
+                          style={{ color: theme.palette.text.secondary }}
                         />
-                        <p className="text-slate-500 text-sm">
+                        <p style={{ color: theme.palette.text.secondary }} className="text-sm">
                           {user.address}{" "}
                           {user.address && (user.city || user.state) && "|"}{" "}
                           {user.city}
@@ -485,18 +519,28 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                   <p className="bg-black p-1 px-2 rounded-tr-full text-white">
                     SKILLS
                   </p>
-                  <div className="py-3 bg-slate-50 border border-slate-200 rounded-b-md">
+                  <div 
+                    style={{ 
+                      backgroundColor: isDark ? "rgba(255, 255, 255, 0.03)" : "#f8fafc",
+                      borderColor: theme.palette.divider
+                    }}
+                    className="py-3 border rounded-b-md"
+                  >
                     {user.skills && user.skills.length > 0 ? (
                       user.skills.map((skill, index) => (
                         <span
                           key={index}
-                          className="bg-slate-200 text-xs my-1 inline-block mx-1 p-1 px-2 rounded-full"
+                          style={{ 
+                            backgroundColor: isDark ? "rgba(255, 255, 255, 0.1)" : "#e2e8f0",
+                            color: theme.palette.text.primary 
+                          }}
+                          className="text-xs my-1 inline-block mx-1 p-1 px-2 rounded-full"
                         >
                           {skill}
                         </span>
                       ))
                     ) : (
-                      <p className="text-slate-500 text-sm px-2">
+                      <p style={{ color: theme.palette.text.secondary }} className="text-sm px-2">
                         No skills added yet
                       </p>
                     )}
@@ -554,7 +598,10 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                 <CustomTabPanel value={value} index={0}>
                   <div className="space-y-6">
                     {/* Academic Performance */}
-                    <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+                    <div 
+                      style={{ backgroundColor: theme.palette.background.paper, borderColor: theme.palette.divider }}
+                      className="border rounded-lg p-5 shadow-sm"
+                    >
                       <div className="flex items-center gap-2 mb-4">
                         <SchoolIcon className="text-[#ca0019]" />
                         <h4 className="text-lg font-medium">
@@ -565,7 +612,7 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                       {/* Overall CGPA */}
                       <div className="mb-6">
                         <div className="flex justify-between items-center mb-2">
-                          <span className="text-gray-700">Overall CGPA</span>
+                          <span style={{ color: theme.palette.text.secondary }}>Overall CGPA</span>
                           <Chip
                             label={user.cgpa || "N/A"}
                             color={
@@ -584,7 +631,7 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
 
                       {/* Semester-wise SGPA */}
                       <div className="space-y-4">
-                        <h5 className="text-gray-700 font-medium">
+                        <h5 style={{ color: theme.palette.text.secondary }} className="font-medium">
                           Semester Performance
                         </h5>
 
@@ -595,7 +642,11 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                               .map((sem) => (
                                 <div
                                   key={sem.semester}
-                                  className="border border-gray-100 rounded p-3 bg-gray-50"
+                                  style={{ 
+                                    backgroundColor: isDark ? "rgba(255, 255, 255, 0.03)" : "#f9fafb", 
+                                    borderColor: theme.palette.divider 
+                                  }}
+                                  className="border rounded p-3"
                                 >
                                   <div className="flex justify-between mb-2">
                                     <span className="font-medium">
@@ -644,7 +695,10 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                     {/* Supplementary Information */}
                     {user.semesterSupplementary &&
                       user.semesterSupplementary.length > 0 && (
-                        <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+                        <div 
+                          style={{ backgroundColor: theme.palette.background.paper, borderColor: theme.palette.divider }}
+                          className="border rounded-lg p-5 shadow-sm"
+                        >
                           <div className="flex items-center gap-2 mb-4">
                             <ErrorIcon className="text-amber-500" />
                             <h4 className="text-lg font-medium">
@@ -656,7 +710,8 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                             {user.semesterSupplementary.map((sem) => (
                               <div
                                 key={sem.semester}
-                                className="border border-gray-100 rounded p-4"
+                                style={{ borderColor: theme.palette.divider }}
+                                className="border rounded p-4"
                               >
                                 <h5 className="font-medium mb-3">
                                   Semester {sem.semester}
@@ -667,13 +722,14 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                                     {sem.subjects.map((subject, idx) => (
                                       <div
                                         key={idx}
-                                        className="flex justify-between items-center p-2 bg-gray-50 rounded"
+                                        style={{ backgroundColor: isDark ? "rgba(255, 255, 255, 0.03)" : "#f9fafb" }}
+                                        className="flex justify-between items-center p-2 rounded"
                                       >
                                         <div>
                                           <p className="font-medium">
                                             {subject.subjectName}
                                           </p>
-                                          <p className="text-xs text-gray-500">
+                                          <p style={{ color: theme.palette.text.secondary }} className="text-xs">
                                             {subject.subjectCode}
                                           </p>
                                         </div>
@@ -704,7 +760,13 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
 
                     {/* Fine Status */}
                     {parseInt(user.fineStatus) > 0 && (
-                      <div className="bg-red-50 border border-red-100 rounded-lg p-5">
+                      <div 
+                        style={{ 
+                          backgroundColor: isDark ? "rgba(244, 67, 54, 0.15)" : "#fef2f2",
+                          borderColor: isDark ? "rgba(244, 67, 54, 0.3)" : "#fecaca" 
+                        }}
+                        className="border rounded-lg p-5"
+                      >
                         <div className="flex items-center gap-2 mb-4">
                           <CurrencyRupeeIcon className="text-red-500" />
                           <h4 className="text-lg font-medium text-red-700">
@@ -734,26 +796,27 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                         {user.achievements.map((achievement, idx) => (
                           <div
                             key={idx}
-                            className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+                            style={{ backgroundColor: theme.palette.background.paper, borderColor: theme.palette.divider }}
+                            className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
                           >
                             <div className="flex items-start gap-3">
                               <div
-                                className={`text-white p-2 rounded-full flex items-center justify-center ${achievement.color || "bg-slate-100"
-                                  }`}
+                                style={{ backgroundColor: isDark ? "rgba(255, 255, 255, 0.08)" : "#f1f5f9" }}
+                                className="text-white p-2 rounded-full flex items-center justify-center"
                               >
                                 {achievement.icon || (
                                   <Award className="w-10 h-10 text-slate-500" />
                                 )}
                               </div>
                               <div>
-                                <h5 className="font-medium text-gray-900">
+                                <h5 style={{ color: theme.palette.text.primary }} className="font-medium">
                                   {achievement.title}
                                 </h5>
-                                <p className="text-sm text-gray-600 mt-1">
+                                <p style={{ color: theme.palette.text.secondary }} className="text-sm mt-1">
                                   {achievement.description}
                                 </p>
                                 {achievement.date && (
-                                  <p className="text-xs text-gray-500 mt-1.5">
+                                  <p style={{ color: theme.palette.text.secondary }} className="text-xs mt-1.5">
                                     {achievement.date || "------"}
                                   </p>
                                 )}
@@ -799,9 +862,13 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                           return (
                             <div
                               key={idx}
-                              className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                              style={{ backgroundColor: theme.palette.background.paper, borderColor: theme.palette.divider }}
+                              className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
                             >
-                              <div className="aspect-[16/9] overflow-hidden bg-gray-50">
+                              <div 
+                                style={{ backgroundColor: isDark ? "rgba(255,255,255,0.03)" : "#f9fafb" }} 
+                                className="aspect-[16/9] overflow-hidden"
+                              >
                                 {previewUrl ? (
                                   <iframe
                                     src={previewUrl}
@@ -844,13 +911,13 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                                 )}
                               </div>
                               <div className="p-4">
-                                <h5 className="font-medium text-gray-900">
+                                <h5 style={{ color: theme.palette.text.primary }} className="font-medium">
                                   {certificate.fileName ||
                                     `Certificate ${idx + 1}`}
                                 </h5>
 
                                 <div className="flex justify-between items-center mt-2">
-                                  <p className="text-xs text-gray-500">
+                                  <p style={{ color: theme.palette.text.secondary }} className="text-xs">
                                     {certificate.createdAt
                                       ? formatDate(certificate.createdAt)
                                       : "Date not available"}
@@ -889,10 +956,14 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                         user.projects.map((project, idx) => (
                           <div
                             key={idx}
-                            className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                            style={{ backgroundColor: theme.palette.background.paper, borderColor: theme.palette.divider }}
+                            className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
                           >
                             {project.imageUrl && (
-                              <div className="aspect-[21/9] overflow-hidden bg-gray-50">
+                              <div 
+                                style={{ backgroundColor: isDark ? "rgba(255,255,255,0.03)" : "#f9fafb" }} 
+                                className="aspect-[21/9] overflow-hidden"
+                              >
                                 <img
                                   src={
                                     project.imageUrl ||
@@ -904,10 +975,10 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                               </div>
                             )}
                             <div className="p-5">
-                              <h5 className="font-medium text-lg text-gray-900">
+                              <h5 style={{ color: theme.palette.text.primary }} className="font-medium text-lg">
                                 {project.title}
                               </h5>
-                              <p className="text-gray-700 my-3 leading-relaxed">
+                              <p style={{ color: theme.palette.text.secondary }} className="my-3 leading-relaxed">
                                 {project.description}
                               </p>
                               <div className="flex flex-wrap gap-2 mb-4">
@@ -915,7 +986,11 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                                   project.technologies.map((tech, index) => (
                                     <span
                                       key={index}
-                                      className="text-xs bg-gray-100 px-2.5 py-1 rounded-full"
+                                      style={{ 
+                                        backgroundColor: isDark ? "rgba(255, 255, 255, 0.08)" : "#f3f4f6", 
+                                        color: theme.palette.text.secondary 
+                                      }}
+                                      className="text-xs px-2.5 py-1 rounded-full"
                                     >
                                       {tech}
                                     </span>
@@ -942,21 +1017,25 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                     </div>
                   </div>
                 </CustomTabPanel>
-                <CustomTabPanel value={value} index={4}>
+                 <CustomTabPanel value={value} index={4}>
                   <div className="space-y-4">
                     {user.internships && user.internships.length > 0 ? (
                       user.internships.map((internship, idx) => (
                         <div
                           key={idx}
-                          className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm"
+                          style={{ backgroundColor: theme.palette.background.paper, borderColor: theme.palette.divider }}
+                          className="border rounded-lg p-5 shadow-sm"
                         >
                           <div className="flex items-start gap-4">
-                            <div className="bg-slate-100 p-3 rounded-full">
-                              <Briefcase className="text-slate-500" size={24} />
+                            <div 
+                              style={{ backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "#f1f5f9" }}
+                              className="p-3 rounded-full"
+                            >
+                              <Briefcase style={{ color: theme.palette.text.secondary }} size={24} />
                             </div>
                             <div className="flex-1">
                               <div className="flex justify-between flex-wrap">
-                                <h4 className="font-medium text-lg">
+                                <h4 style={{ color: theme.palette.text.primary }} className="font-medium text-lg">
                                   {internship.title}
                                 </h4>
                                 <Chip
@@ -973,7 +1052,7 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                                 {internship.company}
                               </h5>
 
-                              <div className="flex items-center gap-2 text-gray-500 text-sm mt-1">
+                              <div style={{ color: theme.palette.text.secondary }} className="flex items-center gap-2 text-sm mt-1">
                                 <CalendarMonthIcon fontSize="small" />
                                 <span>
                                   {internship.startDate} -{" "}
@@ -983,7 +1062,7 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
 
                               <Divider className="my-3" />
 
-                              <p className="text-gray-700 mt-2">
+                              <p style={{ color: theme.palette.text.secondary }} className="mt-2">
                                 {internship.description}
                               </p>
 
@@ -1020,7 +1099,7 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                     {user.event_participation &&
                       user.event_participation.length > 0 ? (
                       <div>
-                        <h4 className="font-medium text-lg mb-4 flex items-center gap-2">
+                        <h4 style={{ color: theme.palette.text.primary }} className="font-medium text-lg mb-4 flex items-center gap-2">
                           <EventAvailableIcon className="text-[#ca0019]" />
                           Event Participation
                         </h4>
@@ -1028,9 +1107,12 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                         <Grid container spacing={3}>
                           {user.event_participation.map((event, idx) => (
                             <Grid item xs={12} md={6} key={idx}>
-                              <div className="border border-gray-200 rounded-lg p-4 h-full bg-white shadow-sm hover:shadow-md transition-shadow">
+                              <div 
+                                style={{ backgroundColor: theme.palette.background.paper, borderColor: theme.palette.divider }}
+                                className="border rounded-lg p-4 h-full shadow-sm hover:shadow-md transition-shadow"
+                              >
                                 <div className="flex justify-between items-start">
-                                  <h5 className="font-medium">
+                                  <h5 style={{ color: theme.palette.text.primary }} className="font-medium">
                                     {event.eventName || "Event Title"}
                                   </h5>
                                   <Chip
@@ -1046,14 +1128,14 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                                   />
                                 </div>
 
-                                <div className="mt-2 text-sm text-gray-600 flex items-center gap-1">
+                                <div style={{ color: theme.palette.text.secondary }} className="mt-2 text-sm flex items-center gap-1">
                                   <CalendarMonthIcon fontSize="small" />
                                   <span>{event.eventDate || "Event date"}</span>
                                 </div>
 
                                 {user.eventContributionType && (
                                   <div className="mt-3">
-                                    <p className="text-sm text-gray-500 mb-1">
+                                    <p style={{ color: theme.palette.text.secondary }} className="text-sm mb-1">
                                       Contribution as:
                                     </p>
                                     <div className="flex flex-wrap gap-1">
@@ -1098,7 +1180,7 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
         fullWidth
         maxWidth="sm"
       >
-        <DialogTitle sx={{ borderBottom: "1px solid #eee", fontWeight: 500 }}>
+        <DialogTitle sx={{ borderBottom: "1px solid", borderColor: "divider", fontWeight: 500 }}>
           Impose Fine on {user.fullName}
         </DialogTitle>
 
@@ -1114,7 +1196,13 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
               <Typography variant="subtitle2" sx={{ mb: 1 }}>
                 Member Details
               </Typography>
-              <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-md">
+              <div 
+                style={{ 
+                  backgroundColor: isDark ? "rgba(255, 255, 255, 0.03)" : "#f9fafb",
+                  borderColor: theme.palette.divider 
+                }}
+                className="flex items-center gap-3 p-3 rounded-md border"
+              >
                 <Avatar
                   src={user.profilePic?.fileUrl || userIcon}
                   alt={user.fullName}
@@ -1124,7 +1212,7 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                   <Typography variant="body1" className="font-medium">
                     {user.fullName}
                   </Typography>
-                  <Typography variant="body2" className="text-gray-500">
+                  <Typography variant="body2" style={{ color: theme.palette.text.secondary }}>
                     {user.admno} • {user.batch}
                   </Typography>
                 </div>

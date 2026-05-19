@@ -1,9 +1,10 @@
 import React from "react";
-import { Box, Button, Typography, Stack } from "@mui/material";
+import { Box, Button, Typography, Stack, useTheme } from "@mui/material";
 import { Link } from "react-router";
 
 
 export default function Banner(props) {
+  const theme = useTheme();
   return (
     <Box
       sx={{
@@ -11,7 +12,9 @@ export default function Banner(props) {
         flexDirection: "column",
         backgroundImage: `url(${props.img})`,
         backgroundSize: "cover",
-        backgroundColor: "#ca0019",
+        background: theme.palette.mode === "dark" 
+          ? "linear-gradient(135deg, #1f1f1f 0%, #2d1013 100%)" 
+          : `linear-gradient(135deg, ${theme.palette.primary.main} 0%, #a30014 100%)`,
         py: { xs: "30px", md: "26px" },
         px: { xs: "30px", md: "64px" },
         borderRadius: "10px",
@@ -42,7 +45,7 @@ export default function Banner(props) {
       <Typography
         variant="body1"
         sx={{
-          color: "#E3DAFF",
+          color: "rgba(255, 255, 255, 0.9)",
           fontWeight: 500,
           mb: "40px",
           lineHeight: "28px",
@@ -65,12 +68,12 @@ export default function Banner(props) {
           variant="contained"
           sx={{
             backgroundColor: "white",
-            color: "black",
+            color: theme.palette.mode === "dark" ? "#ff5252" : theme.palette.primary.main,
             fontWeight: 500,
             fontSize: "14px",
             py: "10px",
             px: "27px",
-            ":hover": { backgroundColor: "#f4f4f4" },
+            ":hover": { backgroundColor: "rgba(255, 255, 255, 0.9)" },
           }}
           >
             Manage Students

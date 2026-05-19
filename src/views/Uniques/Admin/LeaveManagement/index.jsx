@@ -26,6 +26,7 @@ import {
   Tab,
   CircularProgress,
   Alert,
+  Autocomplete,
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -43,6 +44,7 @@ const AdminLeaveManagement = () => {
   const [actionType, setActionType] = useState("");
   const [leaves, setLeaves] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [memberFilter, setMemberFilter] = useState(null);
 
   useEffect(() => {
     fetchLeaves();
@@ -81,13 +83,55 @@ const AdminLeaveManagement = () => {
   const approvedLeaves = leaves.filter((l) => l.status === "Approved");
   const rejectedLeaves = leaves.filter((l) => l.status === "Rejected");
 
+  const getUniqueMembersFromLeaves = () => {
+    const uniqueMembers = [...new Set(leaves.map((leave) => leave.memberName))].sort();
+    return uniqueMembers.map((name) => ({
+      label: name,
+      id: name,
+    }));
+  };
+
   const getDisplayLeaves = () => {
+    let displayLeaves = [];
     switch (tabValue) {
-      case 0: return pendingLeaves;
-      case 1: return approvedLeaves;
-      case 2: return rejectedLeaves;
-      default: return [];
+      case 0:
+        displayLeaves = pendingLeaves;
+        break;
+      case 1:
+        displayLeaves = approvedLeaves;
+        break;
+      case 2:
+        displayLeaves = rejectedLeaves;
+        break;
+      default:
+        displayLeaves = [];
     }
+
+    if (memberFilter) {
+      displayLeaves = displayLeaves.filter(
+        (leave) => leave.memberName === memberFilter.label
+      );
+    }
+
+    return displayLeaves;
+  };
+
+  const getMemberLeaveStats = () => {
+    if (!memberFilter) return null;
+    const memberLeaves = leaves.filter(
+      (leave) => leave.memberName === memberFilter.label
+    );
+    const approvedCount = memberLeaves.filter(
+      (l) => l.status === "Approved"
+    ).length;
+    const totalDays = memberLeaves
+      .filter((l) => l.status === "Approved")
+      .reduce((sum, l) => sum + l.days, 0);
+    const pendingCount = memberLeaves.filter(
+      (l) => l.status === "Pending"
+    ).length;
+
+    return { total: memberLeaves.length, approved: approvedCount, totalDays, pending: pendingCount };
   };
 
   const handleOpenDialog = (leave, type) => {
@@ -164,16 +208,16 @@ const AdminLeaveManagement = () => {
   const LeaveTable = ({ leavesToDisplay }) => (
     <TableContainer component={Paper} sx={{ mt: 2 }}>
       <Table>
-        <TableHead sx={{ backgroundColor: theme.palette.primary.light }}>
+        <TableHead sx={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : theme.palette.primary.main }}>
           <TableRow>
-            <TableCell sx={{ color: "white", fontWeight: 600 }}>Member</TableCell>
-            <TableCell sx={{ color: "white", fontWeight: 600 }}>Leave Type</TableCell>
-            <TableCell sx={{ color: "white", fontWeight: 600 }}>Start Date</TableCell>
-            <TableCell sx={{ color: "white", fontWeight: 600 }}>End Date</TableCell>
-            <TableCell sx={{ color: "white", fontWeight: 600 }} align="center">Days</TableCell>
-            <TableCell sx={{ color: "white", fontWeight: 600 }}>Reason</TableCell>
-            <TableCell sx={{ color: "white", fontWeight: 600 }}>Status</TableCell>
-            <TableCell sx={{ color: "white", fontWeight: 600 }} align="center">Actions</TableCell>
+            <TableCell sx={{ color: theme.palette.mode === 'dark' ? theme.palette.text.primary : "white", fontWeight: 600 }}>Member</TableCell>
+            <TableCell sx={{ color: theme.palette.mode === 'dark' ? theme.palette.text.primary : "white", fontWeight: 600 }}>Leave Type</TableCell>
+            <TableCell sx={{ color: theme.palette.mode === 'dark' ? theme.palette.text.primary : "white", fontWeight: 600 }}>Start Date</TableCell>
+            <TableCell sx={{ color: theme.palette.mode === 'dark' ? theme.palette.text.primary : "white", fontWeight: 600 }}>End Date</TableCell>
+            <TableCell sx={{ color: theme.palette.mode === 'dark' ? theme.palette.text.primary : "white", fontWeight: 600 }} align="center">Days</TableCell>
+            <TableCell sx={{ color: theme.palette.mode === 'dark' ? theme.palette.text.primary : "white", fontWeight: 600 }}>Reason</TableCell>
+            <TableCell sx={{ color: theme.palette.mode === 'dark' ? theme.palette.text.primary : "white", fontWeight: 600 }}>Status</TableCell>
+            <TableCell sx={{ color: theme.palette.mode === 'dark' ? theme.palette.text.primary : "white", fontWeight: 600 }} align="center">Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -185,7 +229,7 @@ const AdminLeaveManagement = () => {
                     <Typography variant="body2" sx={{ fontWeight: 600 }}>
                       {leave.memberName}
                     </Typography>
-                    <Typography variant="caption" color="textSecondary">
+                    <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
                       {leave.memberEmail}
                     </Typography>
                   </Box>
@@ -240,8 +284,10 @@ const AdminLeaveManagement = () => {
           ) : (
             <TableRow>
               <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
-                <Typography color="textSecondary">
-                  No {tabValue === 0 ? "pending" : tabValue === 1 ? "approved" : "rejected"} leave requests
+                <Typography sx={{ color: theme.palette.text.secondary }}>
+                  {memberFilter
+                    ? `No ${tabValue === 0 ? "pending" : tabValue === 1 ? "approved" : "rejected"} leave requests for ${memberFilter.label}`
+                    : `No ${tabValue === 0 ? "pending" : tabValue === 1 ? "approved" : "rejected"} leave requests`}
                 </Typography>
               </TableCell>
             </TableRow>
@@ -284,38 +330,99 @@ const AdminLeaveManagement = () => {
           <>
             <Grid container spacing={2} sx={{ mb: 4 }}>
               <Grid item xs={12} sm={6} md={3}>
-                <Card>
+                <Card sx={{ backgroundColor: theme.palette.background.paper }}>
                   <CardContent>
-                    <Typography color="textSecondary" gutterBottom>Pending Requests</Typography>
-                    <Typography variant="h5">{pendingLeaves.length}</Typography>
+                    <Typography sx={{ color: theme.palette.text.secondary }} gutterBottom>Pending Requests</Typography>
+                    <Typography variant="h5" sx={{ color: theme.palette.text.primary }}>{pendingLeaves.length}</Typography>
                   </CardContent>
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-                <Card>
+                <Card sx={{ backgroundColor: theme.palette.background.paper }}>
                   <CardContent>
-                    <Typography color="textSecondary" gutterBottom>Approved</Typography>
-                    <Typography variant="h5">{approvedLeaves.length}</Typography>
+                    <Typography sx={{ color: theme.palette.text.secondary }} gutterBottom>Approved</Typography>
+                    <Typography variant="h5" sx={{ color: theme.palette.text.primary }}>{approvedLeaves.length}</Typography>
                   </CardContent>
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-                <Card>
+                <Card sx={{ backgroundColor: theme.palette.background.paper }}>
                   <CardContent>
-                    <Typography color="textSecondary" gutterBottom>Rejected</Typography>
-                    <Typography variant="h5">{rejectedLeaves.length}</Typography>
+                    <Typography sx={{ color: theme.palette.text.secondary }} gutterBottom>Rejected</Typography>
+                    <Typography variant="h5" sx={{ color: theme.palette.text.primary }}>{rejectedLeaves.length}</Typography>
                   </CardContent>
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-                <Card>
+                <Card sx={{ backgroundColor: theme.palette.background.paper }}>
                   <CardContent>
-                    <Typography color="textSecondary" gutterBottom>Total Requests</Typography>
-                    <Typography variant="h5">{leaves.length}</Typography>
+                    <Typography sx={{ color: theme.palette.text.secondary }} gutterBottom>Total Requests</Typography>
+                    <Typography variant="h5" sx={{ color: theme.palette.text.primary }}>{leaves.length}</Typography>
                   </CardContent>
                 </Card>
               </Grid>
             </Grid>
+
+            {leaves.length > 0 && (
+              <Box sx={{ mb: 3 }}>
+                <Autocomplete
+                  options={getUniqueMembersFromLeaves()}
+                  value={memberFilter}
+                  onChange={(e, newValue) => {
+                    setMemberFilter(newValue);
+                  }}
+                  getOptionLabel={(option) => option.label || ""}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Filter by Member"
+                      placeholder="Search member name..."
+                      variant="outlined"
+                      size="small"
+                    />
+                  )}
+                  clearIcon={null}
+                  sx={{ maxWidth: 300 }}
+                />
+                {memberFilter && (
+                  <Box sx={{ mt: 2, p: 2, bgcolor: theme.palette.mode === "dark" ? "rgba(25, 118, 210, 0.15)" : "rgba(25, 118, 210, 0.1)", borderRadius: 1, border: `1px solid ${theme.palette.divider}` }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: theme.palette.text.primary }}>
+                      {memberFilter.label}'s Leave Statistics
+                    </Typography>
+                    <Grid container spacing={1}>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <Typography variant="body2" sx={{ color: theme.palette.text.primary }}>
+                          <strong>Total Requests:</strong> {getMemberLeaveStats()?.total || 0}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <Typography variant="body2" sx={{ color: theme.palette.text.primary }}>
+                          <strong>Approved:</strong> {getMemberLeaveStats()?.approved || 0}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <Typography variant="body2" sx={{ color: theme.palette.text.primary }}>
+                          <strong>Total Days:</strong> {getMemberLeaveStats()?.totalDays || 0}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <Typography variant="body2" sx={{ color: theme.palette.text.primary }}>
+                          <strong>Pending:</strong> {getMemberLeaveStats()?.pending || 0}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Button
+                      variant="text"
+                      size="small"
+                      onClick={() => setMemberFilter(null)}
+                      sx={{ mt: 1 }}
+                    >
+                      Clear Filter
+                    </Button>
+                  </Box>
+                )}
+              </Box>
+            )}
 
             <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
               <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)}>
@@ -339,43 +446,43 @@ const AdminLeaveManagement = () => {
         <DialogContent sx={{ pt: 2 }}>
           {selectedLeave && (
             <Stack spacing={2}>
-              <Box sx={{ p: 2, bgcolor: theme.palette.mode === "dark" ? "grey.800" : "grey.100", borderRadius: 1 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>Member Information</Typography>
-                <Typography variant="body2"><strong>Name:</strong> {selectedLeave.memberName}</Typography>
-                <Typography variant="body2"><strong>Email:</strong> {selectedLeave.memberEmail}</Typography>
+              <Box sx={{ p: 2, bgcolor: theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)", borderRadius: 1, border: `1px solid ${theme.palette.divider}` }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: theme.palette.text.primary }}>Member Information</Typography>
+                <Typography variant="body2" sx={{ color: theme.palette.text.primary }}><strong>Name:</strong> {selectedLeave.memberName}</Typography>
+                <Typography variant="body2" sx={{ color: theme.palette.text.primary }}><strong>Email:</strong> {selectedLeave.memberEmail}</Typography>
                 {selectedLeave.memberPhone && (
-                  <Typography variant="body2"><strong>Phone:</strong> {selectedLeave.memberPhone}</Typography>
+                  <Typography variant="body2" sx={{ color: theme.palette.text.primary }}><strong>Phone:</strong> {selectedLeave.memberPhone}</Typography>
                 )}
               </Box>
 
-              <Box sx={{ p: 2, bgcolor: theme.palette.mode === "dark" ? "grey.800" : "grey.100", borderRadius: 1 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>Leave Information</Typography>
-                <Typography variant="body2"><strong>Type:</strong> {selectedLeave.type}</Typography>
-                <Typography variant="body2"><strong>Start Date:</strong> {new Date(selectedLeave.startDate).toLocaleDateString()}</Typography>
-                <Typography variant="body2"><strong>End Date:</strong> {new Date(selectedLeave.endDate).toLocaleDateString()}</Typography>
-                <Typography variant="body2"><strong>Number of Days:</strong> {selectedLeave.days}</Typography>
-                <Typography variant="body2"><strong>Applied On:</strong> {new Date(selectedLeave.appliedDate).toLocaleDateString()}</Typography>
+              <Box sx={{ p: 2, bgcolor: theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)", borderRadius: 1, border: `1px solid ${theme.palette.divider}` }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: theme.palette.text.primary }}>Leave Information</Typography>
+                <Typography variant="body2" sx={{ color: theme.palette.text.primary }}><strong>Type:</strong> {selectedLeave.type}</Typography>
+                <Typography variant="body2" sx={{ color: theme.palette.text.primary }}><strong>Start Date:</strong> {new Date(selectedLeave.startDate).toLocaleDateString()}</Typography>
+                <Typography variant="body2" sx={{ color: theme.palette.text.primary }}><strong>End Date:</strong> {new Date(selectedLeave.endDate).toLocaleDateString()}</Typography>
+                <Typography variant="body2" sx={{ color: theme.palette.text.primary }}><strong>Number of Days:</strong> {selectedLeave.days}</Typography>
+                <Typography variant="body2" sx={{ color: theme.palette.text.primary }}><strong>Applied On:</strong> {new Date(selectedLeave.appliedDate).toLocaleDateString()}</Typography>
               </Box>
 
-              <Box sx={{ p: 2, bgcolor: theme.palette.mode === "dark" ? "grey.800" : "grey.100", borderRadius: 1 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>Reason</Typography>
-                <Typography variant="body2">{selectedLeave.reason}</Typography>
+              <Box sx={{ p: 2, bgcolor: theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)", borderRadius: 1, border: `1px solid ${theme.palette.divider}` }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: theme.palette.text.primary }}>Reason</Typography>
+                <Typography variant="body2" sx={{ color: theme.palette.text.primary }}>{selectedLeave.reason}</Typography>
               </Box>
 
               {selectedLeave.status === "Approved" && (
-                <Box sx={{ p: 2, bgcolor: theme.palette.success.light, borderRadius: 1 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>Approval Information</Typography>
-                  <Typography variant="body2"><strong>Approved By:</strong> {selectedLeave.approvedBy}</Typography>
-                  <Typography variant="body2"><strong>Approved Date:</strong> {new Date(selectedLeave.approvedDate).toLocaleDateString()}</Typography>
+                <Box sx={{ p: 2, bgcolor: theme.palette.mode === "dark" ? "rgba(76, 175, 80, 0.15)" : "rgba(76, 175, 80, 0.1)", borderRadius: 1, border: `1px solid ${theme.palette.success.main}` }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: theme.palette.text.primary }}>Approval Information</Typography>
+                  <Typography variant="body2" sx={{ color: theme.palette.text.primary }}><strong>Approved By:</strong> {selectedLeave.approvedBy}</Typography>
+                  <Typography variant="body2" sx={{ color: theme.palette.text.primary }}><strong>Approved Date:</strong> {new Date(selectedLeave.approvedDate).toLocaleDateString()}</Typography>
                 </Box>
               )}
 
               {selectedLeave.status === "Rejected" && (
-                <Box sx={{ p: 2, bgcolor: theme.palette.error.light, borderRadius: 1 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>Rejection Information</Typography>
-                  <Typography variant="body2"><strong>Rejected By:</strong> {selectedLeave.rejectedBy}</Typography>
-                  <Typography variant="body2"><strong>Rejected Date:</strong> {new Date(selectedLeave.rejectedDate).toLocaleDateString()}</Typography>
-                  <Typography variant="body2"><strong>Reason:</strong> {selectedLeave.rejectionReason}</Typography>
+                <Box sx={{ p: 2, bgcolor: theme.palette.mode === "dark" ? "rgba(244, 67, 54, 0.15)" : "rgba(244, 67, 54, 0.1)", borderRadius: 1, border: `1px solid ${theme.palette.error.main}` }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: theme.palette.text.primary }}>Rejection Information</Typography>
+                  <Typography variant="body2" sx={{ color: theme.palette.text.primary }}><strong>Rejected By:</strong> {selectedLeave.rejectedBy}</Typography>
+                  <Typography variant="body2" sx={{ color: theme.palette.text.primary }}><strong>Rejected Date:</strong> {new Date(selectedLeave.rejectedDate).toLocaleDateString()}</Typography>
+                  <Typography variant="body2" sx={{ color: theme.palette.text.primary }}><strong>Reason:</strong> {selectedLeave.rejectionReason}</Typography>
                 </Box>
               )}
 

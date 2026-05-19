@@ -33,6 +33,7 @@ import {
   InputLabel,
   Alert,
   Grid,
+  useTheme,
 } from "@mui/material";
 import {
   Search as SearchIcon,
@@ -53,6 +54,8 @@ import axios from "axios";
 import { format } from "date-fns";
 
 const EnquiryManagement = () => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
   // State variables
   const [enquiries, setEnquiries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -359,11 +362,11 @@ const EnquiryManagement = () => {
           variant="h4"
           component="h1"
           gutterBottom
-          className="text-gray-800"
+          style={{ color: theme.palette.text.primary }}
         >
           Enquiry Management
         </Typography>
-        <Typography variant="body1" className="text-gray-600 mb-4">
+        <Typography variant="body1" style={{ color: theme.palette.text.secondary }} className="mb-4">
           Manage and respond to enquiries from website visitors.
         </Typography>
 
@@ -441,7 +444,7 @@ const EnquiryManagement = () => {
       {/* Enquiries Table */}
       <TableContainer component={Paper} className="mb-4">
         <Table sx={{ minWidth: 650 }}>
-          <TableHead className="bg-gray-100">
+          <TableHead sx={{ bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#f3f4f6' }}>
             <TableRow>
               <TableCell>Name</TableCell>
               <TableCell>Contact</TableCell>
@@ -456,7 +459,7 @@ const EnquiryManagement = () => {
               <TableRow>
                 <TableCell colSpan={6} align="center" className="py-8">
                   <CircularProgress size={40} />
-                  <Typography variant="body2" className="mt-2 text-gray-600">
+                  <Typography variant="body2" color="text.secondary" className="mt-2">
                     Loading enquiries...
                   </Typography>
                 </TableCell>
@@ -613,7 +616,23 @@ const EnquiryManagement = () => {
         onClose={() => setModalOpen(false)}
         aria-labelledby="enquiry-details-modal"
       >
-        <Box className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-xl p-6 w-11/12 max-w-3xl max-h-[90vh] overflow-y-auto">
+        <Box 
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            bgcolor: 'background.paper',
+            borderRadius: '12px',
+            boxShadow: 24,
+            p: 3,
+            width: '91.666667%',
+            maxWidth: '768px',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            color: 'text.primary',
+          }}
+        >
           {selectedEnquiry ? (
             <>
               {/* Modal Header */}
@@ -621,7 +640,8 @@ const EnquiryManagement = () => {
                 <Typography
                   variant="h5"
                   component="h2"
-                  className="text-gray-800"
+                  style={{ color: theme.palette.text.primary }}
+                  className="font-bold"
                 >
                   Enquiry Details
                 </Typography>
@@ -639,7 +659,8 @@ const EnquiryManagement = () => {
                     <CardContent>
                       <Typography
                         variant="subtitle1"
-                        className="font-bold text-gray-700 mb-2"
+                        color="text.primary"
+                        className="font-bold mb-2"
                       >
                         Contact Information
                       </Typography>
@@ -650,7 +671,7 @@ const EnquiryManagement = () => {
                           <Box>
                             <Typography
                               variant="body2"
-                              className="text-gray-500"
+                              color="text.secondary"
                             >
                               Full Name
                             </Typography>
@@ -665,7 +686,7 @@ const EnquiryManagement = () => {
                           <Box>
                             <Typography
                               variant="body2"
-                              className="text-gray-500"
+                              color="text.secondary"
                             >
                               Email Address
                             </Typography>
@@ -681,7 +702,7 @@ const EnquiryManagement = () => {
                             <Box>
                               <Typography
                                 variant="body2"
-                                className="text-gray-500"
+                                color="text.secondary"
                               >
                                 Phone Number
                               </Typography>
@@ -701,14 +722,15 @@ const EnquiryManagement = () => {
                     <CardContent>
                       <Typography
                         variant="subtitle1"
-                        className="font-bold text-gray-700 mb-2"
+                        color="text.primary"
+                        className="font-bold mb-2"
                       >
                         Enquiry Details
                       </Typography>
 
                       <Box className="space-y-3">
                         <Box>
-                          <Typography variant="body2" className="text-gray-500">
+                          <Typography variant="body2" color="text.secondary">
                             Status
                           </Typography>
                           <Box className="mt-1">
@@ -717,7 +739,7 @@ const EnquiryManagement = () => {
                         </Box>
 
                         <Box>
-                          <Typography variant="body2" className="text-gray-500">
+                          <Typography variant="body2" color="text.secondary">
                             Date Submitted
                           </Typography>
                           <Typography variant="body1">
@@ -730,7 +752,7 @@ const EnquiryManagement = () => {
                             <Box>
                               <Typography
                                 variant="body2"
-                                className="text-gray-500"
+                                color="text.secondary"
                               >
                                 Interested Services
                               </Typography>
@@ -759,16 +781,23 @@ const EnquiryManagement = () => {
                 <CardContent>
                   <Typography
                     variant="subtitle1"
-                    className="font-bold text-gray-700 mb-2"
+                    color="text.primary"
+                    className="font-bold mb-2"
                   >
                     Enquiry Message
                   </Typography>
-                  <Typography
-                    variant="body1"
-                    className="bg-gray-50 p-3 rounded whitespace-pre-line"
+                  <Box
+                    sx={{
+                      bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#f9fafb',
+                      p: 2,
+                      borderRadius: 1,
+                      whiteSpace: 'pre-line',
+                      color: 'text.primary',
+                      fontSize: '0.875rem'
+                    }}
                   >
                     {selectedEnquiry.message}
-                  </Typography>
+                  </Box>
                 </CardContent>
               </Card>
 
@@ -777,7 +806,8 @@ const EnquiryManagement = () => {
                 <CardContent>
                   <Typography
                     variant="subtitle1"
-                    className="font-bold text-gray-700 mb-3"
+                    color="text.primary"
+                    className="font-bold mb-3"
                   >
                     Update Status
                   </Typography>
@@ -840,7 +870,8 @@ const EnquiryManagement = () => {
                 <CardContent>
                   <Typography
                     variant="subtitle1"
-                    className="font-bold text-gray-700 mb-3"
+                    color="text.primary"
+                    className="font-bold mb-3"
                   >
                     Reply to Enquiry
                   </Typography>

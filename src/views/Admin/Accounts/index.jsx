@@ -11,7 +11,8 @@ import {
   Card,
   CardContent,
   Chip,
-  Alert
+  Alert,
+  useTheme
 } from '@mui/material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
@@ -26,6 +27,7 @@ import axios from 'axios';
 const API_BASE_URL = 'http://localhost:5000/api/admin';
 
 const index = () => {
+  const theme = useTheme();
   // State for statistics
   const [stats, setStats] = useState({
     totalMembers: 0,
@@ -43,8 +45,13 @@ const index = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Colors for charts
-  const COLORS = ['#ca0019', '#f44336', '#ff9800', '#2196f3'];
+  // Colors for charts - using theme palette
+  const COLORS = [
+    theme.palette.primary.main,
+    theme.palette.error.main,
+    theme.palette.warning.main,
+    theme.palette.info.main
+  ];
   
   // Fetch statistics
   useEffect(() => {
@@ -128,7 +135,7 @@ const index = () => {
 
   return (
     <div className="p-4">
-      <Typography variant="h4" fontWeight="bold" className="mb-6 text-gray-800">
+      <Typography variant="h4" fontWeight="bold" style={{ color: theme.palette.text.primary }} className="mb-6">
         Financial Management
       </Typography>
       
@@ -139,7 +146,7 @@ const index = () => {
       )}
       
       {/* Primary Stats Cards Row */}
-      <Typography variant="h6" fontWeight="medium" className="mb-2 text-gray-700">
+      <Typography variant="h6" fontWeight="medium" style={{ color: theme.palette.text.secondary }} className="mb-2">
         Overview
       </Typography>
       <div className='grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mb-6'>
@@ -167,7 +174,7 @@ const index = () => {
       </div>
       
       {/* Secondary Stats Cards Row */}
-      <Typography variant="h6" fontWeight="medium" className="mb-2 text-gray-700">
+      <Typography variant="h6" fontWeight="medium" style={{ color: theme.palette.text.secondary }} className="mb-2">
         Member Status
       </Typography>
       <div className='grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mb-6'>
@@ -223,8 +230,11 @@ const index = () => {
                   <YAxis />
                   <Tooltip 
                     formatter={(value) => [`₹${value}`, 'Total Fine']}
-                    labelStyle={{ color: '#333' }}
-                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }}
+                    labelStyle={{ color: theme.palette.text.primary }}
+                    contentStyle={{ 
+                      backgroundColor: theme.palette.background.paper, 
+                      border: `1px solid ${theme.palette.divider}`
+                    }}
                   />
                   <Bar dataKey="fines" fill="#ca0019" name="Total Fine" />
                 </BarChart>
@@ -267,11 +277,17 @@ const index = () => {
                 <Box className="mt-4">
                   <div className="flex justify-center gap-4">
                     <div className="flex items-center">
-                      <div className="w-3 h-3 rounded-full bg-[#ca0019] mr-2"></div>
+                      <div 
+                        className="w-3 h-3 rounded-full mr-2" 
+                        style={{ backgroundColor: theme.palette.primary.main }}
+                      ></div>
                       <Typography variant="body2">Members with Fine</Typography>
                     </div>
                     <div className="flex items-center">
-                      <div className="w-3 h-3 rounded-full bg-[#2196f3] mr-2"></div>
+                      <div 
+                        className="w-3 h-3 rounded-full mr-2" 
+                        style={{ backgroundColor: theme.palette.info.main }}
+                      ></div>
                       <Typography variant="body2">Paid Members</Typography>
                     </div>
                   </div>

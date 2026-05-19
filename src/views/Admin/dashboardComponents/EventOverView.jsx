@@ -9,8 +9,12 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import Chip from '@mui/material/Chip';
+import { useTheme } from "@mui/material/styles";
 
 const EventOverView = ({ event }) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+
   // Destructure event properties with defaults
   const {
     eventStatus = "upcoming",
@@ -33,10 +37,18 @@ const EventOverView = ({ event }) => {
     return date.toISOString().split("T")[0]; // Returns YYYY-MM-DD
   };
 
-
   return (
-    <div className="w-[96%] relative my-2 mx-auto rounded-md border border-slate-200 p-2">
-      <div className="absolute bottom-0 right-0 bg-[#ca0019] text-white text-xs px-2">
+    <div 
+      style={{
+        borderColor: theme.palette.divider,
+        backgroundColor: isDark ? "rgba(255, 255, 255, 0.02)" : "transparent"
+      }}
+      className="w-[96%] relative my-2 mx-auto rounded-md border p-2"
+    >
+      <div 
+        style={{ backgroundColor: theme.palette.primary.main }} 
+        className="absolute bottom-0 right-0 text-white text-xs px-2"
+      >
         <p>Event</p>
       </div>
       
@@ -46,7 +58,11 @@ const EventOverView = ({ event }) => {
           <Chip 
             label={eventType}
             size="small"
-            className="bg-blue-50 text-blue-700 text-xs"
+            style={{
+              backgroundColor: isDark ? "rgba(33, 150, 243, 0.15)" : "#e3f2fd",
+              color: isDark ? "#90caf9" : "#1976d2"
+            }}
+            className="text-xs"
           />
         )}
         <div>
@@ -72,7 +88,10 @@ const EventOverView = ({ event }) => {
       {/* Event name with tooltip */}
       <div className="mt-2">
         <Tooltip title={eventName} arrow>
-          <h2 className="text-lg font-semibold ps-3 flex items-center gap-x-1 text-slate-700">
+          <h2 
+            style={{ color: theme.palette.text.primary }}
+            className="text-lg font-semibold ps-3 flex items-center gap-x-1"
+          >
             <span className={`inline-block w-3 h-3 rounded-full ${
               eventStatus === 'upcoming' ? 'bg-[#ca0019]' : 
               eventStatus === 'ongoing' ? 'bg-amber-500' : 
@@ -87,7 +106,10 @@ const EventOverView = ({ event }) => {
         {/* Brief description if available */}
         {eventDescription && (
           <Tooltip title={eventDescription} arrow>
-            <p className="text-xs text-slate-500 ps-7 mb-1">
+            <p 
+              style={{ color: theme.palette.text.secondary }}
+              className="text-xs ps-7 mb-1"
+            >
               {eventDescription.length > 45 ? eventDescription.slice(0, 45) + "..." : eventDescription}
             </p>
           </Tooltip>
@@ -97,13 +119,13 @@ const EventOverView = ({ event }) => {
       {/* Event details - row 1 */}
       <div className="flex flex-wrap justify-start gap-x-5 items-center px-3 py-2">
         <div className="flex items-center gap-x-1">
-          <CalendarMonthOutlinedIcon sx={{ fontSize: 14, color: "#64748b" }} />
-          <p className="text-sm text-slate-500">{formatDateForInput(eventDate)}</p>
+          <CalendarMonthOutlinedIcon sx={{ fontSize: 14, color: theme.palette.text.secondary }} />
+          <p style={{ color: theme.palette.text.secondary }} className="text-sm">{formatDateForInput(eventDate)}</p>
         </div>
         {eventTime && (
           <div className="flex items-center gap-x-1">
-            <ScheduleOutlinedIcon sx={{ fontSize: 14, color: '#64748b' }} />
-            <p className="text-sm text-slate-500">{eventTime}</p>
+            <ScheduleOutlinedIcon sx={{ fontSize: 14, color: theme.palette.text.secondary }} />
+            <p style={{ color: theme.palette.text.secondary }} className="text-sm">{eventTime}</p>
           </div>
         )}
       </div>
@@ -113,9 +135,9 @@ const EventOverView = ({ event }) => {
         <div className="flex flex-wrap justify-start gap-x-5 items-center px-3 pb-2">
           {eventVenue && (
             <div className="flex items-center gap-x-1">
-              <LocationOnOutlinedIcon sx={{ fontSize: 14, color: '#64748b' }} />
+              <LocationOnOutlinedIcon sx={{ fontSize: 14, color: theme.palette.text.secondary }} />
               <Tooltip title={eventVenue} arrow>
-                <p className="text-sm text-slate-500">
+                <p style={{ color: theme.palette.text.secondary }} className="text-sm">
                   {eventVenue.length > 15 ? eventVenue.slice(0, 15) + "..." : eventVenue}
                 </p>
               </Tooltip>
@@ -124,8 +146,8 @@ const EventOverView = ({ event }) => {
           
           {eventOrganizerBatch && (
             <div className="flex items-center gap-x-1">
-              <GroupsOutlinedIcon sx={{ fontSize: 14, color: '#64748b' }} />
-              <p className="text-sm text-slate-500">{eventOrganizerBatch}</p>
+              <GroupsOutlinedIcon sx={{ fontSize: 14, color: theme.palette.text.secondary }} />
+              <p style={{ color: theme.palette.text.secondary }} className="text-sm">{eventOrganizerBatch}</p>
             </div>
           )}
         </div>
@@ -135,3 +157,4 @@ const EventOverView = ({ event }) => {
 };
 
 export default EventOverView;
+

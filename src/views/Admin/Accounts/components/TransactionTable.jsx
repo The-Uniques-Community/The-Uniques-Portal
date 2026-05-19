@@ -279,10 +279,10 @@ const FinePaymentModal = ({ open, onClose, memberId, fine, onPaymentComplete }) 
             <Box 
               mt={3} 
               p={3} 
-              border="1px dashed #ccc" 
+              border={`1px dashed ${theme.palette.divider}`} 
               borderRadius={1} 
               textAlign="center"
-              bgcolor={files.length > 0 ? 'rgba(0,0,0,0.02)' : 'transparent'}
+              bgcolor={files.length > 0 ? (theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)') : 'transparent'}
             >
               {files.length > 0 ? (
                 <Box>
@@ -743,8 +743,8 @@ const FineTable = () => {
   return (
     <Box
       sx={{
-        backgroundColor: "#f5f5f5",
-        color: "#333",
+        backgroundColor: theme.palette.mode === "dark" ? "background.default" : "#f5f5f5",
+        color: "text.primary",
         minHeight: "80vh",
         p: 3,
       }}
@@ -847,9 +847,9 @@ const FineTable = () => {
           value={search}
           onChange={handleSearchChange}
           InputProps={{
-            startAdornment: <SearchIcon sx={{ mr: 1, color: "#555" }} />,
+            startAdornment: <SearchIcon sx={{ mr: 1, color: theme.palette.mode === "dark" ? "text.secondary" : "#555" }} />,
           }}
-          sx={{ bgcolor: "#fff", borderRadius: 1, input: { color: "#333" }, flexGrow: 1 }}
+          sx={{ bgcolor: theme.palette.mode === "dark" ? "background.paper" : "#fff", borderRadius: 1, flexGrow: 1 }}
         />
         <Box display="flex" gap={2} flexWrap="wrap">
           <FormControl sx={{ minWidth: 120 }}>
@@ -858,7 +858,7 @@ const FineTable = () => {
               value={statusFilter}
               label="Status"
               onChange={handleStatusChange}
-              sx={{ bgcolor: "#fff", color: "#333" }}
+              sx={{ bgcolor: theme.palette.mode === "dark" ? "background.paper" : "#fff" }}
             >
               <MenuItem value="All">All Status</MenuItem>
               <MenuItem value="Pending">Pending</MenuItem>
@@ -873,7 +873,7 @@ const FineTable = () => {
               value={batchFilter}
               label="Batch"
               onChange={handleBatchChange}
-              sx={{ bgcolor: "#fff", color: "#333" }}
+              sx={{ bgcolor: theme.palette.mode === "dark" ? "background.paper" : "#fff" }}
             >
               <MenuItem value="All Batches">All Batches</MenuItem>
               <MenuItem value="The Uniques 1.0">The Uniques 1.0</MenuItem>
@@ -896,27 +896,27 @@ const FineTable = () => {
       {/* Fines Table */}
       <TableContainer
         component={Paper}
-        sx={{ backgroundColor: "#fff", minHeight: "50vh" }}
+        sx={{ backgroundColor: "background.paper", minHeight: "50vh" }}
       >
         <Table>
           <TableHead sx={{ padding: 2 }}>
-            <TableRow sx={{ bgcolor: "#fff", borderBottom: 2 }}>
-              <TableCell sx={{ color: "#555", fontWeight: "bold" }}>
+            <TableRow sx={{ bgcolor: "background.paper", borderBottom: 2, borderColor: "divider" }}>
+              <TableCell sx={{ color: "text.secondary", fontWeight: "bold" }}>
                 Member
               </TableCell>
-              <TableCell sx={{ color: "#555", fontWeight: "bold" }}>
+              <TableCell sx={{ color: "text.secondary", fontWeight: "bold" }}>
                 Batch
               </TableCell>
-              <TableCell sx={{ color: "#555", fontWeight: "bold" }}>
+              <TableCell sx={{ color: "text.secondary", fontWeight: "bold" }}>
                 Pending Amount
               </TableCell>
-              <TableCell sx={{ color: "#555", fontWeight: "bold" }}>
+              <TableCell sx={{ color: "text.secondary", fontWeight: "bold" }}>
                 Pending Fines
               </TableCell>
-              <TableCell sx={{ color: "#555", fontWeight: "bold" }}>
+              <TableCell sx={{ color: "text.secondary", fontWeight: "bold" }}>
                 Last Updated
               </TableCell>
-              <TableCell sx={{ color: "#555", fontWeight: "bold", width: 120 }}>
+              <TableCell sx={{ color: "text.secondary", fontWeight: "bold", width: 120 }}>
                 Actions
               </TableCell>
             </TableRow>
@@ -937,7 +937,7 @@ const FineTable = () => {
             ) : (
               fines.map((fine) => (
                 <TableRow key={fine.id} hover>
-                  <TableCell sx={{ color: "#333" }}>
+                  <TableCell sx={{ color: "text.primary" }}>
                     <div className="flex items-center gap-2">
                       <Avatar alt={fine.name} src={fine.profilePic?.url} />
                       <div>
@@ -948,13 +948,13 @@ const FineTable = () => {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell sx={{ color: "#333" }}>
+                  <TableCell sx={{ color: "text.primary" }}>
                     <div className="flex gap-x-1 items-center"> 
                       <img className="h-5 w-5 object-center object-contain inline" src={tu} alt="TU"/> 
                       {fine.batch}
                     </div>
                   </TableCell>
-                  <TableCell sx={{ color: "#333" }}>
+                  <TableCell sx={{ color: "text.primary" }}>
                     <Typography
                       sx={{
                         fontWeight: 'bold',
@@ -964,7 +964,7 @@ const FineTable = () => {
                       ₹{fine.totalPendingAmount}
                     </Typography>
                   </TableCell>
-                  <TableCell sx={{ color: "#333" }}>
+                  <TableCell sx={{ color: "text.primary" }}>
                     {fine.pendingFinesCount > 0 ? (
                       <Badge badgeContent={fine.pendingFinesCount} color="warning">
                         <ReceiptIcon fontSize="small" />
@@ -973,7 +973,7 @@ const FineTable = () => {
                       <Chip label="None" size="small" color="success" />
                     )}
                   </TableCell>
-                  <TableCell sx={{ color: "#333" }}>
+                  <TableCell sx={{ color: "text.primary" }}>
                     {new Date(fine.updatedAt).toLocaleDateString()}
                   </TableCell>
                   <TableCell>
@@ -1089,9 +1089,16 @@ const FineTable = () => {
                 <div>
                   <Grid container spacing={2} sx={{ mb: 3 }}>
                     <Grid item xs={12} sm={4}>
-                      <Card sx={{ bgcolor: theme.palette.warning.light, height: '100%' }}>
+                      <Card 
+                        sx={{ 
+                          bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 152, 0, 0.12)' : theme.palette.warning.light, 
+                          color: theme.palette.mode === 'dark' ? theme.palette.warning.main : 'inherit',
+                          border: theme.palette.mode === 'dark' ? `1px solid rgba(255, 152, 0, 0.3)` : 'none',
+                          height: '100%' 
+                        }}
+                      >
                         <CardContent>
-                          <Typography variant="overline">
+                          <Typography variant="overline" sx={{ color: theme.palette.mode === 'dark' ? theme.palette.warning.main : 'text.secondary' }}>
                             Pending
                           </Typography>
                           <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
@@ -1101,9 +1108,16 @@ const FineTable = () => {
                       </Card>
                     </Grid>
                     <Grid item xs={12} sm={4}>
-                      <Card sx={{ bgcolor: theme.palette.success.light, height: '100%' }}>
+                      <Card 
+                        sx={{ 
+                          bgcolor: theme.palette.mode === 'dark' ? 'rgba(76, 175, 80, 0.12)' : theme.palette.success.light, 
+                          color: theme.palette.mode === 'dark' ? theme.palette.success.main : 'inherit',
+                          border: theme.palette.mode === 'dark' ? `1px solid rgba(76, 175, 80, 0.3)` : 'none',
+                          height: '100%' 
+                        }}
+                      >
                         <CardContent>
-                          <Typography variant="overline">
+                          <Typography variant="overline" sx={{ color: theme.palette.mode === 'dark' ? theme.palette.success.main : 'text.secondary' }}>
                             Paid
                           </Typography>
                           <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
@@ -1113,9 +1127,16 @@ const FineTable = () => {
                       </Card>
                     </Grid>
                     <Grid item xs={12} sm={4}>
-                      <Card sx={{ bgcolor: theme.palette.grey[200], height: '100%' }}>
+                      <Card 
+                        sx={{ 
+                          bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : theme.palette.grey[200], 
+                          color: 'text.primary',
+                          border: theme.palette.mode === 'dark' ? `1px solid ${theme.palette.divider}` : 'none',
+                          height: '100%' 
+                        }}
+                      >
                         <CardContent>
-                          <Typography variant="overline">
+                          <Typography variant="overline" sx={{ color: 'text.secondary' }}>
                             Waived
                           </Typography>
                           <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
@@ -1345,7 +1366,7 @@ const FineTable = () => {
                     sx={{ 
                       borderRadius: 1,
                       mb: 1,
-                      '&:hover': { bgcolor: '#f5f5f5' }
+                      '&:hover': { bgcolor: 'action.hover' }
                     }}
                   >
                     <ListItemAvatar>

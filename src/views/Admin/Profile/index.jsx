@@ -57,14 +57,14 @@ import {
 
 // Styled Components
 const ActionButton = styled(IconButton)(({ theme }) => ({
-  backgroundColor: '#f0f0f0',
+  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#f0f0f0',
   borderRadius: '50%',
   padding: 8,
   margin: '0 4px',
   transition: 'all 0.2s ease',
   '&:hover': {
     transform: 'scale(1.1)',
-    backgroundColor: '#e0e0e0'
+    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : '#e0e0e0'
   }
 }));
 
@@ -78,25 +78,21 @@ const RoundedChip = styled(Chip)(() => ({
 }));
 
 const AnimatedCard = styled(Card)(({ theme }) => ({
-
   marginBottom: theme.spacing(2),
   width: '100%',
   borderRadius: theme.spacing(2),
   overflow: 'hidden',
-  backgroundColor: '#ffffff',
+  backgroundColor: theme.palette.background.paper,
 }));
-
-
 
 const ActivityCard = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
-  backgroundColor: '#f8f9fa',
+  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#f8f9fa',
   borderRadius: theme.spacing(2),
   marginBottom: theme.spacing(2),
   position: 'relative',
   transition: 'all 0.3s ease',
-  border: '1px solid #e0e0e0',
-
+  border: `1px solid ${theme.palette.divider}`,
 }));
 
 const FloatingActionButton = styled(Fab)(({ theme }) => ({
@@ -175,7 +171,7 @@ function App() {
       }
       
       body {
-        background-color: #f5f7fa;
+        background-color: ${theme.palette.mode === 'dark' ? theme.palette.background.default : '#f5f7fa'};
         margin: 0;
         padding: 0;
       }

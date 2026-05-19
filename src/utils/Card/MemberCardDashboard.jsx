@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { BASE_URL } from "@/config";
-import { Button, Card, CardContent, Avatar, IconButton } from "@mui/material";
+import { Button, Card, CardContent, Avatar, IconButton, useTheme } from "@mui/material";
 import { FaEye } from "react-icons/fa";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import GitHubIcon from "@mui/icons-material/GitHub";
@@ -23,6 +23,8 @@ import "tailwindcss/tailwind.css";
 import ProfileModal from "../Modal/ProfileModal";
 import userIcon from "@/assets/img/user-icon.png";
 const UserProfileModal = ({ open, handleClose, userData }) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
   const [activeTab, setActiveTab] = useState(0);
 
   const handleTabChange = (event, newValue) => {
@@ -42,6 +44,7 @@ const UserProfileModal = ({ open, handleClose, userData }) => {
     borderRadius: "8px",
     maxHeight: "90vh",
     overflowY: "auto",
+    color: "text.primary",
   };
   const getProxyImageUrl = (fileId) => {
     if (!fileId) return "/placeholder.svg"; // Fallback image
@@ -56,30 +59,30 @@ const UserProfileModal = ({ open, handleClose, userData }) => {
           <div className="flex-shrink-0">
             <img
               src={
-                user?.profilePic?.fileId
-                  ? getProxyImageUrl(user.profilePic.fileId)
+                userData?.profilePic?.fileId
+                  ? getProxyImageUrl(userData.profilePic.fileId)
                   : userIcon
               }
-              sx={{ width: 120, height: 120 }}
-              className="border-2 border-gray-200"
+              style={{ width: 120, height: 120, borderColor: theme.palette.divider }}
+              className="border-2 rounded"
             />
           </div>
           <div className="flex-1">
-            <Typography variant="h5" className="font-bold">
+            <Typography variant="h5" className="font-bold" style={{ color: theme.palette.text.primary }}>
               {userData?.fullName}
             </Typography>
-            <Typography variant="subtitle1" className="text-gray-600">
+            <Typography variant="subtitle1" style={{ color: theme.palette.text.secondary }}>
               {userData?.email}
             </Typography>
-            <Typography variant="body2" className="text-gray-500">
+            <Typography variant="body2" style={{ color: theme.palette.text.secondary }}>
               {userData?.course} - {userData?.batch}
             </Typography>
-            <Typography variant="body2" className="text-gray-500">
+            <Typography variant="body2" style={{ color: theme.palette.text.secondary }}>
               Status:{" "}
               <span
                 className={`capitalize ${userData?.profileStatus === "active"
-                  ? "text-green-600"
-                  : "text-red-600"
+                  ? "text-green-600 font-semibold"
+                  : "text-red-600 font-semibold"
                   }`}
               >
                 {userData?.profileStatus}
@@ -105,7 +108,7 @@ const UserProfileModal = ({ open, handleClose, userData }) => {
               )}
               {userData?.githubProfile && (
                 <IconButton href={userData.githubProfile} target="_blank">
-                  <GitHub />
+                  <GitHub style={{ color: theme.palette.text.primary }} />
                 </IconButton>
               )}
               <IconButton href={`mailto:${userData?.email}`}>
@@ -298,6 +301,8 @@ const sampleUserData = {
 };
 
 export const MemberCardDashboard = ({ user, onEdit, onDelete, refreshData }) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
   const [open, setOpen] = useState(false);
 
   const handleClose = () => setOpen(false);
@@ -308,10 +313,16 @@ export const MemberCardDashboard = ({ user, onEdit, onDelete, refreshData }) => 
   return (
     <>
       {/* User Card */}
-      <Card className="rounded-md shadow-sm border border-slate-200 bg-white p-4 max-w-96">
+      <Card 
+        style={{
+          backgroundColor: theme.palette.background.paper,
+          borderColor: theme.palette.divider,
+        }}
+        className="rounded-2xl shadow-lg border p-4 max-w-96"
+      >
         <CardContent className="flex flex-col gap-2">
           {/* Status Tags */}
-          <div className="flex justify-between items-center my-4">
+          <div style={{ color: theme.palette.text.secondary }} className="flex justify-between items-center my-4">
             <div className="font-medium">
               <img
                 src={tu}
@@ -336,6 +347,7 @@ export const MemberCardDashboard = ({ user, onEdit, onDelete, refreshData }) => 
                     onEdit(user);
                   }}
                   className="text-blue-600 hover:bg-blue-50"
+                  style={{ color: isDark ? "#90caf9" : "#1976d2" }}
                   title="Edit Member"
                 >
                   <Edit fontSize="small" />
@@ -349,6 +361,7 @@ export const MemberCardDashboard = ({ user, onEdit, onDelete, refreshData }) => 
                     onDelete(user._id);
                   }}
                   className="text-red-600 hover:bg-red-50"
+                  style={{ color: isDark ? "#f48fb1" : "#d32f2f" }}
                   title="Delete Member"
                 >
                   <Delete fontSize="small" />
@@ -359,18 +372,28 @@ export const MemberCardDashboard = ({ user, onEdit, onDelete, refreshData }) => 
 
           {/* User Details */}
           <div className="flex items-center gap-3">
-            <img
+            <Avatar
               src={
                 user?.profilePic?.fileId
                   ? getProxyImageUrl(user.profilePic.fileId)
                   : userIcon
               }
               alt={user.fullName}
-              className="w-16 h-16 rounded-full object-cover object-center"
+              sx={{ 
+                width: 64, 
+                height: 64, 
+                border: `4px solid ${isDark ? 'rgba(255,255,255,0.05)' : '#f5f5f5'}`,
+                boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+                cursor: 'pointer',
+                transition: 'transform 0.2s',
+                '&:hover': {
+                  transform: 'scale(1.05)'
+                }
+              }}
             />
             <div>
-              <h2 className="text-lg font-semibold">{user.fullName}</h2>
-              <p className="text-gray-500 text-sm">
+              <h2 style={{ color: theme.palette.text.primary }} className="text-lg font-semibold">{user.fullName}</h2>
+              <p style={{ color: theme.palette.text.secondary }} className="text-sm">
                 {user.bio ? user.bio.slice(0, 36) + "..." : "No bio available"}
               </p>
             </div>
@@ -380,36 +403,48 @@ export const MemberCardDashboard = ({ user, onEdit, onDelete, refreshData }) => 
           <div className="flex justify-start gap-x-4 mt-3">
             {user.githubProfile && (
               <Link to={user.githubProfile}>
-                <div className="w-10 h-10 p-1 bg-black rounded-full">
+                <div 
+                  style={{ backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "#000000" }} 
+                  className="w-10 h-10 p-1 rounded-full"
+                >
                   <div className="w-full h-full flex items-center justify-center">
-                    <GitHubIcon fontSize="medium" className="text-white" />
+                    <GitHubIcon fontSize="medium" style={{ color: isDark ? theme.palette.text.primary : "#ffffff" }} />
                   </div>
                 </div>
               </Link>
             )}
             {user.linkedinProfile && (
               <Link to={user.linkedinProfile}>
-                <div className="w-10 h-10 p-1 bg-black rounded-full">
+                <div 
+                  style={{ backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "#000000" }} 
+                  className="w-10 h-10 p-1 rounded-full"
+                >
                   <div className="w-full h-full flex items-center justify-center">
-                    <LinkedInIcon fontSize="medium" className="text-white" />
+                    <LinkedInIcon fontSize="medium" style={{ color: isDark ? theme.palette.text.primary : "#ffffff" }} />
                   </div>
                 </div>
               </Link>
             )}
             {user.twitterProfile && (
               <Link to={user.twitterProfile}>
-                <div className="w-10 h-10 p-1 bg-black rounded-full">
+                <div 
+                  style={{ backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "#000000" }} 
+                  className="w-10 h-10 p-1 rounded-full"
+                >
                   <div className="w-full h-full flex items-center justify-center">
-                    <XIcon fontSize="medium" className="text-white" />
+                    <XIcon fontSize="medium" style={{ color: isDark ? theme.palette.text.primary : "#ffffff" }} />
                   </div>
                 </div>
               </Link>
             )}
             {user.whatsappContact && (
               <Link to={`https://wa.me/${user.whatsappContact}`}>
-                <div className="w-10 h-10 p-1 bg-black rounded-full">
+                <div 
+                  style={{ backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "#000000" }} 
+                  className="w-10 h-10 p-1 rounded-full"
+                >
                   <div className="w-full h-full flex items-center justify-center">
-                    <WhatsAppIcon fontSize="medium" className="text-white" />
+                    <WhatsAppIcon fontSize="medium" style={{ color: isDark ? theme.palette.text.primary : "#ffffff" }} />
                   </div>
                 </div>
               </Link>

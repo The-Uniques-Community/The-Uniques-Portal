@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTheme } from "@mui/material/styles";
 import { NewMember } from "./dashboardComponents/NewMember";
 import StatCard from "./dashboardComponents/StatCard";
 import { Groups2 } from "@mui/icons-material";
@@ -281,7 +282,9 @@ const FinePaymentModal = ({
               border="1px dashed #ccc"
               borderRadius={1}
               textAlign="center"
-              bgcolor={files.length > 0 ? "rgba(0,0,0,0.02)" : "transparent"}
+              sx={(theme) => ({
+                bgcolor: files.length > 0 ? theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.02)" : "transparent"
+              })}
             >
               {files.length > 0 ? (
                 <Box>
@@ -337,7 +340,7 @@ const FinePaymentModal = ({
                     variant="caption"
                     display="block"
                     mt={1}
-                    color="textSecondary"
+                    sx={{ color: (theme) => theme.palette.text.secondary }}
                   >
                     Supported formats: JPG, PNG, PDF
                   </Typography>
@@ -462,14 +465,14 @@ const FineDetailsModal = ({ open, onClose, selectedFine, onPayFine, loading }) =
 
             <Box display="flex" justifyContent="space-around" alignItems="center">
               <Box textAlign="center">
-                <Typography variant="body2" color="textSecondary">Pending</Typography>
+                <Typography variant="body2" sx={{ color: (theme) => theme.palette.text.secondary }}>Pending</Typography>
                 <Typography variant="h6" color="error">
                   ₹{selectedFine.totals.pending || 0}
                 </Typography>
               </Box>
               <Divider orientation="vertical" flexItem />
               <Box textAlign="center">
-                <Typography variant="body2" color="textSecondary">Paid</Typography>
+                <Typography variant="body2" sx={{ color: (theme) => theme.palette.text.secondary }}>Paid</Typography>
                 <Typography variant="h6" color="success.main">
                   ₹{selectedFine.totals.paid || 0}
                 </Typography>
@@ -494,7 +497,7 @@ const FineDetailsModal = ({ open, onClose, selectedFine, onPayFine, loading }) =
         {/* Fine List */}
         <TableContainer component={Paper} variant="outlined">
           <Table size="small">
-            <TableHead sx={{ bgcolor: 'grey.50' }}>
+            <TableHead sx={(theme) => ({ bgcolor: theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.04)" })}>
               <TableRow>
                 <TableCell>Date</TableCell>
                 <TableCell>Reason</TableCell>
@@ -562,7 +565,7 @@ const FineDetailsModal = ({ open, onClose, selectedFine, onPayFine, loading }) =
               ) : (
                 <TableRow>
                   <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
-                    <Typography variant="body2" color="textSecondary">
+                    <Typography variant="body2" sx={{ color: (theme) => theme.palette.text.secondary }}>
                       No fines found
                     </Typography>
                   </TableCell>
@@ -583,6 +586,9 @@ const FineDetailsModal = ({ open, onClose, selectedFine, onPayFine, loading }) =
 };
 
 const Index = () => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+
   // State for storing fetched data
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -1198,7 +1204,14 @@ const Index = () => {
         onClose={handleCloseModal}
         aria-labelledby="member-details-modal"
       >
-        <Box className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-xl p-6 w-11/12 max-w-3xl max-h-[90vh] overflow-y-auto">
+        <Box 
+          style={{
+            backgroundColor: theme.palette.background.paper,
+            borderColor: theme.palette.divider,
+            color: theme.palette.text.primary,
+          }}
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-xl shadow-xl border p-6 w-11/12 max-w-3xl max-h-[90vh] overflow-y-auto"
+        >
           {selectedMember && (
             <>
               {/* Modal Header */}
@@ -1206,7 +1219,8 @@ const Index = () => {
                 <Typography
                   variant="h5"
                   component="h2"
-                  className="font-bold text-slate-800"
+                  style={{ color: theme.palette.text.primary }}
+                  className="font-bold"
                 >
                   {tableView === 0
                     ? "Fine Details"
@@ -1252,7 +1266,13 @@ const Index = () => {
               {tableView === 0 ? (
                 // Fine Details Content
                 <div className="space-y-4">
-                  <div className="bg-red-50 p-4 rounded-lg">
+                  <div 
+                    style={{
+                      backgroundColor: isDark ? "rgba(244, 67, 54, 0.15)" : "#fef2f2",
+                      borderColor: isDark ? "rgba(244, 67, 54, 0.3)" : "#fecaca"
+                    }}
+                    className="p-4 rounded-lg border"
+                  >
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
                         <CurrencyRupeeIcon className="text-red-600" />
@@ -1268,7 +1288,13 @@ const Index = () => {
                     </div>
                   </div>
 
-                  <Card variant="outlined" className="border-red-200">
+                  <Card 
+                    variant="outlined" 
+                    style={{
+                      borderColor: isDark ? theme.palette.divider : "#fecaca",
+                      backgroundColor: theme.palette.background.paper
+                    }}
+                  >
                     <CardContent>
                       <Typography
                         variant="subtitle1"
@@ -1278,7 +1304,12 @@ const Index = () => {
                         Payment Status
                       </Typography>
 
-                      <div className="bg-gray-50 p-3 rounded-lg mb-3">
+                      <div 
+                        style={{
+                          backgroundColor: isDark ? "rgba(255, 255, 255, 0.05)" : "#f9fafb"
+                        }}
+                        className="p-3 rounded-lg mb-3"
+                      >
                         <div className="flex justify-between items-center">
                           <Typography variant="body2">Fine Status:</Typography>
                           <Chip
@@ -1292,7 +1323,8 @@ const Index = () => {
 
                       <Typography
                         variant="body2"
-                        className="text-gray-600 italic"
+                        style={{ color: theme.palette.text.secondary }}
+                        className="italic"
                       >
                         Fine must be paid before the end of the semester to
                         avoid exam restrictions.
@@ -1303,7 +1335,7 @@ const Index = () => {
                         <Box
                           mt={2}
                           p={2}
-                          border="1px solid #eee"
+                          border={`1px solid ${theme.palette.divider}`}
                           borderRadius={1}
                         >
                           <Typography variant="subtitle2" gutterBottom>
@@ -1326,7 +1358,12 @@ const Index = () => {
                     </CardContent>
                   </Card>
 
-                  <div className="bg-gray-50 p-4 rounded-lg">
+                  <div 
+                    style={{
+                      backgroundColor: isDark ? "rgba(255, 255, 255, 0.05)" : "#f9fafb"
+                    }}
+                    className="p-4 rounded-lg"
+                  >
                     <Typography
                       variant="subtitle1"
                       className="font-semibold mb-2"
@@ -1335,7 +1372,7 @@ const Index = () => {
                     </Typography>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <Typography variant="body2" className="text-gray-500">
+                        <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
                           Email
                         </Typography>
                         <Typography variant="body2">
@@ -1343,7 +1380,7 @@ const Index = () => {
                         </Typography>
                       </div>
                       <div>
-                        <Typography variant="body2" className="text-gray-500">
+                        <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
                           Contact
                         </Typography>
                         <Typography variant="body2">
@@ -1374,7 +1411,12 @@ const Index = () => {
               ) : (
                 // Supplementary Exam Details Content
                 <div className="space-y-4">
-                  <div className="bg-blue-50 p-4 rounded-lg">
+                  <div 
+                    style={{
+                      backgroundColor: isDark ? "rgba(33, 150, 243, 0.15)" : "#eff6ff"
+                    }}
+                    className="p-4 rounded-lg"
+                  >
                     <div className="flex items-center gap-2 mb-2">
                       <SchoolIcon className="text-blue-600" />
                       <Typography variant="h6" className="font-semibold">
@@ -1385,7 +1427,13 @@ const Index = () => {
                     {selectedMember.semesterSupplementary.find(
                       (sem) => sem.semester === currentSemester
                     ) ? (
-                      <List className="bg-white rounded-lg">
+                      <List 
+                        style={{
+                          backgroundColor: theme.palette.background.paper,
+                          borderColor: theme.palette.divider,
+                        }}
+                        className="rounded-lg border"
+                      >
                         {selectedMember.semesterSupplementary
                           .find((sem) => sem.semester === currentSemester)
                           .subjects.map((subject, idx) => (
