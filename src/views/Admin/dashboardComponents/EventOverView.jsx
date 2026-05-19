@@ -10,6 +10,8 @@ import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import Chip from '@mui/material/Chip';
 import { useTheme } from "@mui/material/styles";
+import { alpha } from "@mui/material/styles";
+import { Box, Typography } from "@mui/material";
 
 const EventOverView = ({ event }) => {
   const theme = useTheme();
@@ -38,22 +40,49 @@ const EventOverView = ({ event }) => {
   };
 
   return (
-    <div 
-      style={{
-        borderColor: theme.palette.divider,
-        backgroundColor: isDark ? "rgba(255, 255, 255, 0.02)" : "transparent"
+    <Box
+      sx={{
+        position: "relative",
+        width: "96%",
+        mx: "auto",
+        my: 1.25,
+        p: 2,
+        overflow: "hidden",
+        borderRadius: "14px",
+        border: "1px solid",
+        borderColor: "divider",
+        background:
+          theme.palette.mode === "dark"
+            ? alpha(theme.palette.background.paper, 0.72)
+            : `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.primary.main, 0.035)} 100%)`,
+        boxShadow: `0 10px 30px ${alpha("#000", isDark ? 0.22 : 0.06)}`,
+        transition: "all 0.2s ease",
+        "&:hover": {
+          transform: "translateY(-2px)",
+          borderColor: alpha(theme.palette.primary.main, 0.45),
+          boxShadow: `0 16px 34px ${alpha(theme.palette.primary.main, 0.14)}`,
+        },
       }}
-      className="w-[96%] relative my-2 mx-auto rounded-md border p-2"
     >
-      <div 
-        style={{ backgroundColor: theme.palette.primary.main }} 
-        className="absolute bottom-0 right-0 text-white text-xs px-2"
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: 0,
+          right: 0,
+          color: "white",
+          bgcolor: "primary.main",
+          px: 1.2,
+          py: 0.35,
+          fontSize: 11,
+          fontWeight: 800,
+          borderTopLeftRadius: "8px",
+        }}
       >
-        <p>Event</p>
-      </div>
+        Event
+      </Box>
       
       {/* Status indicator */}
-      <div className="flex justify-between items-start">
+      <div className="flex justify-between items-start gap-2">
         {eventType && (
           <Chip 
             label={eventType}
@@ -86,11 +115,19 @@ const EventOverView = ({ event }) => {
       </div>
       
       {/* Event name with tooltip */}
-      <div className="mt-2">
+      <div className="mt-3">
         <Tooltip title={eventName} arrow>
-          <h2 
-            style={{ color: theme.palette.text.primary }}
-            className="text-lg font-semibold ps-3 flex items-center gap-x-1"
+          <Typography
+            variant="h6"
+            sx={{
+              color: "text.primary",
+              fontSize: "1.05rem",
+              fontWeight: 900,
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              lineHeight: 1.25,
+            }}
           >
             <span className={`inline-block w-3 h-3 rounded-full ${
               eventStatus === 'upcoming' ? 'bg-[#ca0019]' : 
@@ -100,7 +137,7 @@ const EventOverView = ({ event }) => {
             {eventName ? 
               (eventName.length > 20 ? eventName.slice(0, 16) + "..." : eventName) : 
               "Can't Load Name"}
-          </h2>
+          </Typography>
         </Tooltip>
         
         {/* Brief description if available */}
@@ -152,7 +189,7 @@ const EventOverView = ({ event }) => {
           )}
         </div>
       )}
-    </div>
+    </Box>
   );
 };
 

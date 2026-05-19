@@ -456,8 +456,23 @@ export const MemberCardDashboard = ({ user, onEdit, onDelete, refreshData }) => 
             <Button
               variant="contained"
               startIcon={<FaEye />}
-              className="text-white w-full hover:bg-black"
               onClick={() => setOpen(true)}
+              sx={{
+                width: "100%",
+                bgcolor: "#ca0019",
+                color: "#fff",
+                fontWeight: 800,
+                textTransform: "none",
+                borderRadius: "8px",
+                boxShadow: "0 10px 24px rgba(202, 0, 25, 0.22)",
+                "&:hover": {
+                  bgcolor: "#a30014",
+                  color: "#fff",
+                },
+                "& .MuiButton-startIcon": {
+                  color: "inherit",
+                },
+              }}
             >
               View Details
             </Button>

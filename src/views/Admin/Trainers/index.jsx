@@ -31,6 +31,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import { getAllTrainers, addTrainer, updateTrainer, deleteTrainer, uploadTrainerImage } from "@/utils/adminTrainer";
 import { BASE_URL } from "@/config";
+import ModernHeader from "@/utils/Header/ModernHeader";
 
 const Trainers = () => {
   const [trainers, setTrainers] = useState([]);
@@ -204,19 +205,21 @@ const Trainers = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
-        <Typography variant="h4" gutterBottom>
-          Trainers Management
-        </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => handleOpen()}
-          sx={{ bgcolor: "#ca0019", "&:hover": { bgcolor: "#a30014" } }}
-        >
-          Add Trainer
-        </Button>
-      </Box>
+      <ModernHeader
+        title="Trainers"
+        highlight="Management"
+        subtitle="Manage internal mentors and industry trainers with a consistent workspace view."
+        action={
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => handleOpen()}
+            sx={{ bgcolor: "#ca0019", "&:hover": { bgcolor: "#a30014" } }}
+          >
+            Add Trainer
+          </Button>
+        }
+      />
 
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 

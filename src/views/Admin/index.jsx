@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 import { NewMember } from "./dashboardComponents/NewMember";
-import StatCard from "./dashboardComponents/StatCard";
+import ModernStatCard from "@/utils/Card/ModernStatCard";
 import { Groups2 } from "@mui/icons-material";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
@@ -897,37 +897,45 @@ const Index = () => {
   return (
     <div className="w-full">
       {/* Main Dashboard Layout */}
-      <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 grid-cols-1 gap-3 md:px-3 px-1 py-5 mb-5">
-        <div className="col-span-4">
+      <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 grid-cols-1 gap-5 md:px-4 px-2 py-5 mb-5">
+        <div className="xl:col-span-4 lg:col-span-3 md:col-span-2">
           <Banner />
-          <div className="grid xl:grid-cols-4 lg:grid-cols-4 md:grid-cols-3 place-items-center grid-cols-1 gap-4">
-            <StatCard
+          <div className="grid xl:grid-cols-4 lg:grid-cols-2 md:grid-cols-2 place-items-stretch grid-cols-1 gap-5 mt-5">
+            <ModernStatCard
               icon={<Groups2 fontSize="large" />}
-              title="Total Members"
+              label="Total Members"
               value={stats.totalMembers}
               link="/admin/members-overview"
+              color="#2196F3"
+              gradient="radial-gradient(circle at 80% 20%, rgba(33, 150, 243, 0.15) 0%, transparent 50%)"
             />
-            <StatCard
+            <ModernStatCard
               icon={<CurrencyRupeeIcon fontSize="large" />}
-              title="Total Fine"
+              label="Total Fine"
               value={stats.totalFine}
               link="/admin/accounts"
+              color="#FFA500"
+              gradient="radial-gradient(circle at 80% 20%, rgba(255, 165, 0, 0.15) 0%, transparent 50%)"
             />
-            <StatCard
+            <ModernStatCard
               icon={<EventAvailableIcon fontSize="large" />}
-              title="Total Events"
+              label="Total Events"
               value={stats.totalEvents}
               link="/admin/events-overview"
+              color="#4CAF50"
+              gradient="radial-gradient(circle at 80% 20%, rgba(76, 175, 80, 0.15) 0%, transparent 50%)"
             />
-            <StatCard
+            <ModernStatCard
               icon={<LocationCityIcon fontSize="large" />}
-              title="Total Campus"
+              label="Total Campus"
               value={stats.totalCampus}
+              color="#ca0019"
+              gradient="radial-gradient(circle at 80% 20%, rgba(202, 0, 25, 0.15) 0%, transparent 50%)"
             />
           </div>
 
           <div className="px-1 py-5 my-5">
-            <h2 className="text-2xl font-bold text-slate-800 mb-5">
+            <h2 className="text-2xl font-bold mb-5" style={{ color: theme.palette.text.primary }}>
               Newly Added Members
             </h2>
             {loading ? (
@@ -947,18 +955,38 @@ const Index = () => {
             )}
           </div>
         </div>
-        <div>
+        <div className="xl:col-span-1 lg:col-span-1 md:col-span-1">
           <div className="mb-5">
             <Calender />
           </div>
-          <div
-            className="mb-5 overflow-auto h-[500px]"
-            style={{
-              scrollbarWidth: "thin",
-              scrollbarColor: "#d4d4d4 #f3f3f3",
-              scrollbarTrackColor: "#f3f3f3",
+          <Box
+            sx={{
+              mb: 5,
+              border: "1px solid",
+              borderColor: "divider",
+              borderRadius: "16px",
+              bgcolor: "background.paper",
+              overflow: "hidden",
+              boxShadow: "0 14px 40px rgba(0,0,0,0.06)",
             }}
           >
+            <Box sx={{ p: 2.25, borderBottom: "1px solid", borderColor: "divider" }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 900, color: "text.primary", lineHeight: 1.15 }}>
+                Event Stream
+              </Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 600 }}>
+                Recent operational activity
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                overflow: "auto",
+                maxHeight: 500,
+                py: 1,
+                scrollbarWidth: "thin",
+                scrollbarColor: "#d4d4d4 #f3f3f3",
+              }}
+            >
             {loading ? (
               <div className="flex justify-center py-8">
                 <CircularProgress size={24} />
@@ -968,13 +996,14 @@ const Index = () => {
                 <EventOverView key={index} event={event} />
               ))
             )}
-          </div>
+            </Box>
+          </Box>
         </div>
       </div>
 
       {/* Member Filters Section */}
       <div className="mx-3 mb-10">
-        <h2 className="text-2xl font-bold text-slate-800 mb-3">
+        <h2 className="text-2xl font-bold mb-3" style={{ color: theme.palette.text.primary }}>
           Member Filters
         </h2>
 

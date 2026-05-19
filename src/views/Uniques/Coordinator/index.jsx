@@ -1,7 +1,6 @@
-import { useTheme } from '@mui/material/styles';
 import React, { useState, useEffect } from "react";
 import { NewMember } from "./dashboardComponents/NewMember";
-import StatCard from "./dashboardComponents/StatCard";
+import ModernStatCard from "@/utils/Card/ModernStatCard";
 import { Groups2 } from "@mui/icons-material";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
@@ -49,6 +48,7 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import SchoolIcon from "@mui/icons-material/School";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import CloseIcon from "@mui/icons-material/Close";
@@ -70,6 +70,7 @@ import UploadFile from "@mui/icons-material/UploadFile";
 import RemoveCircle from "@mui/icons-material/RemoveCircle";
 import Preview from "@mui/icons-material/Preview";
 import Close from "@mui/icons-material/Close";
+import ModernTable from "@/utils/Table/ModernTable";
 
 // Fine Payment Modal Component
 const FinePaymentModal = ({
@@ -79,7 +80,6 @@ const FinePaymentModal = ({
   fine,
   onPaymentComplete,
 }) => {
-  const theme = useTheme();
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("upi");
@@ -376,7 +376,6 @@ const FinePaymentModal = ({
 
 // Receipt Preview Modal Component
 const ReceiptPreviewModal = ({ open, onClose, receiptUrl }) => {
-  const theme = useTheme();
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>
@@ -397,7 +396,7 @@ const ReceiptPreviewModal = ({ open, onClose, receiptUrl }) => {
                   width="100%"
                   height="500px"
                   title="PDF Receipt"
-                  style={{ border: "1px solid", borderColor: theme.palette.divider }}
+                  style={{ border: "1px solid #ddd" }}
                 />
               </Box>
             ) : (
@@ -428,7 +427,6 @@ const ReceiptPreviewModal = ({ open, onClose, receiptUrl }) => {
 
 // Add this component inside the index.jsx file
 const FineDetailsModal = ({ open, onClose, selectedFine, onPayFine, loading }) => {
-  const theme = useTheme();
   const [activeTab, setActiveTab] = useState(0);
 
   if (!selectedFine) return null;
@@ -497,85 +495,69 @@ const FineDetailsModal = ({ open, onClose, selectedFine, onPayFine, loading }) =
         </Box>
 
         {/* Fine List */}
-        <TableContainer component={Paper} variant="outlined">
-          <Table size="small">
-            <TableHead sx={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'grey.50' }}>
-              <TableRow>
-                <TableCell>Date</TableCell>
-                <TableCell>Reason</TableCell>
-                <TableCell align="right">Amount</TableCell>
-                <TableCell align="center">Status</TableCell>
-                <TableCell align="center">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {selectedFine.fines.length > 0 ? (
-                selectedFine.fines
-                  .filter(fine => {
-                    if (activeTab === 0) return true;
-                    if (activeTab === 1) return fine.status === "pending";
-                    if (activeTab === 2) return fine.status === "paid";
-                    return true;
-                  })
-                  .map((fine, index) => (
-                    <TableRow key={fine._id || index} hover>
-                      <TableCell>
-                        {fine.dateImposed ? new Date(fine.dateImposed).toLocaleDateString() : "N/A"}
-                      </TableCell>
-                      <TableCell>{fine.reason || "Fine Imposed"}</TableCell>
-                      <TableCell align="right">₹{fine.amount}</TableCell>
-                      <TableCell align="center">
-                        <Chip
-                          size="small"
-                          label={fine.status === "paid" ? "Paid" : "Pending"}
-                          color={fine.status === "paid" ? "success" : "warning"}
-                          icon={fine.status === "paid" ? <DoneIcon /> : <PendingIcon />}
-                        />
-                      </TableCell>
-                      <TableCell align="center">
-                        {fine.status === "pending" ? (
-                          <Button
-                            size="small"
-                            variant="contained"
-                            color="primary"
-                            onClick={() => onPayFine(selectedFine.member.id, fine._id)}
-                            disabled={loading}
-                          >
-                            Mark as Paid
-                          </Button>
-                        ) : (
-                          <a href={fine.proofOfPayment?.fileUrl} target="_blank" rel="noopener noreferrer">
-                            <Button
-                              size="small"
-                              variant="outlined"
-                              startIcon={<ReceiptIcon />}
-                              onClick={() => {
-                                if (fine.proofOfPayment?.fileUrl) {
-                                  setReceiptPreviewUrl(fine.proofOfPayment.fileUrl);
-                                  setOpenReceiptPreview(true);
-                                }
-                              }}
-                              disabled={!fine.proofOfPayment}
-                            >
-                              View Receipt
-                            </Button>
-                          </a>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
-                    <Typography variant="body2" color="textSecondary">
-                      No fines found
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <ModernTable
+          title="Fines"
+          columns={[
+            { id: "date", label: "Date" },
+            { id: "reason", label: "Reason" },
+            { id: "amount", label: "Amount", align: "right" },
+            { id: "status", label: "Status", align: "center" },
+            { id: "actions", label: "Actions", align: "center" },
+          ]}
+          data={selectedFine.fines.filter(fine => {
+            if (activeTab === 0) return true;
+            if (activeTab === 1) return fine.status === "pending";
+            if (activeTab === 2) return fine.status === "paid";
+            return true;
+          })}
+          renderRow={(fine) => (
+            <>
+              <TableCell>
+                {fine.dateImposed ? new Date(fine.dateImposed).toLocaleDateString() : "N/A"}
+              </TableCell>
+              <TableCell>{fine.reason || "Fine Imposed"}</TableCell>
+              <TableCell align="right">₹{fine.amount}</TableCell>
+              <TableCell align="center">
+                <Chip
+                  size="small"
+                  label={fine.status === "paid" ? "Paid" : "Pending"}
+                  color={fine.status === "paid" ? "success" : "warning"}
+                  icon={fine.status === "paid" ? <DoneIcon /> : <PendingIcon />}
+                />
+              </TableCell>
+              <TableCell align="center">
+                {fine.status === "pending" ? (
+                  <Button
+                    size="small"
+                    variant="contained"
+                    color="primary"
+                    onClick={() => onPayFine(selectedFine.member.id, fine._id)}
+                    disabled={loading}
+                  >
+                    Mark as Paid
+                  </Button>
+                ) : (
+                  <a href={fine.proofOfPayment?.fileUrl} target="_blank" rel="noopener noreferrer">
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      startIcon={<ReceiptIcon />}
+                      onClick={() => {
+                        if (fine.proofOfPayment?.fileUrl) {
+                          setReceiptPreviewUrl(fine.proofOfPayment.fileUrl);
+                          setOpenReceiptPreview(true);
+                        }
+                      }}
+                      disabled={!fine.proofOfPayment}
+                    >
+                      View Receipt
+                    </Button>
+                  </a>
+                )}
+              </TableCell>
+            </>
+          )}
+        />
       </DialogContent>
 
       <DialogActions>
@@ -589,6 +571,7 @@ const FineDetailsModal = ({ open, onClose, selectedFine, onPayFine, loading }) =
 
 const index = () => {
   const theme = useTheme();
+
   // State for storing fetched data
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -897,32 +880,40 @@ const index = () => {
   return (
     <div className="w-full">
       {/* Main Dashboard Layout */}
-      <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 grid-cols-1 gap-3 md:px-3 px-1 py-5 mb-5">
-        <div className="col-span-4">
+      <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 grid-cols-1 gap-5 md:px-4 px-2 py-5 mb-5">
+        <div className="xl:col-span-4 lg:col-span-3 md:col-span-2">
           <Banner />
-          <div className="grid xl:grid-cols-4 lg:grid-cols-4 md:grid-cols-3 place-items-center grid-cols-1 gap-4">
-            <StatCard
+          <div className="grid xl:grid-cols-4 lg:grid-cols-2 md:grid-cols-2 place-items-stretch grid-cols-1 gap-5 mt-5">
+            <ModernStatCard
               icon={<Groups2 fontSize="large" />}
-              title="Total Members"
+              label="Total Members"
               value={stats.totalMembers}
               link="/admin/members-overview"
+              color="#2196F3"
+              gradient="radial-gradient(circle at 80% 20%, rgba(33, 150, 243, 0.15) 0%, transparent 50%)"
             />
-            <StatCard
+            <ModernStatCard
               icon={<CurrencyRupeeIcon fontSize="large" />}
-              title="Total Fine"
+              label="Total Fine"
               value={stats.totalFine}
               link="/admin/accounts"
+              color="#FFA500"
+              gradient="radial-gradient(circle at 80% 20%, rgba(255, 165, 0, 0.15) 0%, transparent 50%)"
             />
-            <StatCard
+            <ModernStatCard
               icon={<EventAvailableIcon fontSize="large" />}
-              title="Total Events"
+              label="Total Events"
               value={stats.totalEvents}
               link="/admin/events-overview"
+              color="#4CAF50"
+              gradient="radial-gradient(circle at 80% 20%, rgba(76, 175, 80, 0.15) 0%, transparent 50%)"
             />
-            <StatCard
+            <ModernStatCard
               icon={<LocationCityIcon fontSize="large" />}
-              title="Total Campus"
+              label="Total Campus"
               value={stats.totalCampus}
+              color="#ca0019"
+              gradient="radial-gradient(circle at 80% 20%, rgba(202, 0, 25, 0.15) 0%, transparent 50%)"
             />
           </div>
 
@@ -947,18 +938,38 @@ const index = () => {
             )}
           </div>
         </div>
-        <div>
+        <div className="xl:col-span-1 lg:col-span-1 md:col-span-1">
           <div className="mb-5">
             <Calender />
           </div>
-          <div
-            className="mb-5 overflow-auto h-[500px]"
-            style={{
-              scrollbarWidth: "thin",
-              scrollbarColor: "#d4d4d4 #f3f3f3",
-              scrollbarTrackColor: "#f3f3f3",
+          <Box
+            sx={{
+              mb: 5,
+              border: "1px solid",
+              borderColor: "divider",
+              borderRadius: "16px",
+              bgcolor: "background.paper",
+              overflow: "hidden",
+              boxShadow: "0 14px 40px rgba(0,0,0,0.06)",
             }}
           >
+            <Box sx={{ p: 2.25, borderBottom: "1px solid", borderColor: "divider" }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 900, color: "text.primary", lineHeight: 1.15 }}>
+                Event Stream
+              </Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 600 }}>
+                Recent operational activity
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                overflow: "auto",
+                maxHeight: 500,
+                py: 1,
+                scrollbarWidth: "thin",
+                scrollbarColor: "#d4d4d4 #f3f3f3",
+              }}
+            >
             {loading ? (
               <div className="flex justify-center py-8">
                 <CircularProgress size={24} />
@@ -968,7 +979,8 @@ const index = () => {
                 <EventOverView key={index} event={event} />
               ))
             )}
-          </div>
+            </Box>
+          </Box>
         </div>
       </div>
 
@@ -1005,73 +1017,56 @@ const index = () => {
                 <CircularProgress />
               </div>
             ) : (
-              <TableContainer
-                component={Paper}
-                className="shadow-md rounded-md"
-              >
-                <Table>
-                  <TableHead sx={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#f3f4f6' }}>
-                    <TableRow>
-                      <TableCell>Member</TableCell>
-                      <TableCell>Admission No</TableCell>
-                      <TableCell>Batch</TableCell>
-                      <TableCell align="right">Fine Amount</TableCell>
-                      <TableCell align="center">Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {fineMembers.length > 0 ? (
-                      fineMembers.map((member) => (
-                        <TableRow key={member._id} hover>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <Avatar
-                                src={member.profilePic ? (typeof member.profilePic === 'object' ? getProxyImageUrl(member.profilePic.fileId) : getProxyImageUrl(member.profilePic)) : "/placeholder.svg"}
-                                alt={member.name}
-                              />
-                              <div>
-                                <div className="font-medium">
-                                  {member.name}
-                                </div>
-                                <div className="text-xs text-gray-500">
-                                  {member.email}
-                                </div>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>{member.admno}</TableCell>
-                          <TableCell>{member.batch}</TableCell>
-                          <TableCell align="right">
-                            <Chip
-                              label={`₹${member.totalPendingAmount}`}
-                              color="error"
-                              variant="outlined"
-                            />
-                          </TableCell>
-                          <TableCell align="center">
-                            <Button
-                              variant="contained"
-                              size="small"
-                              style={{ backgroundColor: "#ca0019" }}
-                              onClick={() => handleViewDetails(member)}
-                            >
-                              View Details
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={5} align="center" className="py-8">
-                          <Typography variant="body1" color="textSecondary">
-                            No members with fines found
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+              <ModernTable
+                title="Members with Fines"
+                columns={[
+                  { id: "member", label: "Member" },
+                  { id: "admissionNo", label: "Admission No" },
+                  { id: "batch", label: "Batch" },
+                  { id: "fineAmount", label: "Fine Amount", align: "right" },
+                  { id: "actions", label: "Actions", align: "center" },
+                ]}
+                data={fineMembers}
+                renderRow={(member) => (
+                  <>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Avatar
+                          src={member.profilePic ? (typeof member.profilePic === 'object' ? getProxyImageUrl(member.profilePic.fileId) : getProxyImageUrl(member.profilePic)) : "/placeholder.svg"}
+                          alt={member.name}
+                        />
+                        <div>
+                          <div className="font-medium">
+                            {member.name}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {member.email}
+                          </div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>{member.admno}</TableCell>
+                    <TableCell>{member.batch}</TableCell>
+                    <TableCell align="right">
+                      <Chip
+                        label={`₹${member.totalPendingAmount}`}
+                        color="error"
+                        variant="outlined"
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      <Button
+                        variant="contained"
+                        size="small"
+                        style={{ backgroundColor: "#ca0019" }}
+                        onClick={() => handleViewDetails(member)}
+                      >
+                        View Details
+                      </Button>
+                    </TableCell>
+                  </>
+                )}
+              />
             )}
           </>
         ) : (
@@ -1101,98 +1096,80 @@ const index = () => {
                 <CircularProgress />
               </div>
             ) : (
-              <TableContainer
-                component={Paper}
-                className="shadow-md rounded-md"
-              >
-                <Table>
-                  <TableHead sx={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#f3f4f6' }}>
-                    <TableRow>
-                      <TableCell>Member</TableCell>
-                      <TableCell>Admission No</TableCell>
-                      <TableCell>Batch</TableCell>
-                      <TableCell>Subjects</TableCell>
-                      <TableCell align="center">Status</TableCell>
-                      <TableCell align="center">Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {supplementaryMembers.length > 0 ? (
-                      supplementaryMembers.map((member) => (
-                        <TableRow key={member._id} hover>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <Avatar
-                                src={member?.profilePic?.fileId ?
-                                  getProxyImageUrl(member.profilePic.fileId) :
-                                  '/placeholder.svg'
-                                }
-                              />
-                              <div>
-                                <div className="font-medium">
-                                  {member.fullName}
-                                </div>
-                                <div className="text-xs text-gray-500">
-                                  {member.email}
-                                </div>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>{member.admno}</TableCell>
-                          <TableCell>{member.batch}</TableCell>
-                          <TableCell>
-                            {member.semesterSupplementary.find(
-                              (sem) => sem.semester === currentSemester
-                            )?.subjects.length || 0}{" "}
-                            subjects
-                          </TableCell>
-                          <TableCell align="center">
-                            {member.semesterSupplementary
-                              .find((sem) => sem.semester === currentSemester)
-                              ?.subjects.some(
-                                (subj) => subj.status === "pending"
-                              ) && (
-                                <Chip
-                                  icon={<WarningAmberIcon />}
-                                  label="Pending"
-                                  color="warning"
-                                  size="small"
-                                  style={{ marginRight: 4 }}
-                                />
-                              )}
-                            {member.semesterSupplementary
-                              .find((sem) => sem.semester === currentSemester)
-                              ?.subjects.some(
-                                (subj) => subj.status === "failed"
-                              ) && (
-                                <Chip label="Failed" color="error" size="small" />
-                              )}
-                          </TableCell>
-                          <TableCell align="center">
-                            <Button
-                              variant="contained"
-                              size="small"
-                              style={{ backgroundColor: "#ca0019" }}
-                              onClick={() => handleViewDetails(member)}
-                            >
-                              View Details
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={6} align="center" className="py-8">
-                          <Typography variant="body1" color="textSecondary">
-                            No members with supplementary exams in semester{" "}
-                            {currentSemester}
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+              <ModernTable
+                title={`Supplementary Exams - Semester ${currentSemester}`}
+                columns={[
+                  { id: "member", label: "Member" },
+                  { id: "admissionNo", label: "Admission No" },
+                  { id: "batch", label: "Batch" },
+                  { id: "subjects", label: "Subjects" },
+                  { id: "status", label: "Status", align: "center" },
+                  { id: "actions", label: "Actions", align: "center" },
+                ]}
+                data={supplementaryMembers}
+                renderRow={(member) => (
+                  <>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Avatar
+                          src={member?.profilePic?.fileId ?
+                            getProxyImageUrl(member.profilePic.fileId) :
+                            '/placeholder.svg'
+                          }
+                        />
+                        <div>
+                          <div className="font-medium">
+                            {member.fullName}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {member.email}
+                          </div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>{member.admno}</TableCell>
+                    <TableCell>{member.batch}</TableCell>
+                    <TableCell>
+                      {member.semesterSupplementary.find(
+                        (sem) => sem.semester === currentSemester
+                      )?.subjects.length || 0}{" "}
+                      subjects
+                    </TableCell>
+                    <TableCell align="center">
+                      {member.semesterSupplementary
+                        .find((sem) => sem.semester === currentSemester)
+                        ?.subjects.some(
+                          (subj) => subj.status === "pending"
+                        ) && (
+                          <Chip
+                            icon={<WarningAmberIcon />}
+                            label="Pending"
+                            color="warning"
+                            size="small"
+                            style={{ marginRight: 4 }}
+                          />
+                        )}
+                      {member.semesterSupplementary
+                        .find((sem) => sem.semester === currentSemester)
+                        ?.subjects.some(
+                          (subj) => subj.status === "failed"
+                        ) && (
+                          <Chip label="Failed" color="error" size="small" />
+                        )}
+                    </TableCell>
+                    <TableCell align="center">
+                      <Button
+                        variant="contained"
+                        size="small"
+                        style={{ backgroundColor: "#ca0019" }}
+                        onClick={() => handleViewDetails(member)}
+                      >
+                        View Details
+                      </Button>
+                    </TableCell>
+                  </>
+                )}
+              />
             )}
           </>
         )}
@@ -1212,7 +1189,8 @@ const index = () => {
                 <Typography
                   variant="h5"
                   component="h2"
-                  className="font-bold text-slate-800"
+                  style={{ color: theme.palette.text.primary }}
+                  className="font-bold"
                 >
                   {tableView === 0
                     ? "Fine Details"

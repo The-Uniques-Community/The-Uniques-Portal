@@ -35,6 +35,7 @@ import {
   Grid,
   useTheme,
 } from "@mui/material";
+import ModernTable from "@/utils/Table/ModernTable";
 import {
   Search as SearchIcon,
   Mail as MailIcon,
@@ -52,6 +53,7 @@ import {
 } from "@mui/icons-material";
 import axios from "axios";
 import { format } from "date-fns";
+import ModernHeader from "@/utils/Header/ModernHeader";
 
 const EnquiryManagement = () => {
   const theme = useTheme();
@@ -356,30 +358,21 @@ const EnquiryManagement = () => {
 
   return (
     <div className="p-6">
-      {/* Header Section */}
-      <div className="mb-6">
-        <Typography
-          variant="h4"
-          component="h1"
-          gutterBottom
-          style={{ color: theme.palette.text.primary }}
-        >
-          Enquiry Management
-        </Typography>
-        <Typography variant="body1" style={{ color: theme.palette.text.secondary }} className="mb-4">
-          Manage and respond to enquiries from website visitors.
-        </Typography>
+      <ModernHeader
+        title="Enquiry"
+        highlight="Management"
+        subtitle="Manage and respond to enquiries from website visitors."
+      />
 
-        {alertInfo.show && (
-          <Alert
-            severity={alertInfo.severity}
-            onClose={() => setAlertInfo((prev) => ({ ...prev, show: false }))}
-            className="mb-4"
-          >
-            {alertInfo.message}
-          </Alert>
-        )}
-      </div>
+      {alertInfo.show && (
+        <Alert
+          severity={alertInfo.severity}
+          onClose={() => setAlertInfo((prev) => ({ ...prev, show: false }))}
+          className="mb-4"
+        >
+          {alertInfo.message}
+        </Alert>
+      )}
 
       {/* Filter and Search Section */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
@@ -442,144 +435,113 @@ const EnquiryManagement = () => {
       </div>
 
       {/* Enquiries Table */}
-      <TableContainer component={Paper} className="mb-4">
-        <Table sx={{ minWidth: 650 }}>
-          <TableHead sx={{ bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#f3f4f6' }}>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Contact</TableCell>
-              <TableCell>Message</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell align="center">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={6} align="center" className="py-8">
-                  <CircularProgress size={40} />
-                  <Typography variant="body2" color="text.secondary" className="mt-2">
-                    Loading enquiries...
+      <ModernTable
+        title="Enquiries"
+        columns={[
+          { id: "name", label: "Name" },
+          { id: "contact", label: "Contact" },
+          { id: "message", label: "Message" },
+          { id: "date", label: "Date" },
+          { id: "status", label: "Status" },
+          { id: "actions", label: "Actions", align: "center" },
+        ]}
+        data={enquiries}
+        renderRow={(enquiry) => (
+          <>
+            <TableCell>
+              <div className="flex items-center">
+                <PersonIcon
+                  fontSize="small"
+                  className="text-gray-400 mr-2"
+                />
+                <div>
+                  <Typography variant="body2" className="font-medium">
+                    {`${enquiry.firstName} ${enquiry.lastName}`}
                   </Typography>
-                </TableCell>
-              </TableRow>
-            ) : enquiries.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} align="center" className="py-8">
-                  <Typography variant="body1" className="text-gray-500">
-                    No enquiries found.
-                  </Typography>
-                  <Typography variant="body2" className="mt-1 text-gray-400">
-                    {searchTerm
-                      ? "Try adjusting your search terms."
-                      : "New enquiries will appear here."}
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            ) : (
-              enquiries.map((enquiry) => (
-                <TableRow
-                  key={enquiry._id}
-                  hover
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell>
-                    <div className="flex items-center">
-                      <PersonIcon
-                        fontSize="small"
-                        className="text-gray-400 mr-2"
-                      />
-                      <div>
-                        <Typography variant="body2" className="font-medium">
-                          {`${enquiry.firstName} ${enquiry.lastName}`}
-                        </Typography>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div className="flex items-center">
-                        <MailIcon
-                          fontSize="small"
-                          className="text-gray-400 mr-1"
-                        />
-                        <Typography variant="body2">{enquiry.email}</Typography>
-                      </div>
-                      {enquiry.phone && (
-                        <div className="flex items-center">
-                          <PhoneIcon
-                            fontSize="small"
-                            className="text-gray-400 mr-1"
-                          />
-                          <Typography variant="body2">
-                            {enquiry.phone}
-                          </Typography>
-                        </div>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Typography
-                      variant="body2"
-                      className="line-clamp-2 max-w-sm"
-                    >
-                      {enquiry.message}
+                </div>
+              </div>
+            </TableCell>
+            <TableCell>
+              <div className="space-y-1">
+                <div className="flex items-center">
+                  <MailIcon
+                    fontSize="small"
+                    className="text-gray-400 mr-1"
+                  />
+                  <Typography variant="body2">{enquiry.email}</Typography>
+                </div>
+                {enquiry.phone && (
+                  <div className="flex items-center">
+                    <PhoneIcon
+                      fontSize="small"
+                      className="text-gray-400 mr-1"
+                    />
+                    <Typography variant="body2">
+                      {enquiry.phone}
                     </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <CalendarTodayIcon
-                        fontSize="small"
-                        className="text-gray-400 mr-1"
-                      />
-                      <Typography variant="body2">
-                        {formatDate(enquiry.createdAt)}
-                      </Typography>
-                    </div>
-                  </TableCell>
-                  <TableCell>{getStatusChip(enquiry.status)}</TableCell>
-                  <TableCell align="center">
-                    <div className="flex justify-center space-x-1">
-                      <IconButton
-                        size="small"
-                        onClick={() => handleViewEnquiry(enquiry._id)}
-                        title="View Details"
-                      >
-                        <VisibilityIcon fontSize="small" />
-                      </IconButton>
+                  </div>
+                )}
+              </div>
+            </TableCell>
+            <TableCell>
+              <Typography
+                variant="body2"
+                className="line-clamp-2 max-w-sm"
+              >
+                {enquiry.message}
+              </Typography>
+            </TableCell>
+            <TableCell>
+              <div className="flex items-center">
+                <CalendarTodayIcon
+                  fontSize="small"
+                  className="text-gray-400 mr-1"
+                />
+                <Typography variant="body2">
+                  {formatDate(enquiry.createdAt)}
+                </Typography>
+              </div>
+            </TableCell>
+            <TableCell>{getStatusChip(enquiry.status)}</TableCell>
+            <TableCell align="center">
+              <div className="flex justify-center space-x-1">
+                <IconButton
+                  size="small"
+                  onClick={() => handleViewEnquiry(enquiry._id)}
+                  title="View Details"
+                >
+                  <VisibilityIcon fontSize="small" />
+                </IconButton>
 
-                      <IconButton
-                        size="small"
-                        color="primary"
-                        onClick={() => {
-                          if (enquiry && enquiry._id) {
-                            handleViewEnquiry(enquiry._id);
-                          } else {
-                            showAlert("Error: Invalid enquiry data", "error");
-                          }
-                        }}
-                        title="Reply"
-                      >
-                        <ReplyIcon fontSize="small" />
-                      </IconButton>
+                <IconButton
+                  size="small"
+                  color="primary"
+                  onClick={() => {
+                    if (enquiry && enquiry._id) {
+                      handleViewEnquiry(enquiry._id);
+                    } else {
+                      showAlert("Error: Invalid enquiry data", "error");
+                    }
+                  }}
+                  title="Reply"
+                >
+                  <ReplyIcon fontSize="small" />
+                </IconButton>
 
-                      <IconButton
-                        size="small"
-                        color="error"
-                        onClick={() => handleDeleteConfirmation(enquiry._id)}
-                        title="Delete"
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                <IconButton
+                  size="small"
+                  color="error"
+                  onClick={() => handleDeleteConfirmation(enquiry._id)}
+                  title="Delete"
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </div>
+            </TableCell>
+          </>
+        )}
+        loading={loading}
+      />
 
       {/* Pagination */}
       <div className="flex justify-between items-center">

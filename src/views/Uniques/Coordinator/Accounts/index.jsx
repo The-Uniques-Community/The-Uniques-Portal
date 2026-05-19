@@ -23,6 +23,7 @@ import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import axios from 'axios';
 import { BASE_URL } from '@/config';
+import ModernHeader from '@/utils/Header/ModernHeader';
 
 const API_BASE_URL = `${BASE_URL}/api/admin`;
 
@@ -129,9 +130,11 @@ const index = () => {
 
   return (
     <div className="p-4">
-      <Typography variant="h4" fontWeight="bold" className="mb-6 text-gray-800">
-        Financial Management
-      </Typography>
+      <ModernHeader
+        title="Financial"
+        highlight="Management"
+        subtitle="Track fines, pending dues, paid members, and batch-wise financial signals."
+      />
       
       {error && (
         <Alert severity="error" className="mb-4">

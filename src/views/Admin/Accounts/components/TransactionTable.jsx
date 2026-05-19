@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ModernTable from "@/utils/Table/ModernTable";
 import {
   Box,
   Table,
@@ -894,143 +895,105 @@ const FineTable = () => {
       </Box>
 
       {/* Fines Table */}
-      <TableContainer
-        component={Paper}
-        sx={{ backgroundColor: "background.paper", minHeight: "50vh" }}
-      >
-        <Table>
-          <TableHead sx={{ padding: 2 }}>
-            <TableRow sx={{ bgcolor: "background.paper", borderBottom: 2, borderColor: "divider" }}>
-              <TableCell sx={{ color: "text.secondary", fontWeight: "bold" }}>
-                Member
-              </TableCell>
-              <TableCell sx={{ color: "text.secondary", fontWeight: "bold" }}>
-                Batch
-              </TableCell>
-              <TableCell sx={{ color: "text.secondary", fontWeight: "bold" }}>
-                Pending Amount
-              </TableCell>
-              <TableCell sx={{ color: "text.secondary", fontWeight: "bold" }}>
-                Pending Fines
-              </TableCell>
-              <TableCell sx={{ color: "text.secondary", fontWeight: "bold" }}>
-                Last Updated
-              </TableCell>
-              <TableCell sx={{ color: "text.secondary", fontWeight: "bold", width: 120 }}>
-                Actions
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
-                  <CircularProgress size={40} sx={{ color: "#ca0019" }} />
-                </TableCell>
-              </TableRow>
-            ) : fines.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
-                  <Typography variant="body1">No fine records found</Typography>
-                </TableCell>
-              </TableRow>
-            ) : (
-              fines.map((fine) => (
-                <TableRow key={fine.id} hover>
-                  <TableCell sx={{ color: "text.primary" }}>
-                    <div className="flex items-center gap-2">
-                      <Avatar alt={fine.name} src={fine.profilePic?.url} />
-                      <div>
-                        <Typography variant="body1">{fine.name}</Typography>
-                        <Typography variant="caption" color="textSecondary">
-                          {fine.admno}
-                        </Typography>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell sx={{ color: "text.primary" }}>
-                    <div className="flex gap-x-1 items-center"> 
-                      <img className="h-5 w-5 object-center object-contain inline" src={tu} alt="TU"/> 
-                      {fine.batch}
-                    </div>
-                  </TableCell>
-                  <TableCell sx={{ color: "text.primary" }}>
-                    <Typography
-                      sx={{
-                        fontWeight: 'bold',
-                        color: fine.totalPendingAmount > 0 ? theme.palette.warning.dark : theme.palette.success.main
-                      }}
-                    >
-                      ₹{fine.totalPendingAmount}
-                    </Typography>
-                  </TableCell>
-                  <TableCell sx={{ color: "text.primary" }}>
-                    {fine.pendingFinesCount > 0 ? (
-                      <Badge badgeContent={fine.pendingFinesCount} color="warning">
-                        <ReceiptIcon fontSize="small" />
-                      </Badge>
-                    ) : (
-                      <Chip label="None" size="small" color="success" />
-                    )}
-                  </TableCell>
-                  <TableCell sx={{ color: "text.primary" }}>
-                    {new Date(fine.updatedAt).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    <Box display="flex" gap={1}>
-                      <Tooltip title="View Details">
-                        <IconButton 
-                          color="primary" 
-                          onClick={() => viewFineDetails(fine)}
-                          size="small"
-                        >
-                          <VisibilityIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Add Fine">
-                        <IconButton 
-                          color="warning"
-                          size="small"
-                          onClick={() => {
-                            setSelectedMember({
-                              _id: fine.id,
-                              fullName: fine.name,
-                              admno: fine.admno,
-                              batch: fine.batch,
-                              profilePic: fine.profilePic,
-                              pendingAmount: fine.totalPendingAmount
-                            });
-                            setOpenAddFineModal(true);
-                          }}
-                        >
-                          <AddCircleIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
+      <ModernTable
+        title="Fine Records"
+        columns={[
+          { id: "member", label: "Member" },
+          { id: "batch", label: "Batch" },
+          { id: "pendingAmount", label: "Pending Amount" },
+          { id: "pendingFines", label: "Pending Fines" },
+          { id: "lastUpdated", label: "Last Updated" },
+          { id: "actions", label: "Actions", width: 120 },
+        ]}
+        data={fines}
+        renderRow={(fine) => (
+          <>
+            <TableCell sx={{ color: "text.primary" }}>
+              <div className="flex items-center gap-2">
+                <Avatar alt={fine.name} src={fine.profilePic?.url} />
+                <div>
+                  <Typography variant="body1">{fine.name}</Typography>
+                  <Typography variant="caption" color="textSecondary">
+                    {fine.admno}
+                  </Typography>
+                </div>
+              </div>
+            </TableCell>
+            <TableCell sx={{ color: "text.primary" }}>
+              <div className="flex gap-x-1 items-center">
+                <img className="h-5 w-5 object-center object-contain inline" src={tu} alt="TU" />
+                {fine.batch}
+              </div>
+            </TableCell>
+            <TableCell sx={{ color: "text.primary" }}>
+              <Typography
+                sx={{
+                  fontWeight: 'bold',
+                  color: fine.totalPendingAmount > 0 ? theme.palette.warning.dark : theme.palette.success.main
+                }}
+              >
+                ₹{fine.totalPendingAmount}
+              </Typography>
+            </TableCell>
+            <TableCell sx={{ color: "text.primary" }}>
+              {fine.pendingFinesCount > 0 ? (
+                <Badge badgeContent={fine.pendingFinesCount} color="warning">
+                  <ReceiptIcon fontSize="small" />
+                </Badge>
+              ) : (
+                <Chip label="None" size="small" color="success" />
+              )}
+            </TableCell>
+            <TableCell sx={{ color: "text.primary" }}>
+              {new Date(fine.updatedAt).toLocaleDateString()}
+            </TableCell>
+            <TableCell>
+              <Box display="flex" gap={1}>
+                <Tooltip title="View Details">
+                  <IconButton
+                    color="primary"
+                    onClick={() => viewFineDetails(fine)}
+                    size="small"
+                  >
+                    <VisibilityIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Add Fine">
+                  <IconButton
+                    color="warning"
+                    size="small"
+                    onClick={() => {
+                      setSelectedMember({
+                        _id: fine.id,
+                        fullName: fine.name,
+                        admno: fine.admno,
+                        batch: fine.batch,
+                        profilePic: fine.profilePic,
+                      });
+                      setOpenAddFineModal(true);
+                    }}
+                  >
+                    <AddCircleIcon />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </TableCell>
+          </>
+        )}
+        loading={loading}
+        
+      />
       {/* Pagination */}
       <Box display="flex" justifyContent="center" mt={2}>
         <Pagination
           count={totalPages}
           page={page}
           onChange={(e, value) => setPage(value)}
-          sx={{
-            "& .Mui-selected": {
-              backgroundColor: "#ca0019 !important",
-              color: "white",
-            },
-          }}
+          color="primary"
         />
       </Box>
 
-      {/* View Fine Details Modal */}
+      {/* Fine Details Modal */}
       <Modal
         open={openViewModal}
         onClose={() => setOpenViewModal(false)}

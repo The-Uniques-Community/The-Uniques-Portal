@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import StatCard from '../dashboardComponents/StatCard';
+import ModernStatCard from '@/utils/Card/ModernStatCard';
 import FineTable from './components/TransactionTable';
 import { 
   Box, 
@@ -23,6 +23,7 @@ import ReceiptIcon from '@mui/icons-material/Receipt';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import axios from 'axios';
+import ModernHeader from '@/utils/Header/ModernHeader';
 
 const API_BASE_URL = 'http://localhost:5000/api/admin';
 
@@ -135,9 +136,11 @@ const index = () => {
 
   return (
     <div className="p-4">
-      <Typography variant="h4" fontWeight="bold" style={{ color: theme.palette.text.primary }} className="mb-6">
-        Financial Management
-      </Typography>
+      <ModernHeader
+        title="Financial"
+        highlight="Management"
+        subtitle="Track fines, pending dues, paid members, and batch-wise financial signals."
+      />
       
       {error && (
         <Alert severity="error" className="mb-4">
@@ -150,26 +153,34 @@ const index = () => {
         Overview
       </Typography>
       <div className='grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mb-6'>
-        <StatCard 
-          icon={<GroupsIcon fontSize="large" className="text-blue-600" />}
-          title='Total Members' 
+        <ModernStatCard 
+          icon={<GroupsIcon fontSize="large" />}
+          label='Total Members' 
           value={loading ? <CircularProgress size={24} /> : stats.totalMembers}
           link="/admin/members-overview"
+          color="#2196F3"
+          gradient="radial-gradient(circle at 80% 20%, rgba(33, 150, 243, 0.15) 0%, transparent 50%)"
         />
-        <StatCard 
-          icon={<ReceiptIcon fontSize="large" className="text-purple-600" />}
-          title='Total Fines Issued' 
+        <ModernStatCard 
+          icon={<ReceiptIcon fontSize="large" />}
+          label='Total Fines Issued' 
           value={loading ? <CircularProgress size={24} /> : stats.totalFinesIssued}
+          color="#9C27B0"
+          gradient="radial-gradient(circle at 80% 20%, rgba(156, 39, 176, 0.15) 0%, transparent 50%)"
         />
-        <StatCard 
-          icon={<CurrencyRupeeIcon fontSize="large" className="text-amber-700" />}
-          title='Total Fine Amount' 
+        <ModernStatCard 
+          icon={<CurrencyRupeeIcon fontSize="large" />}
+          label='Total Fine Amount' 
           value={loading ? <CircularProgress size={24} /> : `₹${stats.totalAmount}`}
+          color="#FF9800"
+          gradient="radial-gradient(circle at 80% 20%, rgba(255, 152, 0, 0.15) 0%, transparent 50%)"
         />
-        <StatCard 
-          icon={<PendingActionsIcon fontSize="large" className="text-red-600" />}
-          title='Pending Amount' 
+        <ModernStatCard 
+          icon={<PendingActionsIcon fontSize="large" />}
+          label='Pending Amount' 
           value={loading ? <CircularProgress size={24} /> : `₹${stats.totalPendingAmount}`}
+          color="#f44336"
+          gradient="radial-gradient(circle at 80% 20%, rgba(244, 67, 54, 0.15) 0%, transparent 50%)"
         />
       </div>
       
@@ -178,29 +189,33 @@ const index = () => {
         Member Status
       </Typography>
       <div className='grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mb-6'>
-        <StatCard 
-          icon={<PaidIcon fontSize="large" className="text-green-600" />}
-          title='Paid Amount' 
+        <ModernStatCard 
+          icon={<PaidIcon fontSize="large" />}
+          label='Paid Amount' 
           value={loading ? <CircularProgress size={24} /> : `₹${stats.totalPaidAmount}`}
-          bgColor="bg-green-50"
+          color="#4CAF50"
+          gradient="radial-gradient(circle at 80% 20%, rgba(76, 175, 80, 0.15) 0%, transparent 50%)"
         />
-        <StatCard 
-          icon={<ThumbUpIcon fontSize="large" className="text-indigo-600" />}
-          title='Waived Amount' 
+        <ModernStatCard 
+          icon={<ThumbUpIcon fontSize="large" />}
+          label='Waived Amount' 
           value={loading ? <CircularProgress size={24} /> : `₹${stats.totalWaivedAmount}`}
-          bgColor="bg-indigo-50"
+          color="#3F51B5"
+          gradient="radial-gradient(circle at 80% 20%, rgba(63, 81, 181, 0.15) 0%, transparent 50%)"
         />
-        <StatCard 
-          icon={<PaidIcon fontSize="large" className="text-emerald-600" />}
-          title='Members with No Fine' 
+        <ModernStatCard 
+          icon={<PaidIcon fontSize="large" />}
+          label='Members with No Fine' 
           value={loading ? <CircularProgress size={24} /> : stats.paidMembers}
-          bgColor="bg-emerald-50"
+          color="#10B981"
+          gradient="radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.15) 0%, transparent 50%)"
         />
-        <StatCard 
-          icon={<WarningAmberIcon fontSize="large" className="text-rose-600" />}
-          title='Members with Fine' 
+        <ModernStatCard 
+          icon={<WarningAmberIcon fontSize="large" />}
+          label='Members with Pending Fine' 
           value={loading ? <CircularProgress size={24} /> : stats.membersWithPendingFines}
-          bgColor="bg-rose-50"
+          color="#F43F5E"
+          gradient="radial-gradient(circle at 80% 20%, rgba(244, 63, 94, 0.15) 0%, transparent 50%)"
         />
       </div>
       

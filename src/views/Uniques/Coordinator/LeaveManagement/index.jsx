@@ -33,6 +33,8 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { toast } from "react-toastify";
 import { BASE_URL } from "@/config";
+import ModernTable from "@/utils/Table/ModernTable";
+import ModernHeader from "@/utils/Header/ModernHeader";
 
 const CoordinatorLeaveManagement = () => {
   const theme = useTheme();
@@ -162,111 +164,100 @@ const CoordinatorLeaveManagement = () => {
   };
 
   const LeaveTable = ({ leavesToDisplay }) => (
-    <TableContainer component={Paper} sx={{ mt: 2 }}>
-      <Table>
-        <TableHead sx={{ backgroundColor: theme.palette.primary.light }}>
-          <TableRow>
-            <TableCell sx={{ color: "white", fontWeight: 600 }}>Member</TableCell>
-            <TableCell sx={{ color: "white", fontWeight: 600 }}>Leave Type</TableCell>
-            <TableCell sx={{ color: "white", fontWeight: 600 }}>Start Date</TableCell>
-            <TableCell sx={{ color: "white", fontWeight: 600 }}>End Date</TableCell>
-            <TableCell sx={{ color: "white", fontWeight: 600 }} align="center">Days</TableCell>
-            <TableCell sx={{ color: "white", fontWeight: 600 }}>Reason</TableCell>
-            <TableCell sx={{ color: "white", fontWeight: 600 }}>Status</TableCell>
-            <TableCell sx={{ color: "white", fontWeight: 600 }} align="center">Actions</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {leavesToDisplay.length > 0 ? (
-            leavesToDisplay.map((leave) => (
-              <TableRow key={leave._id} hover>
-                <TableCell>
-                  <Box>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      {leave.memberName}
-                    </Typography>
-                    <Typography variant="caption" color="textSecondary">
-                      {leave.memberEmail}
-                    </Typography>
-                  </Box>
-                </TableCell>
-                <TableCell>{leave.type}</TableCell>
-                <TableCell>{new Date(leave.startDate).toLocaleDateString()}</TableCell>
-                <TableCell>{new Date(leave.endDate).toLocaleDateString()}</TableCell>
-                <TableCell align="center">{leave.days}</TableCell>
-                <TableCell>{leave.reason}</TableCell>
-                <TableCell>
-                  <Chip label={leave.status} color={getStatusColor(leave.status)} size="small" />
-                </TableCell>
-                <TableCell align="center">
-                  <Stack direction="row" spacing={1} justifyContent="center">
-                    <Button
-                      size="small"
-                      startIcon={<VisibilityIcon />}
-                      onClick={() => handleOpenDialog(leave, "view")}
-                      variant="outlined"
-                      disabled={isLoading}
-                    >
-                      View
-                    </Button>
-                    {leave.status === "Pending" && (
-                      <>
-                        <Button
-                          size="small"
-                          startIcon={<CheckCircleIcon />}
-                          onClick={() => handleOpenDialog(leave, "approve")}
-                          color="success"
-                          variant="outlined"
-                          disabled={isLoading}
-                        >
-                          Approve
-                        </Button>
-                        <Button
-                          size="small"
-                          startIcon={<CancelIcon />}
-                          onClick={() => handleOpenDialog(leave, "reject")}
-                          color="error"
-                          variant="outlined"
-                          disabled={isLoading}
-                        >
-                          Reject
-                        </Button>
-                      </>
-                    )}
-                  </Stack>
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
-                <Typography color="textSecondary">
-                  No {tabValue === 0 ? "pending" : tabValue === 1 ? "approved" : "rejected"} leave requests
-                </Typography>
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <ModernTable
+      title="Leave Requests"
+      columns={[
+        { id: "member", label: "Member" },
+        { id: "type", label: "Leave Type" },
+        { id: "startDate", label: "Start Date" },
+        { id: "endDate", label: "End Date" },
+        { id: "days", label: "Days", align: "center" },
+        { id: "reason", label: "Reason" },
+        { id: "status", label: "Status" },
+        { id: "actions", label: "Actions", align: "center" },
+      ]}
+      data={leavesToDisplay}
+      renderRow={(leave) => (
+        <>
+          <TableCell>
+            <Box>
+              <Typography variant="body2" sx={{ fontWeight: 700, color: "text.primary" }}>
+                {leave.memberName}
+              </Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                {leave.memberEmail}
+              </Typography>
+            </Box>
+          </TableCell>
+          <TableCell>{leave.type}</TableCell>
+          <TableCell>{new Date(leave.startDate).toLocaleDateString()}</TableCell>
+          <TableCell>{new Date(leave.endDate).toLocaleDateString()}</TableCell>
+          <TableCell align="center">{leave.days}</TableCell>
+          <TableCell>{leave.reason}</TableCell>
+          <TableCell>
+            <Chip label={leave.status} color={getStatusColor(leave.status)} size="small" />
+          </TableCell>
+          <TableCell align="center">
+            <Stack direction="row" spacing={1} justifyContent="center">
+              <Button
+                size="small"
+                startIcon={<VisibilityIcon />}
+                onClick={() => handleOpenDialog(leave, "view")}
+                variant="outlined"
+                disabled={isLoading}
+              >
+                View
+              </Button>
+              {leave.status === "Pending" && (
+                <>
+                  <Button
+                    size="small"
+                    startIcon={<CheckCircleIcon />}
+                    onClick={() => handleOpenDialog(leave, "approve")}
+                    color="success"
+                    variant="outlined"
+                    disabled={isLoading}
+                  >
+                    Approve
+                  </Button>
+                  <Button
+                    size="small"
+                    startIcon={<CancelIcon />}
+                    onClick={() => handleOpenDialog(leave, "reject")}
+                    color="error"
+                    variant="outlined"
+                    disabled={isLoading}
+                  >
+                    Reject
+                  </Button>
+                </>
+              )}
+            </Stack>
+          </TableCell>
+        </>
+      )}
+    />
   );
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Box sx={{ mb: 4 }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
-          <Typography variant="h4" sx={{ fontWeight: 600 }}>
-            Leave Management
-          </Typography>
-          <Button
-            variant="outlined"
-            startIcon={<RefreshIcon />}
-            onClick={fetchLeaves}
-            disabled={isLoading}
-          >
-            {isLoading ? "Loading..." : "Refresh"}
-          </Button>
-        </Box>
+        <ModernHeader
+          title="Leave"
+          highlight="Management"
+          subtitle="Review member leave requests and keep approvals moving clearly."
+          action={
+            <Button
+              variant="outlined"
+              startIcon={<RefreshIcon />}
+              onClick={fetchLeaves}
+              disabled={isLoading}
+            >
+              {isLoading ? "Loading..." : "Refresh"}
+            </Button>
+          }
+          sx={{ px: 0 }}
+        />
 
         {!isLoading && leaves.length === 0 && (
           <Alert severity="info" sx={{ mb: 3 }}>

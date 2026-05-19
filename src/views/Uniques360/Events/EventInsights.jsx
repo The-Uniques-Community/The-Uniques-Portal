@@ -25,6 +25,8 @@ import {
   Divider,
   useTheme,
 } from "@mui/material";
+import ModernTable from "@/utils/Table/ModernTable";
+import ModernHeader from "@/utils/Header/ModernHeader";
 import {
   Event as EventIcon,
   Schedule as TimelineIcon,
@@ -36,6 +38,8 @@ import {
 import axios from "axios";
 import { BASE_URL } from "@/config";
 import { toast } from "react-toastify";
+
+const BRAND_COLOR = "#ca0019";
 
 const EventInsights = () => {
   const [tasks, setTasks] = useState([]);
@@ -91,24 +95,19 @@ const EventInsights = () => {
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case "high": return themeColors.red;
-      case "medium": return themeColors.black;
-      case "low": return themeColors.gray;
-      default: return themeColors.gray;
-    }
-  };
-
-  const getProgressValue = (status) => {
-    switch (status) {
-      case "completed": return 100;
-      case "in-progress": return 50;
-      default: return 10;
+      case "high": return BRAND_COLOR;
+      case "medium": return "text.primary";
+      default: return "text.secondary";
     }
   };
 
   const getTaskProgress = (task) => {
     if (typeof task.progressPercent === "number") return task.progressPercent;
-    return getProgressValue(task.status);
+    switch (task.status) {
+      case "completed": return 100;
+      case "in-progress": return 50;
+      default: return 10;
+    }
   };
 
   const getInitials = (fullName) => {
@@ -125,53 +124,52 @@ const EventInsights = () => {
   if (loading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh" }}>
-        <CircularProgress sx={{ color: themeColors.red }} />
+        <CircularProgress sx={{ color: BRAND_COLOR }} />
       </Box>
     );
   }
 
   return (
-    <Box sx={{ p: 4, bgcolor: isDark ? "background.default" : "#fafafa", minHeight: "100vh" }}>
-      {/* Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: "bold", color: themeColors.black, mb: 1 }}>
-          Event Analytics Dashboard
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Real-time insights and tracking for all active event tasks.
-        </Typography>
-      </Box>
+    <Box sx={{ p: { xs: 2, md: 4 }, minHeight: "100vh", bgcolor: "background.default" }}>
+      <ModernHeader
+        title="Event Analytics"
+        highlight="Engine"
+        subtitle="Real-time metrics, milestones, and deployment health tracking for active operational event vectors."
+      />
 
-      {/* Stats Cards */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      {/* Stats Matrix Grid */}
+      <Grid container spacing={2.5} sx={{ mb: 4 }}>
         {[
-          { title: "Total Event Tasks", value: stats.total, icon: <EventIcon />, color: themeColors.red },
-          { title: "Upcoming Tasks", value: stats.upcoming, icon: <TimelineIcon />, color: themeColors.black },
-          { title: "Completed", value: stats.completed, icon: <DoneIcon />, color: themeColors.red },
-          { title: "Urgent (High Priority)", value: stats.urgent, icon: <UrgencyIcon />, color: themeColors.black },
+          { title: "Total Event Tasks", value: stats.total, icon: <EventIcon />, color: BRAND_COLOR },
+          { title: "Upcoming Tasks", value: stats.upcoming, icon: <TimelineIcon />, color: "#FFA500" },
+          { title: "Completed Milestones", value: stats.completed, icon: <DoneIcon />, color: "#4CAF50" },
+          { title: "Urgent Hotspots", value: stats.urgent, icon: <UrgencyIcon />, color: BRAND_COLOR },
         ].map((stat, index) => (
-          <Grid item xs={12} sm={6} md={3} key={index}>
+          <Grid item xs={6} md={3} key={index}>
             <Card sx={{ 
-              borderRadius: 4,
-              boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-              borderLeft: `6px solid ${stat.color}`,
-              transition: "transform 0.2s",
-              "&:hover": { transform: "translateY(-5px)" }
+              borderRadius: "12px",
+              boxShadow: "none",
+              border: "1px solid",
+              borderColor: "divider",
+              borderLeft: `5px solid ${stat.color}`,
+              bgcolor: "background.paper"
             }}>
-              <CardContent sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <CardContent sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", p: 2.5, "&:last-child": { pb: 2.5 } }}>
                 <Box>
-                  <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+                  <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>
                     {stat.title}
                   </Typography>
-                  <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+                  <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: "text.primary" }}>
                     {stat.value}
                   </Typography>
                 </Box>
                 <Box sx={{ 
-                  p: 1.5, 
-                  borderRadius: "50%", 
-                  bgcolor: `${stat.color}15`, 
-                  color: stat.color 
+                  p: 1.25, 
+                  borderRadius: "8px", 
+                  bgcolor: "action.hover", 
+                  color: stat.color,
+                  display: "flex",
+                  alignItems: "center"
                 }}>
                   {stat.icon}
                 </Box>
@@ -181,128 +179,135 @@ const EventInsights = () => {
         ))}
       </Grid>
 
-      {/* Main Content */}
+      {/* Main Workspace Configuration Layout */}
       <Grid container spacing={3}>
-        {/* Main Table */}
+        {/* Core Task Registry View */}
         <Grid item xs={12} lg={7}>
-          <TableContainer component={Paper} sx={{ 
-            borderRadius: 4,
-            boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-            border: "1px solid rgba(0,0,0,0.04)"
-          }}>
-            <Box sx={{ p: 3 }}>
-              <Typography variant="h6" sx={{ fontWeight: "bold" }}>Active Event Tasks</Typography>
-            </Box>
-            <Table>
-              <TableHead sx={{ bgcolor: themeColors.black }}>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>Event Title</TableCell>
-                  <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>Priority</TableCell>
-                  <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>Team</TableCell>
-                  <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>Progress</TableCell>
-                  <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>Deadline</TableCell>
-                  <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>Action</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {tasks.map((task) => (
-                  <TableRow key={task._id} hover>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ fontWeight: "medium" }}>{task.title}</Typography>
-                      <Typography variant="caption" color="text.secondary">{task.projectCategory || "General"}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Chip 
-                        label={task.priority} 
-                        size="small" 
-                        sx={{ 
-                          bgcolor: `${getPriorityColor(task.priority)}15`, 
-                          color: getPriorityColor(task.priority),
-                          textTransform: "capitalize"
-                        }} 
+          <ModernTable
+            title="Active Event Matrix Stream"
+            columns={[
+              { id: "title", label: "EVENT OPERATIONAL LOG" },
+              { id: "priority", label: "PRIORITY" },
+              { id: "team", label: "TEAM", align: "right" },
+              { id: "progress", label: "PROGRESS" },
+              { id: "deadline", label: "DEADLINE" },
+              { id: "actions", label: "ACTIONS", align: "right" },
+            ]}
+            data={tasks}
+            renderRow={(task) => (
+              <>
+                <TableCell>
+                  <Typography variant="body2" sx={{ fontWeight: 600, color: "text.primary" }}>{task.title}</Typography>
+                  <Typography variant="caption" sx={{ color: "text.secondary" }}>{task.projectCategory || "General Namespace"}</Typography>
+                </TableCell>
+                <TableCell>
+                  <Chip
+                    label={task.priority}
+                    size="small"
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: "11px",
+                      borderRadius: "4px",
+                      bgcolor: "action.selected",
+                      color: getPriorityColor(task.priority),
+                      textTransform: "capitalize"
+                    }}
+                  />
+                </TableCell>
+                <TableCell>
+                  <AvatarGroup max={4} sx={{ justifyContent: "flex-end" }}>
+                    {task.assignedTo?.map((item, i) => {
+                      const inner = item && item.member ? item.member : item;
+                      return (
+                        <Avatar key={inner?._id || i} sx={{ bgcolor: "action.selected", color: "text.primary", width: 28, height: 28, fontSize: "10px", fontWeight: 700, border: "2px solid var(--mui-palette-background-paper) !important" }}>
+                          {getInitials(inner?.fullName || inner?.email)}
+                        </Avatar>
+                      );
+                    })}
+                  </AvatarGroup>
+                </TableCell>
+                <TableCell>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, minWidth: "100px" }}>
+                    <Box sx={{ width: "100%" }}>
+                      <LinearProgress
+                        variant="determinate"
+                        value={getTaskProgress(task)}
+                        sx={{
+                          height: 5,
+                          borderRadius: 4,
+                          bgcolor: "action.hover",
+                          "& .MuiLinearProgress-bar": { bgcolor: task.status === "completed" ? "#4CAF50" : BRAND_COLOR }
+                        }}
                       />
-                    </TableCell>
-                    <TableCell>
-                      <AvatarGroup max={4} sx={{ justifyContent: "flex-end" }}>
-                        {task.assignedTo?.map((item, i) => {
-                          const inner = item && item.member ? item.member : item;
-                          return (
-                            <Avatar key={inner?._id || i} sx={{ bgcolor: "#cfd3d8", color: "#555", width: 32, height: 32, fontSize: 12 }}>
-                              {getInitials(inner?.fullName || inner?.email)}
-                            </Avatar>
-                          );
-                        })}
-                      </AvatarGroup>
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Box sx={{ width: "100%" }}>
-                          <LinearProgress 
-                            variant="determinate" 
-                            value={getTaskProgress(task)} 
-                            sx={{ 
-                              height: 6, 
-                              borderRadius: 10, 
-                                bgcolor: themeColors.lightGray,
-                                "& .MuiLinearProgress-bar": { bgcolor: task.status === "completed" ? themeColors.red : themeColors.black }
-                            }} 
-                          />
-                        </Box>
-                        <Typography variant="caption">{getTaskProgress(task)}%</Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      {new Date(task.deadline).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', gap: 1 }}>
-                        {task.status !== 'completed' && (
-                          <IconButton size="small" onClick={() => handleMarkComplete(task._id)} title="Mark complete">
-                            <DoneIcon fontSize="small" sx={{ color: themeColors.red }} />
-                          </IconButton>
-                        )}
-                        <IconButton size="small" color="primary">
-                          <OpenIcon fontSize="small" />
-                        </IconButton>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                    </Box>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: "text.primary" }}>{getTaskProgress(task)}%</Typography>
+                  </Box>
+                </TableCell>
+                <TableCell sx={{ fontSize: "13px", color: "text.secondary", fontWeight: 500 }}>
+                  {new Date(task.deadline).toLocaleDateString()}
+                </TableCell>
+                <TableCell align="right">
+                  <Box sx={{ display: 'flex', gap: 0.5, justifyContent: "flex-end" }}>
+                    {task.status !== 'completed' && (
+                      <IconButton size="small" onClick={() => handleMarkComplete(task._id)} title="Mark complete" sx={{ color: "success.main", "&:hover": { bgcolor: "action.hover" } }}>
+                        <DoneIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                    <IconButton size="small" color="primary" sx={{ "&:hover": { bgcolor: "action.hover" } }}>
+                      <OpenIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                </TableCell>
+              </>
+            )}
+          />
         </Grid>
 
-        {/* Team Workload / Event Activity */}
+        {/* Real-time Task Activity Roster Stream */}
         <Grid item xs={12} lg={5}>
           <Card sx={{ 
-            borderRadius: 4,
-            boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+            borderRadius: "14px",
+            boxShadow: "none",
+            border: "1px solid",
+            borderColor: "divider",
+            bgcolor: "background.paper",
             height: "100%"
           }}>
-            <CardContent>
-              <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>Event Activity</Typography>
-              <List>
-                {tasks.slice(0, 5).map((task, i) => (
-                  <React.Fragment key={i}>
-                    <ListItem alignItems="flex-start">
+            <Box sx={{ p: 2.5, borderBottom: "1px solid", borderColor: "divider" }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "text.primary" }}>
+                Live Stream Manifest
+              </Typography>
+            </Box>
+            <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
+              <List disablePadding>
+                {tasks.slice(0, 6).map((task, i) => (
+                  <React.Fragment key={task._id || i}>
+                    <ListItem sx={{ py: 1.75, px: 2.5, "&:hover": { bgcolor: "action.hover" } }}>
                       <ListItemAvatar>
-                        <Avatar sx={{ bgcolor: task.status === "completed" ? themeColors.red : themeColors.black }}>
-                          <StudentIcon />
+                        <Avatar sx={{ 
+                          width: 36, 
+                          height: 36, 
+                          bgcolor: task.status === "completed" ? "success.soft" : "action.selected", 
+                          color: task.status === "completed" ? "success.main" : BRAND_COLOR 
+                        }}>
+                          <StudentIcon sx={{ fontSize: "18px" }} />
                         </Avatar>
                       </ListItemAvatar>
                       <ListItemText
                         primary={task.title}
-                        secondary={
-                          <Typography variant="caption" color="text.secondary">
-                            Assigned to {task.assignedTo?.length || 0} students • Deadline: {new Date(task.deadline).toLocaleDateString()}
-                          </Typography>
-                        }
+                        secondary={`Assigned Members: ${task.assignedTo?.length || 0} allocation vectors • Cutoff: ${new Date(task.deadline).toLocaleDateString()}`}
+                        primaryTypographyProps={{ sx: { fontWeight: 600, fontSize: "14px", color: "text.primary" } }}
+                        secondaryTypographyProps={{ sx: { fontSize: "12px", color: "text.secondary", mt: 0.25 } }}
                       />
                     </ListItem>
-                    {i < tasks.slice(0, 5).length - 1 && <Divider />}
+                    {i < Math.min(tasks.length, 6) - 1 && <Divider />}
                   </React.Fragment>
                 ))}
+                {tasks.length === 0 && (
+                  <Box sx={{ py: 6, textAlign: "center", color: "text.secondary", fontWeight: 500 }}>
+                    No operations streaming.
+                  </Box>
+                )}
               </List>
             </CardContent>
           </Card>

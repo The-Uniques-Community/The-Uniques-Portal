@@ -34,6 +34,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { toast } from "react-toastify";
 import { BASE_URL } from "@/config";
+import ModernHeader from "@/utils/Header/ModernHeader";
 
 const AdminLeaveManagement = () => {
   const theme = useTheme();
@@ -300,19 +301,22 @@ const AdminLeaveManagement = () => {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Box sx={{ mb: 4 }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
-          <Typography variant="h4" sx={{ fontWeight: 600 }}>
-            Leave Management
-          </Typography>
-          <Button
-            variant="outlined"
-            startIcon={<RefreshIcon />}
-            onClick={fetchLeaves}
-            disabled={isLoading}
-          >
-            {isLoading ? "Loading..." : "Refresh"}
-          </Button>
-        </Box>
+        <ModernHeader
+          title="Leave"
+          highlight="Management"
+          subtitle="Review member leave requests, filter by member, and keep approvals moving clearly."
+          action={
+            <Button
+              variant="outlined"
+              startIcon={<RefreshIcon />}
+              onClick={fetchLeaves}
+              disabled={isLoading}
+            >
+              {isLoading ? "Loading..." : "Refresh"}
+            </Button>
+          }
+          sx={{ px: 0 }}
+        />
 
         {!isLoading && leaves.length === 0 && (
           <Alert severity="info" sx={{ mb: 3 }}>

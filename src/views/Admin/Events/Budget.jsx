@@ -34,6 +34,7 @@ import {
   Avatar,
   Input,
 } from "@mui/material";
+import ModernTable from "@/utils/Table/ModernTable";
 import {
   Add,
   AttachMoney,

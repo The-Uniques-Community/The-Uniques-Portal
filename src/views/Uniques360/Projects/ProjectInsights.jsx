@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -21,12 +21,14 @@ import {
   CircularProgress,
   useTheme,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles"; // Import alpha for secure hex opacities
+import ModernTable from "@/utils/Table/ModernTable";
+import ModernHeader from "@/utils/Header/ModernHeader";
 import {
   Assignment as ProjectIcon,
   TrendingUp as OngoingIcon,
   CheckCircle as CompletedIcon,
   Timer as AgingIcon,
-  People as TeamIcon,
   Launch as OpenIcon,
 } from "@mui/icons-material";
 import axios from "axios";
@@ -51,8 +53,9 @@ const ProjectInsights = () => {
       const response = await axios.get(`${BASE_URL}/api/uniques360/tasks/coordinator/current`, {
         withCredentials: true,
       });
-      // Filter only project tasks
-      const projectTasks = response.data.filter(task => task.taskType === "project");
+      // Safety guard: Ensure response data is an array before filtering
+      const data = Array.isArray(response.data) ? response.data : [];
+      const projectTasks = data.filter(task => task.taskType === "project");
       setTasks(projectTasks);
     } catch (error) {
       console.error("Error fetching project tasks:", error);
@@ -78,20 +81,22 @@ const ProjectInsights = () => {
     }
   };
 
-  const stats = {
-    total: tasks.length,
-    ongoing: tasks.filter(t => t.status === "in-progress" || t.status === "pending").length,
-    completed: tasks.filter(t => t.status === "completed").length,
-    aging: tasks.filter(t => {
-      if (t.status === "completed") return false;
-      const deadline = new Date(t.deadline);
-      const today = new Date();
-      return deadline < today;
-    }).length,
-  };
+  // Wrapped in useMemo to avoid recalculating loops on arbitrary re-renders
+  const stats = useMemo(() => {
+    const today = new Date();
+    return {
+      total: tasks.length,
+      ongoing: tasks.filter(t => t.status === "in-progress" || t.status === "pending").length,
+      completed: tasks.filter(t => t.status === "completed").length,
+      aging: tasks.filter(t => {
+        if (t.status === "completed" || !t.deadline) return false;
+        return new Date(t.deadline) < today;
+      }).length,
+    };
+  }, [tasks]);
 
   const getPriorityColor = (priority) => {
-    switch (priority) {
+    switch (priority?.toLowerCase()) {
       case "high": return themeColors.red;
       case "medium": return themeColors.black;
       case "low": return themeColors.gray;
@@ -108,16 +113,12 @@ const ProjectInsights = () => {
   }
 
   return (
-    <Box sx={{ p: 4, bgcolor: isDark ? "background.default" : "#fafafa", minHeight: "100vh" }}>
-      {/* Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: "bold", color: themeColors.black, mb: 1 }}>
-          Project Analytics Dashboard
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Real-time insights and tracking for all active projects.
-        </Typography>
-      </Box>
+    <Box sx={{ p: { xs: 2, md: 4 }, bgcolor: "background.default", minHeight: "100vh" }}>
+      <ModernHeader
+        title="Project Analytics"
+        highlight="Dashboard"
+        subtitle="Real-time insights and tracking for all active projects."
+      />
 
       {/* Stats Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -133,7 +134,7 @@ const ProjectInsights = () => {
               boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
               borderLeft: `6px solid ${stat.color}`,
               transition: "transform 0.2s",
-              "&:hover": { transform: "translateY(-5px)" }
+              "& :hover": { transform: "translateY(-5px)" }
             }}>
               <CardContent sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <Box>
@@ -147,7 +148,7 @@ const ProjectInsights = () => {
                 <Box sx={{ 
                   p: 1.5, 
                   borderRadius: "50%", 
-                  bgcolor: `${stat.color}15`, 
+                  bgcolor: alpha(stat.color, 0.08), // Clean UI opacity transparency fallback
                   color: stat.color 
                 }}>
                   {stat.icon}
@@ -162,92 +163,90 @@ const ProjectInsights = () => {
       <Grid container spacing={3}>
         {/* Project List Table */}
         <Grid item xs={12} lg={8}>
-          <TableContainer component={Paper} sx={{ borderRadius: 4, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
-            <Box sx={{ p: 3, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <Typography variant="h6" sx={{ fontWeight: "bold" }}>Active Project Tasks</Typography>
-            </Box>
-            <Table>
-              <TableHead sx={{ bgcolor: themeColors.black }}>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>Project Title</TableCell>
-                  <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>Priority</TableCell>
-                  <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>Team</TableCell>
-                  <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>Progress</TableCell>
-                  <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>Deadline</TableCell>
-                  <TableCell sx={{ fontWeight: "bold", color: "#fff" }} align="right">Action</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {tasks.map((task) => (
-                  <TableRow key={task._id} hover>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ fontWeight: "medium" }}>{task.title}</Typography>
-                      <Typography variant="caption" color="text.secondary">{task.projectCategory || "General"}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Chip 
-                        label={task.priority} 
-                        size="small" 
-                        sx={{ 
-                          bgcolor: `${getPriorityColor(task.priority)}15`, 
-                          color: getPriorityColor(task.priority),
-                          fontWeight: "bold",
-                          textTransform: "capitalize"
-                        }} 
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <AvatarGroup max={3}>
-                        {task.assignedTo?.map((item, i) => {
-                          const inner = item && item.member ? item.member : item;
-                          return (
-                            <Tooltip title={inner.fullName} key={i}>
-                              <Avatar sx={{ width: 30, height: 30, fontSize: "0.8rem" }}>
-                                {inner.fullName?.charAt(0)}
-                              </Avatar>
-                            </Tooltip>
-                          );
-                        })}
-                      </AvatarGroup>
-                    </TableCell>
-                    <TableCell sx={{ width: 150 }}>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <LinearProgress 
-                          variant="determinate" 
-                          value={task.status === "completed" ? 100 : task.status === "in-progress" ? 50 : 10} 
-                          sx={{ 
-                            flexGrow: 1, 
-                            height: 6, 
-                            borderRadius: 3,
-                            bgcolor: themeColors.lightGray,
-                            "& .MuiLinearProgress-bar": { bgcolor: task.status === "completed" ? themeColors.red : themeColors.black }
-                          }} 
-                        />
-                        <Typography variant="caption">{task.status === "completed" ? "100%" : task.status === "in-progress" ? "50%" : "10%"}</Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="caption">
-                        {new Date(task.deadline).toLocaleDateString()}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="right">
-                      <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-                        {task.status !== 'completed' && (
-                          <IconButton size="small" onClick={() => handleMarkComplete(task._id)} title="Mark complete">
-                            <CompletedIcon fontSize="small" sx={{ color: themeColors.red }} />
-                          </IconButton>
-                        )}
-                        <IconButton size="small">
-                          <OpenIcon fontSize="small" sx={{ color: themeColors.gray }} />
-                        </IconButton>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <ModernTable
+            title="Active Project Tasks"
+            columns={[
+              { id: "title", label: "Project Title" },
+              { id: "priority", label: "Priority" },
+              { id: "team", label: "Team" },
+              { id: "progress", label: "Progress" },
+              { id: "deadline", label: "Deadline" },
+              { id: "action", label: "Action", align: "right" },
+            ]}
+            data={tasks}
+            renderRow={(task) => (
+              <>
+                <TableCell>
+                  <Typography variant="body2" sx={{ fontWeight: "medium" }}>{task.title || "Untitled Task"}</Typography>
+                  <Typography variant="caption" color="text.secondary">{task.projectCategory || "General"}</Typography>
+                </TableCell>
+                <TableCell>
+                  <Chip
+                    label={task.priority || "low"}
+                    size="small"
+                    sx={{
+                      bgcolor: alpha(getPriorityColor(task.priority), 0.08),
+                      color: getPriorityColor(task.priority),
+                      fontWeight: "bold",
+                      textTransform: "capitalize"
+                    }}
+                  />
+                </TableCell>
+                <TableCell>
+                  <AvatarGroup max={3}>
+                    {task.assignedTo?.map((item, i) => {
+                      if (!item) return null;
+                      const inner = item.member ? item.member : item;
+                      const displayName = inner?.fullName || "Team Member";
+                      
+                      return (
+                        <Tooltip title={displayName} key={inner?._id || i}>
+                          <Avatar sx={{ width: 30, height: 30, fontSize: "0.8rem" }}>
+                            {displayName.charAt(0).toUpperCase()}
+                          </Avatar>
+                        </Tooltip>
+                      );
+                    })}
+                  </AvatarGroup>
+                </TableCell>
+                <TableCell sx={{ width: 150 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <LinearProgress
+                      variant="determinate"
+                      value={task.status === "completed" ? 100 : task.status === "in-progress" ? 50 : 10}
+                      sx={{
+                        flexGrow: 1,
+                        height: 6,
+                        borderRadius: 3,
+                        bgcolor: themeColors.lightGray,
+                        "& .MuiLinearProgress-bar": { bgcolor: task.status === "completed" ? themeColors.red : themeColors.black }
+                      }}
+                    />
+                    <Typography variant="caption">
+                      {task.status === "completed" ? "100%" : task.status === "in-progress" ? "50%" : "10%"}
+                    </Typography>
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="caption">
+                    {task.deadline ? new Date(task.deadline).toLocaleDateString() : "No Deadline"}
+                  </Typography>
+                </TableCell>
+                <TableCell align="right">
+                  <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                    {task.status !== 'completed' && (
+                      <IconButton size="small" onClick={() => handleMarkComplete(task._id)} title="Mark complete">
+                        <CompletedIcon fontSize="small" sx={{ color: themeColors.red }} />
+                      </IconButton>
+                    )}
+                    <IconButton size="small">
+                      <OpenIcon fontSize="small" sx={{ color: themeColors.gray }} />
+                    </IconButton>
+                  </Box>
+                </TableCell>
+              </>
+            )}
+          />
         </Grid>
 
         {/* Team Overview Card */}
@@ -256,7 +255,6 @@ const ProjectInsights = () => {
             <CardContent>
               <Typography variant="h6" sx={{ fontWeight: "bold", mb: 3 }}>Team Workload</Typography>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                {/* Mockup team members - in a real app, this would be derived from the tasks data */}
                 {[
                   { name: "Sagar Modi", role: "Developer", load: 80, color: themeColors.red },
                   { name: "Sumit Modi", role: "Designer", load: 45, color: themeColors.black },

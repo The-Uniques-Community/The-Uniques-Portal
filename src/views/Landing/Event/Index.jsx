@@ -3,7 +3,7 @@ import axios from 'axios';
 import { BASE_URL } from '@/config';
 import Event from './Componant/Event';
 import CommunityCard from '@/utils/Card/CommunityCard';
-import Header from '@/utils/Header/index';
+import ModernHeader from '@/utils/Header/ModernHeader';
 import CallToAction from '../homComponents/CallToAction';
 import { 
   TextField, 
@@ -305,10 +305,9 @@ const Index = () => {
 
   return (
     <>
-      <Header 
+      <ModernHeader 
         title="Join the Biggest Event of the Year 🎉" 
         subtitle="Don't miss out!" 
-        chipLabel="Exclusive Event" 
       />
       
       {/* Filters Section */}

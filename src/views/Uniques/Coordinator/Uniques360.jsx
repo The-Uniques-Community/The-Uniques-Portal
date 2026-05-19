@@ -49,6 +49,7 @@ import axios from "axios";
 import { BASE_URL } from "@/config";
 import { toast } from "react-toastify";
 import { useThemeContext } from "@/theme/ThemeProvider";
+import ModernHeader from "@/utils/Header/ModernHeader";
 import TaskTable from "./Uniques360/components/TaskTable";
 import logoCommunity from "@/assets/logos/theuniquesCommunity.png";
 import logoWhite from "@/assets/logos/uniqueswhite.png";
@@ -358,19 +359,21 @@ const Uniques360Coordinator = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: "bold", color: "#ca0019" }}>
-          Uniques 360 - Task Management
-        </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setOpen(true)}
-          sx={{ bgcolor: "#ca0019", "&:hover": { bgcolor: "#a30014" }, borderRadius: 1 }}
-        >
-          Assign New Task
-        </Button>
-      </Box>
+      <ModernHeader
+        title="Uniques 360"
+        highlight="Task Management"
+        subtitle="Assign tasks, review project and event progress, and track active member work."
+        action={
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setOpen(true)}
+            sx={{ bgcolor: "#ca0019", "&:hover": { bgcolor: "#a30014" }, borderRadius: 1 }}
+          >
+            Assign New Task
+          </Button>
+        }
+      />
 
       {/* Navigation Insights Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>

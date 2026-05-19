@@ -52,6 +52,7 @@ import {
 import axios from "axios";
 import { format } from "date-fns";
 import { BASE_URL } from "@/config";
+import ModernHeader from "@/utils/Header/ModernHeader";
 
 const EnquiryManagement = () => {
   // State variables
@@ -354,30 +355,21 @@ const EnquiryManagement = () => {
 
   return (
     <div className="p-6">
-      {/* Header Section */}
-      <div className="mb-6">
-        <Typography
-          variant="h4"
-          component="h1"
-          gutterBottom
-          className="text-gray-800"
-        >
-          Enquiry Management
-        </Typography>
-        <Typography variant="body1" className="text-gray-600 mb-4">
-          Manage and respond to enquiries from website visitors.
-        </Typography>
+      <ModernHeader
+        title="Enquiry"
+        highlight="Management"
+        subtitle="Manage and respond to enquiries from website visitors."
+      />
 
-        {alertInfo.show && (
-          <Alert
-            severity={alertInfo.severity}
-            onClose={() => setAlertInfo((prev) => ({ ...prev, show: false }))}
-            className="mb-4"
-          >
-            {alertInfo.message}
-          </Alert>
-        )}
-      </div>
+      {alertInfo.show && (
+        <Alert
+          severity={alertInfo.severity}
+          onClose={() => setAlertInfo((prev) => ({ ...prev, show: false }))}
+          className="mb-4"
+        >
+          {alertInfo.message}
+        </Alert>
+      )}
 
       {/* Filter and Search Section */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
@@ -440,9 +432,32 @@ const EnquiryManagement = () => {
       </div>
 
       {/* Enquiries Table */}
-      <TableContainer component={Paper} className="mb-4">
+      <TableContainer
+        component={Paper}
+        className="mb-4"
+        sx={{
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: "10px",
+          overflow: "hidden",
+          backgroundColor: "background.paper",
+        }}
+      >
         <Table sx={{ minWidth: 650 }}>
-          <TableHead className="bg-gray-100">
+          <TableHead
+            sx={{
+              "& .MuiTableCell-head": {
+                bgcolor: "action.hover",
+                color: "text.primary",
+                borderBottom: "1px solid",
+                borderColor: "divider",
+                fontWeight: 800,
+                fontSize: "12px",
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
+              },
+            }}
+          >
             <TableRow>
               <TableCell>Name</TableCell>
               <TableCell>Contact</TableCell>

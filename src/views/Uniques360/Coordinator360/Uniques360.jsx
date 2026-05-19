@@ -1,37 +1,32 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import ModernTable from "@/utils/Table/ModernTable";
+import ModernButton from "@/utils/Buttons/ModernButton";
+import ModernStatCard from "@/utils/Card/ModernStatCard";
+import ModernHeader from "@/utils/Header/ModernHeader";
+import { alpha } from "@mui/material/styles";
 import {
   Box,
-  Typography,
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Paper,
-  Chip,
-  IconButton,
-  CircularProgress,
-  LinearProgress,
-  Avatar,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Card,
   CardContent,
+  CircularProgress,
+  FormControl,
   Grid,
+  InputLabel,
+  LinearProgress,
+  MenuItem,
+  Paper,
+  Select,
+  Typography,
 } from "@mui/material";
 
 import {
   Add as AddIcon,
-  Visibility as ViewIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  CheckCircle as CompleteIcon,
-  People as TeamIcon,
-  Close as CloseIcon,
-  History as HistoryIcon,
   Refresh as RefreshIcon,
+  Assignment as TaskIcon,
+  HourglassEmpty as PendingIcon,
+  TrendingUp as ProgressIcon,
+  CheckCircleOutline as CompleteIcon,
 } from "@mui/icons-material";
 
 import axios from "axios";
@@ -46,16 +41,17 @@ import ReportsDialog from "./components/ReportsDialog";
 import EditTaskDialog from "./components/EditTaskDialog";
 import TeamDialog from "./components/TeamDialog";
 
+const BRAND_COLOR = "#ca0019";
+const BRAND_HOVER = "#a30014";
+
 const Uniques360Coordinator = () => {
   const [tasks, setTasks] = useState([]);
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [tasksLoading, setTasksLoading] = useState(false);
-
   const [submitting, setSubmitting] = useState(false);
 
   const [open, setOpen] = useState(false);
-
   const [newTask, setNewTask] = useState({
     title: "",
     description: "",
@@ -65,16 +61,17 @@ const Uniques360Coordinator = () => {
     taskType: "project",
   });
   const [newTaskRoles, setNewTaskRoles] = useState({});
-
   const [selectedBatch, setSelectedBatch] = useState("");
 
   const [reportsOpen, setReportsOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [reports, setReports] = useState([]);
   const [reportsLoading, setReportsLoading] = useState(false);
+  
   const [teamSelectedBatch, setTeamSelectedBatch] = useState("");
   const [teamSelectedMember, setTeamSelectedMember] = useState("");
   const [teamSelectedRole, setTeamSelectedRole] = useState("");
+  
   const [taskTypeFilter, setTaskTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [memberFilter, setMemberFilter] = useState("all");
@@ -92,25 +89,18 @@ const Uniques360Coordinator = () => {
   const { isDarkMode } = useThemeContext();
 
   // ================= FETCH TASKS =================
-
   const fetchTasks = async () => {
     try {
       setTasksLoading(true);
       const response = await axios.get(
         `${BASE_URL}/api/uniques360/tasks/coordinator/current`,
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
-
       const tasksData = Array.isArray(response.data) ? response.data : response.data?.tasks || response.data || [];
       setTasks(tasksData);
-      console.log("Tasks fetched successfully:", tasksData);
     } catch (error) {
       console.error("Error fetching tasks:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to fetch tasks"
-      );
+      toast.error(error.response?.data?.message || "Failed to fetch tasks");
       setTasks([]);
     } finally {
       setTasksLoading(false);
@@ -118,37 +108,24 @@ const Uniques360Coordinator = () => {
   };
 
   // ================= FETCH MEMBERS =================
-
   const fetchMembers = async () => {
     try {
-      const response = await axios.get(
-        `${BASE_URL}/api/admin/member`,
-        {
-          withCredentials: true,
-        }
-      );
-
+      const response = await axios.get(`${BASE_URL}/api/admin/member`, {
+        withCredentials: true,
+      });
       setMembers(response.data?.data || []);
     } catch (error) {
       console.error(error);
-      toast.error(
-        error.response?.data?.message || "Failed to fetch members"
-      );
+      toast.error(error.response?.data?.message || "Failed to fetch members");
     }
   };
 
   // ================= INITIAL LOAD =================
-
   useEffect(() => {
     const init = async () => {
       try {
         setLoading(true);
-
-        // Fetch tasks first to ensure they are loaded
-        await fetchTasks();
-        
-        // Then fetch members
-        await fetchMembers();
+        await Promise.all([fetchTasks(), fetchMembers()]);
       } catch (error) {
         console.error("Error initializing:", error);
         toast.error("Failed to load dashboard");
@@ -156,45 +133,34 @@ const Uniques360Coordinator = () => {
         setLoading(false);
       }
     };
-
     init();
   }, []);
 
   // ================= CREATE TASK =================
-
   const handleCreateTask = async () => {
     try {
       if (!newTask.title.trim()) {
         toast.error("Task title is required");
         return;
       }
-
       if (newTask.assignedTo.length === 0) {
         toast.error("Please assign at least one member");
         return;
       }
 
       setSubmitting(true);
-
       const assignedTo = newTask.assignedTo.map((memberId) => ({
         member: memberId,
         role: newTaskRoles[memberId] || null,
       }));
 
-      const response = await axios.post(
+      await axios.post(
         `${BASE_URL}/api/uniques360/tasks`,
-        {
-          ...newTask,
-          assignedTo,
-        },
-        {
-          withCredentials: true,
-        }
+        { ...newTask, assignedTo },
+        { withCredentials: true }
       );
 
       toast.success("Task assigned successfully");
-
-      // Reset form
       setOpen(false);
       setNewTask({
         title: "",
@@ -206,148 +172,91 @@ const Uniques360Coordinator = () => {
       });
       setNewTaskRoles({});
       setSelectedBatch("");
-
-      // Fetch updated tasks from server to ensure consistency
       await fetchTasks();
     } catch (error) {
       console.error("Error creating task:", error);
-      toast.error(
-        error.response?.data?.message || "Error creating task"
-      );
+      toast.error(error.response?.data?.message || "Error creating task");
     } finally {
       setSubmitting(false);
     }
   };
 
   // ================= UPDATE STATUS =================
-
   const handleStatusUpdate = async (taskId, newStatus) => {
     try {
       await axios.patch(
         `${BASE_URL}/api/uniques360/tasks/${taskId}`,
         { status: newStatus },
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
-
       toast.success(`Task marked as ${newStatus}`);
-
-      // Fetch updated tasks to ensure consistency
       await fetchTasks();
     } catch (error) {
       console.error("Error updating status:", error);
-      toast.error(
-        error.response?.data?.message || "Error updating status"
-      );
+      toast.error(error.response?.data?.message || "Error updating status");
     }
   };
 
   // ================= DELETE TASK =================
-
   const handleDeleteTask = async (taskId) => {
-    if (
-      !window.confirm(
-        "Are you sure you want to delete this task?"
-      )
-    )
-      return;
-
+    if (!window.confirm("Are you sure you want to delete this task?")) return;
     try {
-      await axios.delete(
-        `${BASE_URL}/api/uniques360/tasks/${taskId}`,
-        {
-          withCredentials: true,
-        }
-      );
-
+      await axios.delete(`${BASE_URL}/api/uniques360/tasks/${taskId}`, {
+        withCredentials: true,
+      });
       toast.success("Task deleted");
-
       fetchTasks();
     } catch (error) {
       console.error(error);
-
-      toast.error(
-        error.response?.data?.message ||
-          "Error deleting task"
-      );
+      toast.error(error.response?.data?.message || "Error deleting task");
     }
   };
 
   // ================= UPDATE TASK =================
-
   const handleUpdateTask = async () => {
     try {
       setSubmitting(true);
-
       await axios.put(`${BASE_URL}/api/uniques360/tasks/${selectedTask._id}`, selectedTask, {
         withCredentials: true,
       });
-
       toast.success("Task updated");
-
       setEditOpen(false);
-
       fetchTasks();
     } catch (error) {
       console.error(error);
-
-      toast.error(
-        error.response?.data?.message ||
-          "Error updating task"
-      );
+      toast.error(error.response?.data?.message || "Error updating task");
     } finally {
       setSubmitting(false);
     }
   };
 
   // ================= FETCH REPORTS =================
-
   const fetchReports = async (taskId) => {
     try {
       setReportsLoading(true);
-
       const response = await axios.get(
         `${BASE_URL}/api/uniques360/reports/task/${taskId}`,
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
-
       setReports(response.data || []);
     } catch (error) {
       console.error(error);
-
-      toast.error(
-        error.response?.data?.message ||
-          "Error fetching reports"
-      );
+      toast.error(error.response?.data?.message || "Error fetching reports");
     } finally {
       setReportsLoading(false);
     }
   };
 
   // ================= REMOVE MEMBER =================
-
-  const handleRemoveMember = async (
-    taskId,
-    memberId
-  ) => {
+  const handleRemoveMember = async (taskId, memberId) => {
     try {
       await axios.post(
         `${BASE_URL}/api/uniques360/tasks/${taskId}/members/remove`,
-        {
-          memberIdToRemove: memberId,
-        },
-        {
-          withCredentials: true,
-        }
+        { memberIdToRemove: memberId },
+        { withCredentials: true }
       );
-
       toast.success("Member removed");
-
       fetchTasks();
-
       setSelectedTask((prev) => ({
         ...prev,
         assignedTo: (prev.assignedTo || []).filter((m) => {
@@ -358,37 +267,27 @@ const Uniques360Coordinator = () => {
       }));
     } catch (error) {
       console.error(error);
-
-      toast.error(
-        error.response?.data?.message ||
-          "Error removing member"
-      );
+      toast.error(error.response?.data?.message || "Error removing member");
     }
   };
-
-  // ================= STATUS COLOR =================
 
   const getStatusColor = (status) => {
-    switch (status) {
-      case "completed":
-        return "success";
-
-      case "in-progress":
-        return "warning";
-
-      default:
-        return "default";
+    switch (status?.toLowerCase()) {
+      case "completed": return "success";
+      case "in-progress": return "warning";
+      default: return "default";
     }
   };
 
-  // ================= TASK STATISTICS =================
-
-  const taskStats = {
-    total: tasks.length,
-    pending: tasks.filter((t) => t.status === "pending").length,
-    inProgress: tasks.filter((t) => t.status === "in-progress").length,
-    completed: tasks.filter((t) => t.status === "completed").length,
-  };
+  // Memoizing operations to protect logic iteration arrays
+  const taskStats = useMemo(() => {
+    return {
+      total: tasks.length,
+      pending: tasks.filter((t) => t.status?.toLowerCase() === "pending").length,
+      inProgress: tasks.filter((t) => t.status?.toLowerCase() === "in-progress").length,
+      completed: tasks.filter((t) => t.status?.toLowerCase() === "completed").length,
+    };
+  }, [tasks]);
 
   const filteredTasks = tasks.filter((task) => {
     const typeOk = taskTypeFilter === "all" || task.taskType === taskTypeFilter;
@@ -401,7 +300,14 @@ const Uniques360Coordinator = () => {
     return typeOk && statusOk && memberOk;
   });
 
-  // ================= LOADING =================
+  // Toggles the filter state if clicked multiple times
+  const handleMetricCardClick = (targetStatus) => {
+    if (statusFilter === targetStatus) {
+      setStatusFilter("all");
+    } else {
+      setStatusFilter(targetStatus);
+    }
+  };
 
   if (loading) {
     return (
@@ -419,251 +325,244 @@ const Uniques360Coordinator = () => {
           component="img"
           src={isDarkMode ? logoWhite : logoCommunity}
           alt="logo"
-          sx={{
-            height: isDarkMode ? 60 : 80,
-          }}
+          sx={{ height: isDarkMode ? 60 : 80 }}
         />
-
-        <Box sx={{ width: 300 }}>
+        <Box sx={{ width: 280 }}>
           <LinearProgress
             sx={{
               height: 4,
               borderRadius: 2,
-              "& .MuiLinearProgress-bar": {
-                backgroundColor: "#ca0019",
-              },
+              backgroundColor: "action.hover",
+              "& .MuiLinearProgress-bar": { backgroundColor: BRAND_COLOR },
             }}
           />
         </Box>
-
-        <Typography variant="caption">
-          Loading workspace...
+        <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 500, letterSpacing: "0.3px" }}>
+          Loading system workspace...
         </Typography>
       </Box>
     );
   }
 
-  // ================= MAIN UI =================
-
   return (
-    <Box sx={{ p: 3 }}>
-      {/* HEADER */}
-
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          mb: 4,
-        }}
-      >
-        <Typography
-          variant="h4"
-          sx={{
-            fontWeight: "bold",
-            color: "#ca0019",
-          }}
-        >
-          Uniques 360 - Task Management
-        </Typography>
-
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setOpen(true)}
-          sx={{
-            bgcolor: "#ca0019",
-            "&:hover": {
-              bgcolor: "#a30014",
-            },
-          }}
-        >
-          Assign New Task
-        </Button>
-      </Box>
-
-      {/* TASK STATUS SUMMARY */}
-
-      <Box sx={{ mb: 4, display: "grid", gridTemplateColumns: { xs: "1fr 1fr", md: "repeat(4, 1fr)" }, gap: 2 }}>
-        <Paper
-          sx={{
-            p: 2.5,
-            textAlign: "center",
-            bgcolor: "background.paper",
-            border: "1px solid",
-            borderColor: "divider",
-            borderRadius: 2,
-            transition: "all 0.3s ease",
-            "&:hover": {
-              boxShadow: 3,
-              borderColor: "#ca0019",
-            },
-          }}
-        >
-          <Typography variant="body2" color="textSecondary" sx={{ mb: 0.5 }}>
-            Total Tasks
-          </Typography>
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: "bold",
-              color: "#ca0019",
-            }}
+    <Box sx={{ p: { xs: 2, md: 4 }, bgcolor: "background.default", minHeight: "100vh" }}>
+      <ModernHeader
+        title="Uniques 360"
+        highlight="Workspace"
+        subtitle="Monitor assignments, project deployment logs, and student metrics across batches."
+        sx={{ mb: 5 }}
+        action={
+          <ModernButton
+            startIcon={<AddIcon sx={{ fontSize: "20px !important", transition: "transform 0.3s ease" }} />}
+            onClick={() => setOpen(true)}
           >
-            {taskStats.total}
-          </Typography>
-        </Paper>
-
+            Assign New Task
+          </ModernButton>
+        }
+      />
+{/* DASHBOARD STATUS SUMMARY METRICS */}
+<Grid container spacing={3} sx={{ mb: 4 }}>
+  {[
+    { 
+      label: "Total Tasks", 
+      value: taskStats.total, 
+      color: BRAND_COLOR, 
+      filterValue: "all", 
+      icon: <TaskIcon sx={{ fontSize: "24px" }} />,
+      gradient: "radial-gradient(circle at 80% 20%, rgba(202, 0, 25, 0.15) 0%, transparent 50%)"
+    },
+    { 
+      label: "Pending Operation", 
+      value: taskStats.pending, 
+      color: "#FFA500", 
+      filterValue: "pending", 
+      icon: <PendingIcon sx={{ fontSize: "24px" }} />,
+      gradient: "radial-gradient(circle at 80% 20%, rgba(255, 165, 0, 0.15) 0%, transparent 50%)"
+    },
+    { 
+      label: "Active Progression", 
+      value: taskStats.inProgress, 
+      color: "#2196F3", 
+      filterValue: "in-progress", 
+      icon: <ProgressIcon sx={{ fontSize: "24px" }} />,
+      gradient: "radial-gradient(circle at 80% 20%, rgba(33, 150, 243, 0.15) 0%, transparent 50%)"
+    },
+    { 
+      label: "Completed Operations", 
+      value: taskStats.completed, 
+      color: "#4CAF50", 
+      filterValue: "completed", 
+      icon: <CompleteIcon sx={{ fontSize: "24px" }} />,
+      gradient: "radial-gradient(circle at 80% 20%, rgba(76, 175, 80, 0.15) 0%, transparent 50%)"
+    }
+  ].map((stat, idx) => {
+    const isSelected = statusFilter === stat.filterValue;
+    return (
+      <Grid item xs={12} sm={6} md={3} key={idx}>
         <Paper
+          onClick={() => handleMetricCardClick(stat.filterValue)}
           sx={{
-            p: 2.5,
-            textAlign: "center",
-            bgcolor: "background.paper",
+            p: 3,
+            borderRadius: "14px",
+            bgcolor: isSelected ? "#0a0a0a" : "rgba(255, 255, 255, 0.02)",
+            backgroundImage: isSelected ? stat.gradient : "none",
             border: "1px solid",
-            borderColor: "divider",
-            borderRadius: 2,
-            transition: "all 0.3s ease",
+            borderColor: isSelected ? stat.color : "rgba(255, 255, 255, 0.07)",
+            cursor: "pointer",
+            userSelect: "none",
+            display: "flex",
+            alignItems: "center",
+            position: "relative",
+            overflow: "hidden",
+            height: "110px",
+            transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+            boxShadow: isSelected 
+              ? `0 20px 40px -15px ${alpha(stat.color, 0.3)}, inset 0 0 0 1px ${alpha(stat.color, 0.2)}` 
+              : "none",
+            "&::before": {
+              content: '""',
+              position: "absolute",
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: "4px",
+              bgcolor: stat.color,
+              transform: isSelected ? "scaleY(1)" : "scaleY(0)",
+              transition: "transform 0.2s ease",
+            },
             "&:hover": {
-              boxShadow: 3,
-              borderColor: "#FFA500",
+              bgcolor: isSelected ? "#0a0a0a" : "rgba(255, 255, 255, 0.05)",
+              borderColor: alpha(stat.color, 0.6),
+              transform: "translateY(-2px)",
+              "& .metric-icon-wrapper": {
+                color: "#ffffff",
+                bgcolor: stat.color,
+                boxShadow: `0 0 20px ${alpha(stat.color, 0.6)}`,
+              }
             },
           }}
         >
-          <Typography variant="body2" color="textSecondary" sx={{ mb: 0.5 }}>
-            Pending
-          </Typography>
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: "bold",
-              color: "#FFA500",
-            }}
-          >
-            {taskStats.pending}
-          </Typography>
+          {/* Main Metrics Layout */}
+          <Box sx={{ display: "flex", width: "100%", alignItems: "center", justifyContent: "space-between" }}>
+            <Box>
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  fontWeight: 700, 
+                  color: isSelected ? "#ffffff" : "text.secondary", 
+                  fontSize: "11px", 
+                  textTransform: "uppercase", 
+                  letterSpacing: "1.5px",
+                  display: "block",
+                  mb: 0.5,
+                  opacity: isSelected ? 1 : 0.5
+                }}
+              >
+                {stat.label}
+              </Typography>
+              <Typography 
+                variant="h3" 
+                sx={{ 
+                  fontWeight: 900, 
+                  color: isSelected ? "#ffffff" : stat.color, 
+                  fontSize: "2.25rem",
+                  lineHeight: 1,
+                  letterSpacing: "-1px"
+                }}
+              >
+                {stat.value}
+              </Typography>
+            </Box>
+
+            {/* Futuristic Hex/Circle Container Style */}
+            <Box 
+              className="metric-icon-wrapper"
+              sx={{ 
+                width: "48px",
+                height: "48px",
+                borderRadius: "12px", 
+                bgcolor: isSelected ? stat.color : "rgba(255, 255, 255, 0.03)", 
+                color: isSelected ? "#ffffff" : "text.secondary",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+                border: "1px solid",
+                borderColor: isSelected ? "transparent" : "rgba(255, 255, 255, 0.08)",
+                boxShadow: isSelected ? `0 0 15px ${alpha(stat.color, 0.5)}` : "none"
+              }}
+            >
+              {stat.icon}
+            </Box>
+          </Box>
         </Paper>
+      </Grid>
+    );
+  })}
+</Grid>
 
-        <Paper
-          sx={{
-            p: 2.5,
-            textAlign: "center",
-            bgcolor: "background.paper",
-            border: "1px solid",
-            borderColor: "divider",
-            borderRadius: 2,
-            transition: "all 0.3s ease",
-            "&:hover": {
-              boxShadow: 3,
-              borderColor: "#2196F3",
-            },
-          }}
-        >
-          <Typography variant="body2" color="textSecondary" sx={{ mb: 0.5 }}>
-            In Progress
-          </Typography>
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: "bold",
-              color: "#2196F3",
-            }}
-          >
-            {taskStats.inProgress}
-          </Typography>
-        </Paper>
-
-        <Paper
-          sx={{
-            p: 2.5,
-            textAlign: "center",
-            bgcolor: "background.paper",
-            border: "1px solid",
-            borderColor: "divider",
-            borderRadius: 2,
-            transition: "all 0.3s ease",
-            "&:hover": {
-              boxShadow: 3,
-              borderColor: "#4CAF50",
-            },
-          }}
-        >
-          <Typography variant="body2" color="textSecondary" sx={{ mb: 0.5 }}>
-            Completed
-          </Typography>
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: "bold",
-              color: "#4CAF50",
-            }}
-          >
-            {taskStats.completed}
-          </Typography>
-        </Paper>
-      </Box>
-        <Card sx={{ mb: 3, borderRadius: 2, boxShadow: "0 4px 20px rgba(0,0,0,0.06)" }}>
-          <CardContent>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={4}>
-                <FormControl fullWidth size="small">
-                  <InputLabel>Filter by Type</InputLabel>
-                  <Select value={taskTypeFilter} label="Filter by Type" onChange={(e) => setTaskTypeFilter(e.target.value)}>
-                    <MenuItem value="all">All Tasks</MenuItem>
-                    <MenuItem value="project">Project</MenuItem>
-                    <MenuItem value="event">Event</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <FormControl fullWidth size="small">
-                  <InputLabel>Filter by Status</InputLabel>
-                  <Select value={statusFilter} label="Filter by Status" onChange={(e) => setStatusFilter(e.target.value)}>
-                    <MenuItem value="all">All Status</MenuItem>
-                    <MenuItem value="pending">Pending</MenuItem>
-                    <MenuItem value="in-progress">In Progress</MenuItem>
-                    <MenuItem value="completed">Completed</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <FormControl fullWidth size="small">
-                  <InputLabel>Filter by Member</InputLabel>
-                  <Select value={memberFilter} label="Filter by Member" onChange={(e) => setMemberFilter(e.target.value)}>
-                    <MenuItem value="all">All Members</MenuItem>
-                    {members.map((member) => (
-                      <MenuItem key={member._id} value={member._id}>{member.fullName}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
+      {/* CONTROL FILTERS CONFIGURATION BAR */}
+      <Card sx={{ mb: 4, borderRadius: "16px", border: "1px solid", borderColor: "divider", boxShadow: "none", bgcolor: "background.paper" }}>
+        <CardContent sx={{ p: 2.5, "&:last-child": { pb: 2.5 } }}>
+          <Grid container spacing={2.5}>
+            <Grid item xs={12} sm={4}>
+              <FormControl fullWidth size="small">
+                <InputLabel>Filter by Type</InputLabel>
+                <Select value={taskTypeFilter} label="Filter by Type" onChange={(e) => setTaskTypeFilter(e.target.value)} sx={{ borderRadius: "10px" }}>
+                  <MenuItem value="all">All Tasks</MenuItem>
+                  <MenuItem value="project">Project</MenuItem>
+                  <MenuItem value="event">Event</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
-          </CardContent>
-        </Card>
+
+            <Grid item xs={12} sm={4}>
+              <FormControl fullWidth size="small">
+                <InputLabel>Filter by Status</InputLabel>
+                <Select value={statusFilter} label="Filter by Status" onChange={(e) => setStatusFilter(e.target.value)} sx={{ borderRadius: "10px" }}>
+                  <MenuItem value="all">All Status</MenuItem>
+                  <MenuItem value="pending">Pending</MenuItem>
+                  <MenuItem value="in-progress">In Progress</MenuItem>
+                  <MenuItem value="completed">Completed</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12} sm={4}>
+              <FormControl fullWidth size="small">
+                <InputLabel>Filter by Member</InputLabel>
+                <Select value={memberFilter} label="Filter by Member" onChange={(e) => setMemberFilter(e.target.value)} sx={{ borderRadius: "10px" }}>
+                  <MenuItem value="all">All Members</MenuItem>
+                  {members.map((member) => (
+                    <MenuItem key={member._id} value={member._id}>{member.fullName}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
+
+      {/* DYNAMIC DATA VIEWS */}
       {tasksLoading && (
-        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-          <CircularProgress size={50} />
+        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 8 }}>
+          <CircularProgress size={38} sx={{ color: BRAND_COLOR }} />
         </Box>
       )}
 
       {!tasksLoading && tasks.length === 0 && (
-        <Paper sx={{ p: 4, textAlign: "center", bgcolor: "background.paper" }}>
-          <Typography variant="h6" color="textSecondary" sx={{ mb: 2 }}>
+        <Paper sx={{ p: 6, textAlign: "center", borderRadius: "16px", border: "1px solid", borderColor: "divider", boxShadow: "none", bgcolor: "background.paper" }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "text.primary", mb: 1 }}>
             No tasks assigned yet
           </Typography>
-          <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
-            Click "Assign New Task" button to create your first task assignment
+          <Typography variant="body2" sx={{ color: "text.secondary", mb: 3, maxWidth: "400px", mx: "auto" }}>
+            Initialize assignments and milestone actions inside the coordinator workspace.
           </Typography>
           <Button
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => setOpen(true)}
-            sx={{
-              bgcolor: "#ca0019",
-              "&:hover": {
-                bgcolor: "#a30014",
-              },
-            }}
+            sx={{ textTransform: "none", fontWeight: 600, borderRadius: "10px", bgcolor: BRAND_COLOR, "&:hover": { bgcolor: BRAND_HOVER }, boxShadow: "none" }}
           >
             Assign First Task
           </Button>
@@ -671,68 +570,67 @@ const Uniques360Coordinator = () => {
       )}
 
       {!tasksLoading && tasks.length > 0 && filteredTasks.length === 0 && (
-        <Paper sx={{ p: 4, textAlign: "center", bgcolor: "background.paper" }}>
-          <Typography variant="h6" color="textSecondary">
-            No tasks match the selected filters
+        <Paper sx={{ p: 6, textAlign: "center", borderRadius: "16px", border: "1px solid", borderColor: "divider", boxShadow: "none", bgcolor: "background.paper" }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "text.primary" }}>
+            No tasks match your current filter parameters
           </Typography>
-          <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-            Try adjusting your filter criteria
+          <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
+            Adjust choices or clear filters to locate hidden records.
           </Typography>
         </Paper>
       )}
 
       {!tasksLoading && filteredTasks.length > 0 && (
         <Box sx={{ mb: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <Typography variant="body2" color="textSecondary">
-            Showing {filteredTasks.length} of {tasks.length} {tasks.length === 1 ? "task" : "tasks"}
+          <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 700, letterSpacing: "0.5px" }}>
+            SHOWING {filteredTasks.length} OF {tasks.length} OPERATIONS
           </Typography>
           <Button
             size="small"
-            startIcon={<RefreshIcon />}
+            startIcon={<RefreshIcon sx={{ fontSize: "16px !important" }} />}
             onClick={fetchTasks}
-            sx={{ textTransform: "none" }}
+            sx={{ textTransform: "none", fontWeight: 700, fontSize: "12px", color: BRAND_COLOR, "&:hover": { bgcolor: alpha(BRAND_COLOR, 0.04) } }}
           >
-            Refresh
+            Sync Matrix
           </Button>
         </Box>
       )}
 
-      {/* TABLE */}
-
+      {/* CORE ASSIGNMENT GRID REPO */}
       {!tasksLoading && filteredTasks.length > 0 && (
-        <TaskTable
-          tasks={filteredTasks}
-          getStatusColor={getStatusColor}
-          onViewReports={(task) => {
-            setSelectedTask(task);
-            setReportsOpen(true);
-            fetchReports(task._id);
-          }}
-          onEdit={(task) => {
-            setSelectedTask({
-              ...task,
-              assignedTo: task.assignedTo?.map((item) => {
-                const inner = item && item.member ? item.member : item;
-                return inner?._id || inner?.id || inner;
-              }) || [],
-            });
-
-            setEditOpen(true);
-          }}
-          onManageTeam={(task) => {
-            setSelectedTask(task);
-            setTeamSelectedBatch("");
-            setTeamSelectedMember("");
-            setTeamSelectedRole("");
-            setTeamOpen(true);
-          }}
-          onMarkComplete={handleStatusUpdate}
-          onDelete={handleDeleteTask}
-        />
+        <Box sx={{ mb: 4 }}>
+          <TaskTable
+            tasks={filteredTasks}
+            getStatusColor={getStatusColor}
+            onViewReports={(task) => {
+              setSelectedTask(task);
+              setReportsOpen(true);
+              fetchReports(task._id);
+            }}
+            onEdit={(task) => {
+              setSelectedTask({
+                ...task,
+                assignedTo: task.assignedTo?.map((item) => {
+                  const inner = item && item.member ? item.member : item;
+                  return inner?._id || inner?.id || inner;
+                }) || [],
+              });
+              setEditOpen(true);
+            }}
+            onManageTeam={(task) => {
+              setSelectedTask(task);
+              setTeamSelectedBatch("");
+              setTeamSelectedMember("");
+              setTeamSelectedRole("");
+              setTeamOpen(true);
+            }}
+            onMarkComplete={handleStatusUpdate}
+            onDelete={handleDeleteTask}
+          />
+        </Box>
       )}
 
-      {/* CREATE TASK DIALOG */}
-
+      {/* MODAL SYNC SYSTEM */}
       <CreateTaskDialog
         open={open}
         onClose={() => setOpen(false)}
@@ -778,7 +676,6 @@ const Uniques360Coordinator = () => {
         batches={batches}
         onAddMember={async () => {
           if (!selectedTask || !teamSelectedMember) return;
-
           try {
             await axios.post(
               `${BASE_URL}/api/uniques360/tasks/${selectedTask._id}/members`,
@@ -786,12 +683,9 @@ const Uniques360Coordinator = () => {
                 newMemberId: teamSelectedMember,
                 role: teamSelectedRole || null,
               },
-              {
-                withCredentials: true,
-              }
+              { withCredentials: true }
             );
-
-            toast.success("Member added");
+            toast.success("Teammate deployed");
             setTeamSelectedMember("");
             setTeamSelectedBatch("");
             setTeamSelectedRole("");

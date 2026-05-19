@@ -28,6 +28,8 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
+import ModernTable from "@/utils/Table/ModernTable";
+import ModernHeader from "@/utils/Header/ModernHeader";
 import {
   AddCircleOutline,
   EventNote,
@@ -290,9 +292,11 @@ const index = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" sx={{ mb: 4, fontWeight: "bold" }}>
-        Event Management
-      </Typography>
+      <ModernHeader
+        title="Event"
+        highlight="Management"
+        subtitle="Create, review, and manage event operations from one workspace."
+      />
 
       {/* Stats Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -410,135 +414,122 @@ const index = () => {
         </Paper>
       ) : (
         <>
-          <TableContainer component={Paper} sx={{ borderRadius: 2, mb: 2 }}>
-            <Table>
-              <TableHead>
-                <TableRow sx={{ backgroundColor: theme.palette.action.hover }}>
-                  <TableCell>Event Name</TableCell>
-                  <TableCell>Date</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Budget Status</TableCell>
-                  <TableCell>Venue</TableCell>
-                  <TableCell>Event Type</TableCell>
-                  <TableCell>Organizer Batch</TableCell>
-                  <TableCell align="center">Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {events.map((event) => (
-                  <TableRow
-                    key={event._id}
-                    hover
-                    sx={{
-                      backgroundColor:
-                        event.eventStatus === "ongoing"
-                          ? alpha(getStatusColor("ongoing"), 0.05)
-                          : "inherit",
-                    }}
+          <ModernTable
+            title="Events List"
+            columns={[
+              { id: "eventName", label: "Event Name" },
+              { id: "date", label: "Date" },
+              { id: "status", label: "Status" },
+              { id: "budgetStatus", label: "Budget Status" },
+              { id: "venue", label: "Venue" },
+              { id: "eventType", label: "Event Type" },
+              { id: "organizerBatch", label: "Organizer Batch" },
+              { id: "actions", label: "Actions", align: "center" },
+            ]}
+            data={events}
+            renderRow={(event) => (
+              <>
+                <TableCell>{event.eventName}</TableCell>
+                <TableCell>
+                  {formatDate(event.eventDate)}
+                  <Typography
+                    variant="caption"
+                    display="block"
+                    color="text.secondary"
                   >
-                    <TableCell>{event.eventName}</TableCell>
-                    <TableCell>
-                      {formatDate(event.eventDate)}
-                      <Typography
-                        variant="caption"
-                        display="block"
-                        color="text.secondary"
-                      >
-                        {event.eventTime}
+                    {event.eventTime}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  {renderStatusIndicator(event.eventStatus)}
+                </TableCell>
+                <TableCell>
+                  {event.budget && event.budget.totalAllocated ? (
+                    <Box>
+                      <Typography variant="body2" fontWeight="bold">
+                        {formatCurrency(event.budget.totalAllocated)}
                       </Typography>
-                    </TableCell>
-                    <TableCell>
-                      {renderStatusIndicator(event.eventStatus)}
-                    </TableCell>
-                    <TableCell>
-                      {event.budget && event.budget.totalAllocated ? (
-                        <Box>
-                          <Typography variant="body2" fontWeight="bold">
-                            {formatCurrency(event.budget.totalAllocated)}
-                          </Typography>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 0.5,
-                            }}
-                          >
-                            <Box
-                              sx={{
-                                width: 8,
-                                height: 8,
-                                borderRadius: "50%",
-                                bgcolor:
-                                  event.budget.remaining > 0
-                                    ? "#52c41a"
-                                    : "#ff4d4f",
-                              }}
-                            />
-                            <Typography variant="caption">
-                              {formatCurrency(event.budget.remaining)} remaining
-                            </Typography>
-                          </Box>
-                        </Box>
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          Not set
-                        </Typography>
-                      )}
-                    </TableCell>
-                    <TableCell>{event.eventVenue}</TableCell>
-                    <TableCell>{event.eventType}</TableCell>
-                    <TableCell>{event.eventOrganizerBatch}</TableCell>
-                    <TableCell align="center">
                       <Box
                         sx={{
                           display: "flex",
-                          justifyContent: "center",
-                          gap: 1,
+                          alignItems: "center",
+                          gap: 0.5,
                         }}
                       >
-                        <Button
-                          variant="outlined"
-                          color="error"
-                          size="small"
-                          startIcon={<Delete />}
-                          onClick={() => handleDeleteClick(event._id)}
-                          sx={{ borderRadius: 2 }}
-                        >
-                          Delete
-                        </Button>
-
-                        <Button
-                          variant="outlined"
-                          color="primary"
-                          size="small"
-                          startIcon={<Visibility />}
-                          onClick={() => handleViewEvent(event._id)}
-                          sx={{ borderRadius: 2 }}
-                        >
-                          View
-                        </Button>
-
-                        <Tooltip title="Manage Budget">
-                          <IconButton
-                            color="info"
-                            size="small"
-                            onClick={() => handleViewBudget(event._id)}
-                            sx={{
-                              borderRadius: 2,
-                              border: "1px solid",
-                              borderColor: "divider",
-                            }}
-                          >
-                            <AttachMoney />
-                          </IconButton>
-                        </Tooltip>
+                        <Box
+                          sx={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: "50%",
+                            bgcolor:
+                              event.budget.remaining > 0
+                                ? "#52c41a"
+                                : "#ff4d4f",
+                          }}
+                        />
+                        <Typography variant="caption">
+                          {formatCurrency(event.budget.remaining)} remaining
+                        </Typography>
                       </Box>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                    </Box>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      Not set
+                    </Typography>
+                  )}
+                </TableCell>
+                <TableCell>{event.eventVenue}</TableCell>
+                <TableCell>{event.eventType}</TableCell>
+                <TableCell>{event.eventOrganizerBatch}</TableCell>
+                <TableCell align="center">
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      startIcon={<Delete />}
+                      onClick={() => handleDeleteClick(event._id)}
+                      sx={{ borderRadius: 2 }}
+                    >
+                      Delete
+                    </Button>
+
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      size="small"
+                      startIcon={<Visibility />}
+                      onClick={() => handleViewEvent(event._id)}
+                      sx={{ borderRadius: 2 }}
+                    >
+                      View
+                    </Button>
+
+                    <Tooltip title="Manage Budget">
+                      <IconButton
+                        color="info"
+                        size="small"
+                        onClick={() => handleViewBudget(event._id)}
+                        sx={{
+                          borderRadius: 2,
+                          border: "1px solid",
+                          borderColor: "divider",
+                        }}
+                      >
+                        <AttachMoney />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                </TableCell>
+              </>
+            )}
+          />
 
           {/* Pagination Controls */}
           {pagination.totalPages > 1 && (

@@ -41,6 +41,7 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "@/config";
+import ModernHeader from "@/utils/Header/ModernHeader";
 
 const index = () => {
   const [events, setEvents] = useState([]);
@@ -288,9 +289,11 @@ const index = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" sx={{ mb: 4, fontWeight: "bold" }}>
-        Event Management
-      </Typography>
+      <ModernHeader
+        title="Event"
+        highlight="Management"
+        subtitle="Create, review, and manage event operations from one workspace."
+      />
 
       {/* Stats Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>

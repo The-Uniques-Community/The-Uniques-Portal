@@ -1,5 +1,5 @@
 import React from "react";
-import Header from "./componants/Header";
+import ModernHeader from "@/utils/Header/ModernHeader";
 import Second from "./componants/Batches";
 import Third from "./componants/Third";
 import Fourth from "./componants/Fourth";
@@ -16,7 +16,10 @@ import CallToAction from "../homComponents/CallToAction";
 const index = () => {
   return (
     <div>
-      <Header />
+      <ModernHeader 
+        title="More Than a Community → The Uniques ✦"
+        subtitle="Welcome to the About page of The Uniques Community."
+      />
       <Second />
       {/* <Third/> */}
       {/* <Fourth /> */}

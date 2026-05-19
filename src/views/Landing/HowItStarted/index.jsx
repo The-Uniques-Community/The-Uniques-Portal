@@ -1,5 +1,5 @@
 import React from 'react'
-import Header from "@/views/Landing/HowItStarted/components/Header"
+import ModernHeader from "@/utils/Header/ModernHeader";
 import TimeLine from "@/views/Landing/HowItStarted/components/TimeLine"
 import CallToAction from '../homComponents/CallToAction'
 import Flight from './components/Flight'
@@ -7,7 +7,10 @@ import Flight from './components/Flight'
 const index = () => {
     return (
         <div>
-            <Header />
+            <ModernHeader 
+                title="Uniques’ Odyssey → Idea to Impact ✦"
+                subtitle="The story of how The Uniques community started and grew."
+            />
             <TimeLine />
             <Flight />
             <CallToAction />

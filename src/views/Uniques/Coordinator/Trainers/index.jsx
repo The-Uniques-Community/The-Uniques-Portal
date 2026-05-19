@@ -6,6 +6,7 @@ import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
 import axios from "axios";
 import { BASE_URL } from "@/config";
+import ModernHeader from "@/utils/Header/ModernHeader";
 
 import { TrainerCardDashboard } from "@/utils/Card/TrainerCardDashboard";
 import {
@@ -54,6 +55,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import RefreshIcon from "@mui/icons-material/Refresh";
 import CustomLoader from "@/utils/Loader/CustomLoader";
 import tu from "@/assets/logos/tu.png";
+import ModernTable from "@/utils/Table/ModernTable";
 
 const Trainers = () => {
     const burl = BASE_URL; // Ideally this should come from env or context
@@ -260,12 +262,12 @@ const Trainers = () => {
         <Box sx={{ width: "100%", typography: "body1", p: 3 }}>
             <ToastContainer position="top-right" autoClose={3000} />
             {loading && <CustomLoader />}
-            {/* Header */}
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#ca0019', display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <SchoolIcon fontSize="large" /> Trainers Overview
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 2 }}>
+            <ModernHeader
+                title="Trainers"
+                highlight="Overview"
+                subtitle="Manage trainer profiles, skills, batches, and assignment visibility."
+                action={
+                    <>
                     <Button
                         variant="outlined"
                         startIcon={<RefreshIcon />}
@@ -291,8 +293,10 @@ const Trainers = () => {
                     >
                         Add Trainer
                     </Button>
-                </Box>
-            </Box>
+                    </>
+                }
+                sx={{ mb: 2 }}
+            />
 
             {/* Tabs */}
             <TabContext value={tabValue}>
@@ -349,109 +353,70 @@ const Trainers = () => {
 
                 {/* Manage Tab */}
                 <TabPanel value="2" sx={{ p: 0 }}>
-                    <TableContainer component={Paper} elevation={2} sx={{ borderRadius: 2 }}>
-                        <Table>
-                            <TableHead sx={{ bgcolor: '#f5f5f5' }}>
-                                <TableRow>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Email</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Teaching Batch</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Course</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
-                                    {/* <TableCell sx={{ fontWeight: 'bold' }}>Skills</TableCell> */}
-                                    <TableCell sx={{ fontWeight: 'bold', textAlign: 'right' }}>Actions</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {filteredTrainers.length > 0 ? (
-                                    filteredTrainers.map((trainer) => (
-                                        <TableRow key={trainer._id} hover>
-                                            <TableCell>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                                    <Avatar src={getProxyImageUrl(trainer.profilePic)} alt={trainer.fullName} />
-                                                    <Typography variant="subtitle2">{trainer.fullName}</Typography>
-                                                </Box>
-                                            </TableCell>
-                                            <TableCell>{trainer.email}</TableCell>
-                                            {/* <TableCell>{trainer.email}</TableCell> */}
-                                            <TableCell>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                    <img src={tu} alt="TU" style={{ width: 20, height: 20, objectFit: 'contain' }} />
-                                                    <Chip label={trainer.teachingBatch || trainer.batch} size="small" variant="outlined" />
-                                                </Box>
-                                            </TableCell>
-                                            <TableCell>{trainer.course}</TableCell>
-                                            {/* <TableCell>
-                                                <Chip
-                                                    label={trainer.teachingBatch || trainer.batch}
-                                                    size="small"
-                                                    variant="outlined"
-                                                />
-                                            </TableCell> */}
-                                            {/* <TableCell>{trainer.course}</TableCell> */}
-                                            <TableCell>
-                                                {/* <Chip
-                                                    label={trainer.origin === 'external' ? (trainer.designation || 'External') : 'Uniques'}
-                                                    size="small"
-                                                    color={trainer.origin === 'uniques' ? 'primary' : 'secondary'}
-                                                    variant="filled"
-                                                    sx={{ mr: 1 }}
-                                                /> */}
-                                                <Chip
-                                                    label={trainer.profileStatus}
-                                                    size="small"
-                                                    color={trainer.profileStatus === 'active' ? 'success' : 'default'}
-                                                    sx={{ textTransform: 'capitalize' }}
-                                                />
-                                            </TableCell>
-                                            {/* <TableCell>
-                                                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                                                    {trainer.skills.slice(0, 2).map((skill, idx) => (
-                                                        <Chip key={idx} label={skill} size="small" sx={{ fontSize: '0.7rem' }} />
-                                                    ))}
-                                                    {trainer.skills.length > 2 && <Chip label={`+${trainer.skills.length - 2}`} size="small" sx={{ fontSize: '0.7rem' }} />}
-                                                </Box>
-                                            </TableCell> */}
-                                            <TableCell sx={{ textAlign: 'right' }}>
-                                                <IconButton
-                                                    aria-label="more"
-                                                    aria-controls={`menu-${trainer._id}`}
-                                                    aria-haspopup="true"
-                                                    onClick={(e) => handleMenuClick(e, trainer._id)}
-                                                >
-                                                    <MoreVertIcon />
-                                                </IconButton>
-                                                <Menu
-                                                    id={`menu-${trainer._id}`}
-                                                    anchorEl={anchorEl}
-                                                    keepMounted
-                                                    open={Boolean(anchorEl) && menuTrainerId === trainer._id}
-                                                    onClose={handleCloseMenu}
-                                                >
-                                                    <MenuItem onClick={() => handleOpenDialog(trainer)}>
-                                                        <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
-                                                        Edit
-                                                    </MenuItem>
-                                                    <MenuItem onClick={() => handleOpenDeleteDialog(trainer)} sx={{ color: 'error.main' }}>
-                                                        <ListItemIcon><DeleteIcon fontSize="small" color="error" /></ListItemIcon>
-                                                        Delete
-                                                    </MenuItem>
-                                                </Menu>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                ) : (
-                                    <TableRow>
-                                        <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
-                                            <Typography variant="body1" color="text.secondary">
-                                                No trainers found.
-                                            </Typography>
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                    <ModernTable
+                        title="Manage Trainers"
+                        columns={[
+                            { id: "name", label: "Name" },
+                            { id: "email", label: "Email" },
+                            { id: "teachingBatch", label: "Teaching Batch" },
+                            { id: "course", label: "Course" },
+                            { id: "status", label: "Status" },
+                            { id: "actions", label: "Actions", align: "right" },
+                        ]}
+                        data={filteredTrainers}
+                        renderRow={(trainer) => (
+                            <>
+                                <TableCell>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                        <Avatar src={getProxyImageUrl(trainer.profilePic)} alt={trainer.fullName} />
+                                        <Typography variant="subtitle2">{trainer.fullName}</Typography>
+                                    </Box>
+                                </TableCell>
+                                <TableCell>{trainer.email}</TableCell>
+                                <TableCell>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <img src={tu} alt="TU" style={{ width: 20, height: 20, objectFit: 'contain' }} />
+                                        <Chip label={trainer.teachingBatch || trainer.batch} size="small" variant="outlined" />
+                                    </Box>
+                                </TableCell>
+                                <TableCell>{trainer.course}</TableCell>
+                                <TableCell>
+                                    <Chip
+                                        label={trainer.profileStatus}
+                                        size="small"
+                                        color={trainer.profileStatus === 'active' ? 'success' : 'default'}
+                                        sx={{ textTransform: 'capitalize' }}
+                                    />
+                                </TableCell>
+                                <TableCell sx={{ textAlign: 'right' }}>
+                                    <IconButton
+                                        aria-label="more"
+                                        aria-controls={`menu-${trainer._id}`}
+                                        aria-haspopup="true"
+                                        onClick={(e) => handleMenuClick(e, trainer._id)}
+                                    >
+                                        <MoreVertIcon />
+                                    </IconButton>
+                                    <Menu
+                                        id={`menu-${trainer._id}`}
+                                        anchorEl={anchorEl}
+                                        keepMounted
+                                        open={Boolean(anchorEl) && menuTrainerId === trainer._id}
+                                        onClose={handleCloseMenu}
+                                    >
+                                        <MenuItem onClick={() => handleOpenDialog(trainer)}>
+                                            <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
+                                            Edit
+                                        </MenuItem>
+                                        <MenuItem onClick={() => handleOpenDeleteDialog(trainer)} sx={{ color: 'error.main' }}>
+                                            <ListItemIcon><DeleteIcon fontSize="small" color="error" /></ListItemIcon>
+                                            Delete
+                                        </MenuItem>
+                                    </Menu>
+                                </TableCell>
+                            </>
+                        )}
+                    />
                 </TabPanel>
             </TabContext>
 

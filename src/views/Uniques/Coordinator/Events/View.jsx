@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { BASE_URL } from "@/config";
+import ModernTable from "@/utils/Table/ModernTable";
 import { toast } from "react-toastify"; // Make sure this is installed
 import dayjs from "dayjs"; // Make sure this is installed
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -1918,184 +1919,181 @@ const EventView = () => {
                             });
                             const responseKeys = Array.from(allKeys);
 
+                            const columns = [
+                              { id: "respondent", label: "Respondent", minWidth: 180 },
+                              ...responseKeys.map(key => ({ id: key, label: key, minWidth: 120 })),
+                              { id: "submittedOn", label: "Submitted On", minWidth: 150 },
+                            ];
+
                             return (
-                              <TableContainer
-                                component={Paper}
-                                sx={{
-                                  boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-                                  borderRadius: 2,
-                                  overflow: "hidden",
-                                  overflowX: "auto", // Add horizontal scroll for many columns
-                                }}
-                              >
-                                <Table>
-                                  <TableHead
-                                    sx={{ bgcolor: "rgba(0,0,0,0.02)" }}
-                                  >
-                                    <TableRow>
-                                      {/* Fixed columns */}
-                                      <TableCell
+                              <ModernTable
+                                title={`Submissions (${formResponses.length})`}
+                                columns={columns}
+                                data={formResponses}
+                                renderRow={(response) => (
+                                  <>
+                                    <TableCell>
+                                      <Box
                                         sx={{
-                                          fontWeight: "bold",
-                                          minWidth: 180,
+                                          display: "flex",
+                                          alignItems: "center",
                                         }}
                                       >
-                                        Respondent
-                                      </TableCell>
-
-                                      {/* Dynamic columns based on all possible response fields */}
-                                      {responseKeys.map((key) => (
-                                        <TableCell
-                                          key={key}
+                                        <Avatar
                                           sx={{
-                                            fontWeight: "bold",
-                                            minWidth: 120,
+                                            mr: 1,
+                                            width: 32,
+                                            height: 32,
+                                            fontSize: "0.8rem",
                                           }}
                                         >
-                                          {key}
-                                        </TableCell>
-                                      ))}
-
-                                      {/* Fixed columns at the end */}
-                                      {/* <TableCell
-                                        sx={{
-                                          fontWeight: "bold",
-                                          minWidth: 100,
-                                        }}
-                                      >
-                                        Status
-                                      </TableCell> */}
-                                      <TableCell
-                                        sx={{
-                                          fontWeight: "bold",
-                                          minWidth: 150,
-                                        }}
-                                      >
-                                        Submitted On
-                                      </TableCell>
-                                    </TableRow>
-                                  </TableHead>
-                                  <TableBody>
-                                    {formResponses.map((response, index) => (
-                                      <TableRow
-                                        key={response._id || index}
-                                        sx={{
-                                          "&:hover": {
-                                            backgroundColor: "rgba(0,0,0,0.02)",
-                                          },
-                                          transition: "background-color 0.2s",
-                                        }}
-                                      >
-                                        {/* Respondent info */}
-                                        <TableCell>
-                                          <Box
-                                            sx={{
-                                              display: "flex",
-                                              alignItems: "center",
-                                            }}
+                                          {response.user?.fullName
+                                            ? response.user.fullName[0]
+                                            : "G"}
+                                        </Avatar>
+                                        <Box>
+                                          <Typography
+                                            variant="body2"
+                                            fontWeight="bold"
                                           >
-                                            <Avatar
-                                              sx={{
-                                                mr: 1,
-                                                width: 32,
-                                                height: 32,
-                                              }}
-                                            >
-                                              {(
-                                                response.respondent?.member
-                                                  ?.memberName ||
-                                                response.respondent?.name ||
-                                                "A"
-                                              ).charAt(0)}
-                                            </Avatar>
-                                            <Box>
-                                              <Typography
-                                                variant="body2"
-                                                sx={{ fontWeight: "medium" }}
-                                              >
-                                                {response.respondent?.member
-                                                  ?.memberName ||
-                                                  response.respondent?.name ||
-                                                  ""}
-                                              </Typography>
-                                              <Typography
-                                                variant="caption"
-                                                color="text.secondary"
-                                              >
-                                                {response.respondent?.member
-                                                  ?.memberEmail ||
-                                                  response.respondent?.email ||
-                                                  "No email"}
-                                              </Typography>
-                                            </Box>
-                                          </Box>
-                                        </TableCell>
-
-                                        {/* Dynamic response values */}
-                                        {responseKeys.map((key) => (
-                                          <TableCell key={key}>
-                                            {response.responses &&
-                                            response.responses[key] !==
-                                              undefined
-                                              ? Array.isArray(
-                                                  response.responses[key]
-                                                )
-                                                ? response.responses[key].join(
-                                                    ", "
-                                                  )
-                                                : String(
-                                                    response.responses[key]
-                                                  )
-                                              : "—"}
-                                          </TableCell>
-                                        ))}
-
-                                        {/* Status */}
-                                        {/* <TableCell>
-                                          <Chip
-                                            size="small"
-                                            label={response.status}
-                                            color={
-                                              response.status === "approved"
-                                                ? "success"
-                                                : response.status === "rejected"
-                                                ? "error"
-                                                : "default"
-                                            }
-                                          />
-                                        </TableCell> */}
-
-                                        {/* Date */}
-                                        <TableCell>
-                                          {response.metadata?.submittedAt
-                                            ? new Date(
-                                                response.metadata.submittedAt
-                                              ).toLocaleString()
-                                            : response.createdAt
-                                            ? new Date(
-                                                response.createdAt
-                                              ).toLocaleString()
-                                            : "Unknown"}
-                                        </TableCell>
-                                      </TableRow>
+                                            {response.user?.fullName ||
+                                              "Guest"}
+                                          </Typography>
+                                          <Typography
+                                            variant="caption"
+                                            color="text.secondary"
+                                          >
+                                            {response.user?.email ||
+                                              "No email"}
+                                          </Typography>
+                                        </Box>
+                                      </Box>
+                                    </TableCell>
+                                    {responseKeys.map((key) => (
+                                      <TableCell key={key}>
+                                        {response.responses[key] || "—"}
+                                      </TableCell>
                                     ))}
-                                  </TableBody>
-                                </Table>
-                              </TableContainer>
+                                    <TableCell>
+                                      {new Date(
+                                        response.submittedAt
+                                      ).toLocaleString()}
+                                    </TableCell>
+                                  </>
+                                )}
+                              />
                             );
                           })()
                         ) : (
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ textAlign: "center", mt: 3 }}
+                          >
+                            No responses yet.
+                          </Typography>
+                        )}
+                      </Box>
+                    ) : (
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ textAlign: "center", mt: 3 }}
+                      >
+                        No form is attached to this event.
+                      </Typography>
+                    )}
+                  </Box>
+                )}
+
+                {/* Attendance Tab */}
+                {tabValue === 3 && (
+                  <Box>
+                    {event.eventForm && event.eventForm.formId ? (
+                      <Box>
+                        {/* Previous code for form preview section */}
+
+                        <Divider sx={{ my: 3 }} />
+
+                        <Typography
+                          variant="subtitle1"
+                          fontWeight="bold"
+                          sx={{ mb: 2 }}
+                        >
+                          Attendance ({event.eventGuests?.length || 0})
+                        </Typography>
+
+                        {event.eventGuests && event.eventGuests.length > 0 ? (
+                          <List sx={{ overflowY: "auto", maxHeight: 300 }}>
+                            {event.eventGuests.map((guest, index) => (
+                              <ListItem
+                                key={index}
+                                alignItems="flex-start"
+                                sx={{
+                                  px: 0,
+                                  transition: "background-color 0.2s",
+                                  "&:hover": { backgroundColor: "rgba(0,0,0,0.02)" },
+                                  borderRadius: 1,
+                                }}
+                                secondaryAction={
+                                  !editMode && (
+                                    <IconButton
+                                      edge="end"
+                                      size="small"
+                                      onClick={() =>
+                                        handleRemoveGuest(guest.guestId?._id)
+                                      }
+                                      sx={{
+                                        opacity: 0.6,
+                                        "&:hover": { opacity: 1, color: "error.main" },
+                                      }}
+                                    >
+                                      <Delete fontSize="small" />
+                                    </IconButton>
+                                  )
+                                }
+                              >
+                                <ListItemAvatar>
+                                  <Avatar
+                                    src={guest.guestId?.guestImage?.url}
+                                    sx={{
+                                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                                    }}
+                                  >
+                                    {guest.guestId?.guestName?.charAt(0) || "G"}
+                                  </Avatar>
+                                </ListItemAvatar>
+                                <ListItemText
+                                  primary={guest.guestId?.guestName || "Unknown Guest"}
+                                  secondary={
+                                    <>
+                                      {guest.guestId?.guestDesignation}
+                                      {guest.guestTag && (
+                                        <Chip
+                                          label={guest.guestTag}
+                                          size="small"
+                                          sx={{ mt: 0.5, fontSize: "0.7rem" }}
+                                          variant="outlined"
+                                        />
+                                      )}
+                                    </>
+                                  }
+                                />
+                              </ListItem>
+                            ))}
+                          </List>
+                        ) : (
                           <Box
                             sx={{
-                              p: 4,
+                              p: 3,
                               textAlign: "center",
                               bgcolor: "background.paper",
                               borderRadius: 2,
                               boxShadow: "inset 0 0 8px rgba(0,0,0,0.05)",
                             }}
                           >
-                            <Typography color="text.secondary">
-                              No form responses yet
+                            <Typography variant="body2" color="text.secondary">
+                              No guests added to this event yet
                             </Typography>
                           </Box>
                         )}

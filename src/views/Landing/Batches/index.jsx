@@ -4,7 +4,7 @@ import { Search, Award, RefreshCw, Users } from "lucide-react";
 import axios from "axios";
 import { BASE_URL } from "@/config";
 import MemberCard from "./components/MemberCard";
-import Header from "../About/componants/Header";
+import ModernHeader from "@/utils/Header/ModernHeader";
 import { Card, CardContent, Typography, Box, Tooltip } from "@mui/material";
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import SchoolIcon from '@mui/icons-material/School';
@@ -319,21 +319,11 @@ const index = () => {
 
   return (
     <div className="min-h-screen ">
-      <Header />
+      <ModernHeader 
+        title="Our Batches"
+        subtitle="Explore the talented members of The Uniques Community."
+      />
       
-      {/* Header */}
-      <motion.div
-        className="bg-white py-12 px-4 sm:px-6 lg:px-8 shadow-sm"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="max-w-7xl mx-auto ">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2 text-center">Our Batches</h1>
-          <p className="text-lg text-gray-600 text-center">Explore the talented members of The Uniques Community.</p>
-        </div>
-      </motion.div>
-
       {/* Batch Selection with Enhanced Count Display */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-wrap gap-4 mb-8 justify-center">

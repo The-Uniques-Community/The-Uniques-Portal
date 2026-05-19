@@ -13,6 +13,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Typography,
 } from "@mui/material";
 
 const CreateTaskDialog = ({
@@ -29,21 +30,49 @@ const CreateTaskDialog = ({
   batches,
   members,
 }) => {
-  const filteredMembers = useMemo(() => {
+  const AtlanticFilterMembers = useMemo(() => {
     return selectedBatch
       ? members.filter((member) => member.batch === selectedBatch)
       : members;
   }, [members, selectedBatch]);
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Assign New Task</DialogTitle>
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      fullWidth 
+      maxWidth="sm"
+      PaperProps={{
+        sx: {
+          borderRadius: "14px",
+          backgroundColor: "background.paper",
+          backgroundImage: "none",
+          border: "1px solid",
+          borderColor: "divider",
+          p: 1
+        }
+      }}
+    >
+      <DialogTitle 
+        sx={{ 
+          pb: 1, 
+          fontSize: "19px", 
+          fontWeight: 700,
+          color: "text.primary" 
+        }}
+      >
+        Assign New Task
+      </DialogTitle>
 
-      <DialogContent>
-        <Box sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 2 }}>
+      <DialogContent sx={{ pb: 2 }}>
+        <Box sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 2.5 }}>
+          
+          {/* Task Title */}
           <TextField
             label="Task Title"
             fullWidth
+            variant="outlined"
+            size="small"
             value={newTask.title}
             onChange={(e) =>
               setNewTask({
@@ -53,11 +82,14 @@ const CreateTaskDialog = ({
             }
           />
 
+          {/* Description */}
           <TextField
             label="Description"
             fullWidth
             multiline
             rows={3}
+            variant="outlined"
+            size="small"
             value={newTask.description}
             onChange={(e) =>
               setNewTask({
@@ -67,42 +99,23 @@ const CreateTaskDialog = ({
             }
           />
 
+          {/* Filters and Scopes Meta Group */}
           <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <FormControl fullWidth>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth size="small">
                 <InputLabel>Filter by Batch</InputLabel>
-
                 <Select
                   value={selectedBatch}
                   label="Filter by Batch"
                   onChange={(e) => {
                     setSelectedBatch(e.target.value);
-
                     setNewTask({
                       ...newTask,
                       assignedTo: [],
                     });
-
-                  <FormControl fullWidth>
-                    <InputLabel>Task Type</InputLabel>
-                    <Select
-                      value={newTask.taskType || "project"}
-                      label="Task Type"
-                      onChange={(e) =>
-                        setNewTask({
-                          ...newTask,
-                          taskType: e.target.value,
-                        })
-                      }
-                    >
-                      <MenuItem value="project">Project</MenuItem>
-                      <MenuItem value="event">Event</MenuItem>
-                    </Select>
-                  </FormControl>
                   }}
                 >
                   <MenuItem value="">All Batches</MenuItem>
-
                   {batches.map((batch) => (
                     <MenuItem key={batch} value={batch}>
                       {batch}
@@ -112,112 +125,195 @@ const CreateTaskDialog = ({
               </FormControl>
             </Grid>
 
-            <Grid item xs={6}>
-              <FormControl fullWidth>
-                <InputLabel>Assign Members</InputLabel>
-
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth size="small">
+                <InputLabel>Task Type</InputLabel>
                 <Select
-                  multiple
-                  value={newTask.assignedTo || []}
-                  label="Assign Members"
-                  disabled={!filteredMembers.length && selectedBatch}
-                  onChange={(e) => {
-                    const value = e.target.value;
-
+                  value={newTask.taskType || "project"}
+                  label="Task Type"
+                  onChange={(e) =>
                     setNewTask({
                       ...newTask,
-                      assignedTo:
-                        typeof value === "string" ? value.split(",") : value,
-                    });
-                  }}
-                  renderValue={(selected) => <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>{selected.map((id) => {
-                    const member = members.find((item) => item._id === id);
-                    return <Chip key={id} label={member?.fullName || id} size="small" />;
-                  })}</Box>}
+                      taskType: e.target.value,
+                    })
+                  }
                 >
-                  {filteredMembers.map((member) => (
-                    <MenuItem key={member._id} value={member._id}>
-                      {member.fullName}
-                    </MenuItem>
-                  ))}
+                  <MenuItem value="project">Project Scope</MenuItem>
+                  <MenuItem value="event">Event Activity</MenuItem>
                 </Select>
               </FormControl>
+            </Grid>
+          </Grid>
 
-              {newTask.assignedTo?.length > 0 && (
-                <Box sx={{ mt: 1.5, display: "flex", flexDirection: "column", gap: 1.25 }}>
-                  {newTask.assignedTo.map((memberId) => {
-                    const member = members.find((item) => item._id === memberId);
+          {/* Members Assignee Row Picker */}
+          <FormControl fullWidth size="small">
+            <InputLabel>Assign Members</InputLabel>
+            <Select
+              multiple
+              value={newTask.assignedTo || []}
+              label="Assign Members"
+              disabled={!AtlanticFilterMembers.length && selectedBatch}
+              onChange={(e) => {
+                const value = e.target.value;
+                setNewTask({
+                  ...newTask,
+                  assignedTo: typeof value === "string" ? value.split(",") : value,
+                });
+              }}
+              renderValue={(selected) => (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                  {selected.map((id) => {
+                    const member = members.find((item) => item._id === id);
                     return (
-                      <Box key={memberId} sx={{ display: "flex", gap: 1.25, alignItems: "center", flexWrap: "wrap" }}>
-                        <Box sx={{ minWidth: 180 }}>
-                          <Chip label={member?.fullName || memberId} size="small" />
-                        </Box>
-                        <TextField
-                          label="Role (admin input)"
-                          size="small"
-                          fullWidth
-                          value={newTaskRoles?.[memberId] || ""}
-                          onChange={(e) =>
-                            setNewTaskRoles((prev) => ({
-                              ...prev,
-                              [memberId]: e.target.value,
-                            }))
-                          }
-                          placeholder="frontend, backend, ui, etc."
-                        />
-                      </Box>
+                      <Chip 
+                        key={id} 
+                        label={member?.fullName || id} 
+                        size="small" 
+                        sx={{ 
+                          borderRadius: "4px",
+                          fontWeight: 500,
+                          backgroundColor: "action.hover",
+                          border: "1px solid",
+                          borderColor: "divider"
+                        }} 
+                      />
                     );
                   })}
                 </Box>
               )}
-            </Grid>
-          </Grid>
-
-          <TextField
-            label="Deadline"
-            type="date"
-            fullWidth
-            InputLabelProps={{ shrink: true }}
-            value={newTask.deadline}
-            onChange={(e) =>
-              setNewTask({
-                ...newTask,
-                deadline: e.target.value,
-              })
-            }
-          />
-
-          <FormControl fullWidth>
-            <InputLabel>Priority</InputLabel>
-
-            <Select
-              value={newTask.priority}
-              label="Priority"
-              onChange={(e) =>
-                setNewTask({
-                  ...newTask,
-                  priority: e.target.value,
-                })
-              }
             >
-              <MenuItem value="low">Low</MenuItem>
-              <MenuItem value="medium">Medium</MenuItem>
-              <MenuItem value="high">High</MenuItem>
+              {AtlanticFilterMembers.map((member) => (
+                <MenuItem key={member._id} value={member._id}>
+                  {member.fullName}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
+
+          {/* Inline Role Settings Interface Panel */}
+          {newTask.assignedTo?.length > 0 && (
+            <Box 
+              sx={{ 
+                p: 2, 
+                borderRadius: "8px", 
+                border: "1px dashed", 
+                borderColor: "divider",
+                backgroundColor: "background.default",
+                display: "flex", 
+                flexDirection: "column", 
+                gap: 1.5,
+                maxHeight: "180px",
+                overflowY: "auto"
+              }}
+            >
+              <Typography variant="caption" sx={{ fontWeight: 700, color: "text.subtext", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                Define Member Work Roles
+              </Typography>
+              
+              {newTask.assignedTo.map((memberId) => {
+                const member = members.find((item) => item._id === memberId);
+                return (
+                  <Box key={memberId} sx={{ display: "flex", gap: 2, alignItems: "center", justifyContent: "space-between" }}>
+                    <Box sx={{ minWidth: 140, maxWidth: 180 }}>
+                      <Typography variant="body2" noWrap sx={{ fontWeight: 600, fontSize: "13px" }}>
+                        {member?.fullName || "User Card"}
+                      </Typography>
+                    </Box>
+                    <TextField
+                      label="Assigned Role"
+                      size="small"
+                      value={newTaskRoles?.[memberId] || ""}
+                      onChange={(e) =>
+                        setNewTaskRoles((prev) => ({
+                          ...prev,
+                          [memberId]: e.target.value,
+                        }))
+                      }
+                      placeholder="e.g., Lead Frontend, UI design"
+                      sx={{ 
+                        flexGrow: 1,
+                        "& .MuiInputBase-input": { fontSize: "12.5px", py: 0.75 }
+                      }}
+                    />
+                  </Box>
+                );
+              })}
+            </Box>
+          )}
+
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label="Deadline"
+                type="date"
+                fullWidth
+                size="small"
+                InputLabelProps={{ shrink: true }}
+                value={newTask.deadline}
+                onChange={(e) =>
+                  setNewTask({
+                    ...newTask,
+                    deadline: e.target.value,
+                  })
+                }
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth size="small">
+                <InputLabel>Priority Level</InputLabel>
+                <Select
+                  value={newTask.priority}
+                  label="Priority Level"
+                  onChange={(e) =>
+                    setNewTask({
+                      ...newTask,
+                      priority: e.target.value,
+                    })
+                  }
+                >
+                  <MenuItem value="low">Low Priority</MenuItem>
+                  <MenuItem value="medium">Medium Priority</MenuItem>
+                  <MenuItem value="high">High Priority</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
         </Box>
       </DialogContent>
 
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+      <DialogActions sx={{ p: 2, pt: 1, gap: 1 }}>
+        <Button 
+          onClick={onClose}
+          sx={{
+            textTransform: "none",
+            fontSize: "13.5px",
+            fontWeight: 600,
+            color: "text.secondary"
+          }}
+        >
+          Cancel
+        </Button>
 
         <Button
           variant="contained"
           onClick={onSubmit}
           disabled={submitting}
-          sx={{ bgcolor: "#ca0019" }}
+          sx={{
+            textTransform: "none",
+            fontSize: "13.5px",
+            fontWeight: 600,
+            borderRadius: "6px",
+            px: 2.5,
+            backgroundColor: "primary.main",
+            color: "primary.light",
+            "&:hover": {
+              backgroundColor: "primary.main",
+              opacity: 0.95
+            }
+          }}
         >
-          {submitting ? "Assigning..." : "Assign Task"}
+          {submitting ? "Assigning Task..." : "Assign Task"}
         </Button>
       </DialogActions>
     </Dialog>

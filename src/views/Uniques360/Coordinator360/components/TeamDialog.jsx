@@ -20,9 +20,10 @@ import {
   InputLabel,
   TextField,
   Typography,
+  Grid,
   useTheme,
 } from "@mui/material";
-import { Delete as DeleteIcon } from "@mui/icons-material";
+import { DeleteOutlined as DeleteIcon, GroupAddOutlined as AddTeamIcon } from "@mui/icons-material";
 
 const TeamDialog = ({
   open,
@@ -49,6 +50,7 @@ const TeamDialog = ({
     if (member?.member) return member.member._id || member.member;
     return member._id;
   });
+  
   const assignedMembers = members.filter((member) => assignedIds.includes(member._id));
   const availableMembers = members.filter(
     (member) =>
@@ -66,82 +68,207 @@ const TeamDialog = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Manage Team - {task.title}</DialogTitle>
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      fullWidth 
+      maxWidth="sm"
+      PaperProps={{
+        sx: {
+          borderRadius: "14px",
+          backgroundColor: "background.paper",
+          backgroundImage: "none",
+          border: "1px solid",
+          borderColor: "divider",
+          p: 1
+        }
+      }}
+    >
+      <DialogTitle 
+        sx={{ 
+          pb: 1.5, 
+          fontSize: "19px", 
+          fontWeight: 700,
+          color: "text.primary" 
+        }}
+      >
+        Manage Team Allocation
+      </DialogTitle>
 
       <DialogContent>
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
-          <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: isDark ? "rgba(255, 255, 255, 0.05)" : "#f7f7f7", border: "1px solid", borderColor: "divider" }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
-              Assignment overview
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, mt: 1 }}>
+          
+          {/* Assignment Overview Meta Card */}
+          <Box 
+            sx={{ 
+              p: 2, 
+              borderRadius: "10px", 
+              backgroundColor: isDark ? "rgba(255, 255, 255, 0.05)" : "action.hover", 
+              border: "1px solid",
+              borderColor: "divider" 
+            }}
+          >
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: "13px", color: "text.secondary", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Active Target Workspace
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+            <Typography variant="body1" sx={{ fontWeight: 600, mt: 0.5, color: "text.primary" }}>
               {task.title}
             </Typography>
-            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 1 }}>
-              <Chip label={`Members: ${assignedMembers.length}`} size="small" />
-              <Chip label={task.status === "pending" ? "Pending" : task.status} size="small" color={task.status === "completed" ? "success" : task.status === "in-progress" ? "warning" : "info"} />
+            
+            <Box sx={{ display: "flex", gap: 0.75, flexWrap: "wrap", mt: 1.5 }}>
+              <Chip 
+                label={`Allocated: ${assignedMembers.length}`} 
+                size="small" 
+                sx={{ borderRadius: "4px", fontWeight: 600, fontSize: "11px", height: "22px", backgroundColor: "background.paper", borderColor: "divider" }}
+                variant="outlined"
+              />
+              <Chip 
+                label={task.status === "pending" ? "Pending" : task.status} 
+                size="small" 
+                color={task.status === "completed" ? "success" : task.status === "in-progress" ? "warning" : "info"}
+                variant="soft"
+                sx={{ borderRadius: "4px", fontWeight: 600, fontSize: "11px", height: "22px", textTransform: "capitalize" }}
+              />
               {typeof task.progressPercent === "number" && (
-                <Chip label={`${task.progressPercent}% progress`} size="small" variant="outlined" />
+                <Chip 
+                  label={`${task.progressPercent}% Vector Progress`} 
+                  size="small" 
+                  variant="outlined" 
+                  sx={{ borderRadius: "4px", fontWeight: 600, fontSize: "11px", height: "22px", backgroundColor: "background.paper", borderColor: "divider" }}
+                />
               )}
             </Box>
           </Box>
 
-          <FormControl fullWidth>
-            <InputLabel>Filter by Batch</InputLabel>
-            <Select value={selectedBatch} label="Filter by Batch" onChange={(e) => onSelectedBatchChange(e.target.value)}>
-              <MenuItem value="">All Batches</MenuItem>
-              {batches.map((batch) => (
-                <MenuItem key={batch} value={batch}>
-                  {batch}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          {/* Allocation Matrix Filters and Inputs */}
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth size="small">
+                <InputLabel>Filter by Batch</InputLabel>
+                <Select value={selectedBatch} label="Filter by Batch" onChange={(e) => onSelectedBatchChange(e.target.value)}>
+                  <MenuItem value="">All Batches</MenuItem>
+                  {batches.map((batch) => (
+                    <MenuItem key={batch} value={batch}>
+                      {batch}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
 
-          <FormControl fullWidth>
-            <InputLabel>Add User</InputLabel>
-            <Select value={selectedMemberId} label="Add User" onChange={(e) => onSelectedMemberChange(e.target.value)}>
-              {availableMembers.map((member) => (
-                <MenuItem key={member._id} value={member._id}>
-                  {member.fullName} {member.email ? `(${member.email})` : ""}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth size="small">
+                <InputLabel>Add User</InputLabel>
+                <Select value={selectedMemberId} label="Add User" onChange={(e) => onSelectedMemberChange(e.target.value)}>
+                  {availableMembers.map((member) => (
+                    <MenuItem key={member._id} value={member._id}>
+                      {member.fullName} {member.email ? `(${member.email})` : ""}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
 
-          <TextField
-            label="Role (admin input)"
-            value={selectedRole}
-            onChange={(e) => onSelectedRoleChange(e.target.value)}
-            placeholder="frontend, backend, ui, etc."
-            fullWidth
-          />
+            <Grid item xs={12}>
+              <Box sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
+                <TextField
+                  label="Role Responsibility"
+                  value={selectedRole}
+                  onChange={(e) => onSelectedRoleChange(e.target.value)}
+                  placeholder="e.g., Frontend, Backend, Team Lead"
+                  fullWidth
+                  size="small"
+                />
 
-          <Button variant="contained" onClick={onAddMember} disabled={!selectedMemberId} sx={{ bgcolor: "#ca0019", alignSelf: "flex-start" }}>
-            Add User
-          </Button>
+                <Button 
+                  variant="contained" 
+                  onClick={onAddMember} 
+                  disabled={!selectedMemberId} 
+                  startIcon={<AddTeamIcon sx={{ fontSize: 18 }} />}
+                  sx={{ 
+                    textTransform: "none",
+                    whiteSpace: "nowrap",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    height: "40px",
+                    borderRadius: "6px",
+                    px: 2,
+                    backgroundColor: "primary.main",
+                    color: "primary.light",
+                    "&:hover": {
+                      backgroundColor: "primary.main",
+                      opacity: 0.95
+                    }
+                  }}
+                >
+                  Assign
+                </Button>
+              </Box>
+            </Grid>
+          </Grid>
 
-          <List>
-            {assignedMembers.map((member) => (
-              <ListItem key={member._id} divider>
-                <ListItemAvatar>
-                  <Avatar>{member.fullName?.[0] || "U"}</Avatar>
-                </ListItemAvatar>
-                <ListItemText primary={member.fullName} secondary={getRole(member._id) || member.batch || member.email || "No batch"} />
-                <ListItemSecondaryAction>
-                  <IconButton edge="end" color="error" onClick={() => onRemoveMember(member._id)}>
-                    <DeleteIcon />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
-            ))}
+          {/* Roster Allocation Stream List */}
+          <List disablePadding sx={{ mt: 1, border: "1px solid", borderColor: "divider", borderRadius: "10px", overflow: "hidden" }}>
+            {assignedMembers.length > 0 ? (
+              assignedMembers.map((member, index) => (
+                <ListItem 
+                  key={member._id} 
+                  divider={index !== assignedMembers.length - 1}
+                  sx={{ 
+                    py: 1.5, 
+                    px: 2,
+                    backgroundColor: "background.paper",
+                    "&:hover": { backgroundColor: "action.hover" }
+                  }}
+                >
+                  <ListItemAvatar>
+                    <Avatar sx={{ width: 34, height: 34, fontSize: "12px", fontWeight: 700, bgcolor: "action.selected", color: "text.primary" }}>
+                      {member.fullName?.[0]?.toUpperCase() || "U"}
+                    </Avatar>
+                  </ListItemAvatar>
+                  
+                  <ListItemText 
+                    primary={member.fullName} 
+                    secondary={getRole(member._id) || member.batch || member.email || "General Space"} 
+                    primaryTypographyProps={{ sx: { fontWeight: 600, fontSize: "14px", color: "text.primary" } }}
+                    secondaryTypographyProps={{ sx: { fontSize: "12px", color: "text.secondary", mt: 0.25 } }}
+                  />
+                  
+                  <ListItemSecondaryAction sx={{ pr: 1 }}>
+                    <IconButton 
+                      edge="end" 
+                      size="small" 
+                      onClick={() => onRemoveMember(member._id)}
+                      sx={{ color: "text.secondary", "&:hover": { color: "error.main", backgroundColor: "action.hover" } }}
+                    >
+                      <DeleteIcon sx={{ fontSize: 18 }} />
+                    </IconButton>
+                  </ListItemSecondaryAction>
+                </ListItem>
+              ))
+            ) : (
+              <Box sx={{ py: 4, textAlign: "center", color: "text.subtext" }}>
+                <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                  No members assigned to this operation yet.
+                </Typography>
+              </Box>
+            )}
           </List>
         </Box>
       </DialogContent>
 
-      <DialogActions>
-        <Button onClick={onClose}>Close</Button>
+      <DialogActions sx={{ p: 2, pt: 1 }}>
+        <Button 
+          onClick={onClose}
+          sx={{
+            textTransform: "none",
+            fontSize: "13.5px",
+            fontWeight: 600,
+            color: "text.secondary"
+          }}
+        >
+          Close
+        </Button>
       </DialogActions>
     </Dialog>
   );

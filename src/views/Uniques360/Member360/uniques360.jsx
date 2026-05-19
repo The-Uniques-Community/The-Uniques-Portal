@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Avatar, Box, Button, Chip, LinearProgress, Stack, Typography } from "@mui/material";
-import { CheckCircle as CompleteIcon } from "@mui/icons-material";
+import { Avatar, Box, Button, Chip, Grid, Paper, Typography, CircularProgress } from "@mui/material";
+import { CheckCircleOutline as CompleteIcon, FolderOutlined as ProjectIcon, CalendarTodayOutlined as DateIcon } from "@mui/icons-material";
 import axios from "axios";
 import { BASE_URL } from "@/config";
 import { toast } from "react-toastify";
@@ -136,54 +136,202 @@ const Uniques360Member = () => {
 
   if (loading) {
     return (
-      <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", height: "80vh", gap: 3 }}>
-        <Box component="img" src={isDarkMode ? logoWhite : logoCommunity} alt="logo" sx={{ height: isDarkMode ? 60 : 80 }} />
-        <Box sx={{ width: 300 }}>
-          <LinearProgress sx={{ height: 4, borderRadius: 2, "& .MuiLinearProgress-bar": { backgroundColor: "#ca0019" } }} />
-        </Box>
-        <Typography variant="caption">Loading workspace...</Typography>
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", backgroundColor: "background.default" }}>
+        <CircularProgress size={40} sx={{ color: "primary.main" }} />
       </Box>
     );
   }
 
-  return (
-    <Box sx={{ display: "flex", height: "calc(100vh - 100px)", bgcolor: isDarkMode ? "#0b0e11" : "#f8f9fa" }}>
-      <TaskSidebar tasks={tasks} selectedTask={selectedTask} onSelectTask={setSelectedTask} isDarkMode={isDarkMode} />
+  // Define reactive styling conditions based on current selected status configurations
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "completed": return "#16a34a";
+      case "in-progress": return "#f59e0b";
+      default: return isDarkMode ? "#ff5252" : "#ca0019";
+    }
+  };
 
-      <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+  return (
+    <Grid 
+      container 
+      sx={{ 
+        height: "calc(100vh - 100px)", 
+        bgcolor: "background.default",
+        overflow: "hidden"
+      }}
+    >
+      {/* Sidebar Navigation Panel Container */}
+      <Grid 
+        item 
+        xs={12} 
+        md={3} 
+        sx={{ 
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          borderRight: "1px solid", 
+          borderColor: "divider",
+          zIndex: 5
+        }}
+      >
+        <TaskSidebar tasks={tasks} selectedTask={selectedTask} onSelectTask={setSelectedTask} />
+      </Grid>
+
+      {/* Main Workspace Frame Panel */}
+      <Grid 
+        item 
+        xs={12} 
+        md={9} 
+        sx={{ 
+          display: "flex", 
+          flexDirection: "column", 
+          height: "100%",
+          backgroundColor: "background.default"
+        }}
+      >
         {selectedTask ? (
-          <>
-            <Box sx={{ p: 2, borderBottom: "1px solid #eee" }}>
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 2, flexWrap: "wrap" }}>
+          <Paper
+            elevation={0}
+            sx={{ 
+              flexGrow: 1, 
+              display: "flex", 
+              flexDirection: "column", 
+              m: { xs: 1.5, md: 3 }, 
+              borderRadius: "14px", 
+              overflow: "hidden",
+              border: "1px solid",
+              borderColor: "divider",
+              backgroundColor: "background.default"
+            }}
+          >
+            {/* Context Workspace Active Heading Row */}
+            <Box 
+              sx={{ 
+                p: 2.5, 
+                borderBottom: "1px solid", 
+                borderColor: "divider",
+                backgroundColor: "background.paper"
+              }}
+            >
+              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 2, flexWrap: "wrap", mb: 2 }}>
                 <Box>
-                  <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                  <Typography 
+                    variant="h5" 
+                    sx={{ 
+                      fontWeight: 700, 
+                      fontSize: "20px",
+                      letterSpacing: "-0.2px",
+                      color: "text.primary",
+                      mb: 0.5
+                    }}
+                  >
                     {selectedTask.title}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {selectedTask.projectCategory || "General"}
-                  </Typography>
+                  
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+                    <ProjectIcon sx={{ fontSize: 14, color: "text.subtext" }} />
+                    <Typography variant="body2" sx={{ color: "text.secondary", fontSize: "13px", fontWeight: 500 }}>
+                      {selectedTask.projectCategory || "General Scope"}
+                    </Typography>
+                  </Box>
                 </Box>
-                <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center" }}>
+
+                {/* Main Heading Status & CTA Actions */}
+                <Box sx={{ display: "flex", gap: 1.25, flexWrap: "wrap", alignItems: "center" }}>
                   {selectedTask.status !== "completed" && (
-                    <Button variant="contained" color="success" startIcon={<CompleteIcon />} onClick={handleMarkComplete}>
-                      Complete
+                    <Button 
+                      variant="outlined" 
+                      startIcon={<CompleteIcon sx={{ fontSize: 16 }} />} 
+                      onClick={handleMarkComplete}
+                      sx={{
+                        height: "32px",
+                        fontSize: "12.5px",
+                        fontWeight: 600,
+                        borderRadius: "6px",
+                        textTransform: "none",
+                        color: "text.primary",
+                        borderColor: "divider",
+                        backgroundColor: "background.default",
+                        transition: "all 0.15s ease-in-out",
+                        "&:hover": {
+                          backgroundColor: "action.hover",
+                          borderColor: "action.disabled"
+                        }
+                      }}
+                    >
+                      Mark Complete
                     </Button>
                   )}
-                  <Chip label={taskStatusLabel(selectedTask.status)} color={selectedTask.status === "completed" ? "success" : selectedTask.status === "in-progress" ? "warning" : "info"} />
+
+                  {/* Status Capsule Label Badge */}
+                  <Box 
+                    sx={{ 
+                      display: "inline-flex", 
+                      alignItems: "center", 
+                      gap: 0.75,
+                      px: 1.25, 
+                      height: "32px",
+                      borderRadius: "6px", 
+                      backgroundColor: "background.default",
+                      border: "1px solid",
+                      borderColor: "divider"
+                    }}
+                  >
+                    <Box sx={{ width: 6, height: 6, borderRadius: "50%", bgcolor: getStatusColor(selectedTask.status) }} />
+                    <Typography variant="caption" sx={{ fontSize: "11.5px", color: "text.primary", fontWeight: 600, textTransform: "capitalize" }}>
+                      {taskStatusLabel(selectedTask.status)}
+                    </Typography>
+                  </Box>
+
+                  {/* Progress Indicator Percentage Pill */}
                   {typeof selectedTask.progressPercent === "number" && (
-                    <Chip label={`${selectedTask.progressPercent}% progress`} variant="outlined" color="primary" />
+                    <Chip 
+                      label={`${selectedTask.progressPercent}% Active Progress`} 
+                      size="small"
+                      sx={{ 
+                        height: "32px",
+                        fontSize: "11.5px",
+                        fontWeight: 600,
+                        borderRadius: "6px",
+                        backgroundColor: "action.focus",
+                        color: isDarkMode ? "text.link" : "primary.main",
+                        border: "1px solid transparent"
+                      }}
+                    />
                   )}
+
+                  {/* Due Date Indicator Badge */}
                   {selectedTask.deadline && (
-                    <Chip label={`Due ${new Date(selectedTask.deadline).toLocaleDateString()}`} variant="outlined" />
+                    <Box 
+                      sx={{ 
+                        display: "inline-flex", 
+                        alignItems: "center", 
+                        gap: 0.75,
+                        px: 1.25, 
+                        height: "32px",
+                        borderRadius: "6px", 
+                        backgroundColor: "background.default",
+                        border: "1px solid",
+                        borderColor: "divider",
+                        color: "text.secondary"
+                      }}
+                    >
+                      <DateIcon sx={{ fontSize: 13, color: "text.subtext" }} />
+                      <Typography variant="caption" sx={{ fontSize: "11.5px", fontWeight: 500 }}>
+                        Due {new Date(selectedTask.deadline).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                      </Typography>
+                    </Box>
                   )}
                 </Box>
               </Box>
 
-              <Box sx={{ mt: 2 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
-                  Assigned members
-                </Typography>
-                <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+              {/* Sub-Header Section: Assigned Coworkers / Team members layout */}
+              <Box sx={{ mt: 2, pt: 1.5, borderTop: "1px dashed", borderColor: "divider" }}>
+                <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center" }}>
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: "text.subtext", textTransform: "uppercase", letterSpacing: "0.5px", mr: 1 }}>
+                    Assignees:
+                  </Typography>
+
                   {selectedTask.assignedTo?.length ? (
                     selectedTask.assignedTo.map((item) => {
                       const inner = item && item.member ? item.member : item;
@@ -191,29 +339,85 @@ const Uniques360Member = () => {
                       return (
                         <Chip
                           key={inner._id}
-                          avatar={<Avatar>{inner.fullName?.[0] || "U"}</Avatar>}
-                          label={`${inner.fullName}${role ? ` • ${role}` : inner.email ? ` • ${inner.email}` : ""}`}
+                          avatar={
+                            <Avatar sx={{ "&.MuiAvatar-root": { width: 18, height: 18, fontSize: "9px", fontWeight: 700, bgcolor: "background.drawer", color: "primary.main" } }}>
+                              {inner.fullName?.[0]?.toUpperCase() || "U"}
+                            </Avatar>
+                          }
+                          label={`${inner.fullName}${role ? ` (${role})` : ""}`}
                           variant="outlined"
+                          sx={{
+                            height: "24px",
+                            borderRadius: "4px",
+                            fontSize: "11.5px",
+                            borderColor: "divider",
+                            color: "text.secondary",
+                            backgroundColor: "background.default",
+                            "& .MuiChip-label": { px: 1 }
+                          }}
                         />
                       );
                     })
                   ) : (
-                    <Chip label="No members assigned" variant="outlined" />
+                    <Typography variant="caption" sx={{ color: "text.subtext", fontStyle: "italic" }}>
+                      No active assignees on this card
+                    </Typography>
                   )}
-                </Stack>
+                </Box>
               </Box>
             </Box>
 
-            <ReportFeed reports={reports} reportsLoading={reportsLoading} scrollRef={scrollRef} />
-            <ReportComposer selectedTask={selectedTask} newReport={newReport} setNewReport={setNewReport} progressPercent={progressPercent} setProgressPercent={setProgressPercent} sending={sending} onSubmit={handleSubmitReport} />
-          </>
+            {/* Core Activity Feed Content Stream */}
+            <Box sx={{ flexGrow: 1, overflowY: "auto", backgroundColor: "background.default" }}>
+              <ReportFeed reports={reports} reportsLoading={reportsLoading} scrollRef={scrollRef} />
+            </Box>
+
+            {/* Dedicated Input Text Editor / Composer Base */}
+            <ReportComposer
+              selectedTask={selectedTask}
+              newReport={newReport}
+              setNewReport={setNewReport}
+              progressPercent={progressPercent}
+              setProgressPercent={setProgressPercent}
+              sending={sending}
+              onSubmit={handleSubmitReport}
+            />
+          </Paper>
         ) : (
-          <Box sx={{ flexGrow: 1, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
-            <Typography variant="h5">Select a Project</Typography>
+          /* Empty Workspace Default Placeholder Context Screen */
+          <Box 
+            sx={{ 
+              flexGrow: 1, 
+              display: "flex", 
+              alignItems: "center", 
+              justifyContent: "center", 
+              flexDirection: "column",
+              backgroundColor: "background.default",
+              gap: 1.5
+            }}
+          >
+            <Box 
+              sx={{ 
+                p: 2.5, 
+                borderRadius: "50%", 
+                backgroundColor: "action.hover",
+                border: "1px solid",
+                borderColor: "divider",
+                mb: 1
+              }}
+            >
+              <ProjectIcon sx={{ fontSize: 32, color: "text.subtext" }} />
+            </Box>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "text.primary" }}>
+              No Project Active
+            </Typography>
+            <Typography variant="body2" sx={{ color: "text.subtext", maxWidth: 280, textAlign: "center", fontSize: "13.5px" }}>
+              Select an item assignment thread from the left navigation terminal list to review status reports.
+            </Typography>
           </Box>
         )}
-      </Box>
-    </Box>
+      </Grid>
+    </Grid>
   );
 };
 
