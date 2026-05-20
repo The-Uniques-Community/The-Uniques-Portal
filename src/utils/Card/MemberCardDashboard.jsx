@@ -318,9 +318,9 @@ export const MemberCardDashboard = ({ user, onEdit, onDelete, refreshData }) => 
           backgroundColor: theme.palette.background.paper,
           borderColor: theme.palette.divider,
         }}
-        className="rounded-2xl shadow-lg border p-4 max-w-96"
+        className="rounded-2xl shadow-lg border p-4 max-w-96 h-full flex flex-col"
       >
-        <CardContent className="flex flex-col gap-2">
+        <CardContent className="flex flex-col gap-2 h-full">
           {/* Status Tags */}
           <div style={{ color: theme.palette.text.secondary }} className="flex justify-between items-center my-4">
             <div className="font-medium">
@@ -370,85 +370,88 @@ export const MemberCardDashboard = ({ user, onEdit, onDelete, refreshData }) => 
             </div>
           )}
 
-          {/* User Details */}
-          <div className="flex items-center gap-3">
-            <Avatar
-              src={
-                user?.profilePic?.fileId
-                  ? getProxyImageUrl(user.profilePic.fileId)
-                  : userIcon
-              }
-              alt={user.fullName}
-              sx={{ 
-                width: 64, 
-                height: 64, 
-                border: `4px solid ${isDark ? 'rgba(255,255,255,0.05)' : '#f5f5f5'}`,
-                boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
-                cursor: 'pointer',
-                transition: 'transform 0.2s',
-                '&:hover': {
-                  transform: 'scale(1.05)'
+          {/* Content Wrapper - grows to fill available space */}
+          <div className="flex-1">
+            {/* User Details */}
+            <div className="flex items-center gap-3">
+              <Avatar
+                src={
+                  user?.profilePic?.fileId
+                    ? getProxyImageUrl(user.profilePic.fileId)
+                    : userIcon
                 }
-              }}
-            />
-            <div>
-              <h2 style={{ color: theme.palette.text.primary }} className="text-lg font-semibold">{user.fullName}</h2>
-              <p style={{ color: theme.palette.text.secondary }} className="text-sm">
-                {user.bio ? user.bio.slice(0, 36) + "..." : "No bio available"}
-              </p>
+                alt={user.fullName}
+                sx={{ 
+                  width: 64, 
+                  height: 64, 
+                  border: `4px solid ${isDark ? 'rgba(255,255,255,0.05)' : '#f5f5f5'}`,
+                  boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s',
+                  '&:hover': {
+                    transform: 'scale(1.05)'
+                  }
+                }}
+              />
+              <div>
+                <h2 style={{ color: theme.palette.text.primary }} className="text-lg font-semibold">{user.fullName}</h2>
+                <p style={{ color: theme.palette.text.secondary }} className="text-sm">
+                  {user.bio ? user.bio.slice(0, 36) + "..." : "No bio available"}
+                </p>
+              </div>
             </div>
-          </div>
 
-          {/* Social Media Links */}
-          <div className="flex justify-start gap-x-4 mt-3">
-            {user.githubProfile && (
-              <Link to={user.githubProfile}>
-                <div 
-                  style={{ backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "#000000" }} 
-                  className="w-10 h-10 p-1 rounded-full"
-                >
-                  <div className="w-full h-full flex items-center justify-center">
-                    <GitHubIcon fontSize="medium" style={{ color: isDark ? theme.palette.text.primary : "#ffffff" }} />
+            {/* Social Media Links */}
+            <div className="flex justify-start gap-x-4 mt-3">
+              {user.githubProfile && (
+                <Link to={user.githubProfile}>
+                  <div 
+                    style={{ backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "#000000" }} 
+                    className="w-10 h-10 p-1 rounded-full"
+                  >
+                    <div className="w-full h-full flex items-center justify-center">
+                      <GitHubIcon fontSize="medium" style={{ color: isDark ? theme.palette.text.primary : "#ffffff" }} />
+                    </div>
                   </div>
-                </div>
-              </Link>
-            )}
-            {user.linkedinProfile && (
-              <Link to={user.linkedinProfile}>
-                <div 
-                  style={{ backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "#000000" }} 
-                  className="w-10 h-10 p-1 rounded-full"
-                >
-                  <div className="w-full h-full flex items-center justify-center">
-                    <LinkedInIcon fontSize="medium" style={{ color: isDark ? theme.palette.text.primary : "#ffffff" }} />
+                </Link>
+              )}
+              {user.linkedinProfile && (
+                <Link to={user.linkedinProfile}>
+                  <div 
+                    style={{ backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "#000000" }} 
+                    className="w-10 h-10 p-1 rounded-full"
+                  >
+                    <div className="w-full h-full flex items-center justify-center">
+                      <LinkedInIcon fontSize="medium" style={{ color: isDark ? theme.palette.text.primary : "#ffffff" }} />
+                    </div>
                   </div>
-                </div>
-              </Link>
-            )}
-            {user.twitterProfile && (
-              <Link to={user.twitterProfile}>
-                <div 
-                  style={{ backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "#000000" }} 
-                  className="w-10 h-10 p-1 rounded-full"
-                >
-                  <div className="w-full h-full flex items-center justify-center">
-                    <XIcon fontSize="medium" style={{ color: isDark ? theme.palette.text.primary : "#ffffff" }} />
+                </Link>
+              )}
+              {user.twitterProfile && (
+                <Link to={user.twitterProfile}>
+                  <div 
+                    style={{ backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "#000000" }} 
+                    className="w-10 h-10 p-1 rounded-full"
+                  >
+                    <div className="w-full h-full flex items-center justify-center">
+                      <XIcon fontSize="medium" style={{ color: isDark ? theme.palette.text.primary : "#ffffff" }} />
+                    </div>
                   </div>
-                </div>
-              </Link>
-            )}
-            {user.whatsappContact && (
-              <Link to={`https://wa.me/${user.whatsappContact}`}>
-                <div 
-                  style={{ backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "#000000" }} 
-                  className="w-10 h-10 p-1 rounded-full"
-                >
-                  <div className="w-full h-full flex items-center justify-center">
-                    <WhatsAppIcon fontSize="medium" style={{ color: isDark ? theme.palette.text.primary : "#ffffff" }} />
+                </Link>
+              )}
+              {user.whatsappContact && (
+                <Link to={`https://wa.me/${user.whatsappContact}`}>
+                  <div 
+                    style={{ backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "#000000" }} 
+                    className="w-10 h-10 p-1 rounded-full"
+                  >
+                    <div className="w-full h-full flex items-center justify-center">
+                      <WhatsAppIcon fontSize="medium" style={{ color: isDark ? theme.palette.text.primary : "#ffffff" }} />
+                    </div>
                   </div>
-                </div>
-              </Link>
-            )}
+                </Link>
+              )}
+            </div>
           </div>
 
           {/* View Details Button */}

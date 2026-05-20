@@ -4,6 +4,13 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Absans';
+  src: url('./assets/fonts/absans-regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
 
 @layer utilities {
 
@@ -99,11 +106,11 @@
     
     }
   .dark {
-        --background: 222.2 84% 4.9%;
+        --background: 0 0% 8.6%;
         --foreground: 210 40% 98%;
-        --card: 222.2 84% 4.9%;
+        --card: 0 0% 8.6%;
         --card-foreground: 210 40% 98%;
-        --popover: 222.2 84% 4.9%;
+        --popover: 0 0% 8.6%;
         --popover-foreground: 210 40% 98%;
         --primary: 210 40% 98%;
         --primary-foreground: 222.2 47.4% 11.2%;
@@ -137,7 +144,30 @@
     }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Absans', sans-serif;
   }
     
+}
+
+/* Global Dark Mode Overrides for Hardcoded Light Classes */
+.dark .bg-white,
+.dark .bg-gray-50,
+.dark .bg-slate-50,
+.dark .bg-gray-100,
+.dark .bg-slate-100 {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+.dark .text-black,
+.dark .text-gray-900,
+.dark .text-gray-800,
+.dark .text-gray-700,
+.dark .text-gray-600,
+.dark .text-slate-900,
+.dark .text-slate-800,
+.dark .text-neutral-900,
+.dark .text-neutral-800 {
+  color: hsl(var(--foreground)) !important;
 }
