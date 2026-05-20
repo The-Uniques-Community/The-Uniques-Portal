@@ -82,7 +82,7 @@ export const NewMember = ({ user, refreshData }) => {
 
   const getProxyImageUrl = (fileId) => {
     if (!fileId) return "/placeholder.svg"; // Fallback image
-    return `http://localhost:5000/api/image-proxy/${fileId}`;
+    return `https://theuniquesportal-server.vercel.app/api/image-proxy/${fileId}`;
   };
   // Get status badge color
   const getStatusColor = (status) => {
@@ -107,7 +107,7 @@ export const NewMember = ({ user, refreshData }) => {
 
       // API call to toggle block status
       const response = await axios.patch(
-        `http://localhost:5000/api/admin/member/${user._id}/block`
+        `https://theuniquesportal-server.vercel.app/api/admin/member/${user._id}/block`
       );
 
       // Show success message
@@ -159,7 +159,7 @@ export const NewMember = ({ user, refreshData }) => {
 
       // API call to toggle suspend status
       const response = await axios.patch(
-        `http://localhost:5000/api/admin/member/${user._id}/suspend`,
+        `https://theuniquesportal-server.vercel.app/api/admin/member/${user._id}/suspend`,
         {
           reason: suspendReason,
         }
@@ -226,7 +226,7 @@ export const NewMember = ({ user, refreshData }) => {
 
       // API call to impose fine
       const response = await axios.post(
-        `http://localhost:5000/api/admin/fine/members/${user._id}/fines`,
+        `https://theuniquesportal-server.vercel.app/api/admin/fine/members/${user._id}/fines`,
         {
           amount: Number(fineAmount),
           reason: fineReason.trim(),

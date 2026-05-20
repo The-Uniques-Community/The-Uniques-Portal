@@ -25,7 +25,7 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import axios from 'axios';
 import ModernHeader from '@/utils/Header/ModernHeader';
 
-const API_BASE_URL = 'http://localhost:5000/api/admin';
+const API_BASE_URL = 'https://theuniquesportal-server.vercel.app/api/admin';
 
 const index = () => {
   const theme = useTheme();

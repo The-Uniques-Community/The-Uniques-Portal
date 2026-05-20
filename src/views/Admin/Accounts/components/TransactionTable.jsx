@@ -79,8 +79,8 @@ import tu from '@/assets/logos/tu.png';
 import * as XLSX from 'xlsx';
 
 // Base API URL
-const API_BASE_URL = 'http://localhost:5000/api/admin/fine';
-const UPLOAD_API_URL = 'http://localhost:5000/upload/fine_file_upload';
+const API_BASE_URL = 'https://theuniquesportal-server.vercel.app/api/admin/fine';
+const UPLOAD_API_URL = 'https://theuniquesportal-server.vercel.app/upload/fine_file_upload';
 
 // Fine Payment Modal Component - Fix Receipt icon reference
 const FinePaymentModal = ({ open, onClose, memberId, fine, onPaymentComplete }) => {

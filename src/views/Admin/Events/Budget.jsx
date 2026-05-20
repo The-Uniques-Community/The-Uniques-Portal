@@ -329,7 +329,7 @@ const EventBudget = () => {
       formData.append("itemId", currentItemForReceipt.id);
 
       const response = await fetch(
-        "http://localhost:5000/upload/budget_file_upload",
+        "https://theuniquesportal-server.vercel.app/upload/budget_file_upload",
         {
           method: "POST",
           credentials: "include",
@@ -363,7 +363,7 @@ const EventBudget = () => {
   const handleDeleteExpense = async (expenseId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/events/${id}/expenses/${expenseId}`,
+        `https://theuniquesportal-server.vercel.app/api/events/${id}/expenses/${expenseId}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -389,7 +389,7 @@ const EventBudget = () => {
   const handleDeleteAllocation = async (allocationId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/events/${id}/budget-allocations/${allocationId}`,
+        `https://theuniquesportal-server.vercel.app/api/events/${id}/budget-allocations/${allocationId}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -414,7 +414,7 @@ const EventBudget = () => {
   const handleAddAllocation = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/events/${id}/budget-allocations`,
+        `https://theuniquesportal-server.vercel.app/api/events/${id}/budget-allocations`,
         {
           method: "POST",
           headers: {
@@ -450,7 +450,7 @@ const EventBudget = () => {
   const fetchEvent = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:5000/api/events/${id}`, {
+      const response = await fetch(`https://theuniquesportal-server.vercel.app/api/events/${id}`, {
         credentials: "include",
       });
       const data = await response.json();
@@ -472,7 +472,7 @@ const EventBudget = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:5000/api/events/${id}/budget`,
+        `https://theuniquesportal-server.vercel.app/api/events/${id}/budget`,
         {
           credentials: "include",
         }
@@ -526,7 +526,7 @@ const EventBudget = () => {
   const handleUpdateBudget = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/events/${id}/budget`,
+        `https://theuniquesportal-server.vercel.app/api/events/${id}/budget`,
         {
           method: "PUT",
           headers: {
@@ -563,7 +563,7 @@ const EventBudget = () => {
   const handleAddSponsor = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/events/${id}/sponsors`,
+        `https://theuniquesportal-server.vercel.app/api/events/${id}/sponsors`,
         {
           method: "POST",
           headers: {
@@ -602,7 +602,7 @@ const EventBudget = () => {
   const handleDeleteSponsor = async (sponsorId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/events/${id}/sponsors/${sponsorId}`,
+        `https://theuniquesportal-server.vercel.app/api/events/${id}/sponsors/${sponsorId}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -637,7 +637,7 @@ const EventBudget = () => {
   const handleAddExpense = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/events/${id}/expenses`,
+        `https://theuniquesportal-server.vercel.app/api/events/${id}/expenses`,
         {
           method: "POST",
           headers: {
@@ -680,7 +680,7 @@ const EventBudget = () => {
   const handleUpdateExpenseStatus = async (expenseId, newStatus) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/events/${id}/expenses/${expenseId}`,
+        `https://theuniquesportal-server.vercel.app/api/events/${id}/expenses/${expenseId}`,
         {
           method: "PATCH",
           headers: {
