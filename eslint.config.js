@@ -10,7 +10,7 @@ export default defineConfig([
     files: ['**/*.{js,jsx}'],
     extends: [
       js.configs.recommended,
-      reactHooks.configs.flat.recommended,
+      reactHooks.configs['recommended-latest'], // or we could reconstruct it, but the plugin doesn't export a flat config easily. Actually we can use reactHooks.configs.recommended? No, we just need the rules.
       reactRefresh.configs.vite,
     ],
     languageOptions: {
