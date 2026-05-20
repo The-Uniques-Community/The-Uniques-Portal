@@ -273,7 +273,7 @@ const Login = () => {
                   variant="body2"
                   onClick={(e) => {
                     e.preventDefault();
-                    navigate("/forget-password");
+                    navigate("/auth/forget-password");
                   }}
                   sx={{
                     color: theme.palette.primary.main,
