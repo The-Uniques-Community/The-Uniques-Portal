@@ -33,7 +33,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://theuniquesportal.vercel.app", "https://tuportal.theuniques.in"],
+    origin: ["http://localhost:5173", "https://theuniquesportal.vercel.app", "https://tuportal.theuniques.in", "https://theuniques.in"],
     credentials: true,
   })
 );
