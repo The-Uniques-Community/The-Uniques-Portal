@@ -16,13 +16,13 @@ import communityRoutes from './routes/community/community.routes.js'
 import googleDriveRoutes from './routes/googleDriveUpload.routes.js'
 import memberAdminRouter from "./routes/admin/memberRoute.js";
 import fineRouter from "./routes/admin/fineRoute.js";
-// import publicMemberRouter from "./routes/landing/publicMemberRouter.js";
+import publicMemberRouter from "./routes/landing/publicMemberRouter.js";
 import memberFineRoute from "./routes/member/fineRoute.js";
-// import publicEnquiryRouter from "./routes/landing/publicRoute.js";
+import publicEnquiryRouter from "./routes/landing/publicRoute.js";
 import enquiryRoute from "./routes/admin/enquiryRoute.js";
 import { getAuth } from "./controller/googleDriveService.js";
 import { google } from 'googleapis';
-// import campusAmbassadorRouter from "./routes/community/campusAmbassadorRoute.js";
+import campusAmbassadorRouter from "./routes/community/campusAmbassadorRoute.js";
 import migrationRouter from "./routes/admin/migrationRoutes.js";
 import trainerRoute from "./routes/admin/trainerRoute.js";
 import uniques360Route from "./routes/uniques360/uniques360Route.js";
@@ -48,18 +48,18 @@ app.use("/api/leave", leaveRoute);
 app.use("/api/fine", memberFineRoute)
 app.use("/api/admin", adminRoute);
 app.use("/api/admin/member",memberAdminRouter)
-// app.use("/api/community", communityRoutes);
-// app.use("/api/blogs", blogRouter);
+app.use("/api/community", communityRoutes);
+app.use("/api/blogs", blogRouter);
 app.use("/auth", authRoutes);
 app.use("/auth/password-reset", passwordResetRoutes); // Add this line
 app.use("/api/guest", guestRoute);
 app.use("/api/events", eventRouter)
 app.use('/upload', googleDriveRoutes);
 app.use("/api/admin/fine", fineRouter);
-// app.use("/api/public/members", publicMemberRouter);
-// app.use('/api/contact', publicEnquiryRouter);
+app.use("/api/public/members", publicMemberRouter);
+app.use('/api/contact', publicEnquiryRouter);
 app.use('/api/admin/enquiry', enquiryRoute);
-// app.use('/api', campusAmbassadorRouter);
+app.use('/api', campusAmbassadorRouter);
 app.use('/api/admin/migration', migrationRouter);
 app.use("/api/admin/trainers", trainerRoute);
 app.use("/api/uniques360", uniques360Route);
