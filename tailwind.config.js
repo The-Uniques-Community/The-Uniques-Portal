@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Roboto", "sans-serif"],
+        sans: ["GT Flexa Lt", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
