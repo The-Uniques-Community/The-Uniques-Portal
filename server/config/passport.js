@@ -16,7 +16,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "https://theuniquesportal-server.vercel.app/auth/google/callback",
+      callbackURL: process.env.GOOGLE_CALLBACK_URL || "https://theuniquesportal-server.vercel.app/auth/google/callback",
       scope: ["profile", "email"],
       accessType: "offline", // Request offline access to get a refresh token
       prompt: "consent", // Always prompt for consent
