@@ -23,16 +23,22 @@ import Loader from "@/utils/Loader";
 import ProtectedRoute from "@/routes/ProtectedRoute";
 
 const EventForm = Loader(lazy(() => import("@/utils/event/EventForm")));
+const ProjectForm = Loader(lazy(() => import("@/utils/project/ProjectForm")));
 const CoordinatorLayout = Loader(lazy(() => import("@/layout/Uniques/Coordinator")));
 const CoordinatorDashboard = Loader(lazy(() => import("@/views/Uniques/Coordinator")));
 const Member = Loader(lazy(() => import("@/views/Uniques/Coordinator/Members")));
 const Event = Loader(lazy(() => import("@/views/Uniques/Coordinator/Events")));
+const Projects = Loader(lazy(() => import("@/views/Uniques/Coordinator/Projects")));
 const Account = Loader(lazy(() => import("@/views/Uniques/Coordinator/Accounts/index")));
 const Profile = Loader(lazy(() => import("@/views/Uniques/Member")));
 const EventBudget = Loader(lazy(() => import("@/views/Uniques/Coordinator/Events/Budget")));
 const EventView = Loader(lazy(() => import("@/views/Uniques/Coordinator/Events/View")));
+const ProjectView = Loader(lazy(() => import("@/views/Admin/Projects/View")));
 const Enquiry = Loader(lazy(() => import("@/views/Uniques/Coordinator/Enquiry")));
 const Trainers = Loader(lazy(() => import("@/views/Uniques/Coordinator/Trainers")));
+const Stats = Loader(lazy(() => import("@/views/Uniques/Coordinator/Stats")));
+const Batches = Loader(lazy(() => import("@/views/Uniques/Coordinator/Batches")));
+const Community = Loader(lazy(() => import("@/views/Uniques/Coordinator/Community")));
 const LeaveManagement = Loader(lazy(() => import("@/views/Uniques/Coordinator/LeaveManagement")));
 const Uniques360 = Loader(lazy(() => import("@/views/Uniques360/Coordinator360/Uniques360")));
 const ProjectInsights = Loader(lazy(() => import("@/views/Uniques360/Projects/ProjectInsights")));
@@ -68,6 +74,18 @@ const CoordinatorRoute = {
       element: <EventBudget />,
     },
     {
+      path: "/coordinator/projects-overview",
+      element: <Projects />,
+    },
+    {
+      path: "/coordinator/projects-overview/create",
+      element: <ProjectForm />,
+    },
+    {
+      path: "/coordinator/projects-overview/view/:id",
+      element: <ProjectView />,
+    },
+    {
       path: "/coordinator/accounts",
       element: <Account />,
     },
@@ -82,6 +100,18 @@ const CoordinatorRoute = {
     {
       path: "/coordinator/trainers",
       element: <Trainers />,
+    },
+    {
+      path: "/coordinator/stats",
+      element: <Stats />,
+    },
+    {
+      path: "/coordinator/batches",
+      element: <Batches />,
+    },
+    {
+      path: "/coordinator/community",
+      element: <Community />,
     },
     {
       path: "/coordinator/uniques360",

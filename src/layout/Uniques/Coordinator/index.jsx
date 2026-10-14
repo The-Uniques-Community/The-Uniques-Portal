@@ -37,18 +37,25 @@ import Brightness4Icon from "@mui/icons-material/Brightness4"; // Dark Mode Icon
 import Brightness7Icon from "@mui/icons-material/Brightness7"; // Light Mode Icon
 import { UserIcon } from "lucide-react";
 import SchoolIcon from "@mui/icons-material/School";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import ClassIcon from "@mui/icons-material/Class";
+import Diversity3Icon from "@mui/icons-material/Diversity3";
 
 // Navigation items with full paths
 const STUDENT_NAVIGATION = [
   { segment: "", title: "Dashboard", icon: <DashboardIcon /> },
   { segment: "members-overview", title: "Members", icon: <GroupIcon /> },
   { segment: "events-overview", title: "Events", icon: <EventIcon /> },
+  { segment: "projects-overview", title: "Projects", icon: <AccountTreeIcon /> },
   { segment: "accounts", title: "Accounts", icon: <AccountBalance/> },
   { segment: "enquiry", title: "Enquiry", icon: <AnnouncementIcon/> },
   { segment: "leave-management", title: "Leave Management", icon: <CalendarMonthIcon /> },
   { segment: "profile", title: "Profile", icon: <UserIcon/> },
   { segment: "trainers", title: "Trainers", icon: <SchoolIcon /> },
   { segment: "uniques360", title: "Uniques 360", icon: <AssignmentTurnedInIcon /> },
+  { segment: "stats", title: "Stats", icon: <BarChartIcon /> },
+  { segment: "batches", title: "Batches", icon: <ClassIcon /> },
+  { segment: "community", title: "Community", icon: <Diversity3Icon /> },
 ];
 
 function Branding() {

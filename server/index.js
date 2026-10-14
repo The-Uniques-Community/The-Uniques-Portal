@@ -26,15 +26,46 @@ import campusAmbassadorRouter from "./routes/community/campusAmbassadorRoute.js"
 import migrationRouter from "./routes/admin/migrationRoutes.js";
 import trainerRoute from "./routes/admin/trainerRoute.js";
 import uniques360Route from "./routes/uniques360/uniques360Route.js";
+import projectRouter from "./routes/community/projectRoute.js";
+import statsRouter from "./routes/community/statsRoute.js";
+import batchRouter from "./routes/community/batchRoute.js";
+import communityBenefitsRouter from "./routes/community/communityBenefitsRoute.js";
+import customMemberRouter from "./routes/community/customMemberRoute.js";
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
+// Robust CORS middleware handling all origins and preflight requests
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  } else {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+  }
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, token, X-Requested-With, Accept, Origin"
+  );
+  res.setHeader("Access-Control-Expose-Headers", "Content-Type, Authorization, token");
+
+  if (req.method === "OPTIONS") {
+    return res.status(204).end();
+  }
+  next();
+});
+
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://theuniquesportal.vercel.app", "https://tuportal.theuniques.in", "https://theuniques.in", "https://www.theuniques.in"],
+    origin: (origin, callback) => {
+      callback(null, true);
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "token", "X-Requested-With", "Accept", "Origin"],
   })
 );
 app.use(passport.initialize());
@@ -63,6 +94,12 @@ app.use('/api', campusAmbassadorRouter);
 app.use('/api/admin/migration', migrationRouter);
 app.use("/api/admin/trainers", trainerRoute);
 app.use("/api/uniques360", uniques360Route);
+app.use("/api/projects", projectRouter);
+app.use("/api/community/projects", projectRouter);
+app.use("/api/stats", statsRouter);
+app.use("/api/batches", batchRouter);
+app.use("/api/community-benefits", communityBenefitsRouter);
+app.use("/api/custom-members", customMemberRouter);
 
 app.use('/api/image-proxy/:fileId', async (req, res) => {
   try {

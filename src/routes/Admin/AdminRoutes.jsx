@@ -6,16 +6,22 @@ import ProtectedRoute from "@/routes/ProtectedRoute";
 
 
 const EventForm = Loader(lazy(() => import("@/utils/event/EventForm")));
+const ProjectForm = Loader(lazy(() => import("@/utils/project/ProjectForm")));
 const AdminLayout = Loader(lazy(() => import("@/layout/Admin")));
 const AdminDashboard = Loader(lazy(() => import("@/views/Admin")));
 const Member = Loader(lazy(() => import("@/views/Admin/Members")));
 const Event = Loader(lazy(() => import("@/views/Admin/Events")));
+const Projects = Loader(lazy(() => import("@/views/Admin/Projects")));
 const Account = Loader(lazy(() => import("@/views/Admin/Accounts/index")));
 const Profile = Loader(lazy(() => import("@/views/Admin/Profile")));
 const EventBudget = Loader(lazy(() => import("@/views/Admin/Events/Budget")));
 const EventView = Loader(lazy(() => import("@/views/Admin/Events/View")));
+const ProjectView = Loader(lazy(() => import("@/views/Admin/Projects/View")));
 const Enquiry = Loader(lazy(() => import("@/views/Admin/Enquiry")));
 const Trainers = Loader(lazy(() => import("@/views/Admin/Trainers")));
+const Stats = Loader(lazy(() => import("@/views/Admin/Stats")));
+const Batches = Loader(lazy(() => import("@/views/Admin/Batches")));
+const Community = Loader(lazy(() => import("@/views/Admin/Community")));
 const LeaveManagement = Loader(lazy(() => import("@/views/Uniques/Admin/LeaveManagement")));
 const Uniques360 = Loader(lazy(() => import("@/views/Uniques360/Coordinator360/Uniques360")));
 const ProjectInsights = Loader(lazy(() => import("@/views/Uniques360/Projects/ProjectInsights")));
@@ -49,6 +55,18 @@ const AdminRoutes = {
       element: <EventBudget />,
     },
     {
+      path: "/admin/projects-overview",
+      element: <Projects />,
+    },
+    {
+      path: "/admin/projects-overview/create",
+      element: <ProjectForm />,
+    },
+    {
+      path: "/admin/projects-overview/view/:id",
+      element: <ProjectView />,
+    },
+    {
       path: "/admin/accounts",
       element: <Account />,
     },
@@ -63,6 +81,18 @@ const AdminRoutes = {
     {
       path: "/admin/trainers",
       element: <Trainers />,
+    },
+    {
+      path: "/admin/stats",
+      element: <Stats />,
+    },
+    {
+      path: "/admin/batches",
+      element: <Batches />,
+    },
+    {
+      path: "/admin/community",
+      element: <Community />,
     },
     {
       path: "/admin/leave-management",

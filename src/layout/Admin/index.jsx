@@ -31,15 +31,26 @@ import AnnouncementIcon from '@mui/icons-material/Announcement';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
+import AccountTreeIcon from "@mui/icons-material/AccountTree";
+import SchoolIcon from "@mui/icons-material/School";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import ClassIcon from "@mui/icons-material/Class";
+import Diversity3Icon from "@mui/icons-material/Diversity3";
+
 // Navigation items with full paths
 const ADMIN_NAVIGATION = [
   { segment: "", title: "Dashboard", icon: <DashboardIcon /> },
   { segment: "members-overview", title: "Members", icon: <GroupIcon /> },
   { segment: "events-overview", title: "Events", icon: <EventIcon /> },
+  { segment: "projects-overview", title: "Projects", icon: <AccountTreeIcon /> },
   { segment: "accounts", title: "Accounts", icon: <AccountBalance /> },
   { segment: "enquiry", title: "Enquiry", icon: <AnnouncementIcon /> },
+  { segment: "trainers", title: "Trainers", icon: <SchoolIcon /> },
   { segment: "leave-management", title: "Leave Management", icon: <CalendarMonthIcon /> },
   { segment: "uniques360", title: "Uniques 360", icon: <AssignmentTurnedInIcon /> },
+  { segment: "stats", title: "Stats", icon: <BarChartIcon /> },
+  { segment: "batches", title: "Batches", icon: <ClassIcon /> },
+  { segment: "community", title: "Community", icon: <Diversity3Icon /> },
 ];
 
 function Branding() {

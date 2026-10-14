@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import AdminRoutes from "@/routes/Admin/AdminRoutes";
 import CoordinatorRoutes from "@/routes/Uniques/CoordinatorRoute";
 import MemberRoutes from "@/routes/Uniques/MemberRoutes";
+import CommunityRoutes from "@/routes/Community/CommunityRoutes";
 import Auth from "@/routes/Authentication/Auth";
 
 const router = createBrowserRouter([
@@ -16,6 +17,7 @@ const router = createBrowserRouter([
   AdminRoutes,
   CoordinatorRoutes,
   MemberRoutes,
+  CommunityRoutes,
   Auth,
   {
     path: "*",
