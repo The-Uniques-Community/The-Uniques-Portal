@@ -139,6 +139,10 @@ function DashboardLayoutAppBar() {
         variant={isMobile ? "temporary" : "permanent"}
         open={drawerOpen}
         onClose={toggleDrawer}
+        data-lenis-prevent="true"
+        PaperProps={{
+          "data-lenis-prevent": "true",
+        }}
         sx={{
           width: isMobile ? "auto" : drawerOpen ? 240 : 75,
           flexShrink: 0,
@@ -152,6 +156,13 @@ function DashboardLayoutAppBar() {
             backgroundColor: theme.palette.background.drawer,
             borderRadius: "8px",
             overflowX: "hidden",
+            overflowY: "auto",
+            overscrollBehavior: "contain",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            "&::-webkit-scrollbar": {
+              display: "none",
+            },
             transition: "width 0.3s",
             boxSizing: "border-box",
           },
