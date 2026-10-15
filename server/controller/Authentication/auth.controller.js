@@ -147,6 +147,7 @@ export const emailLogin = async (req, res) => {
 
     return res.json({
       message: "Logged in successfully.",
+      token,
       role: member.role || role,
       member,
     });

@@ -163,10 +163,17 @@ const Login = () => {
               });
               const data = await res.json();
               if (res.ok) {
+                if (data.token) {
+                  localStorage.setItem("token", data.token);
+                }
+                const memberData = data.member || { email: values.email, role: data.role };
+                localStorage.setItem("user", JSON.stringify(memberData));
+                localStorage.setItem("role", data.role || memberData.role);
                 console.log("Login successful, role received:", data.role);
                 toast.success("Logged in successfully");
                 // Use the role from the response to navigate accordingly
-                switch (data.role) {
+                const userRole = (data.role || data.member?.role || "").toLowerCase();
+                switch (userRole) {
                   case "member":
                     console.log("Navigating to /member");
                     navigate("/member");

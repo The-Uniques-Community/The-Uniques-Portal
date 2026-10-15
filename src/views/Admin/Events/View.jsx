@@ -1,3 +1,4 @@
+import { BASE_URL } from "@/config";
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify"; // Make sure this is installed
@@ -242,7 +243,7 @@ const VALID_TEAM_TYPES = [
 const fetchAvailableMembers = async () => {
   try {
     const response = await fetch(
-      `https://theuniquesportal-server.vercel.app/api/admin/member`,
+      `${BASE_URL}/api/admin/member`,
       {
         credentials: "include",
       }
@@ -273,7 +274,7 @@ const fetchEventTeams = async () => {
     
     setLoading(true);
     const response = await fetch(
-      `https://theuniquesportal-server.vercel.app/api/events/${id}/members`,
+      `${BASE_URL}/api/events/${id}/members`,
       {
         credentials: "include",
       }
@@ -355,7 +356,7 @@ const handleSaveMember = async () => {
     setLoading(true);
     
     // Prepare the API endpoint
-    const endpoint = `https://theuniquesportal-server.vercel.app/api/events/${id}/members/team/${teamType}/add`;
+    const endpoint = `${BASE_URL}/api/events/${id}/members/team/${teamType}/add`;
     
     const memberIds = [selectedMember._id];
     
@@ -400,7 +401,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
   try {
     setLoading(true);
 
-    const endpoint = `https://theuniquesportal-server.vercel.app/api/events/${id}/members/team/${memberTeam}/members`;
+    const endpoint = `${BASE_URL}/api/events/${id}/members/team/${memberTeam}/members`;
     
     const response = await fetch(endpoint, {
       method: "DELETE",
@@ -439,7 +440,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
       try {
         setLoading(true);
         const response = await fetch(
-          `https://theuniquesportal-server.vercel.app/api/events/${id}`
+          `${BASE_URL}/api/events/${id}`
         );
         const data = await response.json();
 
@@ -471,7 +472,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
   const fetchAvailableGuests = async () => {
     try {
       const response = await fetch(
-        `https://theuniquesportal-server.vercel.app/api/guest/get-all-guests`
+        `${BASE_URL}/api/guest/get-all-guests`
       );
       const data = await response.json();
 
@@ -487,7 +488,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
   const fetchFormResponses = async (eventId) => {
     try {
       const response = await fetch(
-        `https://theuniquesportal-server.vercel.app/api/events/${eventId}/form-responses`,
+        `${BASE_URL}/api/events/${eventId}/form-responses`,
         {
           credentials: "include",
         }
@@ -556,7 +557,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
       setLoading(true);
 
       const response = await fetch(
-        `https://theuniquesportal-server.vercel.app/api/events/${id}`,
+        `${BASE_URL}/api/events/${id}`,
         {
           method: "PUT",
           headers: {
@@ -628,7 +629,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
       }
 
       const uploadResponse = await fetch(
-        "https://theuniquesportal-server.vercel.app/upload/event_file_upload",
+        `${BASE_URL}/upload/event_file_upload`,
         {
           method: "POST",
 
@@ -649,7 +650,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
       if (uploadResult.success !== false) {
         // Refresh the gallery
         const galleryResponse = await fetch(
-          `https://theuniquesportal-server.vercel.app/api/events/${id}/gallery`
+          `${BASE_URL}/api/events/${id}/gallery`
         );
         const galleryResult = await galleryResponse.json();
 
@@ -684,7 +685,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
   const handleRemoveImage = async (imageId) => {
     try {
       const response = await fetch(
-        `https://theuniquesportal-server.vercel.app/api/events/${id}/gallery`,
+        `${BASE_URL}/api/events/${id}/gallery`,
         {
           method: "PATCH",
           headers: {
@@ -742,7 +743,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
 
         try {
           const response = await fetch(
-            `https://theuniquesportal-server.vercel.app/api/events/${id}/register`,
+            `${BASE_URL}/api/events/${id}/register`,
             {
               method: "POST",
               headers: {
@@ -827,7 +828,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
 
       setLoading(true);
       const response = await fetch(
-        "https://theuniquesportal-server.vercel.app/api/guest/add-guest",
+        `${BASE_URL}/api/guest/add-guest`,
         {
           method: "POST",
           headers: {
@@ -880,7 +881,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
         } else {
           // Create a new guest record first
           const createResponse = await fetch(
-            "https://theuniquesportal-server.vercel.app/api/guest/add-guest",
+            `${BASE_URL}/api/guest/add-guest`,
             {
               method: "POST",
               headers: {
@@ -905,7 +906,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
 
       // Now link the guest to the event
       const response = await fetch(
-        "https://theuniquesportal-server.vercel.app/api/events/link-guest",
+        `${BASE_URL}/api/events/link-guest`,
         {
           method: "POST",
           headers: {
@@ -930,7 +931,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
       if (result.success) {
         // Refresh the event data to get updated guest list
         const eventResponse = await fetch(
-          `https://theuniquesportal-server.vercel.app/api/events/${id}`
+          `${BASE_URL}/api/events/${id}`
         );
         const eventData = await eventResponse.json();
 
@@ -977,7 +978,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
       };
 
       const response = await fetch(
-        `https://theuniquesportal-server.vercel.app/api/events/${id}`,
+        `${BASE_URL}/api/events/${id}`,
         {
           method: "PUT",
           headers: {
@@ -1027,7 +1028,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
       formData.append("files", file);
 
       const response = await fetch(
-        "https://theuniquesportal-server.vercel.app/upload/event_file_upload",
+        `${BASE_URL}/upload/event_file_upload`,
         {
           method: "POST",
           credentials: "include",
@@ -1047,7 +1048,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
       if (result.success !== false) {
         // Refresh event data to get updated banner
         const eventResponse = await fetch(
-          `https://theuniquesportal-server.vercel.app/api/events/${id}`
+          `${BASE_URL}/api/events/${id}`
         );
         const eventData = await eventResponse.json();
 
@@ -1220,7 +1221,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
       };
 
       const response = await fetch(
-        `https://theuniquesportal-server.vercel.app/api/events/${id}/form-response`,
+        `${BASE_URL}/api/events/${id}/form-response`,
         {
           method: "POST",
           headers: {
@@ -2430,7 +2431,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
                       try {
                         setLoading(true);
                         const response = await fetch(
-                          `https://theuniquesportal-server.vercel.app/api/events/${id}/status`,
+                          `${BASE_URL}/api/events/${id}/status`,
                           {
                             method: "PATCH",
                             headers: {
