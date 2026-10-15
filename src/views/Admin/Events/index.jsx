@@ -24,10 +24,10 @@ import {
   DialogTitle,
   DialogContent,
   DialogContentText,
-  DialogActions,
   Snackbar,
   Alert,
 } from "@mui/material";
+import { BASE_URL } from "@/config";
 import ModernTable from "@/utils/Table/ModernTable";
 import ModernHeader from "@/utils/Header/ModernHeader";
 import {
@@ -75,9 +75,14 @@ const index = () => {
   const fetchEvents = async (page = 1) => {
     try {
       setLoading(true);
-      // Add page parameter to the API endpoint
       const response = await fetch(
-        `https://theuniquesportal-server.vercel.app/api/events?page=${page}`
+        `${BASE_URL}/api/events?page=${page}`,
+        {
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+          },
+        }
       );
       const data = await response.json();
 
@@ -197,15 +202,15 @@ const index = () => {
 
     try {
       setDeleteLoading(true);
+      const token = localStorage.getItem("token");
       const response = await fetch(
-        `https://theuniquesportal-server.vercel.app/api/events/${eventToDelete}`,
+        `${BASE_URL}/api/events/${eventToDelete}`,
         {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
-          // Important: backend uses verifyToken which usually checks cookies
-          // fetch needs credentials: 'include' to send cookies
           credentials: "include",
         }
       );

@@ -5,10 +5,21 @@ dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const verifyToken = (req, res, next) => {
-  // Get the token from cookies
-  const token = req.cookies.token; // Make sure 'cookie-parser' middleware is used
-  console.log("Token from cookies:", token);
-  console.log(req.cookies)
+  // Get token from cookies, Authorization header, or token header
+  let token = req.cookies?.token;
+
+  if (!token && req.headers.authorization) {
+    const authHeader = req.headers.authorization;
+    if (authHeader.startsWith("Bearer ")) {
+      token = authHeader.split(" ")[1];
+    } else {
+      token = authHeader;
+    }
+  }
+
+  if (!token && req.headers.token) {
+    token = req.headers.token;
+  }
   
   if (!token) {
     return res.status(401).json({ error: 'No token provided' });

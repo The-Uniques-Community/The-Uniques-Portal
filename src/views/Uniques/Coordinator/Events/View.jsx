@@ -2189,12 +2189,14 @@ const EventView = () => {
                     onChange={async (e) => {
                       try {
                         setLoading(true);
+                        const token = localStorage.getItem("token");
                         const response = await fetch(
-                          `https://theuniquesportal-server.vercel.app/api/events/${id}/status`,
+                          `${BASE_URL}/api/events/${id}/status`,
                           {
                             method: "PATCH",
                             headers: {
                               "Content-Type": "application/json",
+                              ...(token ? { Authorization: `Bearer ${token}` } : {}),
                             },
                             credentials: "include",
                             body: JSON.stringify({ status: e.target.value }),
