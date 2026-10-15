@@ -97,7 +97,7 @@ const index = () => {
         }
         console.log("Batch Data:", batchData);
         
-        // Update states
+        // Update statessss
         setStats({
           totalMembers,
           totalFinesIssued: fineStats.totalFinesIssued || 0,
