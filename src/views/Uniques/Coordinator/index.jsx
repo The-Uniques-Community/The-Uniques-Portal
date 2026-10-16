@@ -888,7 +888,6 @@ const index = () => {
               icon={<Groups2 fontSize="large" />}
               label="Total Members"
               value={stats.totalMembers}
-              link="/admin/members-overview"
               color="#2196F3"
               gradient="radial-gradient(circle at 80% 20%, rgba(33, 150, 243, 0.15) 0%, transparent 50%)"
             />
@@ -896,7 +895,6 @@ const index = () => {
               icon={<CurrencyRupeeIcon fontSize="large" />}
               label="Total Fine"
               value={stats.totalFine}
-              link="/admin/accounts"
               color="#FFA500"
               gradient="radial-gradient(circle at 80% 20%, rgba(255, 165, 0, 0.15) 0%, transparent 50%)"
             />
@@ -904,7 +902,6 @@ const index = () => {
               icon={<EventAvailableIcon fontSize="large" />}
               label="Total Events"
               value={stats.totalEvents}
-              link="/admin/events-overview"
               color="#4CAF50"
               gradient="radial-gradient(circle at 80% 20%, rgba(76, 175, 80, 0.15) 0%, transparent 50%)"
             />
@@ -962,12 +959,27 @@ const index = () => {
               </Typography>
             </Box>
             <Box
+              data-lenis-prevent="true"
+              className="hide-scrollbar"
+              onWheel={(e) => e.stopPropagation()}
+              style={{
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
+              }}
               sx={{
-                overflow: "auto",
+                overflowY: "auto",
+                overflowX: "hidden",
                 maxHeight: 500,
                 py: 1,
-                scrollbarWidth: "thin",
-                scrollbarColor: "#d4d4d4 #f3f3f3",
+                overscrollBehavior: "contain",
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
+                "&::-webkit-scrollbar": {
+                  display: "none !important",
+                  width: "0px !important",
+                  height: "0px !important",
+                  background: "transparent !important",
+                },
               }}
             >
             {loading ? (

@@ -348,14 +348,29 @@ export const NewMember = ({ user, refreshData }) => {
       </Card>
 
       {/* Modal */}
-      <Modal open={open} onClose={() => setOpen(false)}>
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        data-lenis-prevent="true"
+        slotProps={{
+          backdrop: {
+            "data-lenis-prevent": "true",
+            onWheel: (e) => e.stopPropagation(),
+          },
+        }}
+      >
         <Box 
+          data-lenis-prevent="true"
+          onWheel={(e) => e.stopPropagation()}
           style={{
             backgroundColor: theme.palette.background.paper,
             borderColor: theme.palette.divider,
             color: theme.palette.text.primary,
+            overscrollBehavior: "contain",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
           }}
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-2xl shadow-xl border p-6 w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto"
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-2xl shadow-xl border p-6 w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto hide-scrollbar"
         >
           {/* Profile Header */}
           <div className="flex items-center flex-wrap gap-y-5 justify-between mb-4">

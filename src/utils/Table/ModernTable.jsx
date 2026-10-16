@@ -26,6 +26,7 @@ const ModernTable = ({
   return (
     <Paper
       elevation={0}
+      data-lenis-prevent="true"
       sx={{
         borderRadius: "12px",
         overflow: "hidden",
@@ -63,7 +64,28 @@ const ModernTable = ({
       )}
 
       {/* Structured Content Grid Container */}
-      <TableContainer sx={{ maxHeight: 520 }}>
+      <TableContainer
+        data-lenis-prevent="true"
+        className="hide-scrollbar"
+        onWheel={(e) => e.stopPropagation()}
+        style={{
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
+        sx={{
+          maxHeight: 520,
+          overflowY: "auto",
+          overscrollBehavior: "contain",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+          "&::-webkit-scrollbar": {
+            display: "none !important",
+            width: "0px !important",
+            height: "0px !important",
+            background: "transparent !important",
+          },
+        }}
+      >
         <Table stickyHeader size="small">
           <TableHead
             sx={{
