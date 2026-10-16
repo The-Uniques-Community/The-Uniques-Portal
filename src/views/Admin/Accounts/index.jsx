@@ -128,7 +128,7 @@ const index = () => {
     fetchData();
   }, []);
   
-  // Prepare data for pie chart
+  // Prepare data for pie charttt
   const pieData = [
     { name: 'Paid Members', value: stats.paidMembers },
     { name: 'Members with Fine', value: stats.membersWithPendingFines }
