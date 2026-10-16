@@ -39,6 +39,7 @@ import ImageIcon from '@mui/icons-material/Image';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
+import { BASE_URL } from '@/config';
 import { useNavigate } from 'react-router-dom';
 import { ArrowBack } from "@mui/icons-material";
 
@@ -158,7 +159,7 @@ const EventForm = ({ event, onSuccess }) => {
   const fetchGuests = async () => {
     try {
       const response = await axios.get(
-        "https://theuniquesportal-server.vercel.app/api/guest/get-all-guests"
+        `${BASE_URL}/api/guest/get-all-guests`
       );
       setAllGuests(response.data.guests || []);
     } catch (error) {
@@ -170,7 +171,7 @@ const EventForm = ({ event, onSuccess }) => {
   const fetchEventGallery = async (eventId) => {
     try {
       const response = await axios.get(
-        `https://theuniquesportal-server.vercel.app/api/events/${eventId}?populate=gallery`,
+        `${BASE_URL}/api/events/${eventId}?populate=gallery`,
         { withCredentials: true }
       );
       if (response.data.event && response.data.event.eventGallery) {
@@ -263,7 +264,7 @@ const EventForm = ({ event, onSuccess }) => {
 
           try {
             const uploadResponse = await axios.post(
-              "https://theuniquesportal-server.vercel.app/upload/event_file_upload",
+              `${BASE_URL}/upload/event_file_upload`,
               bannerFormData
             );
 
@@ -306,7 +307,7 @@ const EventForm = ({ event, onSuccess }) => {
 
           try {
             const galleryResponse = await axios.post(
-              "https://theuniquesportal-server.vercel.app/upload/event_file_upload",
+              `${BASE_URL}/upload/event_file_upload`,
               galleryFormData
             );
 
@@ -337,7 +338,7 @@ const EventForm = ({ event, onSuccess }) => {
 
           try {
             const receiptResponse = await axios.post(
-              "https://theuniquesportal-server.vercel.app/upload/event_file_upload",
+              `${BASE_URL}/upload/event_file_upload`,
               receiptFormData
             );
 
@@ -379,13 +380,13 @@ const EventForm = ({ event, onSuccess }) => {
         let response;
         if (isEdit) {
           response = await axios.put(
-            `https://theuniquesportal-server.vercel.app/api/events/${eventId}`,
+            `${BASE_URL}/api/events/${eventId}`,
             eventData,
             { withCredentials: true }
           );
         } else {
           response = await axios.post(
-            "https://theuniquesportal-server.vercel.app/api/events",
+            `${BASE_URL}/api/events`,
             eventData,
             { withCredentials: true }
           );
@@ -432,7 +433,7 @@ const EventForm = ({ event, onSuccess }) => {
     onSubmit: async (values) => {
       try {
         const response = await axios.post(
-          "https://theuniquesportal-server.vercel.app/api/guest/add-guest",
+          `${BASE_URL}/api/guest/add-guest`,
           values
         );
         if (response.data.success) {
