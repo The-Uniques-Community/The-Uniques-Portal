@@ -1,8 +1,60 @@
 {
+  "version": 2,
+  "buildCommand": "vite build",
+  "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/api/:match*",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/upload/:match*",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/auth/google/:match*",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/auth/google",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/auth/emaillogin",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/auth/get_user",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/auth/verify_user",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/auth/verify_role",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/auth/logout",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/auth/password-reset/:match*",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/auth/password-reset",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/:match*",
       "destination": "/index.html"
     }
-  ]
+  ],
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 30
+    }
+  }
 }

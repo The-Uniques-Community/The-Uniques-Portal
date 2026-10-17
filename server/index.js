@@ -134,17 +134,21 @@ app.use('/api/image-proxy/:fileId', async (req, res) => {
 });
 
 
-const PORT = process.env.PORT || 5001;
-const server = app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 5001;
+  const server = app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
 
-server.on("error", (err) => {
-  if (err.code === "EADDRINUSE") {
-    console.error(`Port ${PORT} is already in use by another process.`);
-  } else {
-    console.error("Server listen error:", err);
-  }
-});
+  server.on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      console.error(`Port ${PORT} is already in use by another process.`);
+    } else {
+      console.error("Server listen error:", err);
+    }
+  });
+}
 
 dbconnect();
+
+export default app;

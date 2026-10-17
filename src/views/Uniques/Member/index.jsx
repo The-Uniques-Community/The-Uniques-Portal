@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useRef } from "react";
 import {
@@ -96,9 +96,10 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { BASE_URL } from "@/config";
 
 // API base URL
-const API_BASE_URL = "https://theuniquesportal-server.vercel.app";
+const API_BASE_URL = BASE_URL;
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;

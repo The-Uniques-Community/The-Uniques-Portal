@@ -142,14 +142,12 @@ const EventOverView = ({ event }) => {
         
         {/* Brief description if available */}
         {eventDescription && (
-          <Tooltip title={eventDescription} arrow>
-            <p 
-              style={{ color: theme.palette.text.secondary }}
-              className="text-xs ps-7 mb-1"
-            >
-              {eventDescription.length > 45 ? eventDescription.slice(0, 45) + "..." : eventDescription}
-            </p>
-          </Tooltip>
+          <p 
+            style={{ color: theme.palette.text.secondary }}
+            className="text-xs ps-7 mb-1"
+          >
+            {eventDescription.length > 45 ? eventDescription.slice(0, 45) + "..." : eventDescription}
+          </p>
         )}
       </div>
       

@@ -15,6 +15,16 @@ import Lenis from 'lenis'
 // Initialize Lenis
 const lenis = new Lenis({
   autoRaf: true,
+  prevent: (node) => {
+    return (
+      document.body.style.overflow === "hidden" ||
+      Boolean(
+        node?.closest?.(
+          '.MuiModal-root, .MuiDialog-root, [role="dialog"], [data-lenis-prevent]'
+        )
+      )
+    );
+  },
 });
 
 // Listen for the scroll event and log the event data

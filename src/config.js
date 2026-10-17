@@ -1,6 +1,8 @@
-import axios from "axios";
 
-export const BASE_URL = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? "http://localhost:5001" : "https://theuniquesportal-server.vercel.app");
+import axios from "axios";
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL !== undefined
+  ? import.meta.env.VITE_API_BASE_URL
+  : (import.meta.env.DEV ? "http://localhost:5001" : "");
 
 axios.defaults.withCredentials = true;
 
@@ -54,3 +56,4 @@ if (typeof window !== "undefined" && window.fetch) {
     return originalFetch(url, modifiedInit);
   };
 }
+
