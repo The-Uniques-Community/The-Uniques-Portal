@@ -26,7 +26,6 @@ const ModernTable = ({
   return (
     <Paper
       elevation={0}
-      data-lenis-prevent="true"
       sx={{
         borderRadius: "12px",
         overflow: "hidden",
@@ -65,25 +64,10 @@ const ModernTable = ({
 
       {/* Structured Content Grid Container */}
       <TableContainer
-        data-lenis-prevent="true"
-        className="hide-scrollbar"
-        onWheel={(e) => e.stopPropagation()}
-        style={{
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-        }}
         sx={{
-          maxHeight: 520,
-          overflowY: "auto",
-          overscrollBehavior: "contain",
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-          "&::-webkit-scrollbar": {
-            display: "none !important",
-            width: "0px !important",
-            height: "0px !important",
-            background: "transparent !important",
-          },
+          overflowX: "auto",
+          maxWidth: "100%",
+          overscrollBehavior: "auto",
         }}
       >
         <Table stickyHeader size="small">
@@ -119,18 +103,42 @@ const ModernTable = ({
           </TableHead>
 
           <TableBody>
-            {data.map((row, index) => (
-              <TableRow
-                key={row._id || index}
-                hover
-                sx={{
-                  "&:last-child td, &:last-child th": { border: 0 },
-                  transition: "background-color 0.15s ease",
-                }}
-              >
-                {renderRow(row)}
+            {data.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} sx={{ py: 6, px: 2, textAlign: "center" }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      position: { xs: "sticky", md: "static" },
+                      left: 0,
+                      width: { xs: "calc(100vw - 48px)", md: "100%" },
+                      maxWidth: "100%",
+                      mx: "auto",
+                    }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      No records found
+                    </Typography>
+                  </Box>
+                </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              data.map((row, index) => (
+                <TableRow
+                  key={row._id || index}
+                  hover
+                  sx={{
+                    "&:last-child td, &:last-child th": { border: 0 },
+                    transition: "background-color 0.15s ease",
+                  }}
+                >
+                  {renderRow(row)}
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>

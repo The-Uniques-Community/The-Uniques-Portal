@@ -75,7 +75,7 @@ function DashboardLayoutAppBar() {
   const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   // Determine active item based on current URL
   const getActiveItemFromPath = React.useCallback(() => {
@@ -144,17 +144,17 @@ function DashboardLayoutAppBar() {
           "data-lenis-prevent": "true",
         }}
         sx={{
-          width: isMobile ? "auto" : drawerOpen ? 240 : 75,
+          width: isMobile ? 260 : drawerOpen ? 240 : 75,
           flexShrink: 0,
-          zIndex: '2000',
-          ml: 2, // Adds margin-left to create space
+          zIndex: 2000,
+          ml: isMobile ? 0 : 2,
           "& .MuiDrawer-paper": {
-            width: isMobile ? "auto" : drawerOpen ? 240 : 75,
-            height: "96vh",
-            marginTop: "16px",
-            marginLeft: "16px", // Adds spacing between the drawer and the edge
+            width: isMobile ? 260 : drawerOpen ? 240 : 75,
+            height: isMobile ? "100vh" : "96vh",
+            marginTop: isMobile ? 0 : "16px",
+            marginLeft: isMobile ? 0 : "16px",
             backgroundColor: theme.palette.background.drawer,
-            borderRadius: "8px",
+            borderRadius: isMobile ? "0 16px 16px 0" : "8px",
             overflowX: "hidden",
             overflowY: "auto",
             overscrollBehavior: "contain",
@@ -287,7 +287,12 @@ function DashboardLayoutAppBar() {
             sx={{ marginY: "4px" }}
           >
             <ListItemButton
-              onClick={() => setIsOpen(true)}
+              onClick={() => {
+                if (isMobile) {
+                  setDrawerOpen(false);
+                }
+                setIsOpen(true);
+              }}
               sx={{
                 backgroundColor: "inherit",
                 color: theme.palette.primary.light,
@@ -329,12 +334,12 @@ function DashboardLayoutAppBar() {
           zIndex: (theme) => theme.zIndex.drawer + 1,
           left: isMobile ? 0 : drawerOpen ? 256 : 91,
           width: isMobile ? "100%" : `calc(100% - ${drawerOpen ? 256 : 91}px)`,
-          marginTop: "16px", // Adds space between AppBar and top
+          marginTop: isMobile ? 0 : "16px",
           transition: "left 0.3s, width 0.3s",
         }}
       >
         <Toolbar>
-          {isMobile && !drawerOpen && (
+          {isMobile && (
             <IconButton edge="start" aria-label="menu" onClick={toggleDrawer}>
               <MenuIcon sx={{ color: theme.palette.primary.main }} />
             </IconButton>
@@ -347,9 +352,12 @@ function DashboardLayoutAppBar() {
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
-          mt: 8,
-          ml: isMobile ? 0 : drawerOpen ? "272px" : "107px", // Adjusted for sidebar spacing
+          p: { xs: 1.5, sm: 2, md: 3 },
+          mt: { xs: 7, sm: 8 },
+          ml: isMobile ? 0 : drawerOpen ? "272px" : "107px",
+          width: isMobile ? "100%" : `calc(100% - ${drawerOpen ? 272 : 107}px)`,
+          maxWidth: "100vw",
+          overflowX: "hidden",
           transition: "margin-left 0.3s",
         }}
       >

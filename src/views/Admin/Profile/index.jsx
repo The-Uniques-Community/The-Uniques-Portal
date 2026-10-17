@@ -490,12 +490,12 @@ function App() {
   );
 
   return (
-    <Container maxWidth="xl" sx={{ py: 3, minHeight: '100vh' }}>
+    <Container maxWidth="xl" sx={{ py: 3, px: { xs: 1, sm: 2, md: 3 }, minHeight: '100vh' }}>
       {/* Profile Header */}
       <Paper
         elevation={0}
         sx={{
-          p: 3,
+          p: { xs: 2, sm: 3 },
           mb: 3,
           bgcolor: 'white',
           borderBottom: '1px solid',
@@ -515,7 +515,7 @@ function App() {
                   mb: { xs: 2, md: 0 }
                 }}
               />
-              <Box sx={{ flex: 1, minWidth: 250 }}>
+              <Box sx={{ flex: 1, minWidth: { xs: "100%", sm: 250 } }}>
                 {editMode ? (
                   <Box sx={{ mb: 2 }}>
                     <TextField
@@ -600,6 +600,8 @@ function App() {
           value={tabValue}
           onChange={handleTabChange}
           variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
           sx={{
             '& .MuiTabs-flexContainer': {
               gap: 2

@@ -355,7 +355,7 @@ const EnquiryManagement = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-2 sm:p-4 lg:p-6">
       <ModernHeader
         title="Enquiry"
         highlight="Management"
@@ -374,14 +374,15 @@ const EnquiryManagement = () => {
 
       {/* Filter and Search Section */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
-        <Paper className="p-1 w-full lg:w-auto">
+        <Paper className="p-1 w-full lg:w-auto" sx={{ maxWidth: "100%", overflowX: "auto" }}>
           <Tabs
             value={statusFilter}
             onChange={handleTabChange}
             aria-label="enquiry status tabs"
             variant="scrollable"
             scrollButtons="auto"
-            sx={{ minHeight: "48px" }}
+            allowScrollButtonsMobile
+            sx={{ minHeight: "48px", maxWidth: "100%" }}
           >
             {statusOptions.map((status) => (
               <Tab
@@ -398,14 +399,14 @@ const EnquiryManagement = () => {
           </Tabs>
         </Paper>
 
-        <div className="flex items-center gap-3 w-full lg:w-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
           <TextField
             label="Search"
             variant="outlined"
             size="small"
             value={searchTerm}
             onChange={handleSearch}
-            className="w-full lg:w-64"
+            className="w-full sm:w-64"
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -416,7 +417,7 @@ const EnquiryManagement = () => {
             placeholder="Name, email or message..."
           />
 
-          <FormControl size="small" className="w-40">
+          <FormControl size="small" className="w-full sm:w-40">
             <InputLabel>Sort By</InputLabel>
             <Select
               value={filterCriteria}
@@ -440,7 +441,8 @@ const EnquiryManagement = () => {
           border: "1px solid",
           borderColor: "divider",
           borderRadius: "10px",
-          overflow: "hidden",
+          overflowX: "auto",
+          maxWidth: "100%",
           backgroundColor: "background.paper",
         }}
       >
@@ -471,24 +473,52 @@ const EnquiryManagement = () => {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={6} align="center" className="py-8">
-                  <CircularProgress size={40} />
-                  <Typography variant="body2" className="mt-2 text-gray-600">
-                    Loading enquiries...
-                  </Typography>
+                <TableCell colSpan={6} sx={{ py: 8, px: 2, textAlign: "center" }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      position: { xs: "sticky", md: "static" },
+                      left: 0,
+                      width: { xs: "calc(100vw - 48px)", md: "100%" },
+                      maxWidth: "100%",
+                      mx: "auto",
+                    }}
+                  >
+                    <CircularProgress size={40} />
+                    <Typography variant="body2" className="mt-2 text-gray-600">
+                      Loading enquiries...
+                    </Typography>
+                  </Box>
                 </TableCell>
               </TableRow>
             ) : enquiries.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} align="center" className="py-8">
-                  <Typography variant="body1" className="text-gray-500">
-                    No enquiries found.
-                  </Typography>
-                  <Typography variant="body2" className="mt-1 text-gray-400">
-                    {searchTerm
-                      ? "Try adjusting your search terms."
-                      : "New enquiries will appear here."}
-                  </Typography>
+                <TableCell colSpan={6} sx={{ py: 8, px: 2, textAlign: "center" }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      position: { xs: "sticky", md: "static" },
+                      left: 0,
+                      width: { xs: "calc(100vw - 48px)", md: "100%" },
+                      maxWidth: "100%",
+                      mx: "auto",
+                    }}
+                  >
+                    <Typography variant="body1" className="text-gray-500 font-medium">
+                      No enquiries found.
+                    </Typography>
+                    <Typography variant="body2" className="mt-1 text-gray-400">
+                      {searchTerm
+                        ? "Try adjusting your search terms."
+                        : "New enquiries will appear here."}
+                    </Typography>
+                  </Box>
                 </TableCell>
               </TableRow>
             ) : (
@@ -596,8 +626,8 @@ const EnquiryManagement = () => {
       </TableContainer>
 
       {/* Pagination */}
-      <div className="flex justify-between items-center">
-        <FormControl size="small" variant="outlined" className="w-20">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
+        <FormControl size="small" variant="outlined" className="w-20 self-start sm:self-auto">
           <InputLabel>Rows</InputLabel>
           <Select
             value={limit}

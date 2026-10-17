@@ -358,7 +358,7 @@ const EnquiryManagement = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-2 sm:p-4 lg:p-6">
       <ModernHeader
         title="Enquiry"
         highlight="Management"
@@ -377,14 +377,15 @@ const EnquiryManagement = () => {
 
       {/* Filter and Search Section */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
-        <Paper className="p-1 w-full lg:w-auto">
+        <Paper className="p-1 w-full lg:w-auto" sx={{ maxWidth: "100%", overflowX: "auto" }}>
           <Tabs
             value={statusFilter}
             onChange={handleTabChange}
             aria-label="enquiry status tabs"
             variant="scrollable"
             scrollButtons="auto"
-            sx={{ minHeight: "48px" }}
+            allowScrollButtonsMobile
+            sx={{ minHeight: "48px", maxWidth: "100%" }}
           >
             {statusOptions.map((status) => (
               <Tab
@@ -395,13 +396,13 @@ const EnquiryManagement = () => {
                   status.value !== "all" ? getStatusIcon(status.value) : null
                 }
                 iconPosition="start"
-                sx={{ minHeight: "48px" }}
+                sx={{ minHeight: "48px", whiteSpace: "nowrap" }}
               />
             ))}
           </Tabs>
         </Paper>
 
-        <div className="flex items-center gap-3 w-full lg:w-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
           <TextField
             label="Search"
             variant="outlined"
@@ -419,7 +420,7 @@ const EnquiryManagement = () => {
             placeholder="Name, email or message..."
           />
 
-          <FormControl size="small" className="w-40">
+          <FormControl size="small" className="w-full sm:w-40">
             <InputLabel>Sort By</InputLabel>
             <Select
               value={filterCriteria}

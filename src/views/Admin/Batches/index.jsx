@@ -334,7 +334,7 @@ const CoordinatorBatches = () => {
     <Box sx={{ p: { xs: 2, md: 4 }, minHeight: "100vh" }}>
       {/* Top Page Header */}
       <Box sx={{ mb: 4 }}>
-        <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
+        <Stack direction={{ xs: "column", sm: "row" }} alignItems={{ xs: "flex-start", sm: "center" }} spacing={1.5} sx={{ mb: 1 }}>
           <Box
             sx={{
               display: "flex",

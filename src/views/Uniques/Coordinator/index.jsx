@@ -959,26 +959,19 @@ const CoordinatorDashboard = () => {
               </Typography>
             </Box>
             <Box
-              data-lenis-prevent="true"
-              className="hide-scrollbar"
-              onWheel={(e) => e.stopPropagation()}
-              style={{
-                scrollbarWidth: "none",
-                msOverflowStyle: "none",
-              }}
               sx={{
                 overflowY: "auto",
                 overflowX: "hidden",
-                maxHeight: 500,
+                maxHeight: { xs: 400, md: 500 },
                 py: 1,
-                overscrollBehavior: "contain",
-                scrollbarWidth: "none",
-                msOverflowStyle: "none",
+                overscrollBehavior: "auto",
+                WebkitOverflowScrolling: "touch",
                 "&::-webkit-scrollbar": {
-                  display: "none !important",
-                  width: "0px !important",
-                  height: "0px !important",
-                  background: "transparent !important",
+                  width: "4px",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  backgroundColor: "rgba(0,0,0,0.15)",
+                  borderRadius: "4px",
                 },
               }}
             >
@@ -997,16 +990,27 @@ const CoordinatorDashboard = () => {
       </div>
 
       {/* Member Filters Section */}
-      <div className="mx-3 mb-10">
-        <h2 className="text-2xl font-bold mb-3" style={{ color: theme.palette.text.primary }}>
+      <div className="mx-1 sm:mx-3 mb-10">
+        <h2 className="text-xl sm:text-2xl font-bold mb-3" style={{ color: theme.palette.text.primary }}>
           Member Filters
         </h2>
 
-        <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
+        <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2, maxWidth: "100%", overflowX: "auto" }}>
           <Tabs
             value={tableView}
             onChange={handleTableViewChange}
             aria-label="member filter tabs"
+            variant="scrollable"
+            scrollButtons="auto"
+            allowScrollButtonsMobile
+            sx={{
+              maxWidth: "100%",
+              "& .MuiTab-root": {
+                whiteSpace: "nowrap",
+                fontSize: { xs: "0.8rem", sm: "0.875rem" },
+                px: { xs: 1.5, sm: 2 },
+              },
+            }}
           >
             <Tab
               label="Members with Fines"
