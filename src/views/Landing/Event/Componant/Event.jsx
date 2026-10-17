@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '@/config';
 import { Users, X, Calendar, Clock, MapPin, User, Users as UsersIcon, Award } from 'lucide-react';
@@ -182,11 +182,11 @@ const fetchTeamMembers = async (eventId) => {
     };
 
     // Helper function to generate initials avatar URL
-    const getInitialsAvatar = (name) => {
+    const getInitialsAvatar = useCallback((name) => {
         const initials = getNameInitials(name);
         // Using UI Avatars service to generate avatar with brand color background
         return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=ca0019&color=ffffff&size=150&bold=true`;
-    };
+    }, []);
 
     // Handle event registration when button is clicked
     const handleRegisterForEvent = async () => {
@@ -445,7 +445,7 @@ const fetchTeamMembers = async (eventId) => {
   if (event && event._id && activeTab === "organizers" && teamMembers.length === 0) {
     fetchTeamMembers(event._id);
   }
-}, [event, activeTab]);
+}, [event, activeTab, teamMembers.length]);
 
     // Render form field based on type
     const renderFormField = (field) => {
@@ -644,7 +644,7 @@ const fetchTeamMembers = async (eventId) => {
                 setAllEvents([]);
                 setFilteredEvents([]);
             });
-    }, [event]);
+    }, [event, getInitialsAvatar]);
 
     const handleChange = (event, newValue) => {
   setActiveTab(newValue);

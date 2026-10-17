@@ -293,6 +293,7 @@ const EventBudget = () => {
     fetchUserRole();
     fetchEvent();
     fetchBudgetData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   // Upload receipt for expense or sponsor

@@ -39,6 +39,22 @@ export const DEFAULT_BATCH_PROFILES = [
       "The Uniques 4.0 batch is the newest cohort carrying forward the legacy of innovation. They are actively engaged in advanced skills training across Python, Full-Stack Development, DSA, and Salesforce CRM modules.\n\nFocused on real-world implementation, Batch 4.0 is collaborating with community mentors on modern engineering challenges to prepare for elite placements.",
     image: uniques4,
   },
+  {
+    id: "uniques-5.0",
+    label: "Uniques 5.0",
+    title: "The Uniques Batch 5.0",
+    description:
+      "The Uniques 5.0 batch accelerates modern engineering, working across full-stack applications, distributed architectures, and AI-driven workflows.\n\nCommitted to technical excellence, Batch 5.0 is building impactful software and leading collaborative community initiatives.",
+    image: uniques4,
+  },
+  {
+    id: "uniques-6.0",
+    label: "Uniques 6.0",
+    title: "The Uniques Batch 6.0",
+    description:
+      "The Uniques 6.0 batch represents the newest cohort of ambitious builders and innovators. Embracing emerging technologies and real-world problem-solving, Batch 6.0 is carrying the community forward.",
+    image: uniques4,
+  },
 ];
 
 const PROFILES_STORAGE_KEY = "tu_community_batch_profiles";

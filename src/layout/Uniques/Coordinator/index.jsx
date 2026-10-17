@@ -78,7 +78,7 @@ function DashboardLayoutAppBar() {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   // Determine active item based on current URL
-  const getActiveItemFromPath = () => {
+  const getActiveItemFromPath = React.useCallback(() => {
     // Expected path format: /coordinator/:segment/...
     // pathSegments[0] is "", [1] is "coordinator", [2] is the segment
     const pathSegments = location.pathname.split("/");
@@ -87,7 +87,7 @@ function DashboardLayoutAppBar() {
     // Find the item that matches the segment
     const activeNav = STUDENT_NAVIGATION.find(item => item.segment === currentSegment);
     return activeNav ? activeNav.title : "";
-  };
+  }, [location.pathname]);
 
   const [drawerOpen, setDrawerOpen] = React.useState(false); 
   const [activeItem, setActiveItem] = React.useState(getActiveItemFromPath());
@@ -95,7 +95,7 @@ function DashboardLayoutAppBar() {
   // Update active item when location changes
   React.useEffect(() => {
     setActiveItem(getActiveItemFromPath());
-  }, [location.pathname]);
+  }, [getActiveItemFromPath]);
 
   const [isOpen, setIsOpen] = React.useState(false);
   const onClose = () => setIsOpen(false);

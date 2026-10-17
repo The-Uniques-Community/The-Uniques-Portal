@@ -84,6 +84,8 @@ const Uniques360Coordinator = () => {
     "The Uniques 2.0",
     "The Uniques 3.0",
     "The Uniques 4.0",
+    "The Uniques 5.0",
+    "The Uniques 6.0",
   ];
 
   const { isDarkMode } = useThemeContext();

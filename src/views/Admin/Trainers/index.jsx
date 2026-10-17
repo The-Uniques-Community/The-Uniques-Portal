@@ -365,6 +365,7 @@ const Trainers = () => {
                 <MenuItem value="The Uniques 3.0">The Uniques 3.0</MenuItem>
                 <MenuItem value="The Uniques 4.0">The Uniques 4.0</MenuItem>
                 <MenuItem value="The Uniques 5.0">The Uniques 5.0</MenuItem>
+                <MenuItem value="The Uniques 6.0">The Uniques 6.0</MenuItem>
               </Select>
               <FormHelperText>Batch they are teaching</FormHelperText>
             </FormControl>

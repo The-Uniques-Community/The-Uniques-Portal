@@ -1,4 +1,3 @@
-
 import axios from "axios";
 export const BASE_URL = import.meta.env.VITE_API_BASE_URL !== undefined
   ? import.meta.env.VITE_API_BASE_URL
@@ -56,4 +55,3 @@ if (typeof window !== "undefined" && window.fetch) {
     return originalFetch(url, modifiedInit);
   };
 }
-

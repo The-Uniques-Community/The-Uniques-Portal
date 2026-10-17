@@ -100,6 +100,7 @@ const Trainers = () => {
 
     useEffect(() => {
         fetchTrainers();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Validation Schema
@@ -497,6 +498,7 @@ const Trainers = () => {
                                             <MenuItem value="The Uniques 3.0">The Uniques 3.0</MenuItem>
                                             <MenuItem value="The Uniques 4.0">The Uniques 4.0</MenuItem>
                                             <MenuItem value="The Uniques 5.0">The Uniques 5.0</MenuItem>
+                                            <MenuItem value="The Uniques 6.0">The Uniques 6.0</MenuItem>
                                         </Select>
                                         {formik.touched.trainerBatch && formik.errors.trainerBatch && (
                                             <FormHelperText>{formik.errors.trainerBatch}</FormHelperText>
@@ -536,6 +538,7 @@ const Trainers = () => {
                                         <MenuItem value="The Uniques 3.0">The Uniques 3.0</MenuItem>
                                         <MenuItem value="The Uniques 4.0">The Uniques 4.0</MenuItem>
                                         <MenuItem value="The Uniques 5.0">The Uniques 5.0</MenuItem>
+                                        <MenuItem value="The Uniques 6.0">The Uniques 6.0</MenuItem>
                                     </Select>
                                     {formik.touched.teachingBatch && formik.errors.teachingBatch && (
                                         <FormHelperText>{formik.errors.teachingBatch}</FormHelperText>

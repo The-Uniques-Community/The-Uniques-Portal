@@ -324,8 +324,14 @@ export const getMembersByBatch = async (req, res) => {
   try {
     const { batch } = req.params;
 
-    // Validate batch
-    const validBatches = ["The Uniques 1.0", "The Uniques 2.0", "The Uniques 3.0"];
+    const validBatches = [
+      "The Uniques 1.0",
+      "The Uniques 2.0",
+      "The Uniques 3.0",
+      "The Uniques 4.0",
+      "The Uniques 5.0",
+      "The Uniques 6.0",
+    ];
     if (!validBatches.includes(batch)) {
       return res.status(400).json({
         success: false,

@@ -25,7 +25,7 @@ router.get("/verify_user", verifyToken, (req, res) => {
 });
 
 // Route to check if the user has a specific role
-router.get("/verify_role", verifyToken, (req, res, next) => {
+router.get("/verify_role", verifyToken, (req, res, _next) => {
   const { role } = req.query; // Get role from query params
 
   if (!role) {

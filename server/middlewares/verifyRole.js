@@ -29,7 +29,6 @@ const verifyRole = (roles) => {
     }
     
     // User is authorized, proceed
-    req.user = req.user; // Attach decoded token (including role) to the request
     next();
   };
 };

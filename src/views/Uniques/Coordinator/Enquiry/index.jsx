@@ -92,6 +92,7 @@ const EnquiryManagement = () => {
   // Fetch enquiries from API
   useEffect(() => {
     fetchEnquiries();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, limit, statusFilter, filterCriteria]);
 
   const fetchEnquiries = async () => {

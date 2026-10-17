@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { bulkUploadGuests, getAllGuests, addGuest, getGuestById, linkGuestToEvent } from "../../controller/guest/guestController.js";
+import { bulkUploadGuests, getAllGuests, addGuest, getGuestById } from "../../controller/guest/guestController.js";
 const guestRoute = Router();
 
 guestRoute.post("/bulkUpload", bulkUploadGuests);

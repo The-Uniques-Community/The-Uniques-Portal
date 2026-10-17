@@ -61,7 +61,7 @@ import FIFTYSIX from "@/assets/img/HowItStarted/56.jpg";
 import FIFTYSEVEN from "@/assets/img/HowItStarted/57.jpg";
 import FIFTYEIGHT from "@/assets/img/HowItStarted/58.jpg";
 
-export function cn(...inputs) {
+function cn(...inputs) {
     return twMerge(clsx(inputs));
 }
 

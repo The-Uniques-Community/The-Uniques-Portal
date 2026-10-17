@@ -1,6 +1,5 @@
 import Trainer from "../../models/admin/trainerModel.js";
 import mongoose from "mongoose";
-import File from "../../models/member/fileModel.js";
 
 // Add a new trainer
 export const addTrainer = async (req, res) => {

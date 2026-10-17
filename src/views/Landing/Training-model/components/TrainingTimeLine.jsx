@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { useScroll, useTransform, motion } from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
 
-export function cn(...inputs) {
+function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
@@ -40,7 +40,7 @@ export const Timeline = ({ data }) => {
     // Generate random logos for each year only once
     const logosForYears = data.map(() => getRandomLogos());
     setRandomLogosPerYear(logosForYears);
-  }, [ref, data.length]);
+  }, [ref, data]);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,

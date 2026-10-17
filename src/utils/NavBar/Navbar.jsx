@@ -39,35 +39,8 @@ const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
-  // Check authentication status on component mount
-  useEffect(() => {
-    checkAuthStatus();
-  }, []);
-
-  // Function to check if user is logged in
-  const checkAuthStatus = async () => {
-    // Check for token in localStorage or sessionStorage
-    try {
-      // Call the backend endpoint that verifies the role using the verifyRole middleware
-      const response = await axios.get(`${BASE_URL}/auth/verify_user`, {
-        withCredentials: true,
-      });
-      setUser(response?.data.user); // Set user data from response
-      console.log(response?.data.user);
-      setIsLoggedIn(true);
-    } catch (error) {
-      // If the error is due to token expiry or invalid token, automatically log out
-      setUser({}); // Clear user data
-      await handleLogout();
-
-      setIsLoggedIn(false);
-    } finally {
-      // setLoading(false);
-    }
-  };
-
   // Handle logout
-  const handleLogout = async () => {
+  const handleLogout = React.useCallback(async () => {
     try {
       await axios.post(
         `${BASE_URL}/auth/logout`,
@@ -79,7 +52,29 @@ const Navbar = () => {
     } catch (error) {
       console.error("Logout failed:", error);
     }
-  };
+  }, []);
+
+  // Check authentication status on component mount
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      // Check for token in localStorage or sessionStorage
+      try {
+        // Call the backend endpoint that verifies the role using the verifyRole middleware
+        const response = await axios.get(`${BASE_URL}/auth/verify_user`, {
+          withCredentials: true,
+        });
+        setUser(response?.data.user); // Set user data from response
+        setIsLoggedIn(true);
+      } catch {
+        // If the error is due to token expiry or invalid token, automatically log out
+        setUser({}); // Clear user data
+        await handleLogout();
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkAuthStatus();
+  }, [handleLogout]);
 
   // Dynamically generate navItems based on auth status
   const generateNavItems = () => {

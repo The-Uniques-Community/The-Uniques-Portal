@@ -426,7 +426,7 @@ const ReceiptPreviewModal = ({ open, onClose, receiptUrl }) => {
 };
 
 // Add this component inside the Index.jsx file
-const FineDetailsModal = ({ open, onClose, selectedFine, onPayFine, loading }) => {
+const FineDetailsModal = ({ open, onClose, selectedFine, onPayFine, loading, onViewReceipt }) => {
   const [activeTab, setActiveTab] = useState(0);
 
   if (!selectedFine) return null;
@@ -548,9 +548,8 @@ const FineDetailsModal = ({ open, onClose, selectedFine, onPayFine, loading }) =
                               variant="outlined"
                               startIcon={<ReceiptIcon />}
                               onClick={() => {
-                                if (fine.proofOfPayment?.fileUrl) {
-                                  setReceiptPreviewUrl(fine.proofOfPayment.fileUrl);
-                                  setOpenReceiptPreview(true);
+                                if (fine.proofOfPayment?.fileUrl && onViewReceipt) {
+                                  onViewReceipt(fine.proofOfPayment.fileUrl);
                                 }
                               }}
                               disabled={!fine.proofOfPayment}
@@ -621,6 +620,7 @@ const Index = () => {
   const [selectedFine, setSelectedFine] = useState(null);
   const [openViewModal, setOpenViewModal] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
+  const [alert, setAlert] = useState({ open: false, message: '', severity: 'info' });
   const API_BASE_URL = "https://theuniquesportal-server.vercel.app/api/admin";
 
   // Fetch data when component mounts
@@ -748,7 +748,7 @@ const Index = () => {
     };
 
     fetchData();
-  }, []);
+  }, [currentSemester]);
 
   // Handle semester change for supplementary data
   const handleSemesterChange = async (semester) => {
@@ -1653,6 +1653,18 @@ const Index = () => {
         <Alert severity="success">Payment recorded successfully!</Alert>
       </Snackbar>
 
+      {/* Alert notification */}
+      <Snackbar
+        open={alert.open}
+        autoHideDuration={4000}
+        onClose={() => setAlert(prev => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert severity={alert.severity} onClose={() => setAlert(prev => ({ ...prev, open: false }))}>
+          {alert.message}
+        </Alert>
+      </Snackbar>
+
       {/* NEW: Fine Details Modal */}
       <FineDetailsModal
         open={openViewModal}
@@ -1662,15 +1674,10 @@ const Index = () => {
           setFineToUpdate({ memberId, fine: { _id: fineId } });
           setOpenPaymentModal(true);
         }}
-        loading={loading}
-      />
-
-      {/* Add this to the end of your component return statement */}
-      <FineDetailsModal
-        open={openViewModal}
-        onClose={() => setOpenViewModal(false)}
-        selectedFine={selectedFine}
-        onPayFine={handlePayFine}
+        onViewReceipt={(url) => {
+          setReceiptPreviewUrl(url);
+          setOpenReceiptPreview(true);
+        }}
         loading={loading}
       />
     </div>

@@ -1272,10 +1272,11 @@ const handleRemoveMember = async (memberId, memberTeam) => {
     }
   };
   useEffect(() => {
-  if (id) {
-    fetchEventTeams();
-  }
-}, [id]);
+    if (id) {
+      fetchEventTeams();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   // Render form field based on type
   const renderFormField = (field) => {

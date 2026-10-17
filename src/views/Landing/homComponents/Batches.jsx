@@ -48,14 +48,27 @@ const Batches = () => {
       description: "The newest members of The Uniques Community, bringing fresh perspectives and energy to our growing tech community.",
       memberCount: batchCounts["The Uniques 3.0"] || 0
     },
-        {
-          id: "The Uniques 4.0",
-          name: "The Uniques 4.0",
-          icon: "🏅",
-          description: "The latest batch of The Uniques Community, driving innovation and collaboration in the tech space.",
-          memberCount: batchCounts["The Uniques 4.0"] || 0,
-          
-        }
+    {
+      id: "The Uniques 4.0",
+      name: "The Uniques 4.0",
+      icon: "🏅",
+      description: "Driving innovation and collaboration across core software engineering modules.",
+      memberCount: batchCounts["The Uniques 4.0"] || 0,
+    },
+    {
+      id: "The Uniques 5.0",
+      name: "The Uniques 5.0",
+      icon: "🚀",
+      description: "Accelerating modern engineering, full-stack technologies, and industry-grade projects.",
+      memberCount: batchCounts["The Uniques 5.0"] || 0,
+    },
+    {
+      id: "The Uniques 6.0",
+      name: "The Uniques 6.0",
+      icon: "⚡",
+      description: "The newest cohort pushing the frontiers of technology, innovation, and leadership.",
+      memberCount: batchCounts["The Uniques 6.0"] || 0,
+    }
   ], [batchCounts]);
 
   // Fetch batch counts
@@ -72,7 +85,9 @@ const Batches = () => {
             "The Uniques 1.0": parseInt(batchData["The Uniques 1.0"] || 0),
             "The Uniques 2.0": parseInt(batchData["The Uniques 2.0"] || 0),
             "The Uniques 3.0": parseInt(batchData["The Uniques 3.0"] || 0),
-            "The Uniques 4.0": parseInt(batchData["The Uniques 4.0"] || 0)
+            "The Uniques 4.0": parseInt(batchData["The Uniques 4.0"] || 0),
+            "The Uniques 5.0": parseInt(batchData["The Uniques 5.0"] || 0),
+            "The Uniques 6.0": parseInt(batchData["The Uniques 6.0"] || 0)
           };
           setBatchCounts(counts);
 
@@ -86,6 +101,8 @@ const Batches = () => {
           "The Uniques 2.0": 0,
           "The Uniques 3.0": 0,
           "The Uniques 4.0": 0,
+          "The Uniques 5.0": 0,
+          "The Uniques 6.0": 0,
         });
       } finally {
         setCountsLoading(false);

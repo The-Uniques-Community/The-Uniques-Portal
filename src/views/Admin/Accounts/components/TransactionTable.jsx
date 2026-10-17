@@ -84,6 +84,7 @@ const UPLOAD_API_URL = 'https://theuniquesportal-server.vercel.app/upload/fine_f
 
 // Fine Payment Modal Component - Fix Receipt icon reference
 const FinePaymentModal = ({ open, onClose, memberId, fine, onPaymentComplete }) => {
+  const theme = useTheme();
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('upi');
@@ -716,6 +717,7 @@ const FineTable = () => {
   // Load data when component mounts or filters change
   useEffect(() => {
     fetchFines();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, batchFilter, statusFilter]);
 
   // Separate useEffect for search to add debouncing
@@ -725,6 +727,7 @@ const FineTable = () => {
     }, 500); // 500ms debounce
 
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
   // Status Chip component
@@ -880,6 +883,9 @@ const FineTable = () => {
               <MenuItem value="The Uniques 1.0">The Uniques 1.0</MenuItem>
               <MenuItem value="The Uniques 2.0">The Uniques 2.0</MenuItem>
               <MenuItem value="The Uniques 3.0">The Uniques 3.0</MenuItem>
+              <MenuItem value="The Uniques 4.0">The Uniques 4.0</MenuItem>
+              <MenuItem value="The Uniques 5.0">The Uniques 5.0</MenuItem>
+              <MenuItem value="The Uniques 6.0">The Uniques 6.0</MenuItem>
             </Select>
           </FormControl>
           

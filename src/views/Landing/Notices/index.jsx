@@ -24,7 +24,7 @@ import {
   List,
 } from "lucide-react"
 
-const index = () => {
+const Notices = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [selectedPriority, setSelectedPriority] = useState("all")
@@ -1302,4 +1302,4 @@ const index = () => {
   )
 }
 
-export default index
+export default Notices

@@ -26,15 +26,10 @@ for (const file of allFiles) {
     if (match.startsWith('.')) {
       const dir = path.dirname(file);
       let targetPath = path.resolve(dir, match).replace(/\\/g, '/');
-      let found = false;
       
       const exts = ['', '.js', '.jsx', '/index.js', '/index.jsx', '/Index.jsx'];
-      let matchedExt = '';
       for (const ext of exts) {
         if (fileSet.has((targetPath + ext).toLowerCase())) {
-          found = true;
-          matchedExt = ext;
-          
           const actualTarget = actualFiles.get((targetPath + ext).toLowerCase());
           const requestedTarget = targetPath + ext;
           const requestedParts = requestedTarget.split('/');

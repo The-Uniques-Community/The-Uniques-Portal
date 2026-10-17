@@ -85,7 +85,14 @@ const Uniques360Coordinator = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [memberFilter, setMemberFilter] = useState("all");
 
-  const batches = ["The Uniques 1.0", "The Uniques 2.0", "The Uniques 3.0", "The Uniques 4.0"];
+  const batches = [
+    "The Uniques 1.0",
+    "The Uniques 2.0",
+    "The Uniques 3.0",
+    "The Uniques 4.0",
+    "The Uniques 5.0",
+    "The Uniques 6.0",
+  ];
 
   const taskGroups = useMemo(() => ({
     pending: tasks.filter((task) => task.status === "pending"),
