@@ -80,12 +80,18 @@ app.use(async (req, res, next) => {
     next();
   } catch (error) {
     console.error("Database connection error on request:", error.message);
+    const hasUri = Boolean(
+      process.env.MONGODB_URI ||
+      process.env.MONGO_URI ||
+      process.env.MONGODB_URL ||
+      process.env.DATABASE_URL
+    );
     return res.status(500).json({
       error: "Database Connection Failed",
       message: error.message,
-      hint: !process.env.MONGODB_URI
-        ? "MONGODB_URI environment variable is missing in Vercel project settings."
-        : "Failed to connect to MongoDB. Please ensure your MongoDB Atlas IP Access List allows 0.0.0.0/0 (all IPs) for Vercel.",
+      hint: !hasUri
+        ? "MONGODB_URI is not set in Vercel. Go to Project Settings -> Environment Variables, add MONGODB_URI, and Redeploy."
+        : "Failed to connect to MongoDB with provided URI. Check MongoDB Atlas Network Access (whitelist 0.0.0.0/0 for Vercel) and database credentials.",
     });
   }
 });
