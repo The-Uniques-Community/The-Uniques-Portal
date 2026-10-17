@@ -31,9 +31,9 @@ export const TrainerCard = ({ user }) => {
         return `${BASE_URL}/api/image-proxy/${fileId}`;
     };
 
-    const initialImg = user.profilePic
-        ? getProxyImageUrl(user.profilePic.fileId || user.profilePic)
-        : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName)}&background=random`;
+    const initialImg = user?.profilePic
+        ? getProxyImageUrl(user?.profilePic?.fileId || user?.profilePic)
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.fullName || "Trainer")}&background=random`;
 
     const [imgSrc, setImgSrc] = useState(initialImg);
 

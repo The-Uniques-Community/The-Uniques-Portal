@@ -1307,7 +1307,7 @@ const EventBudget = () => {
                             <IconButton
                               size="small"
                               onClick={() =>
-                                handleViewReceipt(sponsor.receiptId.fileId)
+                                handleViewReceipt(sponsor.receiptId?.fileId || sponsor.receiptId)
                               }
                             >
                               <Visibility />
@@ -1403,7 +1403,7 @@ const EventBudget = () => {
                             <IconButton
                               size="small"
                               onClick={() =>
-                                handleViewReceipt(expense.receiptId.fileId)
+                                handleViewReceipt(expense.receiptId?.fileId || expense.receiptId)
                               }
                             >
                               <Visibility />

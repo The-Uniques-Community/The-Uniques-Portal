@@ -299,7 +299,7 @@ export const NewMember = ({ user, refreshData }) => {
                   ? getProxyImageUrl(user.profilePic.fileId)
                   : userIcon
               }
-              alt={user.fullName}
+              alt={user?.fullName || "Member"}
               sx={{ 
                 width: 60, 
                 height: 60, 
@@ -380,7 +380,7 @@ export const NewMember = ({ user, refreshData }) => {
                   getProxyImageUrl(user.profilePic.fileId) : 
                   userIcon
                 }
-                alt={user.fullName}
+                alt={user?.fullName || "Member"}
                 className="w-16 h-16 rounded-full object-cover"
               />
               <div>
