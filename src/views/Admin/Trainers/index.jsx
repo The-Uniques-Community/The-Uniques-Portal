@@ -204,7 +204,7 @@ const Trainers = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
       <ModernHeader
         title="Trainers"
         highlight="Management"
@@ -214,7 +214,7 @@ const Trainers = () => {
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => handleOpen()}
-            sx={{ bgcolor: "#ca0019", "&:hover": { bgcolor: "#a30014" } }}
+            sx={{ bgcolor: "#ca0019", "&:hover": { bgcolor: "#a30014" }, whiteSpace: "nowrap" }}
           >
             Add Trainer
           </Button>
@@ -223,7 +223,14 @@ const Trainers = () => {
 
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-      <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)} sx={{ mb: 2 }}>
+      <Tabs 
+        value={tabValue} 
+        onChange={(e, v) => setTabValue(v)} 
+        variant="scrollable"
+        scrollButtons="auto"
+        allowScrollButtonsMobile
+        sx={{ mb: 2 }}
+      >
         <Tab label="All Trainers" />
         <Tab label="Student Mentors" />
         <Tab label="Industry Pros" />
@@ -232,7 +239,7 @@ const Trainers = () => {
       {loading ? (
         <CircularProgress />
       ) : (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{ overflowX: "auto", maxWidth: "100%" }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -294,7 +301,7 @@ const Trainers = () => {
       <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
         <DialogTitle>{currentTrainer ? "Edit Trainer" : "Add Trainer"}</DialogTitle>
         <DialogContent dividers>
-          <Box component="form" sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+          <Box component="form" sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
             <TextField
               label="Full Name"
               name="fullName"

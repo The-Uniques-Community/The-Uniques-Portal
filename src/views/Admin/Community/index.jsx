@@ -284,7 +284,7 @@ const CoordinatorCommunity = () => {
     <Box sx={{ p: { xs: 2, md: 4 }, minHeight: "100vh" }}>
       {/* Page Header */}
       <Box sx={{ mb: 3 }}>
-        <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
+        <Stack direction={{ xs: "column", sm: "row" }} alignItems={{ xs: "flex-start", sm: "center" }} spacing={1.5} sx={{ mb: 1 }}>
           <Box
             sx={{
               display: "flex",
@@ -332,6 +332,7 @@ const CoordinatorCommunity = () => {
             onChange={(e, val) => setSelectedCardIndex(val)}
             variant="scrollable"
             scrollButtons="auto"
+            allowScrollButtonsMobile
             sx={{
               "& .MuiTab-root": {
                 textTransform: "none",

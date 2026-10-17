@@ -241,7 +241,12 @@ function DashboardLayoutAppBar() {
           </ListItem>
           <ListItem
             button
-            onClick={() => setIsOpen(true)}
+            onClick={() => {
+              if (isMobile) {
+                setDrawerOpen(false);
+              }
+              setIsOpen(true);
+            }}
             sx={{
               backgroundColor: "inherit",
               color: theme.palette.primary.light,

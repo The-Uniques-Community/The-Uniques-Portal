@@ -297,7 +297,7 @@ const AdminEvents = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
       <ModernHeader
         title="Event"
         highlight="Management"
@@ -382,8 +382,10 @@ const AdminEvents = () => {
       <Box
         sx={{
           display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
           justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: { xs: "stretch", sm: "center" },
+          gap: 2,
           mb: 2,
         }}
       >
@@ -393,7 +395,7 @@ const AdminEvents = () => {
           color="primary"
           startIcon={<AddCircleOutline />}
           onClick={handleCreateEvent}
-          sx={{ borderRadius: 2 }}
+          sx={{ borderRadius: 2, whiteSpace: "nowrap" }}
         >
           Create New Event
         </Button>

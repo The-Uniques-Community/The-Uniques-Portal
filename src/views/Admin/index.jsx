@@ -976,26 +976,19 @@ const Index = () => {
               </Typography>
             </Box>
             <Box
-              data-lenis-prevent="true"
-              className="hide-scrollbar"
-              onWheel={(e) => e.stopPropagation()}
-              style={{
-                scrollbarWidth: "none",
-                msOverflowStyle: "none",
-              }}
               sx={{
                 overflowY: "auto",
                 overflowX: "hidden",
-                maxHeight: 500,
+                maxHeight: { xs: 400, md: 500 },
                 py: 1,
-                overscrollBehavior: "contain",
-                scrollbarWidth: "none",
-                msOverflowStyle: "none",
+                overscrollBehavior: "auto",
+                WebkitOverflowScrolling: "touch",
                 "&::-webkit-scrollbar": {
-                  display: "none !important",
-                  width: "0px !important",
-                  height: "0px !important",
-                  background: "transparent !important",
+                  width: "4px",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  backgroundColor: "rgba(0,0,0,0.15)",
+                  borderRadius: "4px",
                 },
               }}
             >
@@ -1019,11 +1012,14 @@ const Index = () => {
           Member Filters
         </h2>
 
-        <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
+        <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2, maxWidth: "100%", overflowX: "auto" }}>
           <Tabs
             value={tableView}
             onChange={handleTableViewChange}
             aria-label="member filter tabs"
+            variant="scrollable"
+            scrollButtons="auto"
+            allowScrollButtonsMobile
           >
             <Tab
               label="Members with Fines"
