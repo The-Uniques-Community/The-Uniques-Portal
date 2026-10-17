@@ -1,6 +1,6 @@
 // models/memberModel.js
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import File from "./fileModel.js";
 const projectSchema = new mongoose.Schema({
   title: {
