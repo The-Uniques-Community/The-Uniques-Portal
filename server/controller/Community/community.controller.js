@@ -1,6 +1,6 @@
 import CommunityAdmin from "../../models/community/communityAdmin.js";
 import CampusAmbassador from "../../models/community/campusAmbassadorModel.js";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 export const createCommunityAdmin = async (req, res) => {
   const { email, password } = req.body;

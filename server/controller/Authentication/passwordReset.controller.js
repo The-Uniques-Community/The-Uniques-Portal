@@ -1,7 +1,7 @@
 import Member from "../../models/member/memberModel.js";
 import Admin from "../../models/admin/adminModel.js";
 import CommunityAdmin from "../../models/community/communityAdmin.js";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import transporter from "../../config/emailConfig.js";
 
 

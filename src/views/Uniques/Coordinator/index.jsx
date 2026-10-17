@@ -1044,7 +1044,7 @@ const CoordinatorDashboard = () => {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Avatar
-                          src={member.profilePic ? (typeof member.profilePic === 'object' ? getProxyImageUrl(member.profilePic.fileId) : getProxyImageUrl(member.profilePic)) : "/placeholder.svg"}
+                          src={getProxyImageUrl(member?.profilePic?.fileId || (typeof member?.profilePic === 'string' ? member.profilePic : null))}
                           alt={member.name}
                         />
                         <div>
@@ -1124,10 +1124,7 @@ const CoordinatorDashboard = () => {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Avatar
-                          src={member?.profilePic?.fileId ?
-                            getProxyImageUrl(member.profilePic.fileId) :
-                            '/placeholder.svg'
-                          }
+                          src={getProxyImageUrl(member?.profilePic?.fileId || (typeof member?.profilePic === 'string' ? member.profilePic : null))}
                         />
                         <div>
                           <div className="font-medium">
@@ -1216,7 +1213,7 @@ const CoordinatorDashboard = () => {
               {/* Member Basic Info */}
               <div className="flex items-center gap-4 mb-6">
                 <Avatar
-                  src={selectedMember.profilePic ? (typeof selectedMember.profilePic === 'object' ? getProxyImageUrl(selectedMember.profilePic.fileId) : getProxyImageUrl(selectedMember.profilePic)) : "/placeholder.svg"}
+                  src={getProxyImageUrl(selectedMember?.profilePic?.fileId || (typeof selectedMember?.profilePic === 'string' ? selectedMember.profilePic : null))}
                   alt={selectedMember.name}
                   sx={{ width: 64, height: 64 }}
                   className="border-2 border-[#ca0019]"

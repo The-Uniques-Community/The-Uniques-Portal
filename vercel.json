@@ -1,8 +1,88 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "app": {
+      "root": ".",
+      "framework": "vite"
+    },
+    "server": {
+      "root": "server",
+      "framework": "express",
+      "entrypoint": "index.js"
+    }
+  },
   "rewrites": [
     {
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "server"
+      }
+    },
+    {
+      "source": "/upload/(.*)",
+      "destination": {
+        "service": "server"
+      }
+    },
+    {
+      "source": "/auth/google/(.*)",
+      "destination": {
+        "service": "server"
+      }
+    },
+    {
+      "source": "/auth/google",
+      "destination": {
+        "service": "server"
+      }
+    },
+    {
+      "source": "/auth/emaillogin",
+      "destination": {
+        "service": "server"
+      }
+    },
+    {
+      "source": "/auth/get_user",
+      "destination": {
+        "service": "server"
+      }
+    },
+    {
+      "source": "/auth/verify_user",
+      "destination": {
+        "service": "server"
+      }
+    },
+    {
+      "source": "/auth/verify_role",
+      "destination": {
+        "service": "server"
+      }
+    },
+    {
+      "source": "/auth/logout",
+      "destination": {
+        "service": "server"
+      }
+    },
+    {
+      "source": "/auth/password-reset/(.*)",
+      "destination": {
+        "service": "server"
+      }
+    },
+    {
+      "source": "/auth/password-reset",
+      "destination": {
+        "service": "server"
+      }
+    },
+    {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "destination": {
+        "service": "app"
+      }
     }
   ]
 }

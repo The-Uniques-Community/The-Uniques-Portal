@@ -69,6 +69,32 @@ app.use(
 );
 app.use(passport.initialize());
 
+// Ensure database connection in serverless environment
+app.use(async (req, res, next) => {
+  if (req.path === "/") {
+    return next();
+  }
+  try {
+    await dbconnect();
+    next();
+  } catch (error) {
+    console.error("Database connection error on request:", error.message);
+    const hasUri = Boolean(
+      process.env.MONGODB_URI ||
+      process.env.MONGO_URI ||
+      process.env.MONGODB_URL ||
+      process.env.DATABASE_URL
+    );
+    return res.status(500).json({
+      error: "Database Connection Failed",
+      message: error.message,
+      hint: !hasUri
+        ? "MONGODB_URI is not set in Vercel. Go to Project Settings -> Environment Variables, add MONGODB_URI, and Redeploy."
+        : "Failed to connect to MongoDB with provided URI. Check MongoDB Atlas Network Access (whitelist 0.0.0.0/0 for Vercel) and database credentials.",
+    });
+  }
+});
+
 app.get("/", (req, res) => {
   res.send("hello its working");
 });
@@ -132,17 +158,21 @@ app.use('/api/image-proxy/:fileId', async (req, res) => {
 });
 
 
-const PORT = process.env.PORT || 5001;
-const server = app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 5001;
+  const server = app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
 
-server.on("error", (err) => {
-  if (err.code === "EADDRINUSE") {
-    console.error(`Port ${PORT} is already in use by another process.`);
-  } else {
-    console.error("Server listen error:", err);
-  }
-});
+  server.on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      console.error(`Port ${PORT} is already in use by another process.`);
+    } else {
+      console.error("Server listen error:", err);
+    }
+  });
+}
 
-dbconnect();
+dbconnect().catch((err) => console.error("Initial DB connect error:", err.message));
+
+export default app;

@@ -2,7 +2,7 @@
 import jwt from "jsonwebtoken";
 import Member from "../../models/member/memberModel.js";
 import Admin from "../../models/admin/adminModel.js";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import CommunityAdmin from "../../models/community/communityAdmin.js";
 
 const generateToken = (member, fallbackRole) => {
