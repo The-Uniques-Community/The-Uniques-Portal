@@ -70,6 +70,26 @@ app.use(
 );
 app.use(passport.initialize());
 
+// Ensure database connection in serverless environment
+app.use(async (req, res, next) => {
+  if (req.path === "/") {
+    return next();
+  }
+  try {
+    await dbconnect();
+    next();
+  } catch (error) {
+    console.error("Database connection error on request:", error.message);
+    return res.status(500).json({
+      error: "Database Connection Failed",
+      message: error.message,
+      hint: !process.env.MONGODB_URI
+        ? "MONGODB_URI environment variable is missing in Vercel project settings."
+        : "Failed to connect to MongoDB. Please ensure your MongoDB Atlas IP Access List allows 0.0.0.0/0 (all IPs) for Vercel.",
+    });
+  }
+});
+
 app.get("/", (req, res) => {
   res.send("hello its working");
 });
@@ -149,6 +169,6 @@ if (!process.env.VERCEL) {
   });
 }
 
-dbconnect();
+dbconnect().catch((err) => console.error("Initial DB connect error:", err.message));
 
 export default app;
