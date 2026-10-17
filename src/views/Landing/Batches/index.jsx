@@ -10,7 +10,7 @@ import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import SchoolIcon from '@mui/icons-material/School';
 import GroupsIcon from '@mui/icons-material/Groups';
 
-const index = () => {
+const Batches = () => {
   // State management
   const [members, setMembers] = useState([]);
   const [selectedBatch, setSelectedBatch] = useState("All");
@@ -60,8 +60,24 @@ const index = () => {
       id: "The Uniques 4.0",
       name: "The Uniques 4.0",
       icon: "🏅",
-      description: "The latest batch of The Uniques Community, driving innovation and collaboration in the tech space.",
+      description: "Driving innovation and collaboration across core software engineering modules.",
       memberCount: batchCounts["The Uniques 4.0"] || 0,
+      iconComponent: <SchoolIcon />
+    },
+    {
+      id: "The Uniques 5.0",
+      name: "The Uniques 5.0",
+      icon: "🚀",
+      description: "Accelerating modern engineering, full-stack technologies, and industry-grade projects.",
+      memberCount: batchCounts["The Uniques 5.0"] || 0,
+      iconComponent: <SchoolIcon />
+    },
+    {
+      id: "The Uniques 6.0",
+      name: "The Uniques 6.0",
+      icon: "⚡",
+      description: "The newest cohort pushing the frontiers of technology, innovation, and leadership.",
+      memberCount: batchCounts["The Uniques 6.0"] || 0,
       iconComponent: <SchoolIcon />
     }
   ], [batchCounts]);
@@ -258,6 +274,22 @@ const index = () => {
         title: "Collaborative Leadership",
         description: "Pioneered new initiatives and fostered cross-batch collaboration in 2024",
         color: "rgb(239, 68, 68)"
+      }
+      ],
+      "The Uniques 5.0": [
+      {
+        id: "modern-tech-initiatives",
+        title: "Modern Tech Initiatives",
+        description: "Advanced skills development across Python, Full-Stack, and AI solutions",
+        color: "rgb(16, 185, 129)"
+      }
+      ],
+      "The Uniques 6.0": [
+      {
+        id: "future-innovators",
+        title: "Future Innovators",
+        description: "Next-generation cohort advancing cutting-edge engineering and research",
+        color: "rgb(59, 130, 246)"
       }
       ]
     };
@@ -473,4 +505,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Batches;

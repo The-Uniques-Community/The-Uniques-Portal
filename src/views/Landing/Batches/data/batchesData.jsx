@@ -1,5 +1,4 @@
-// import type { Batch } from "../types"
-import { Users, Sparkles, Zap, Rocket } from "lucide-react"
+import { Users, Sparkles, Zap, Rocket, Globe, Terminal } from "lucide-react"
 
 export const batchesData= [
   {
@@ -33,10 +32,28 @@ export const batchesData= [
     id: "batch4",
     name: "The Uniques 4.0",
     description:
-      "Our newest batch of talented members, bringing fresh ideas and energy to the community while building on our established traditions.",
+      "Our fourth generation of talented members, bringing fresh ideas and energy while building on established traditions.",
     icon: <Rocket className="h-4 w-4" />,
     memberCount: 30,
     achievements: ["rapid-growth", "diverse-skills", "collaboration"],
+  },
+  {
+    id: "batch5",
+    name: "The Uniques 5.0",
+    description:
+      "Driving hands-on engineering, advanced full-stack development, and high-impact industry challenges.",
+    icon: <Globe className="h-4 w-4" />,
+    memberCount: 35,
+    achievements: ["full-stack", "industry-readiness", "innovation"],
+  },
+  {
+    id: "batch6",
+    name: "The Uniques 6.0",
+    description:
+      "The newest cohort pushing technological boundaries with fresh perspectives, agility, and elite skills.",
+    icon: <Terminal className="h-4 w-4" />,
+    memberCount: 40,
+    achievements: ["cutting-edge", "ai-solutions", "leadership"],
   },
 ]
 

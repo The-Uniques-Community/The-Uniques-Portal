@@ -23,7 +23,7 @@ import Highlight from "./homComponents/Highlight";
 // import Testimonial from "./homComponents/TestimonialCard";
 import Testimonials from "./homComponents/TestimonialCard";
 
-const index = () => {
+const LandingPage = () => {
   const theme = useTheme();
   const [selectedBlog, setSelectedBlog] = useState(null);
   return (
@@ -178,4 +178,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default LandingPage;

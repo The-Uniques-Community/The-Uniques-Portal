@@ -153,6 +153,7 @@ const BlogManagement = () => {
   // Initial data loading
   useEffect(() => {
     fetchMemberBlogs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Filter blogs when search term changes

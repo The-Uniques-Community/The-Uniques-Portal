@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 // import { Button } from "@/components/ui/button";
 // import img from "next/img";
@@ -52,7 +52,7 @@ export default function TestimonialCarousel() {
     const [activeIndex, setActiveIndex] = useState(0);
     const [isAnimating, setIsAnimating] = useState(false);
 
-    const nextSlide = () => {
+    const nextSlide = useCallback(() => {
         if (isAnimating) return;
         setIsAnimating(true);
         // Short delay before changing the active index to allow for animation
@@ -61,7 +61,7 @@ export default function TestimonialCarousel() {
             // Allow time for the animation to complete
             setTimeout(() => setIsAnimating(false), 400);
         }, 300);
-    };
+    }, [isAnimating]);
 
     const prevSlide = () => {
         if (isAnimating) return;
@@ -81,7 +81,7 @@ export default function TestimonialCarousel() {
         }, 5000);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [nextSlide]);
 
     // Calculate indices for visible cards
     const getVisibleIndices = () => {

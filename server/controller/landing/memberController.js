@@ -186,6 +186,27 @@ export const getMemberCounts = async (req, res) => {
         isVerified: true,
         isSuspended: false
       });
+
+      const batch4Count = await Member.countDocuments({
+        batch: "The Uniques 4.0",
+        profileStatus: "active",
+        isVerified: true,
+        isSuspended: false
+      });
+
+      const batch5Count = await Member.countDocuments({
+        batch: "The Uniques 5.0",
+        profileStatus: "active",
+        isVerified: true,
+        isSuspended: false
+      });
+
+      const batch6Count = await Member.countDocuments({
+        batch: "The Uniques 6.0",
+        profileStatus: "active",
+        isVerified: true,
+        isSuspended: false
+      });
       
       return res.status(200).json({
         success: true,
@@ -194,7 +215,10 @@ export const getMemberCounts = async (req, res) => {
           "All": totalCount,
           "The Uniques 1.0": batch1Count,
           "The Uniques 2.0": batch2Count,
-          "The Uniques 3.0": batch3Count
+          "The Uniques 3.0": batch3Count,
+          "The Uniques 4.0": batch4Count,
+          "The Uniques 5.0": batch5Count,
+          "The Uniques 6.0": batch6Count
         }
       });
       

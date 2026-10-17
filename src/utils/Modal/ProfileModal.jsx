@@ -347,7 +347,7 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                     </Link>
                   )}
                   {user.whatsappContact && (
-                    <Link to={`https://wa.me/${user.whatsappContact}` || ""}>
+                    <Link to={`https://wa.me/${user.whatsappContact}`}>
                       <div className="w-7 h-7 p-1 bg-slate-500 rounded-full">
                         <div className="w-full h-full flex items-center justify-center">
                           <WhatsAppIcon

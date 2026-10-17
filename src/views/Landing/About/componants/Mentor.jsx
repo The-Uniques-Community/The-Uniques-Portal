@@ -6,11 +6,6 @@ import ProfileCard from "./Ankur1";
 
 export default function MentorSection() {
   const [modalOpen, setModalOpen] = useState(false);
-  console.log(modalOpen);
-
-  const togglePopup = () => {
-    setIsPopupOpen(!isPopupOpen);
-  };
 
   return (
     <div>

@@ -332,7 +332,6 @@ export const getAllEvents = async (req, res) => {
     } else {
       // For non-filtered view, we have one page for ongoing+upcoming (as much as fits)
       // and then additional pages for completed/cancelled
-      const totalFirstPageItems = Math.min(limitNum, totalOngoing + totalUpcoming);
       const remainingCompletedCancelled = totalCompleted + totalCancelled - 
         Math.max(0, limitNum - (totalOngoing + totalUpcoming));
       

@@ -224,7 +224,7 @@ function App() {
     return () => {
       document.head.removeChild(styleElement);
     };
-  }, []);
+  }, [theme.palette.mode, theme.palette.background.default]);
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);

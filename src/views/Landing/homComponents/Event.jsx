@@ -35,7 +35,7 @@ const CommunityCard = ({ event, onClick }) => {
     if (typeof bannerData === 'object' && bannerData.fileUrl) {
       const fileUrl = bannerData.fileUrl;
       if (fileUrl.includes('/file/d/')) {
-        const fileIdMatch = fileUrl.match(/\/file\/d\/([^\/]+)/);
+        const fileIdMatch = fileUrl.match(/\/file\/d\/([^/]+)/);
         if (fileIdMatch && fileIdMatch[1]) {
           return `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`;
         }

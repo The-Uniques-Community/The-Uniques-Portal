@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Member from '../../models/member/memberModel.js'
 import Event from '../../models/member/eventModel.js'
 import Admin from '../../models/admin/adminModel.js';

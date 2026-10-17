@@ -27,7 +27,7 @@ import ModernHeader from '@/utils/Header/ModernHeader';
 
 const API_BASE_URL = `${BASE_URL}/api/admin`;
 
-const index = () => {
+const CoordinatorAccounts = () => {
   // State for statistics
   const [stats, setStats] = useState({
     totalMembers: 0,
@@ -67,7 +67,14 @@ const index = () => {
         const paidMembers = totalMembers - pendingMembers;
         
         // 4. Fetch batch-wise distribution for chart
-        const batches = ["The Uniques 1.0", "The Uniques 2.0", "The Uniques 3.0"];
+        const batches = [
+          "The Uniques 1.0",
+          "The Uniques 2.0",
+          "The Uniques 3.0",
+          "The Uniques 4.0",
+          "The Uniques 5.0",
+          "The Uniques 6.0",
+        ];
         const batchData = [];
         
         for (const batch of batches) {
@@ -114,7 +121,10 @@ const index = () => {
         setChartData([
           { name: 'The Uniques 1.0', fines: 0, members: 0 },
           { name: 'The Uniques 2.0', fines: 0, members: 0 },
-          { name: 'The Uniques 3.0', fines: 0, members: 0 }
+          { name: 'The Uniques 3.0', fines: 0, members: 0 },
+          { name: 'The Uniques 4.0', fines: 0, members: 0 },
+          { name: 'The Uniques 5.0', fines: 0, members: 0 },
+          { name: 'The Uniques 6.0', fines: 0, members: 0 },
         ]);
       }
     };
@@ -292,4 +302,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default CoordinatorAccounts;

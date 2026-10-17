@@ -43,7 +43,7 @@ import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "@/config";
 import ModernHeader from "@/utils/Header/ModernHeader";
 
-const index = () => {
+const CoordinatorEvents = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -165,6 +165,7 @@ const index = () => {
 
   useEffect(() => {
     fetchEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handlePageChange = (event, value) => {
@@ -617,4 +618,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default CoordinatorEvents;

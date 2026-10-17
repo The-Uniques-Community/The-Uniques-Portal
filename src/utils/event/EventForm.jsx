@@ -65,6 +65,7 @@ const EVENT_BATCHES = [
   "The Uniques 3.0",
   "The Uniques 4.0",
   "The Uniques 5.0",
+  "The Uniques 6.0",
 ];
 
 const GUEST_TAGS = [

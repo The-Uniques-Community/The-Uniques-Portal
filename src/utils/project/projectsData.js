@@ -356,6 +356,7 @@ export const PROJECT_BATCHES = [
   "Uniques 3.0",
   "Uniques 4.0",
   "Uniques 5.0",
+  "Uniques 6.0",
 ];
 
 export const PROJECT_CATEGORIES = [

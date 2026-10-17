@@ -15,6 +15,7 @@ const batchTabs = [
     { label: "The Uniques 3.0", version: "3.0" },
     { label: "The Uniques 4.0", version: "4.0" },
     { label: "The Uniques 5.0", version: "5.0" },
+    { label: "The Uniques 6.0", version: "6.0" },
 ];
 
 const Trainers = () => {

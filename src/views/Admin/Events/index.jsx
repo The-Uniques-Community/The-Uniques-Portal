@@ -43,7 +43,7 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
-const index = () => {
+const AdminEvents = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -170,6 +170,7 @@ const index = () => {
 
   useEffect(() => {
     fetchEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handlePageChange = (event, value) => {
@@ -612,4 +613,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default AdminEvents;

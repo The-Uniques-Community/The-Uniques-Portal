@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { 
@@ -164,10 +164,10 @@ const EventDetailPage = () => {
     return (names[0].charAt(0) + names[1].charAt(0)).toUpperCase();
   };
 
-  const getInitialsAvatar = (name) => {
+  const getInitialsAvatar = useCallback((name) => {
     const initials = getNameInitials(name);
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=ca0019&color=ffffff&size=150&bold=true`;
-  };
+  }, []);
 
   const extractBannerFileId = (banner) => {
     if (!banner) return '1OSWCFdMnh8Y1wZoepQuup8HXzmcpxxKu';
@@ -242,7 +242,7 @@ const EventDetailPage = () => {
       setError('No event ID provided');
       setLoading(false);
     }
-  }, [id]);
+  }, [id, getInitialsAvatar]);
 
   // Fetch team members
   const fetchTeamMembers = async (eventId) => {

@@ -64,11 +64,12 @@ export const saveStoredStats = async (newStats) => {
   try {
     const response = await axios.post(`${BASE_URL}/api/stats/update`, payload);
     if (response.data && response.data.success && response.data.data) {
+      const data = response.data.data;
       savedData = {
-        Earnings: Number(response.data.data.Earnings) ?? payload.Earnings,
-        Clients: Number(response.data.data.Clients) ?? payload.Clients,
-        Projects: Number(response.data.data.Projects) ?? payload.Projects,
-        Events: Number(response.data.data.Events) ?? payload.Events,
+        Earnings: data.Earnings != null && !isNaN(Number(data.Earnings)) ? Number(data.Earnings) : payload.Earnings,
+        Clients: data.Clients != null && !isNaN(Number(data.Clients)) ? Number(data.Clients) : payload.Clients,
+        Projects: data.Projects != null && !isNaN(Number(data.Projects)) ? Number(data.Projects) : payload.Projects,
+        Events: data.Events != null && !isNaN(Number(data.Events)) ? Number(data.Events) : payload.Events,
       };
     }
   } catch (err) {

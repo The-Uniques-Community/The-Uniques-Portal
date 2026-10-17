@@ -59,6 +59,8 @@ const MembersIndex = () => {
     batch2: 0,
     batch3: 0,
     batch4: 0,
+    batch5: 0,
+    batch6: 0,
     blocked: 0
   });
   
@@ -98,7 +100,9 @@ const MembersIndex = () => {
       case "3": return "The Uniques 2.0";
       case "4": return "The Uniques 3.0";
       case "5": return "The Uniques 4.0";
-      case "6": return null; // Blocked members tab
+      case "6": return "The Uniques 5.0";
+      case "7": return "The Uniques 6.0";
+      case "8": return null; // Blocked members tab
       default: return null; // All members tab
     }
   };
@@ -125,6 +129,14 @@ const MembersIndex = () => {
       const batch4Response = await axios.get(`${BASE_URL}/api/admin/member/count`, {
         params: { batch: "The Uniques 4.0" }
       });
+
+      const batch5Response = await axios.get(`${BASE_URL}/api/admin/member/count`, {
+        params: { batch: "The Uniques 5.0" }
+      });
+
+      const batch6Response = await axios.get(`${BASE_URL}/api/admin/member/count`, {
+        params: { batch: "The Uniques 6.0" }
+      });
       
       // Get blocked count
       const blockedResponse = await axios.get(`${BASE_URL}/api/admin/member/count`, {
@@ -137,6 +149,8 @@ const MembersIndex = () => {
         batch2: batch2Response.data.count || 0,
         batch3: batch3Response.data.count || 0,
         batch4: batch4Response.data.count || 0,
+        batch5: batch5Response.data.count || 0,
+        batch6: batch6Response.data.count || 0,
         blocked: blockedResponse.data.count || 0
       });
     } catch (err) {
@@ -163,7 +177,7 @@ const MembersIndex = () => {
       }
       
       // If on blocked members tab, set isSuspended filter
-      if (value === "6") {
+      if (value === "8") {
         params.isSuspended = true;
       }
       
@@ -184,6 +198,10 @@ const MembersIndex = () => {
       } else if (value === "5") {
         filteredMembers = filteredMembers.filter(member => member.batch === "The Uniques 4.0");
       } else if (value === "6") {
+        filteredMembers = filteredMembers.filter(member => member.batch === "The Uniques 5.0");
+      } else if (value === "7") {
+        filteredMembers = filteredMembers.filter(member => member.batch === "The Uniques 6.0");
+      } else if (value === "8") {
         filteredMembers = filteredMembers.filter(member => member.isSuspended === true);
       }
       
@@ -357,7 +375,6 @@ const MembersIndex = () => {
   // Initialize data on component mount
   useEffect(() => {
     fetchTabCounts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
   // Fetch members when tab, page changes, or after a search
@@ -443,11 +460,27 @@ const MembersIndex = () => {
             />
             <Tab 
               label={
+                <Badge badgeContent={tabCounts.batch5} color="primary" max={999}>
+                  The Uniques 5.0
+                </Badge>
+              } 
+              value="6" 
+            />
+            <Tab 
+              label={
+                <Badge badgeContent={tabCounts.batch6} color="primary" max={999}>
+                  The Uniques 6.0
+                </Badge>
+              } 
+              value="7" 
+            />
+            <Tab 
+              label={
                 <Badge badgeContent={tabCounts.blocked} color="error" max={999}>
                   Blocked Members
                 </Badge>
               } 
-              value="6" 
+              value="8" 
             />
           </TabList>
           
@@ -642,6 +675,8 @@ const MembersIndex = () => {
                 <MenuItem value="The Uniques 2.0">The Uniques 2.0</MenuItem>
                 <MenuItem value="The Uniques 3.0">The Uniques 3.0</MenuItem>
                 <MenuItem value="The Uniques 4.0">The Uniques 4.0</MenuItem>
+                <MenuItem value="The Uniques 5.0">The Uniques 5.0</MenuItem>
+                <MenuItem value="The Uniques 6.0">The Uniques 6.0</MenuItem>
               </Select>
               {formErrors.batch && <FormHelperText>{formErrors.batch}</FormHelperText>}
             </FormControl>

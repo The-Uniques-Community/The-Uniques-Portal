@@ -286,7 +286,7 @@ export const resetPassword = async (req, res) => {
       });
     }
 
-    const { user, model } = result;
+    const { model } = result;
 
     // Update password
     await updateUserPassword(email, newPassword, model);

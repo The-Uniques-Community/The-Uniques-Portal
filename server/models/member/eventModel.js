@@ -30,6 +30,7 @@ const eventSchema = new mongoose.Schema({
       "The Uniques 3.0",
       "The Uniques 4.0",
       "The Uniques 5.0",
+      "The Uniques 6.0",
     ],
   },
   // newly added fields

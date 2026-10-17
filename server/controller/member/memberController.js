@@ -3,10 +3,6 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { bulkUploadMembers } from "./members.js";
 import Member from "../../models/member/memberModel.js";
-import { sendPendingApprovalEmail } from "../../services/members/sendPendingApprovalEmail.js";
-import File from "../../models/member/fileModel.js";
-import { uploadFile, createFolderStructure } from "../googleDriveService.js";
-import fs from "fs";
 dotenv.config();
 
 export const uploadDummyMembers = async (req, res) => {

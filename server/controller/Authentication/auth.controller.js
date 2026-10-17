@@ -16,7 +16,7 @@ const generateToken = (member, fallbackRole) => {
 };
 
 // controllers/auth.controller.js
-export const googleCallback = (req, res, next) => {
+export const googleCallback = (req, res, _next) => {
   if (!req.user) {
     return res.status(400).send("Authentication failed. Please try again.");
   }
@@ -62,7 +62,6 @@ export const emailLogin = async (req, res) => {
     // First try to find in Member model
     let member = await Member.findOne({ email });
     let role = "member";
-    let modelType = "member";
 
     // If not found in Member model, try to find in Admin model
     if (!member) {
@@ -70,7 +69,6 @@ export const emailLogin = async (req, res) => {
         member = await Admin.findOne({ email });
         if (member) {
           role = "admin";
-          modelType = "admin";
         }
       } catch (error) {
         console.error("Error loading Admin model:", error);
@@ -82,7 +80,6 @@ export const emailLogin = async (req, res) => {
         member = await CommunityAdmin.findOne({ email });
         if (member) {
           role = "communityadmin";
-          modelType = "communityAdmin";
         }
       } catch (error) {
         console.error("Error loading CommunityAdmin model:", error);

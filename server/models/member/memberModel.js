@@ -1,7 +1,7 @@
 // models/memberModel.js
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import File from "./fileModel.js";
+import "./fileModel.js";
 const projectSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -55,7 +55,14 @@ const memberSchema = new mongoose.Schema(
     },
     batch: {
       type: String,
-      enum: ["The Uniques 1.0", "The Uniques 2.0", "The Uniques 3.0", "The Uniques 4.0"],
+      enum: [
+        "The Uniques 1.0",
+        "The Uniques 2.0",
+        "The Uniques 3.0",
+        "The Uniques 4.0",
+        "The Uniques 5.0",
+        "The Uniques 6.0",
+      ],
     },
     contact: {
       type: String,
