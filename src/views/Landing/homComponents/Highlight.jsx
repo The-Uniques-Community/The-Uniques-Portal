@@ -33,7 +33,7 @@ const transformEventToDestination = (event) => {
     duration: formattedDate,
     distance: event.eventVenue,
     image: getProxiedImageUrl(event.eventBanner?.fileId),
-    images: event.eventGallery?.map(img => getProxiedImageUrl(img.fileId)) || [],
+    images: event.eventGallery?.map(img => getProxiedImageUrl(img?.fileId || img)) || [],
     isHot: event.eventStatus === 'completed',
     attendees: event.eventGuests?.length || 0,
     // Store the original event data for the modal

@@ -1664,12 +1664,8 @@ const Index = () => {
           >
             <Box sx={{ position: "relative" }}>
               <Avatar
-                src={
-                  user?.profilePic?.fileId
-                    ? getProxyImageUrl(user.profilePic.fileId)
-                    : "/placeholder.svg"
-                }
-                alt={user.fullName}
+                src={getProxyImageUrl(user?.profilePic?.fileId)}
+                alt={user?.fullName || "User"}
                 sx={{
                   width: 120,
                   height: 120,
@@ -3226,12 +3222,12 @@ const Index = () => {
 
                       <CardMedia
                         component="iframe"
-                        src={`https://drive.google.com/file/d/${certificate.fileId}/preview`}
+                        src={certificate?.fileId ? `https://drive.google.com/file/d/${certificate.fileId}/preview` : ""}
                         sx={{
                           height: 180,
                           border: "none",
                         }}
-                        title={certificate.fileName}
+                        title={certificate?.fileName || "Certificate"}
                       />
                     </Box>
 
@@ -3841,8 +3837,8 @@ const Index = () => {
               >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                   <Avatar
-                    src={`https://drive.google.com/uc?id=${user?.profilePic?.fileId}`}
-                    alt={user.fullName}
+                    src={getProxyImageUrl(user?.profilePic?.fileId)}
+                    alt={user?.fullName || "User"}
                     sx={{ width: 40, height: 40 }}
                   />
                   <Box>
@@ -3939,9 +3935,9 @@ const Index = () => {
               src={
                 profilePicture
                   ? URL.createObjectURL(profilePicture)
-                  : getProxyImageUrl(user.profilePic.fileId)
+                  : getProxyImageUrl(user?.profilePic?.fileId)
               }
-              alt={user.fullName}
+              alt={user?.fullName || "User"}
               sx={{
                 width: 150,
                 height: 150,

@@ -1164,10 +1164,7 @@ const Index = () => {
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <Avatar
-                                src={user?.profilePic?.fileId ?
-                                  getProxyImageUrl(user.profilePic.fileId) :
-                                  '/placeholder.svg'
-                                }
+                                src={getProxyImageUrl(member?.profilePic?.fileId || (typeof member?.profilePic === 'string' ? member.profilePic : null))}
                               />
                               <div>
                                 <div className="font-medium">
