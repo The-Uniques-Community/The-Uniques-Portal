@@ -13,6 +13,7 @@ import Admin from "../../models/admin/adminModel.js";
 import CommunityAdmin from "../../models/community/communityAdmin.js";
 import User from "../../models/user/userModel.js";
 import transporter from "../../config/emailConfig.js";
+import mongoose from "mongoose";
 
 const PEPPER = process.env.OTP_SECRET || process.env.OTP_PEPPER || process.env.JWT_SECRET || "the-uniques-portal-otp-salt";
 
@@ -90,6 +91,22 @@ export const findUserByEmail = async (email) => {
   user = (await CommunityAdmin.findOne({ email: normalized })) || (await CommunityAdmin.findOne({ email: regex }));
   if (user) return { user, model: "CommunityAdmin" };
 
+  // Direct raw collection fallbacks
+  if (mongoose.connection.readyState === 1 && mongoose.connection.db) {
+    try {
+      const rawMember = await mongoose.connection.db.collection("members").findOne({ email: regex });
+      if (rawMember) return { user: rawMember, model: "members" };
+    } catch (_e) {}
+    try {
+      const rawAdmin = await mongoose.connection.db.collection("admins").findOne({ email: regex });
+      if (rawAdmin) return { user: rawAdmin, model: "admins" };
+    } catch (_e) {}
+    try {
+      const rawComm = await mongoose.connection.db.collection("communityadmins").findOne({ email: regex });
+      if (rawComm) return { user: rawComm, model: "communityadmins" };
+    } catch (_e) {}
+  }
+
   return null;
 };
 
@@ -97,6 +114,16 @@ export const updateUserPassword = async (email, newPassword, model) => {
   const hashedPassword = await bcrypt.hash(newPassword, 12);
   const normalized = email.toLowerCase().trim();
   const regex = new RegExp(`^${escapeRegex(normalized)}$`, "i");
+
+  // If model is a raw collection name
+  if (["members", "admins", "communityadmins"].includes(model) && mongoose.connection.readyState === 1 && mongoose.connection.db) {
+    return await mongoose.connection.db.collection(model).findOneAndUpdate(
+      { $or: [{ email: normalized }, { email: regex }] },
+      { $set: { password: hashedPassword } },
+      { returnDocument: "after" }
+    );
+  }
+
   const Model = model === "User" ? User : model === "Admin" ? Admin : model === "CommunityAdmin" ? CommunityAdmin : Member;
 
   return await Model.findOneAndUpdate(

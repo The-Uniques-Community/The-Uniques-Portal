@@ -129,13 +129,32 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "alive", timestamp: new Date().toISOString() });
 });
 
-app.get("/api/health", (req, res) => {
+app.get("/api/health", async (req, res) => {
   const isConnected = mongoose.connection.readyState === 1;
+  let documentCounts = null;
+  let databaseName = null;
+
+  if (isConnected && mongoose.connection.db) {
+    databaseName = mongoose.connection.db.databaseName;
+    try {
+      const [users, members, admins] = await Promise.all([
+        mongoose.connection.db.collection("users").countDocuments().catch(() => -1),
+        mongoose.connection.db.collection("members").countDocuments().catch(() => -1),
+        mongoose.connection.db.collection("admins").countDocuments().catch(() => -1),
+      ]);
+      documentCounts = { users, members, admins };
+    } catch (_err) {
+      // Ignored: keep health check responsive
+    }
+  }
+
   res.status(isConnected ? 200 : 503).json({
     status: isConnected ? "healthy" : "degraded",
     database: {
       connected: isConnected,
       readyState: mongoose.connection.readyState,
+      name: databaseName,
+      documentCounts,
     },
     uptime: process.uptime(),
   });

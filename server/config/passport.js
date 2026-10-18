@@ -53,6 +53,13 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
             member = await Admin.findOne({ email });
           }
 
+          if (!member && mongoose.connection.readyState === 1 && mongoose.connection.db) {
+            const emailRegex = new RegExp(`^${email.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i");
+            member = (await mongoose.connection.db.collection("members").findOne({ email: emailRegex })) ||
+                     (await mongoose.connection.db.collection("admins").findOne({ email: emailRegex })) ||
+                     (await mongoose.connection.db.collection("communityadmins").findOne({ email: emailRegex }));
+          }
+
           if (!member) {
             console.log("⚠️ Member not found in DB");
             return done(null, false, { message: "Member not found" });
@@ -77,7 +84,9 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
             };
           }
 
-          await member.save();
+          if (typeof member.save === "function") {
+            await member.save();
+          }
           console.log("✅ Member authenticated successfully");
           console.log("Member found, returning:", member);
           return done(null, member);
