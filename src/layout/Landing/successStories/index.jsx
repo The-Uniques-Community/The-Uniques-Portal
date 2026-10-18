@@ -10,14 +10,12 @@ import {
   Drawer,
   Toolbar as MuiToolbar
 } from '@mui/material';
-import { 
-  Menu as MenuIcon,
-  Home as HomeIcon
-} from '@mui/icons-material';
+import MenuIcon from '@mui/icons-material/Menu';
+import HomeIcon from '@mui/icons-material/Home';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { styled } from '@mui/system';
 import { successStories } from '@/views/Landing/SuccessStories/successStoriesData';
-import Sidebar from '@/utils/Sidebar/index'
+import Sidebar from '@/components/navigation/SuccessStoriesSidebar'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 // Custom theme with #ca0019 color

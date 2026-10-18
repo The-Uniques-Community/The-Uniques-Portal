@@ -1,3 +1,9 @@
+/**
+ * @file communityBenefitsController.js
+ * @description Controller managing community testimonial and leadership benefit cards with automatic default seeding.
+ * @architecture Mounted at `/api/community-benefits` via `communityBenefitsRoute.js`. Directly interacts with `BenefitCard` model.
+ * @agent_note Automatically seeds default leadership testimonials (Community Organizer, Technical Lead, Graphics Lead, Event Coordinator, Social Media Lead) when empty.
+ */
 import BenefitCard from "../../models/community/communityBenefitsModel.js";
 
 const DEFAULT_BENEFITS_CARDS = [
@@ -43,6 +49,13 @@ const DEFAULT_BENEFITS_CARDS = [
   },
 ];
 
+/**
+ * @desc Retrieve all community benefit testimonial cards, seeding defaults if database is empty
+ * @route GET /api/community-benefits
+ * @access Public
+ * @returns {Object} 200 - Array of benefit card objects sorted by cardId
+ * @returns {Object} 500 - Server error
+ */
 export const getBenefitsCards = async (req, res) => {
   try {
     let cards = await BenefitCard.find().sort({ cardId: 1 });
@@ -57,6 +70,16 @@ export const getBenefitsCards = async (req, res) => {
   }
 };
 
+/**
+ * @desc Upsert multiple community benefit testimonial cards
+ * @route POST /api/community-benefits/update
+ * @route PUT /api/community-benefits/update
+ * @access Public/Admin
+ * @body {Object[]} cards - Array of benefit card objects
+ * @returns {Object} 200 - Success confirmation and all updated card documents
+ * @returns {Object} 400 - If cards payload is not an array
+ * @returns {Object} 500 - Server error
+ */
 export const updateBenefitsCards = async (req, res) => {
   try {
     const { cards } = req.body;
@@ -88,3 +111,5 @@ export const updateBenefitsCards = async (req, res) => {
     res.status(500).json({ success: false, message: "Error updating benefits cards", error: error.message });
   }
 };
+
+export const updateCommunityBenefits = updateBenefitsCards;

@@ -1,8 +1,27 @@
+/**
+ * @file enquiryController.js
+ * @description Controller managing user public contact enquiries, admin pagination/filtering, email replies, status transitions, and enquiry removal.
+ * @architecture Mounted at `/api/contact` and `/api/admin/enquiry` via `enquiryRoute.js` and `publicRoute.js`, persisting to Enquiry collection and sending notification/reply emails.
+ * @agent_note Handlers send email notifications via `sendContactEmail` and `sendEnquiryReplyEmail`. Failures in mail delivery are logged without blocking database updates.
+ */
 import { sendContactEmail } from '../../services/members/sendContactEmail.js';
 import sendEnquiryReplyEmail from '../../services/members/sendEnquiryReplyEmail.js';
 import Enquiry from '../../models/Enquiry/enquiryModel.js';
 
 // Submit contact form
+/**
+ * @desc    Submit public contact/enquiry form, store in database, and trigger email notification
+ * @route   POST /api/contact OR POST /api/admin/enquiry
+ * @access  Public
+ * @body    {Object} req.body - Contact form payload
+ * @body    {string} req.body.firstName - Sender first name
+ * @body    {string} req.body.lastName - Sender last name
+ * @body    {string} req.body.email - Valid email address
+ * @body    {string} [req.body.phone] - Optional phone number
+ * @body    {string} req.body.message - Enquiry message body
+ * @body    {string[]} [req.body.services] - Requested services or interests
+ * @returns {Object} JSON response with created enquiryId and status message
+ */
 export const submitContactForm = async (req, res) => {
     try {
         // Extract contact form data
@@ -66,6 +85,15 @@ export const submitContactForm = async (req, res) => {
     }
 };
 
+/**
+ * @desc    Send email reply to an enquiry and update enquiry resolution status
+ * @route   POST /api/admin/enquiry/:id/reply
+ * @access  Private (Admin)
+ * @param   {string} req.params.id - Enquiry ObjectId
+ * @body    {Object} req.body
+ * @body    {string} req.body.replyMessage - Content of email response
+ * @returns {Object} JSON response containing updated enquiry and email delivery status
+ */
 export const replyToEnquiry = async (req, res) => {
     try {
         const { replyMessage } = req.body;
@@ -157,6 +185,16 @@ export const replyToEnquiry = async (req, res) => {
 };
 
 // Get all enquiries (admin access only)
+/**
+ * @desc    Get paginated and filtered list of user enquiries
+ * @route   GET /api/admin/enquiry
+ * @access  Private (Admin)
+ * @param   {number} [req.query.page=1] - Current page number
+ * @param   {number} [req.query.limit=10] - Number of records per page
+ * @param   {string} [req.query.status] - Filter by status (new, reviewed, in-progress, resolved, archived)
+ * @param   {string} [req.query.sortBy] - Sort field and order (e.g. "createdAt:desc")
+ * @returns {Object} Paginated enquiries list with pagination metadata
+ */
 export const getAllEnquiries = async (req, res) => {
     try {
         // Add pagination
@@ -207,6 +245,13 @@ export const getAllEnquiries = async (req, res) => {
 };
 
 // Get enquiry by ID (admin access only)
+/**
+ * @desc    Retrieve a single enquiry document by its ID
+ * @route   GET /api/admin/enquiry/:id
+ * @access  Private (Admin)
+ * @param   {string} req.params.id - Enquiry ObjectId
+ * @returns {Object} JSON response containing enquiry document
+ */
 export const getEnquiryById = async (req, res) => {
     try {
         const enquiry = await Enquiry.findById(req.params.id);
@@ -233,6 +278,16 @@ export const getEnquiryById = async (req, res) => {
 };
 
 // Update enquiry status (admin access only)
+/**
+ * @desc    Update status and administrative notes on an enquiry
+ * @route   PATCH /api/admin/enquiry/:id/status
+ * @access  Private (Admin)
+ * @param   {string} req.params.id - Enquiry ObjectId
+ * @body    {Object} req.body
+ * @body    {string} req.body.status - New status ('new' | 'reviewed' | 'in-progress' | 'resolved' | 'archived')
+ * @body    {string} [req.body.notes] - Optional administrative notes
+ * @returns {Object} Updated enquiry document
+ */
 export const updateEnquiryStatus = async (req, res) => {
     try {
         const { status, notes } = req.body;
@@ -282,6 +337,13 @@ export const updateEnquiryStatus = async (req, res) => {
 };
 
 // Delete enquiry (admin access only)
+/**
+ * @desc    Permanently delete an enquiry document by ID
+ * @route   DELETE /api/admin/enquiry/:id
+ * @access  Private (Admin)
+ * @param   {string} req.params.id - Enquiry ObjectId
+ * @returns {Object} Confirmation message of deletion
+ */
 export const deleteEnquiry = async (req, res) => {
     try {
         const enquiry = await Enquiry.findByIdAndDelete(req.params.id);

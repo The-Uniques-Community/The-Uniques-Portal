@@ -1,6 +1,17 @@
+/**
+ * @file leaveEmailService.js
+ * @description Provides automated email notification services for member leave applications, approvals, and rejections.
+ * @architecture Invoked by leave controllers to dispatch transactional HTML email notifications via Nodemailer transporter.
+ * @agent_note Queries Member model for admin and coordinator email addresses; handles excluded recipients on approval/rejection.
+ */
+
 import transporter from "../config/emailConfig.js";
 import Member from "../models/member/memberModel.js";
 
+/**
+ * @desc    Fetches email addresses for all members with admin or coordinator roles.
+ * @returns {Promise<string[]>} Array of admin and coordinator email addresses.
+ */
 // Helper function to get all admin and coordinator emails
 const getAdminAndCoordinatorEmails = async () => {
   try {
@@ -19,6 +30,11 @@ const getAdminAndCoordinatorEmails = async () => {
   }
 };
 
+/**
+ * @desc    Fetches admin and coordinator email addresses excluding a specific recipient.
+ * @param   {string} excludeEmail - Email address to exclude from the results.
+ * @returns {Promise<string[]>} Filtered array of admin and coordinator email addresses.
+ */
 // Helper function to get admin and coordinator emails excluding a specific person
 const getAdminAndCoordinatorEmailsExcluding = async (excludeEmail) => {
   try {
@@ -38,6 +54,20 @@ const getAdminAndCoordinatorEmailsExcluding = async (excludeEmail) => {
   }
 };
 
+/**
+ * @desc    Sends leave submission notification emails to all admins and coordinators.
+ * @param   {Object} leave - Leave application details.
+ * @param   {string} leave.memberName - Name of the applying member.
+ * @param   {string} leave.memberEmail - Email of the applying member.
+ * @param   {string} [leave.memberPhone] - Contact phone number of the applying member.
+ * @param   {string} leave.type - Leave category/type.
+ * @param   {Date|string} leave.startDate - Starting date of the leave.
+ * @param   {Date|string} leave.endDate - Ending date of the leave.
+ * @param   {number} leave.days - Duration of leave in days.
+ * @param   {Date|string} leave.appliedDate - Date application was submitted.
+ * @param   {string} leave.reason - Justification or reason for leave.
+ * @returns {Promise<{success: boolean, error?: string}>} Outcome of email dispatch.
+ */
 // Send email to admin and coordinator when leave is submitted
 export const sendLeaveSubmissionNotification = async (leave) => {
   try {
@@ -135,6 +165,21 @@ export const sendLeaveSubmissionNotification = async (leave) => {
   }
 };
 
+/**
+ * @desc    Sends leave approval notification to the applicant member and other admins/coordinators.
+ * @param   {Object} leave - Approved leave application details.
+ * @param   {string} leave.memberName - Name of the applying member.
+ * @param   {string} leave.memberEmail - Email of the applying member.
+ * @param   {string} leave.type - Leave category/type.
+ * @param   {Date|string} leave.startDate - Starting date of the leave.
+ * @param   {Date|string} leave.endDate - Ending date of the leave.
+ * @param   {number} leave.days - Duration of leave in days.
+ * @param   {string} leave.approvedBy - Name/identifier of the approving authority.
+ * @param   {Date|string} leave.approvedDate - Date when leave was approved.
+ * @param   {string} leave.reason - Original justification for leave.
+ * @param   {string} approverEmail - Email of the approving admin/coordinator (excluded from cc).
+ * @returns {Promise<{success: boolean, error?: string}>} Outcome of email dispatch.
+ */
 // Send email to member when leave is approved
 export const sendLeaveApprovalNotification = async (leave, approverEmail) => {
   try {
@@ -226,6 +271,22 @@ export const sendLeaveApprovalNotification = async (leave, approverEmail) => {
   }
 };
 
+/**
+ * @desc    Sends leave rejection notification to the applicant member and other admins/coordinators.
+ * @param   {Object} leave - Rejected leave application details.
+ * @param   {string} leave.memberName - Name of the applying member.
+ * @param   {string} leave.memberEmail - Email of the applying member.
+ * @param   {string} leave.type - Leave category/type.
+ * @param   {Date|string} leave.startDate - Starting date of the leave.
+ * @param   {Date|string} leave.endDate - Ending date of the leave.
+ * @param   {number} leave.days - Duration of leave in days.
+ * @param   {string} leave.rejectedBy - Name/identifier of the rejecting authority.
+ * @param   {Date|string} leave.rejectedDate - Date when leave was rejected.
+ * @param   {string} leave.rejectionReason - Detailed reason for rejection.
+ * @param   {string} leave.reason - Original justification for leave.
+ * @param   {string} rejectorEmail - Email of the rejecting admin/coordinator (excluded from cc).
+ * @returns {Promise<{success: boolean, error?: string}>} Outcome of email dispatch.
+ */
 // Send email to member when leave is rejected
 export const sendLeaveRejectionNotification = async (leave, rejectorEmail) => {
   try {

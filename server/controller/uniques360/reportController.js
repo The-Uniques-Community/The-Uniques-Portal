@@ -1,3 +1,9 @@
+/**
+ * @file reportController.js
+ * @description Controller handling progress reports submitted by members for assigned Uniques360 tasks.
+ * @architecture Works with Report (server/models/uniques360/Report.js) and Task (server/models/uniques360/Task.js) models under the `/api/uniques360/reports` endpoint namespace.
+ * @agent_note When progress reaches 100%, the handler automatically marks the parent task status as 'completed' and sets completion metadata.
+ */
 import Report from "../../models/uniques360/Report.js";
 import Task from "../../models/uniques360/Task.js";
 
@@ -15,7 +21,17 @@ const isAssignedMember = (task, userId) => {
   });
 };
 
-// Submit a daily report (Member only)
+/**
+ * @desc    Submit a daily or milestone progress report for an assigned task
+ * @route   POST /api/uniques360/reports
+ * @access  Private (Assigned Member only)
+ * @body    {Object} req.body - Report submission payload
+ * @body    {string} req.body.taskId - Target Task ObjectId string
+ * @body    {string} [req.body.reportContent] - Text notes or summary of work done
+ * @body    {Array<string>} [req.body.attachments] - Array of attachment URLs
+ * @body    {number|string} [req.body.progressPercent] - Progress percentage (0 - 100)
+ * @returns {Object} JSON response with created report document
+ */
 export const submitReport = async (req, res) => {
   try {
     const { taskId, reportContent, attachments, progressPercent } = req.body;
@@ -75,7 +91,14 @@ export const submitReport = async (req, res) => {
   }
 };
 
-// Get reports for a task
+/**
+ * @desc    Fetch chronological list of progress reports filed for a specific task
+ * @route   GET /api/uniques360/reports/task/:taskId
+ * @access  Private (Authenticated users / Member / Coordinator)
+ * @param   {Object} req - Express request
+ * @param   {string} req.params.taskId - Task ObjectId string
+ * @returns {Array<Object>} JSON array of Report documents populated with student info
+ */
 export const getTaskReports = async (req, res) => {
   try {
     const { taskId } = req.params;

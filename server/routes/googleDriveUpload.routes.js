@@ -1,4 +1,9 @@
-
+/**
+ * @file googleDriveUpload.routes.js
+ * @description Cloud storage upload router managing Multer temporary disk uploads and Google Drive sync for members, events, fines, budgets, and trainers.
+ * @architecture Mounted at `/upload` in server/index.js, orchestrating multi-part form parsing, folder structure provisioning, and Google Drive file streaming.
+ * @agent_note Files are staged in `/tmp/uploads` before uploading to Google Drive; periodic and startup cleanup jobs purge stale temporary files.
+ */
 
 // routes/apiRoutes.js
 import express from "express";
@@ -7,8 +12,8 @@ import fs from "fs";
 import mongoose from "mongoose";
 import Member from "../models/member/memberModel.js";
 import Event from "../models/member/eventModel.js";
-import File from "../models/member/fileModel.js";
 import Trainer from "../models/admin/trainerModel.js";
+import Project from "../models/projects/projectModel.js";
 import {
   createFolder,
   findFolder,
@@ -16,8 +21,14 @@ import {
   uploadFile,
 } from "../controller/googleDriveService.js";
 import path from "path";
+import verifyToken from "../middlewares/verifyToken.js";
+import verifyRole from "../middlewares/verifyRole.js";
 
 // Clean up temporary directories on startup
+/**
+ * @desc Synchronously purges leftover files in `/tmp/uploads` on module initialization to prevent storage leaks.
+ * @returns {void}
+ */
 function cleanupTempDirectories() {
   try {
     const uploadDir = '/tmp/uploads';
@@ -47,6 +58,10 @@ function cleanupTempDirectories() {
 // Add after the cleanupTempDirectories function
 
 // Periodically clean old temporary files (files older than 15 minutes)
+/**
+ * @desc Scans `/tmp/uploads` and unlinks temporary files older than 15 minutes.
+ * @returns {void}
+ */
 function scheduleCleanup() {
   try {
     const MAX_AGE_MS = 15 * 60 * 1000; // 15 minutes
@@ -97,14 +112,36 @@ if (!fs.existsSync(uploadDir)) {
 
 const router = express.Router();
 
-// Update the multer configuration to use /tmp/uploads
+const ALLOWED_MIME_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'application/pdf'
+];
+
+// Update the multer configuration to use /tmp/uploads with 10MB limit and safe MIME whitelist
 const upload = multer({
   storage: multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, '/tmp/uploads')  // Changed from '/var/task/uploads'
+      cb(null, '/tmp/uploads');
     },
-  })
-})
+    filename: function (req, file, cb) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      cb(null, uniqueSuffix + '-' + file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_'));
+    }
+  }),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB maximum file size
+  },
+  fileFilter: (req, file, cb) => {
+    if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only JPEG, PNG, WEBP, GIF, and PDF files are allowed.'));
+    }
+  }
+});
 
 /**
  * POST /api/create_main_folder
@@ -123,7 +160,7 @@ const upload = multer({
         "name": "The Uniques 3.0"
     }56
  */
-router.post("/create_main_folder", async (req, res) => {
+router.post("/create_main_folder", verifyToken, verifyRole(['admin']), async (req, res) => {
   try {
     const { mainFolderName } = req.body;
     if (!mainFolderName) {
@@ -172,7 +209,7 @@ router.post("/create_main_folder", async (req, res) => {
 //   }
 // }
 // -----------------------------------------------------------------------------------------------------------
-router.post("/create_student_folder", async (req, res) => {
+router.post("/create_student_folder", verifyToken, verifyRole(['admin']), async (req, res) => {
   try {
     const { mainFolderName, studentId, subfolders } = req.body;
 
@@ -209,7 +246,7 @@ router.post("/create_student_folder", async (req, res) => {
  * POST /api/add_subfolder
  * Adds a new subfolder to an existing student folder
  */
-router.post("/add_subfolder", async (req, res) => {
+router.post("/add_subfolder", verifyToken, verifyRole(['admin']), async (req, res) => {
   try {
     const { mainFolderName, studentId, subfolder } = req.body;
 
@@ -261,7 +298,15 @@ router.post("/add_subfolder", async (req, res) => {
 // }
 //------------------------THIS THE requests FOR FILE UPLOAD--------------------------------------------------------------
 
-router.post("/file_upload", upload.array("files", 10), async (req, res) => {
+router.post("/file_upload", verifyToken, upload.array("files", 10), (req, res, next) => {
+  const targetMemberId = req.body.memberId;
+  const currentUserId = req.user._id || req.user.id;
+  const isPrivileged = ['admin', 'coordinator'].includes((req.user.role || '').toLowerCase());
+  if (targetMemberId && targetMemberId.toString() !== currentUserId.toString() && !isPrivileged) {
+    return res.status(403).json({ success: false, message: "Forbidden: Cannot upload assets for another member" });
+  }
+  next();
+}, async (req, res) => {
   try {
     const { mainFolderName, studentId, subfolder, memberId } = req.body;
     if (
@@ -316,82 +361,57 @@ router.post("/file_upload", upload.array("files", 10), async (req, res) => {
         // Update Member document based on updateField
         if (updateField) {
           if (updateField === "profilePic") {
-            // For non-array fields like profilePic, check if an entry already exists
             const member = await Member.findById(memberId);
-
-            if (member && member.profilePic) {
-              // Update existing File document instead of creating a new one
-              await File.findByIdAndUpdate(
-                member.profilePic,
-                {
-                  fileName: fileUploadResult.fileName,
-                  fileUrl: fileUploadResult.fileUrl,
-                  fileId: fileUploadResult.fileId,
-                  fileOwner: memberId,
-                },
-                { new: true }
-              );
-
-              // No need to update member since reference remains the same
-              console.log(`Updated existing File record: ${member.profilePic}`);
-              uploadedFiles.push({
-                ...fileUploadResult,
-                _id: member.profilePic,
-                updated: true,
-              });
-            } else {
-              // Create new File document (original behavior)
-              const fileRecord = new File({
-                fileName: fileUploadResult.fileName,
-                fileUrl: fileUploadResult.fileUrl,
-                fileId: fileUploadResult.fileId,
-                fileOwner: memberId,
-              });
-              await fileRecord.save();
-
-              // Update member with new file reference
-              await Member.findByIdAndUpdate(memberId, {
-                [updateField]: fileRecord._id,
-              });
-
-              uploadedFiles.push({
-                ...fileUploadResult,
-                _id: fileRecord._id,
-                new: true,
-              });
-            }
-          } else {
-            // For array fields, keep current functionality (push new entries)
-            const fileRecord = new File({
+            const existingId = (member && member.profilePic && member.profilePic._id) ? member.profilePic._id : new mongoose.Types.ObjectId();
+            const fileAttachment = {
+              _id: existingId,
               fileName: fileUploadResult.fileName,
               fileUrl: fileUploadResult.fileUrl,
+              url: fileUploadResult.fileUrl,
               fileId: fileUploadResult.fileId,
-              fileOwner: memberId,
-            });
-            await fileRecord.save();
+            };
 
-            // Push file record reference to array
             await Member.findByIdAndUpdate(memberId, {
-              $push: { [updateField]: fileRecord._id },
+              profilePic: fileAttachment
             });
 
             uploadedFiles.push({
               ...fileUploadResult,
-              _id: fileRecord._id,
+              ...fileAttachment,
+              updated: Boolean(member && member.profilePic),
+              new: !member || !member.profilePic,
+            });
+          } else {
+            // For array fields like certifications or achievements
+            const fileAttachment = {
+              _id: new mongoose.Types.ObjectId(),
+              fileName: fileUploadResult.fileName,
+              fileUrl: fileUploadResult.fileUrl,
+              url: fileUploadResult.fileUrl,
+              fileId: fileUploadResult.fileId,
+            };
+
+            await Member.findByIdAndUpdate(memberId, {
+              $push: { [updateField]: fileAttachment },
+            });
+
+            uploadedFiles.push({
+              ...fileUploadResult,
+              ...fileAttachment,
             });
           }
         } else {
-          // No specified field to update, just save the file
-          const fileRecord = new File({
+          // No specified field to update, return file attachment metadata
+          const fileAttachment = {
+            _id: new mongoose.Types.ObjectId(),
             fileName: fileUploadResult.fileName,
             fileUrl: fileUploadResult.fileUrl,
+            url: fileUploadResult.fileUrl,
             fileId: fileUploadResult.fileId,
-            fileOwner: memberId,
-          });
-          await fileRecord.save();
+          };
           uploadedFiles.push({
             ...fileUploadResult,
-            _id: fileRecord._id,
+            ...fileAttachment,
           });
         }
       } catch (fileError) {
@@ -430,7 +450,7 @@ router.post("/file_upload", upload.array("files", 10), async (req, res) => {
  * - fileKey: Key/field name in event model that contains file reference
  * - files: One or more files to upload
  */
-router.post("/event_file_upload", upload.array("files", 10), async (req, res) => {
+router.post("/event_file_upload", verifyToken, verifyRole(['admin', 'coordinator']), upload.array("files", 10), async (req, res) => {
   const tempFiles = req.files || [];
 
   try {
@@ -486,43 +506,40 @@ router.post("/event_file_upload", upload.array("files", 10), async (req, res) =>
         });
 
         if (event.eventBanner) {
-          // Update existing File document
-          await File.findByIdAndUpdate(
-            event.eventBanner,
-            {
-              fileName: fileUploadResult.fileName,
-              fileUrl: fileUploadResult.fileUrl,
-              fileId: fileUploadResult.fileId,
-              lastUpdated: new Date()
-            },
-            { new: true }
-          );
+          const bannerAttachment = {
+            _id: (event.eventBanner && event.eventBanner._id) ? event.eventBanner._id : new mongoose.Types.ObjectId(),
+            fileName: fileUploadResult.fileName,
+            fileUrl: fileUploadResult.fileUrl,
+            url: fileUploadResult.fileUrl,
+            fileId: fileUploadResult.fileId,
+          };
+
+          await Event.findByIdAndUpdate(eventId, {
+            eventBanner: bannerAttachment
+          });
 
           uploadedFiles.push({
             ...fileUploadResult,
-            _id: event.eventBanner,
+            ...bannerAttachment,
             type: "banner",
             status: "updated"
           });
         } else {
-          // Create new File document
-          const fileRecord = new File({
+          const bannerAttachment = {
+            _id: new mongoose.Types.ObjectId(),
             fileName: fileUploadResult.fileName,
             fileUrl: fileUploadResult.fileUrl,
+            url: fileUploadResult.fileUrl,
             fileId: fileUploadResult.fileId,
-            eventId: eventId,
-            fileType: "event-banner"
-          });
-          await fileRecord.save();
+          };
 
-          // Update event
           await Event.findByIdAndUpdate(eventId, {
-            eventBanner: fileRecord._id
+            eventBanner: bannerAttachment
           });
 
           uploadedFiles.push({
             ...fileUploadResult,
-            _id: fileRecord._id,
+            ...bannerAttachment,
             type: "banner",
             status: "created"
           });
@@ -531,15 +548,6 @@ router.post("/event_file_upload", upload.array("files", 10), async (req, res) =>
       else if (fileKey === 'eventGallery') {
         // Array field - handle multiple files
         if (replaceGallery === 'true') {
-          // Clear existing gallery if replace option is set
-          // First get existing gallery items
-          const existingGallery = event.eventGallery || [];
-
-          // Delete all file references
-          if (existingGallery.length > 0) {
-            await File.deleteMany({ _id: { $in: existingGallery } });
-          }
-
           // Clear gallery array in event
           await Event.findByIdAndUpdate(eventId, { eventGallery: [] });
         }
@@ -552,24 +560,22 @@ router.post("/event_file_upload", upload.array("files", 10), async (req, res) =>
             customPrefix: file.originalname.substring(0, 15).replace(/[^a-zA-Z0-9-_]/g, '')
           });
 
-          // Create new File document
-          const fileRecord = new File({
+          const galleryAttachment = {
+            _id: new mongoose.Types.ObjectId(),
             fileName: fileUploadResult.fileName,
             fileUrl: fileUploadResult.fileUrl,
+            url: fileUploadResult.fileUrl,
             fileId: fileUploadResult.fileId,
-            eventId: eventId,
-            fileType: "event-gallery"
-          });
-          await fileRecord.save();
+          };
 
           // Add to event gallery
           await Event.findByIdAndUpdate(eventId, {
-            $push: { eventGallery: fileRecord._id }
+            $push: { eventGallery: galleryAttachment }
           });
 
           uploadedFiles.push({
             ...fileUploadResult,
-            _id: fileRecord._id,
+            ...galleryAttachment,
             type: "gallery",
             status: "added"
           });
@@ -584,20 +590,17 @@ router.post("/event_file_upload", upload.array("files", 10), async (req, res) =>
           customPrefix: file.originalname.substring(0, 15).replace(/[^a-zA-Z0-9-_]/g, '')
         });
 
-        // Create file record
-        const fileRecord = new File({
+        const unlinkedAttachment = {
+          _id: new mongoose.Types.ObjectId(),
           fileName: fileUploadResult.fileName,
           fileUrl: fileUploadResult.fileUrl,
+          url: fileUploadResult.fileUrl,
           fileId: fileUploadResult.fileId,
-          relatedTo: "event",
-          relatedName: eventName,
-          fileType: fileKey === 'eventBanner' ? "event-banner" : "event-gallery"
-        });
-        await fileRecord.save();
+        };
 
         uploadedFiles.push({
           ...fileUploadResult,
-          _id: fileRecord._id,
+          ...unlinkedAttachment,
           type: fileKey === 'eventBanner' ? "banner" : "gallery",
           status: "unlinked"
         });
@@ -635,7 +638,7 @@ router.post("/event_file_upload", upload.array("files", 10), async (req, res) =>
   }
 });
 
-router.post("/budget_file_upload", upload.single("file"), async (req, res) => {
+router.post("/budget_file_upload", verifyToken, verifyRole(['admin', 'coordinator']), upload.single("file"), async (req, res) => {
   const tempFile = req.file;
 
   try {
@@ -691,20 +694,18 @@ router.post("/budget_file_upload", upload.single("file"), async (req, res) => {
       customPrefix: `${itemType}-${itemId.substring(0, 8)}`
     });
 
-    // Create file record
-    const fileRecord = new File({
+    // Create embedded receipt attachment
+    const receiptAttachment = {
+      _id: new mongoose.Types.ObjectId(),
       fileName: fileUploadResult.fileName,
       fileUrl: fileUploadResult.fileUrl,
+      url: fileUploadResult.fileUrl,
       fileId: fileUploadResult.fileId,
-      eventId: eventId,
-      fileType: `${itemType}-receipt`,
-      relatedId: itemId
-    });
-    await fileRecord.save();
+    };
 
     // Update the event item with receipt reference
     const updatePath = `${itemType}s.${itemIndex}.receiptId`;
-    const updateObj = { [updatePath]: fileRecord._id };
+    const updateObj = { [updatePath]: receiptAttachment };
 
     // Initialize budget updates object
     const budgetUpdates = {};
@@ -759,7 +760,7 @@ router.post("/budget_file_upload", upload.single("file"), async (req, res) => {
       message: `Receipt uploaded and ${itemType} updated successfully`,
       file: {
         ...fileUploadResult,
-        _id: fileRecord._id,
+        ...receiptAttachment,
       },
       eventId: eventId,
       itemType: itemType,
@@ -796,7 +797,7 @@ router.post("/budget_file_upload", upload.single("file"), async (req, res) => {
  * - fileType: Type of file (receipt, proof, waiver, other)
  * - files: One or more files to upload
  */
-router.post("/fine_file_upload", upload.array("files", 5), async (req, res) => {
+router.post("/fine_file_upload", verifyToken, verifyRole(['admin', 'coordinator']), upload.array("files", 5), async (req, res) => {
   const tempFiles = req.files || [];
 
   try {
@@ -855,22 +856,18 @@ router.post("/fine_file_upload", upload.array("files", 5), async (req, res) => {
         customPrefix: `${fileType}-${file.originalname.substring(0, 15).replace(/[^a-zA-Z0-9-_]/g, '')}`
       });
 
-      // Create new File document
-      const fileRecord = new File({
+      const fileAttachment = {
+        _id: new mongoose.Types.ObjectId(),
         fileName: fileUploadResult.fileName,
         fileUrl: fileUploadResult.fileUrl,
+        url: fileUploadResult.fileUrl,
         fileId: fileUploadResult.fileId,
-        fileType: `fine-${fileType}`,
-        relatedTo: "fine",
-        relatedId: fineId || null,
-        fileOwner: memberId
-      });
-      await fileRecord.save();
+        type: fileType,
+      };
 
       uploadedFiles.push({
         ...fileUploadResult,
-        _id: fileRecord._id,
-        type: fileType
+        ...fileAttachment,
       });
     }
 
@@ -915,7 +912,7 @@ router.post("/fine_file_upload", upload.array("files", 5), async (req, res) => {
  * - trainerId: MongoDB ID of the trainer
  * - file: The image file to upload
  */
-router.post("/trainer_file_upload", upload.single("file"), async (req, res) => {
+router.post("/trainer_file_upload", verifyToken, verifyRole(['admin', 'coordinator']), upload.single("file"), async (req, res) => {
   const tempFile = req.file;
 
   try {
@@ -952,45 +949,28 @@ router.post("/trainer_file_upload", upload.single("file"), async (req, res) => {
       customPrefix: tempFile.originalname.substring(0, 15).replace(/[^a-zA-Z0-9-_]/g, '')
     });
 
-    if (trainer.profilePic) {
-      // Check if profilePic is an ID string or object
-      const profilePicId = typeof trainer.profilePic === 'object' ? trainer.profilePic._id : trainer.profilePic;
-      
-      // Update existing File document
-      await File.findByIdAndUpdate(
-        profilePicId,
-        {
-          fileName: fileUploadResult.fileName,
-          fileUrl: fileUploadResult.fileUrl,
-          fileId: fileUploadResult.fileId,
-          lastUpdated: new Date()
-        },
-        { new: true }
-      );
-    } else {
-      // Create new File document
-      const fileRecord = new File({
-        fileName: fileUploadResult.fileName,
-        fileUrl: fileUploadResult.fileUrl,
-        fileId: fileUploadResult.fileId,
-        relatedTo: "trainer",
-        relatedId: trainerId,
-        fileType: "trainer-profile"
-      });
-      await fileRecord.save();
+    const existingId = (trainer.profilePic && typeof trainer.profilePic === 'object' && trainer.profilePic._id) 
+      ? trainer.profilePic._id 
+      : new mongoose.Types.ObjectId();
 
-      // Update trainer
-      await Trainer.findByIdAndUpdate(trainerId, {
-        profilePic: fileRecord._id
-      });
-    }
+    const profilePicAttachment = {
+      _id: existingId,
+      fileName: fileUploadResult.fileName,
+      fileUrl: fileUploadResult.fileUrl,
+      url: fileUploadResult.fileUrl,
+      fileId: fileUploadResult.fileId,
+    };
+
+    await Trainer.findByIdAndUpdate(trainerId, {
+      profilePic: profilePicAttachment
+    });
 
     // Send response
     res.status(200).json({
       message: `Trainer profile picture updated successfully`,
       file: {
         ...fileUploadResult,
-        _id: trainer.profilePic || "new_id", 
+        ...profilePicAttachment,
       },
       trainerId: trainerId,
       trainerName: trainerName
@@ -1013,5 +993,86 @@ router.post("/trainer_file_upload", upload.single("file"), async (req, res) => {
     }
   }
 });
+
+/**
+ * POST /upload/project_file_upload
+ * Uploads a project thumbnail to Google Drive under 'The Uniques Projects' -> [Batch]
+ * Supports optional projectId to automatically update the project document,
+ * or returns { fileId, fileUrl, fileName, proxyUrl } for new project creation.
+ */
+router.post(
+  "/project_file_upload",
+  verifyToken,
+  verifyRole(["admin", "coordinator"]),
+  upload.single("file"),
+  async (req, res) => {
+    const tempFile = req.file;
+
+    if (!tempFile) {
+      return res.status(400).json({
+        success: false,
+        message: "No file provided for upload.",
+      });
+    }
+
+    try {
+      const { batch, title, projectId } = req.body;
+      const batchName = (batch && batch.trim()) || "General Projects";
+      const projectTitle = (title && title.trim()) || "Project";
+      const mainFolderName = "The Uniques Projects";
+
+      // Provision folder structure: The Uniques Projects -> [Batch] -> thumbnails
+      const folderStructure = await createFolderStructure(
+        mainFolderName,
+        batchName,
+        ["thumbnails"]
+      );
+
+      const targetFolderId = folderStructure.subfolders["thumbnails"].id;
+
+      // Upload file to Google Drive
+      const fileUploadResult = await uploadFile(tempFile.path, targetFolderId, {
+        category: "project-thumbnail",
+        customPrefix: projectTitle.substring(0, 15).replace(/[^a-zA-Z0-9-_]/g, ""),
+      });
+
+      // If projectId is provided, update the project document directly
+      if (projectId && mongoose.Types.ObjectId.isValid(projectId)) {
+        await Project.findByIdAndUpdate(projectId, {
+          image: `/api/image-proxy/${fileUploadResult.fileId}`,
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Project thumbnail uploaded successfully",
+        file: {
+          fileId: fileUploadResult.fileId,
+          fileUrl: fileUploadResult.fileUrl,
+          fileName: fileUploadResult.fileName,
+          proxyUrl: `/api/image-proxy/${fileUploadResult.fileId}`,
+        },
+        projectId: projectId || null,
+        batch: batchName,
+      });
+    } catch (error) {
+      console.error("Error in project file upload:", error);
+      res.status(500).json({
+        success: false,
+        message: "Error during project file upload.",
+        error: error.message,
+      });
+    } finally {
+      // Clean up temporary file
+      try {
+        if (tempFile && fs.existsSync(tempFile.path)) {
+          fs.unlinkSync(tempFile.path);
+        }
+      } catch (err) {
+        console.error("Error deleting temp file:", tempFile?.path, err);
+      }
+    }
+  }
+);
 
 export default router;

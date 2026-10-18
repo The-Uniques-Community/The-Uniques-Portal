@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./style.css";
 import HeroClip from "@/assets/img/Community/Sample1.png";
-import Button from "@/utils/Buttons/Button";
+import Button from "@/components/buttons/Button";
 import DoubleQuotes from "@/assets/img/Community/Double.png";
 import ApplicationForm from '@/components/ApplicationForm';
 

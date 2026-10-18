@@ -4,7 +4,7 @@ import tu from "@/assets/logos/theuniquesCommunity.png";
 import InstagramIcon from '@mui/icons-material/Instagram';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "@/config";
 
@@ -27,6 +27,7 @@ const ContactForm = () => {
     severity: 'success'
   });
   const [errors, setErrors] = useState({});
+  const [isMapActive, setIsMapActive] = useState(false);
   
   // Available services
   const services = [
@@ -265,9 +266,12 @@ const ContactForm = () => {
 
           <h3 className="text-2xl font-semibold mt-8 mb-2">Visit us</h3>
           <p className="text-gray-600 mb-2">SVIET, Banur, Punjab-140601</p>
-          <div>
+          <div 
+            className="relative rounded-lg overflow-hidden group"
+            onMouseLeave={() => setIsMapActive(false)}
+          >
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3690.82409273242!2d76.70145491128464!3d30.55434119412627!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390fc3b350bbf2e7%3A0xece92a925f664640!2sThe%20uniques!5e1!3m2!1sen!2sin!4v1740583636506!5m2!1sen!2sin"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3690.82409273242!2d76.70145491128464!3d30.55434119412627!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390fc3b350bbf2e7%3A0xece92a925f664640!2sThe%20uniques!5e0!3m2!1sen!2sin!4v1740583636506!5m2!1sen!2sin"
               style={{ border: 0 }}
               width={"100%"}
               height={"220px"}
@@ -275,7 +279,42 @@ const ContactForm = () => {
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               title="The Uniques Community Map Location"
+              className={`w-full h-[220px] rounded-lg transition-all duration-300 dark:invert-[0.92] dark:hue-rotate-180 dark:contrast-[1.15] dark:brightness-[0.88] dark:saturate-[0.85] ${!isMapActive ? 'pointer-events-none' : ''}`}
             ></iframe>
+
+            {!isMapActive && (
+              <div 
+                onClick={() => setIsMapActive(true)}
+                className="absolute inset-0 bg-black/10 dark:bg-black/30 backdrop-blur-[1px] flex flex-col items-center justify-center cursor-pointer transition-opacity hover:bg-black/20"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsMapActive(true); }}
+                aria-label="Click to interact with map"
+              >
+                <span className="bg-white/90 dark:bg-neutral-900/90 text-gray-800 dark:text-gray-200 text-xs font-medium px-3 py-1.5 rounded-full shadow-md backdrop-blur-sm pointer-events-none">
+                  Click to interact with map
+                </span>
+                <a
+                  href="https://maps.google.com/?q=The+uniques+SVIET+Banur"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="mt-2 text-xs text-white/90 hover:text-white underline drop-shadow"
+                >
+                  Open in Google Maps
+                </a>
+              </div>
+            )}
+            {isMapActive && (
+              <button
+                type="button"
+                onClick={() => setIsMapActive(false)}
+                className="absolute top-2 right-2 bg-white/90 dark:bg-neutral-800/90 text-gray-700 dark:text-gray-200 text-xs px-2.5 py-1 rounded shadow hover:bg-white dark:hover:bg-neutral-800 transition"
+                title="Lock map scroll"
+              >
+                Done
+              </button>
+            )}
           </div>
         </div>
       </div>

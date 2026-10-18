@@ -1,15 +1,15 @@
 import React from "react";
-import ModernHeader from "@/utils/Header/ModernHeader";
-import Second from "./componants/Batches";
-import Third from "./componants/Third";
-import Fourth from "./componants/Fourth";
-import Fifth from "./componants/Fifth";
-import Mentor from "./componants/Mentor";
-import TrainingTabs from "./componants/TraningModel";
-import VisionMission from "./componants/Vision";
-import Testimonial from "./componants/Testimonial";
-import Faq from "./componants/Faq";
-import CallToAction from "../homComponents/CallToAction";
+import ModernHeader from "@/components/headers/ModernHeader";
+import Second from "./components/Batches";
+import Third from "./components/Third";
+import Fourth from "./components/Fourth";
+import Fifth from "./components/Fifth";
+import Mentor from "./components/Mentor";
+import TrainingTabs from "./components/TraningModel";
+import VisionMission from "./components/Vision";
+import Testimonial from "./components/Testimonial";
+import Faq from "./components/Faq";
+import CallToAction from "../homeComponents/CallToAction";
 
 
 

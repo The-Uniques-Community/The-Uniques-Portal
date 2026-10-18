@@ -21,7 +21,8 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useThemeContext } from "@/theme/ThemeProvider";
-import ConfirmationModal from "@/utils/Modal/ConfirmationModal";
+import ConfirmationModal from "@/components/modals/ConfirmationModal";
+import authService from "@/services/authService";
 import logo from "@/assets/logos/theuniquesCommunity.png";
 import uniques_white from "@/assets/logos/uniqueswhite.png";
 import Brightness4Icon from "@mui/icons-material/Brightness4"; // Dark Mode Icon
@@ -65,20 +66,15 @@ function DashboardLayoutAppBar() {
 
   const [isOpen, setIsOpen] = React.useState(false);
   const onClose = () => setIsOpen(false);
-  const onConfirm = () => {
-    fetch("https://theuniquesportal-server.vercel.app/auth/logout", {
-      method: "POST",
-      credentials: "include",
-    })
-      .then(() => {
-        localStorage.removeItem("activeItem");
-        localStorage.removeItem("role");
-        toast.success("Logged out successfully");
-        navigate("/");
-      })
-      .catch((error) => {
-        console.error("Logout error:", error);
-      });
+  const onConfirm = async () => {
+    try {
+      await authService.logout();
+      localStorage.removeItem("activeItem");
+      toast.success("Logged out successfully");
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
     setIsOpen(false);
   };
 
@@ -121,14 +117,9 @@ function DashboardLayoutAppBar() {
             marginLeft: "16px", // Adds spacing between the drawer and the edge
             backgroundColor: theme.palette.background.drawer,
             borderRadius: "8px",
-            overflowX: "hidden",
-            overflowY: "auto",
-            overscrollBehavior: "contain",
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
-            "&::-webkit-scrollbar": {
-              display: "none",
-            },
+            overflow: "hidden",
+            display: "flex",
+            flexDirection: "column",
             transition: "width 0.3s",
             boxSizing: "border-box",
           },
@@ -139,6 +130,7 @@ function DashboardLayoutAppBar() {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            flexShrink: 0,
           }}
         >
           {drawerOpen && !isMobile && (
@@ -159,7 +151,26 @@ function DashboardLayoutAppBar() {
           </Box>
         </Box>
 
-        <List sx={{ padding: 2 }}>
+        <List
+          data-lenis-prevent="true"
+          onWheel={(e) => e.stopPropagation()}
+          sx={{
+            padding: 2,
+            flexGrow: 1,
+            overflowY: "auto",
+            overflowX: "hidden",
+            minHeight: 0,
+            overscrollBehavior: "contain",
+            scrollbarWidth: "thin",
+            "&::-webkit-scrollbar": {
+              width: "4px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "rgba(255, 255, 255, 0.2)",
+              borderRadius: "4px",
+            },
+          }}
+        >
           {STUDENT_NAVIGATION.map((item) => {
             const isActive = activeItem === item.title;
 
@@ -204,7 +215,7 @@ function DashboardLayoutAppBar() {
             );
           })}
         </List>
-        <List sx={{ padding: 2, marginTop: "auto" }}>
+        <List sx={{ padding: 2, flexShrink: 0, marginTop: "auto" }}>
           <ListItem
             button
             onClick={toggleTheme} // Toggles between light and dark mode

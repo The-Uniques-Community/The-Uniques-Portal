@@ -1,6 +1,32 @@
+/**
+ * @file trainerController.js
+ * @description Controller managing trainer lifecycle including creation, profile retrieval, modification, and deletion with profile picture cleanup.
+ * @architecture Part of the admin module mounted at `/api/admin/trainers`. Interfaces with `Trainer` and `File` models.
+ * @agent_note When deleting a trainer, their profile picture File document reference in MongoDB is cleaned up if present.
+ */
 import Trainer from "../../models/admin/trainerModel.js";
 import mongoose from "mongoose";
 
+/**
+ * @desc Add a new trainer profile
+ * @route POST /api/admin/trainers/add-trainer
+ * @access Private (Admin)
+ * @body {string} fullName - Full name of the trainer
+ * @body {string} email - Email address
+ * @body {string} contact - Phone/contact number
+ * @body {string} origin - Origin type ('uniques' or 'external')
+ * @body {string} [designation] - Professional designation (if external)
+ * @body {string} [trainerBatch] - Member batch (if uniques origin)
+ * @body {string} teachingBatch - Target teaching batch
+ * @body {string} course - Course name
+ * @body {string} [bio] - Short biography
+ * @body {string[]} [skills] - Array of skills/technologies
+ * @body {string} [linkedinProfile] - LinkedIn profile URL
+ * @body {string} [githubProfile] - GitHub profile URL
+ * @returns {Object} 201 - JSON with status and created trainer object
+ * @returns {Object} 400 - If trainer with email already exists
+ * @returns {Object} 500 - Server error
+ */
 // Add a new trainer
 export const addTrainer = async (req, res) => {
     try {
@@ -35,10 +61,17 @@ export const addTrainer = async (req, res) => {
     }
 };
 
+/**
+ * @desc Retrieve all trainer profiles with populated profile pictures
+ * @route GET /api/admin/trainers/all-trainers
+ * @access Private (Admin)
+ * @returns {Object[]} 200 - Array of trainer objects sorted newest first
+ * @returns {Object} 500 - Server error
+ */
 // Get all trainers
 export const getAllTrainers = async (req, res) => {
     try {
-        const trainers = await Trainer.find().populate('profilePic').sort({ createdAt: -1 });
+        const trainers = await Trainer.find().sort({ createdAt: -1 });
         res.status(200).json(trainers);
     } catch (error) {
         console.error("Error fetching trainers:", error);
@@ -46,13 +79,23 @@ export const getAllTrainers = async (req, res) => {
     }
 };
 
+/**
+ * @desc Update an existing trainer profile by ID
+ * @route PUT /api/admin/trainers/update-trainer/:id
+ * @access Private (Admin)
+ * @params {string} id - Trainer document ID
+ * @body {Object} updates - Updated trainer fields
+ * @returns {Object} 200 - JSON with success message and updated trainer object
+ * @returns {Object} 404 - If trainer is not found
+ * @returns {Object} 500 - Server error
+ */
 // Update a trainer
 export const updateTrainer = async (req, res) => {
     try {
         const { id } = req.params;
         const updates = req.body;
 
-        const updatedTrainer = await Trainer.findByIdAndUpdate(id, updates, { new: true }).populate('profilePic');
+        const updatedTrainer = await Trainer.findByIdAndUpdate(id, updates, { new: true });
 
         if (!updatedTrainer) {
             return res.status(404).json({ message: "Trainer not found." });
@@ -65,6 +108,15 @@ export const updateTrainer = async (req, res) => {
     }
 };
 
+/**
+ * @desc Delete a trainer by ID and clean up associated profile picture File record
+ * @route DELETE /api/admin/trainers/delete-trainer/:id
+ * @access Private (Admin)
+ * @params {string} id - Trainer document ID
+ * @returns {Object} 200 - JSON success message
+ * @returns {Object} 404 - If trainer is not found
+ * @returns {Object} 500 - Server error
+ */
 // Delete a trainer
 export const deleteTrainer = async (req, res) => {
     try {
@@ -75,32 +127,16 @@ export const deleteTrainer = async (req, res) => {
             return res.status(404).json({ message: "Trainer not found." });
         }
 
-        // Check if trainer has a profile picture and delete the file record
+        // Embedded subdocument profilePic deletes automatically with the Trainer document.
+        // For backward compatibility with legacy File records:
         if (trainer.profilePic) {
             try {
-                // Assuming profilePic stores the File ID or we need to find it
-                // Based on previous context, profilePic in Trainer model is a reference to File model
-                // We should delete the File document. 
-                // Note: This does not delete from Google Drive, only the DB record.
-                // To delete from Drive, we would need a drive service helper.
-                // For now, we are cleaning up the DB reference as requested.
-
-                // If profilePic is an object (populated), use ._id, else use it directly
                 const fileId = trainer.profilePic._id || trainer.profilePic;
-
-                // Import File model dynamically or ensure it's imported at top (it's not, so we'll just use mongoose model if not imported, 
-                // but better to rely on what we have or just import it)
-                // Let's add the import at the top in a separate edit if needed, or assume it's global? 
-                // No, ES modules. I'll add the import in a minute, but for now let's write the logic.
-                // Actually, checking previous steps, I should probably import File model.
-                // But wait, I can't add import here easily without changing top of file. 
-                // I will use mongoose.model("File") to retrieve it without restart.
-
-                const File = mongoose.model("File");
-                await File.findByIdAndDelete(fileId);
+                if (mongoose.models.File) {
+                    await mongoose.models.File.findByIdAndDelete(fileId);
+                }
             } catch (fileError) {
-                console.error("Error deleting trainer profile picture record:", fileError);
-                // Continue with trainer deletion even if file deletion fails
+                console.error("Error cleaning up legacy trainer profile picture record:", fileError);
             }
         }
 

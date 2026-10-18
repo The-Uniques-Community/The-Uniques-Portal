@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { Box, CircularProgress, IconButton, Paper, TextField, InputAdornment, Typography } from "@mui/material";
-import { Send as SendIcon, QueryStats as ProgressIcon } from "@mui/icons-material";
+import SendIcon from '@mui/icons-material/Send';
+import ProgressIcon from '@mui/icons-material/QueryStats';
 
 const ReportComposer = ({ selectedTask, newReport, setNewReport, progressPercent, setProgressPercent, sending, onSubmit }) => {
   const fileInputRef = useRef(null);

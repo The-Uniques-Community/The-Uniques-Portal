@@ -4,7 +4,6 @@ import { useTheme } from "@mui/material/styles";
 import { FaLinkedinIn, FaInstagram, FaGithub } from "react-icons/fa";
 import { GoArrowUpRight } from "react-icons/go";
 import { FaXTwitter } from "react-icons/fa6";
-import { Link, useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import { TbTrophy, TbBriefcase } from "react-icons/tb";
@@ -42,75 +41,102 @@ export const TrainerCard = ({ user }) => {
     };
 
     return (
-        <div className="relative w-80 bg-white rounded-xl overflow-hidden shadow-md border border-slate-200 group transition-all hover:shadow-2xl hover:scale-[1.01] duration-300">
-
-            {/* Sidebar (Right) - Fixed Width, Full Height, Dark Background */}
-            <div className="absolute top-0 right-0 w-16 h-full bg-[#1e1e1e] flex flex-col items-center pt-6 gap-5 z-20">
-                {user.githubProfile && (
-                    <Link to={user.githubProfile} target="_blank" className="bg-white p-2 rounded-full hover:bg-slate-200 transition-colors">
-                        <FaGithub size={16} className="text-black" />
-                    </Link>
-                )}
-                {user.linkedinProfile && (
-                    <Link to={user.linkedinProfile} target="_blank" className="bg-white p-2 rounded-full hover:bg-slate-200 transition-colors">
-                        <FaLinkedinIn size={16} className="text-[#0077b5]" />
-                    </Link>
-                )}
-                {user.twitterProfile && (
-                    <Link to={user.twitterProfile} target="_blank" className="bg-white p-2 rounded-full hover:bg-slate-200 transition-colors">
-                        <FaXTwitter size={16} className="text-black" />
-                    </Link>
-                )}
-                {/* Arrow Button at Bottom */}
-                <button
-                    onClick={handleOpen}
-                    className="mt-auto mb-6 w-10 h-10 rounded-full bg-black border border-zinc-700 flex items-center justify-center text-white hover:bg-[#ca0019] hover:border-[#ca0019] transition-all duration-300 group-hover:rotate-45"
-                >
-                    <GoArrowUpRight size={20} />
-                </button>
+        <div className="relative w-full max-w-sm bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl border border-slate-200 group transition-all duration-300 flex flex-col">
+            {/* Image Container - Clean rounded design without face-cutting clip-path */}
+            <div
+                onClick={handleOpen}
+                className="relative h-64 w-full cursor-pointer overflow-hidden bg-slate-100"
+            >
+                <img
+                    src={imgSrc}
+                    onError={handleImgError}
+                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
+                    alt={user.fullName}
+                />
+                {/* Batch Badge */}
+                <div className="absolute top-4 left-4 bg-[#ca0019] text-white text-xs font-bold px-3 py-1 rounded-full shadow-md z-10 tracking-wide">
+                    {user.teachingBatch || "The Uniques 2.0"}
+                </div>
             </div>
 
-            {/* Content Area (Left) - Right margin reserved for Sidebar */}
-            <div className="mr-16 flex flex-col h-full bg-white relative">
+            {/* Content Area */}
+            <div className="p-5 flex flex-col flex-grow">
+                <div className="cursor-pointer" onClick={handleOpen}>
+                    <h3 className="font-extrabold text-xl text-slate-900 group-hover:text-[#ca0019] transition-colors leading-tight truncate">
+                        {user.fullName}
+                    </h3>
+                    <p className="text-sm text-slate-500 font-medium truncate mt-1">
+                        {user.designation || "Technical Trainer"}
+                    </p>
+                </div>
 
-                {/* Image Container */}
-                <div
-                    onClick={handleOpen}
-                    className="relative h-64 w-full cursor-pointer bg-slate-50"
-                    style={{
-                        clipPath: "polygon(30% 0%, 85% 0, 100% 12%, 100% 100%, 60% 100%, 40% 85%, 0 85%, 0 0)",
-                    }}
-                >
-                    <img
-                        src={imgSrc}
-                        onError={handleImgError}
-                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                        alt={user.fullName}
-                    />
-                    {/* Batch Badge (Overlapping Image) */}
-                    <div className="absolute bottom-[20%] left-0 bg-[#ca0019] text-white text-xs font-bold px-3 py-1.5 shadow-md z-10">
-                        {user.teachingBatch || "The Uniques 2.0"}
+                {/* Stats / Skills Pills */}
+                <div className="flex flex-wrap items-center gap-2 mt-3">
+                    <div className="flex items-center gap-1.5 bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
+                        <span className="font-bold text-slate-700 text-xs">{user.skills?.length || 0}</span>
+                        <span className="text-xs text-slate-500 font-medium">Skills</span>
                     </div>
                 </div>
 
-                {/* Text Info */}
-                <div className="p-5 flex flex-col gap-2 relative top-[-15px]"> {/* Negative top margin to pull text up into the white space created by clip-path if needed, or just normal flow */}
-                    <h3 className="font-extrabold text-xl text-slate-900 leading-tight truncate pr-2">{user.fullName}</h3>
-                    <p className="text-sm text-slate-500 font-medium truncate">{user.designation || "Technical Trainer"}</p>
-
-                    {/* Stats / Skills Pills */}
-                    <div className="flex flex-wrap items-center gap-2 mt-3">
-                        <div className="flex items-center gap-1.5 bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
-                            <span className="font-bold text-slate-700 text-xs">{user.skills?.length || 0}</span>
-                            <span className="text-xs text-slate-500 font-medium">Skills</span>
-                        </div>
-
-                        {/* Example Achievement Pill - Optional based on data */}
-                        {/* <div className="flex items-center gap-1.5 bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
-                             <TbTrophy className="text-[#ca0019] text-xs"/>
-                             <span className="text-xs text-slate-500 font-medium">Expert</span>
-                        </div> */}
+                {/* Clean Bottom Action Row with Social Icons and View Profile */}
+                <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
+                    {/* Social Media Links */}
+                    <div className="flex items-center gap-2">
+                        {user.githubProfile && (
+                            <a
+                                href={user.githubProfile}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-700 transition-colors"
+                                title="GitHub"
+                            >
+                                <FaGithub size={15} />
+                            </a>
+                        )}
+                        {user.linkedinProfile && (
+                            <a
+                                href={user.linkedinProfile}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-[#0077b5]/10 hover:text-[#0077b5] flex items-center justify-center text-slate-700 transition-colors"
+                                title="LinkedIn"
+                            >
+                                <FaLinkedinIn size={15} />
+                            </a>
+                        )}
+                        {user.twitterProfile && (
+                            <a
+                                href={user.twitterProfile}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-700 transition-colors"
+                                title="Twitter"
+                            >
+                                <FaXTwitter size={15} />
+                            </a>
+                        )}
+                        {user.instagramProfile && (
+                            <a
+                                href={user.instagramProfile}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-pink-50 hover:text-pink-600 flex items-center justify-center text-slate-700 transition-colors"
+                                title="Instagram"
+                            >
+                                <FaInstagram size={15} />
+                            </a>
+                        )}
                     </div>
+
+                    {/* View Profile Action */}
+                    <button
+                        onClick={handleOpen}
+                        className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-[#ca0019] group/btn transition-colors py-1.5 px-3 rounded-lg hover:bg-red-50"
+                        aria-label={`View profile of ${user.fullName}`}
+                    >
+                        <span>View Profile</span>
+                        <GoArrowUpRight size={15} className="group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+                    </button>
                 </div>
             </div>
 
@@ -175,32 +201,32 @@ export const TrainerCard = ({ user }) => {
                                 <h4 className="font-bold text-sm text-slate-900 uppercase tracking-wider mb-3 border-b border-slate-100 pb-2">Connect</h4>
                                 <div className="flex items-center gap-3">
                                     {user.githubProfile && (
-                                        <Link to={user.githubProfile} target="_blank">
+                                        <a href={user.githubProfile} target="_blank" rel="noopener noreferrer">
                                             <div className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-white hover:bg-black transition-colors">
                                                 <FaGithub size={18} />
                                             </div>
-                                        </Link>
+                                        </a>
                                     )}
                                     {user.linkedinProfile && (
-                                        <Link to={user.linkedinProfile} target="_blank">
+                                        <a href={user.linkedinProfile} target="_blank" rel="noopener noreferrer">
                                             <div className="w-10 h-10 rounded-full bg-[#0077b5] flex items-center justify-center text-white hover:opacity-90 transition-opacity">
                                                 <FaLinkedinIn size={18} />
                                             </div>
-                                        </Link>
+                                        </a>
                                     )}
                                     {user.twitterProfile && (
-                                        <Link to={user.twitterProfile} target="_blank">
+                                        <a href={user.twitterProfile} target="_blank" rel="noopener noreferrer">
                                             <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white hover:opacity-80 transition-opacity">
                                                 <FaXTwitter size={18} />
                                             </div>
-                                        </Link>
+                                        </a>
                                     )}
                                     {user.instagramProfile && (
-                                        <Link to={user.instagramProfile} target="_blank">
+                                        <a href={user.instagramProfile} target="_blank" rel="noopener noreferrer">
                                             <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 flex items-center justify-center text-white hover:opacity-90 transition-opacity">
                                                 <FaInstagram size={18} />
                                             </div>
-                                        </Link>
+                                        </a>
                                     )}
                                 </div>
                             </div>

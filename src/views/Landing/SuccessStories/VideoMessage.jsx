@@ -2,9 +2,18 @@ import React, { useState } from 'react';
 import { Box, Typography, Paper, Chip, Fade } from '@mui/material';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
+import { isYouTubeUrl, isVimeoUrl, getYouTubeEmbedUrl, getVimeoEmbedUrl } from '@/utils/videoUtils';
 
 const VideoMessage = ({ student, SectionHeading }) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const isYouTube = isYouTubeUrl(student?.video);
+  const isVimeo = isVimeoUrl(student?.video);
+  const isEmbed = isYouTube || isVimeo;
+  const embedUrl = isYouTube
+    ? getYouTubeEmbedUrl(student?.video)
+    : isVimeo
+    ? getVimeoEmbedUrl(student?.video)
+    : '';
 
   return (
     <Paper
@@ -116,57 +125,86 @@ const VideoMessage = ({ student, SectionHeading }) => {
                 }
               }}
             >
-              {/* Video Element */}
-              <Box
-                component="video"
-                key={student.id}
-                controls
-                preload="auto"
-                playsInline
-                src={student.video}
-                onLoadedData={(event) => {
-                  const video = event.currentTarget;
-                  if (video.currentTime !== 0) {
-                    video.currentTime = 0;
-                  }
-                  video.pause();
-                  setIsPlaying(false);
-                }}
-                onPlay={() => setIsPlaying(true)}
-                onPause={() => setIsPlaying(false)}
-                onEnded={() => setIsPlaying(false)}
-                sx={{
-                  width: '100%',
-                  height: 'auto',
-                  maxHeight: 520,
-                  display: 'block',
-                  backgroundColor: '#000',
-                  objectFit: 'contain',
-                  borderRadius: 3,
-                }}
-              />
-              
-              {/* Play overlay (only visible when video not playing) */}
-              <Box
-                sx={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  width: 60,
-                  height: 60,
-                  borderRadius: '50%',
-                  bgcolor: '#ca0019',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  opacity: isPlaying ? 0 : 0.9,
-                  transition: 'opacity 0.2s ease',
-                  pointerEvents: 'none',
-                }}
-              >
-                <PlayCircleOutlineIcon sx={{ fontSize: 40, color: '#fff' }} />
-              </Box>
+              {/* Video Element or Embed */}
+              {isEmbed ? (
+                <Box
+                  sx={{
+                    position: 'relative',
+                    width: '100%',
+                    paddingTop: '56.25%', // 16:9 Aspect Ratio
+                    backgroundColor: '#000',
+                  }}
+                >
+                  <iframe
+                    src={embedUrl}
+                    title={`${student?.name || 'Student'}'s Video Message`}
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      border: 0,
+                    }}
+                  />
+                </Box>
+              ) : (
+                <>
+                  <Box
+                    component="video"
+                    key={student.id}
+                    controls
+                    preload="auto"
+                    playsInline
+                    src={student.video}
+                    onLoadedData={(event) => {
+                      const video = event.currentTarget;
+                      if (video.currentTime !== 0) {
+                        video.currentTime = 0;
+                      }
+                      video.pause();
+                      setIsPlaying(false);
+                    }}
+                    onPlay={() => setIsPlaying(true)}
+                    onPause={() => setIsPlaying(false)}
+                    onEnded={() => setIsPlaying(false)}
+                    sx={{
+                      width: '100%',
+                      height: 'auto',
+                      maxHeight: 520,
+                      display: 'block',
+                      backgroundColor: '#000',
+                      objectFit: 'contain',
+                      borderRadius: 3,
+                    }}
+                  />
+                  
+                  {/* Play overlay (only visible when direct video not playing) */}
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      width: 60,
+                      height: 60,
+                      borderRadius: '50%',
+                      bgcolor: '#ca0019',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      opacity: isPlaying ? 0 : 0.9,
+                      transition: 'opacity 0.2s ease',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    <PlayCircleOutlineIcon sx={{ fontSize: 40, color: '#fff' }} />
+                  </Box>
+                </>
+              )}
             </Box>
 
             {/* Inspirational Quote Section */}

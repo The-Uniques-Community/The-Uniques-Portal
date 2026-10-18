@@ -4,8 +4,8 @@ import axios from "axios";
 import { BASE_URL } from "@/config";
 import { TrainerCard } from "./TrainerCard";
 import SearchIcon from "@mui/icons-material/Search";
-import CustomLoader from "@/utils/Loader/CustomLoader";
-import { School } from "@mui/icons-material";
+import { CardSkeleton } from "@/components/common/skeletons";
+import School from '@mui/icons-material/School';
 import { motion, AnimatePresence } from "framer-motion";
 
 const batchTabs = [
@@ -238,7 +238,7 @@ const Trainers = () => {
 
                     {/* ========== CONTENT SECTION ========== */}
                     {loading ? (
-                        <CustomLoader />
+                        <CardSkeleton type="trainer" count={8} />
                     ) : error ? (
                         <Box sx={{ textAlign: "center", py: 10 }}>
                             <Typography color="error" variant="h6">{error}</Typography>

@@ -1,5 +1,17 @@
-import mongoose from "mongoose";
+/**
+ * @file trainerModel.js
+ * @description Mongoose schema and model for internal and external trainers and instructors.
+ * @architecture Manages instructional personnel profiles, teaching assignments, and profile pic references to the File model.
+ * @agent_note Enforces conditional requirements based on 'origin' (uniques vs external); maintains legacy 'batch' field alongside 'teachingBatch'.
+ */
 
+import mongoose from "mongoose";
+import fileAttachmentSchema from "../common/fileAttachmentSchema.js";
+
+/**
+ * Mongoose schema definition for Trainer entities.
+ * Includes conditional validation based on origin ('uniques' requires trainerBatch; 'external' requires designation).
+ */
 const trainerSchema = new mongoose.Schema({
     fullName: {
         type: String,
@@ -56,8 +68,7 @@ const trainerSchema = new mongoose.Schema({
         default: "active",
     },
     profilePic: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'File',
+        type: fileAttachmentSchema,
         default: null,
     },
     linkedinProfile: {
@@ -70,6 +81,9 @@ const trainerSchema = new mongoose.Schema({
     },
 }, { timestamps: true });
 
-const Trainer = mongoose.model("Trainer", trainerSchema);
+const Trainer = mongoose.models.Trainer || mongoose.model("Trainer", trainerSchema);
 
+/**
+ * @module Trainer
+ */
 export default Trainer;

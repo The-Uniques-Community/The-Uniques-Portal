@@ -1,5 +1,16 @@
-import mongoose from "mongoose";
+/**
+ * @file eventModel.js
+ * @description Mongoose schema and model for community events, budgets, expenses, sponsorships, and guest management.
+ * @architecture Comprehensive event operations model linking members, external guests, uploaded banners/receipts, and audit logs.
+ * @agent_note Pre-save hook computes budget remaining balance; validates receiptId when sponsorships/expenses are finalized; references File, Member, and Guest models.
+ */
 
+import mongoose from "mongoose";
+import fileAttachmentSchema from "../common/fileAttachmentSchema.js";
+
+/**
+ * Mongoose schema definition for community events, financial tracking, and team contributions.
+ */
 const eventSchema = new mongoose.Schema({
   eventName: {
     type: String,
@@ -10,8 +21,8 @@ const eventSchema = new mongoose.Schema({
     required: true,
   },
   eventBanner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "File",
+    type: fileAttachmentSchema,
+    default: null,
   },
   eventDate: {
     type: Date,
@@ -51,7 +62,7 @@ const eventSchema = new mongoose.Schema({
       contributionTeam: [
         {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "Member" // Assuming Member is the model for team members
+          ref: "User"
         }
       ]
     }
@@ -80,12 +91,10 @@ const eventSchema = new mongoose.Schema({
       },
     },
   ],
-  eventGallery: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "File",
-    },
-  ],
+  eventGallery: {
+    type: [fileAttachmentSchema],
+    default: [],
+  },
 
   eventType: {
     type: String,
@@ -152,8 +161,8 @@ const eventSchema = new mongoose.Schema({
         default: "cash",
       },
       receiptId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "File",
+        type: fileAttachmentSchema,
+        default: null,
       },
       receivedStatus: {
         type: String,
@@ -163,7 +172,7 @@ const eventSchema = new mongoose.Schema({
           validator: function (value) {
             // Only validate when status is "received"
             if (value === "received") {
-              return !!this.receiptId; // Must have receiptId for received sponsorships
+              return !!(this.receiptId && (this.receiptId.fileId || this.receiptId.fileUrl));
             } 
             return true;
           },
@@ -200,14 +209,14 @@ const eventSchema = new mongoose.Schema({
           validator: function (value) {
             // Only validate when status is "completed"
             if (value === "completed") {
-              return !!this.receiptId; // Must have receiptId to be "completed"
+              return !!(this.receiptId && (this.receiptId.fileId || this.receiptId.fileUrl));
             }
             return true;
           },
           message: "Receipt upload required to mark payment as completed",
         },
       },
-      receiptId: { type: mongoose.Schema.Types.ObjectId, ref: "File" },
+      receiptId: { type: fileAttachmentSchema, default: null },
       paidBy: { type: String },
       paidOn: Date,
       notes: String,
@@ -271,6 +280,9 @@ const eventSchema = new mongoose.Schema({
   ],
 });
 
+/**
+ * Pre-save middleware to calculate the remaining event budget.
+ */
 eventSchema.pre("save", function (next) {
   if (this.budget) {
     // Calculate remaining budget
@@ -279,5 +291,9 @@ eventSchema.pre("save", function (next) {
   next();
 });
 
-const Event = mongoose.model("Event", eventSchema);
+const Event = mongoose.models.Event || mongoose.model("Event", eventSchema);
+
+/**
+ * @module Event
+ */
 export default Event;

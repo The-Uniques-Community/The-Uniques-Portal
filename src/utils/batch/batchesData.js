@@ -1,4 +1,4 @@
-import axios from "axios";
+import apiClient from "@/services/apiClient";
 import { BASE_URL } from "@/config";
 
 export const DEFAULT_BATCHES = [
@@ -38,7 +38,7 @@ export const getStoredBatches = () => {
 
 export const fetchBatches = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/api/batches/all`);
+    const response = await apiClient.get(`${BASE_URL}/api/batches/all`);
     if (response.data && response.data.success && Array.isArray(response.data.data)) {
       const batches = response.data.data;
       localStorage.setItem(BATCH_STORAGE_KEY, JSON.stringify(batches));
@@ -82,7 +82,7 @@ export const addStoredBatch = async (batchName) => {
   if (!current.includes(formatted)) {
     // 1. Save in MongoDB first
     try {
-      await axios.post(`${BASE_URL}/api/batches/add`, { name: formatted });
+      await apiClient.post(`${BASE_URL}/api/batches/add`, { name: formatted });
     } catch (err) {
       console.warn("Backend MongoDB notice for batch add:", err?.message || err);
     }

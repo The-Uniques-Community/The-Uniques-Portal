@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import Loader from "@/utils/Loader";
+import Loader from "@/components/common/loaders/RouteLoader";
 
 const AuthLayout = Loader(lazy(() => import("@/layout/Authentication/AuthLayout")));
 const Login = Loader(lazy(() => import("@/views/Authentication/login")));

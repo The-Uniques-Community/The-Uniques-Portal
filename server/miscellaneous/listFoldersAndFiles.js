@@ -1,3 +1,9 @@
+/**
+ * @file listFoldersAndFiles.js
+ * @description Standalone CLI utility script to discover, inspect, and recursively list folders and files in Google Drive.
+ * @architecture Diagnostic tool for verifying Google Drive service account permissions and folder tree hierarchy.
+ * @agent_note Executes automatically on file execution (`main()`). Loads credentials from `process.env.GOOGLE_SERVICE_ACCOUNT` in production or `../service.json` in development.
+ */
 // listFoldersAndFiles.js
 import { google } from 'googleapis';
 import path from 'path';
@@ -32,7 +38,9 @@ if (process.env.NODE_ENV === 'production') {
 const drive = google.drive({ version: 'v3', auth });
 
 /**
- * List all folders in the Drive.
+ * @desc Queries Google Drive API to list all untrashed folders.
+ * @async
+ * @returns {Promise<Array<{id: string, name: string}>>} List of Google Drive folder objects
  */
 async function listFolders() {
   try {
@@ -47,8 +55,10 @@ async function listFolders() {
 }
 
 /**
- * List files inside a given folder.
- * @param {string} folderId - The ID of the folder.
+ * @desc Queries Google Drive API to list untrashed files contained inside a specified parent folder.
+ * @async
+ * @param {string} folderId - The ID of the target folder in Google Drive
+ * @returns {Promise<Array<{id: string, name: string}>>} List of file objects located within the folder
  */
 async function listFilesInFolder(folderId) {
   try {
@@ -63,7 +73,9 @@ async function listFilesInFolder(folderId) {
 }
 
 /**
- * Main function to list all folders and then list files for each folder.
+ * @desc Orchestrates discovery by listing all root folders and printing file contents per folder.
+ * @async
+ * @returns {Promise<void>}
  */
 async function main() {
   const folders = await listFolders();

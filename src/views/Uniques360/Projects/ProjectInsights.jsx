@@ -22,15 +22,13 @@ import {
   useTheme,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles"; // Import alpha for secure hex opacities
-import ModernTable from "@/utils/Table/ModernTable";
-import ModernHeader from "@/utils/Header/ModernHeader";
-import {
-  Assignment as ProjectIcon,
-  TrendingUp as OngoingIcon,
-  CheckCircle as CompletedIcon,
-  Timer as AgingIcon,
-  Launch as OpenIcon,
-} from "@mui/icons-material";
+import ModernTable from "@/components/tables/ModernTable";
+import ModernHeader from "@/components/headers/ModernHeader";
+import ProjectIcon from '@mui/icons-material/Assignment';
+import OngoingIcon from '@mui/icons-material/TrendingUp';
+import CompletedIcon from '@mui/icons-material/CheckCircle';
+import AgingIcon from '@mui/icons-material/Timer';
+import OpenIcon from '@mui/icons-material/Launch';
 import axios from "axios";
 import { BASE_URL } from "@/config";
 import { toast } from "react-toastify";
@@ -77,7 +75,7 @@ const ProjectInsights = () => {
       fetchProjectTasks();
     } catch (error) {
       console.error("Error marking task completed:", error);
-      toast.error("Failed to mark task completed");
+      toast.error(error.response?.data?.message || "Failed to mark task completed");
     }
   };
 

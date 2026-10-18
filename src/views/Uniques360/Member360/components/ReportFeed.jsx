@@ -1,7 +1,8 @@
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Avatar, Box, Chip, CircularProgress, Paper, Typography } from "@mui/material";
-import { History as HistoryIcon, QueryStats as ProgressIcon } from "@mui/icons-material";
+import HistoryIcon from '@mui/icons-material/History';
+import ProgressIcon from '@mui/icons-material/QueryStats';
 
 const ReportFeed = ({ reports, reportsLoading, scrollRef }) => {
   return (

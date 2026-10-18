@@ -1,7 +1,25 @@
+/**
+ * @file sendEnquiryReplyEmail.js
+ * @description Sends formal reply emails to users who submitted inquiries through the portal contact system.
+ * @architecture Dispatched by admin/coordinator enquiry controllers to notify users of official responses.
+ * @agent_note Formats both the user's original query and the admin's reply; utilizes FRONTEND_URL environment variable for links.
+ */
+
 import dotenv from 'dotenv';
 dotenv.config();
 import transporter from '../../config/emailConfig.js';
 
+/**
+ * @desc    Sends an enquiry reply email containing the original message and admin response.
+ * @param   {Object} data - Reply details.
+ * @param   {string} data.email - Recipient email address.
+ * @param   {string} data.firstName - Recipient first name.
+ * @param   {string} data.lastName - Recipient last name.
+ * @param   {string} data.originalMessage - The user's original inquiry text.
+ * @param   {string} data.replyMessage - The official response message text.
+ * @param   {string} data.respondedBy - Name/title of the admin or coordinator who replied.
+ * @returns {Promise<boolean>} True if email was sent successfully, false otherwise.
+ */
 export const sendEnquiryReplyEmail = async (data) => {
     const { email, firstName, lastName, originalMessage, replyMessage, respondedBy } = data;
     
@@ -89,4 +107,7 @@ export const sendEnquiryReplyEmail = async (data) => {
     }
 };
 
+/**
+ * @module sendEnquiryReplyEmail
+ */
 export default sendEnquiryReplyEmail;

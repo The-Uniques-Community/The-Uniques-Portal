@@ -11,11 +11,9 @@ import {
   Tabs,
   Tab
 } from '@mui/material';
-import {
-  School as SchoolIcon,
-  Timeline as TimelineIcon,
-  PlayCircleOutline as VideoIcon
-} from '@mui/icons-material';
+import SchoolIcon from '@mui/icons-material/School';
+import TimelineIcon from '@mui/icons-material/Timeline';
+import VideoIcon from '@mui/icons-material/PlayCircleOutline';
 import { motion } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/system';

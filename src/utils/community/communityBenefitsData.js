@@ -1,4 +1,4 @@
-import axios from "axios";
+import apiClient from "@/services/apiClient";
 import { BASE_URL } from "@/config";
 import communityOrganizerImg from "@/assets/img/Community/testimonials/community-organizer.webp";
 import technicalLeadImg from "@/assets/img/Community/testimonials/technical-lead.webp";
@@ -81,7 +81,7 @@ export const getStoredBenefitsCards = () => {
 
 export const fetchBenefitsCards = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/api/community-benefits`);
+    const response = await apiClient.get(`${BASE_URL}/api/community-benefits`);
     if (response.data && response.data.success && Array.isArray(response.data.data)) {
       const cards = response.data.data.map((stored, idx) => {
         const defaultCard = DEFAULT_BENEFITS_CARDS[idx] || {};
@@ -132,7 +132,7 @@ export const saveStoredBenefitsCards = async (cards) => {
     window.dispatchEvent(
       new CustomEvent("community-benefits-updated", { detail: getStoredBenefitsCards() })
     );
-    await axios.post(`${BASE_URL}/api/community-benefits/update`, { cards: toSave });
+    await apiClient.post(`${BASE_URL}/api/community-benefits/update`, { cards: toSave });
     return true;
   } catch (err) {
     console.error("Error saving community benefits cards:", err);

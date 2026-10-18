@@ -1,3 +1,9 @@
+/**
+ * @file uniques360Route.js
+ * @description Uniques360 task management and performance reporting router for student members and coordinators.
+ * @architecture Mounted at `/api/uniques360` in server/index.js, routing task assignments, status tracking, and reports through taskController and reportController.
+ * @agent_note All task and reporting routes require authentication via `verifyToken`.
+ */
 import express from 'express';
 import verifyToken from '../../middlewares/verifyToken.js';
 import { 

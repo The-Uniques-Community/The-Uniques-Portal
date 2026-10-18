@@ -1,5 +1,5 @@
-import CommunityCard from "@/utils/Card/CommunityCard";
-import WeirdCard from "@/utils/Card/WeirdCard";
+import CommunityCard from "@/components/cards/CommunityCard";
+import WeirdCard from "@/components/cards/WeirdCard";
 import { events } from "@/assets/dummyData/eventsData";
 const index = () => {
   return (

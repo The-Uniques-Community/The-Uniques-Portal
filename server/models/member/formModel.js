@@ -1,5 +1,15 @@
+/**
+ * @file formModel.js
+ * @description Mongoose schema and model for dynamic custom form templates and surveys.
+ * @architecture Defines reusable form builders, field-level validation schemas, and relationships to creators and submitted responses.
+ * @agent_note Embeds formFieldSchema subdocuments; createdBy references Member; responses references FormResponse documents.
+ */
+
 import mongoose from 'mongoose';
 
+/**
+ * Embedded Mongoose schema definition for individual form input fields.
+ */
 const formFieldSchema = new mongoose.Schema({
   fieldName: {
     type: String,
@@ -28,6 +38,9 @@ const formFieldSchema = new mongoose.Schema({
   }
 });
 
+/**
+ * Mongoose schema definition for dynamic form templates.
+ */
 const formSchema = new mongoose.Schema({
   formTitle: {
     type: String,
@@ -37,7 +50,7 @@ const formSchema = new mongoose.Schema({
   fields: [formFieldSchema],
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Member'
+    ref: 'User'
   },
   createdAt: {
     type: Date,
@@ -53,5 +66,9 @@ const formSchema = new mongoose.Schema({
   }]
 });
 
-const Form = mongoose.model('Form', formSchema);
+const Form = mongoose.models.Form || mongoose.model('Form', formSchema);
+
+/**
+ * @module Form
+ */
 export default Form;

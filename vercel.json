@@ -13,6 +13,12 @@
   },
   "rewrites": [
     {
+      "source": "/health",
+      "destination": {
+        "service": "server"
+      }
+    },
+    {
       "source": "/api/(.*)",
       "destination": {
         "service": "server"
@@ -25,55 +31,13 @@
       }
     },
     {
-      "source": "/auth/google/(.*)",
+      "source": "/auth/(.*)",
       "destination": {
         "service": "server"
       }
     },
     {
-      "source": "/auth/google",
-      "destination": {
-        "service": "server"
-      }
-    },
-    {
-      "source": "/auth/emaillogin",
-      "destination": {
-        "service": "server"
-      }
-    },
-    {
-      "source": "/auth/get_user",
-      "destination": {
-        "service": "server"
-      }
-    },
-    {
-      "source": "/auth/verify_user",
-      "destination": {
-        "service": "server"
-      }
-    },
-    {
-      "source": "/auth/verify_role",
-      "destination": {
-        "service": "server"
-      }
-    },
-    {
-      "source": "/auth/logout",
-      "destination": {
-        "service": "server"
-      }
-    },
-    {
-      "source": "/auth/password-reset/(.*)",
-      "destination": {
-        "service": "server"
-      }
-    },
-    {
-      "source": "/auth/password-reset",
+      "source": "/auth",
       "destination": {
         "service": "server"
       }

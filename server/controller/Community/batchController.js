@@ -1,3 +1,10 @@
+/**
+ * @file batchController.js
+ * @description Controller managing Uniques batch cohorts, batch name registrations, and batch profile descriptions with fallback seeding.
+ * @architecture Mounted at `/api/batches` via `batchRoute.js`. Interacts with `BatchName` and `BatchProfile` models.
+ * @agent_note Automatically seeds default batch cohorts (1.0 to 6.0) and descriptive batch profile cards when database collections are initially empty.
+ */
+import mongoose from "mongoose";
 import { BatchProfile, BatchName } from "../../models/community/batchModel.js";
 
 const DEFAULT_BATCHES = [
@@ -66,6 +73,13 @@ const DEFAULT_PROFILES = [
   },
 ];
 
+/**
+ * @desc Retrieve all registered batch cohort names, seeding defaults if empty
+ * @route GET /api/batches/all
+ * @access Public
+ * @returns {Object} 200 - Array of batch name strings
+ * @returns {Object} 500 - Server error
+ */
 // Get all batch names
 export const getAllBatches = async (req, res) => {
   try {
@@ -82,6 +96,15 @@ export const getAllBatches = async (req, res) => {
   }
 };
 
+/**
+ * @desc Register a new batch cohort name with automatic prefix normalization
+ * @route POST /api/batches/add
+ * @access Public/Admin
+ * @body {string} name - Raw batch name string (e.g., '7.0' or 'The Uniques 7.0')
+ * @returns {Object} 200 - Success message and normalized batch name
+ * @returns {Object} 400 - If batch name is missing
+ * @returns {Object} 500 - Server error
+ */
 // Add new batch name
 export const addBatch = async (req, res) => {
   try {
@@ -108,6 +131,13 @@ export const addBatch = async (req, res) => {
   }
 };
 
+/**
+ * @desc Retrieve all descriptive batch profile cards, seeding defaults if empty
+ * @route GET /api/batches/profiles
+ * @access Public
+ * @returns {Object} 200 - Array of batch profile objects
+ * @returns {Object} 500 - Server error
+ */
 // Get all batch profiles
 export const getBatchProfiles = async (req, res) => {
   try {
@@ -123,6 +153,16 @@ export const getBatchProfiles = async (req, res) => {
   }
 };
 
+/**
+ * @desc Upsert multiple batch profile configuration objects
+ * @route POST /api/batches/profiles/update
+ * @route PUT /api/batches/profiles/update
+ * @access Public/Admin
+ * @body {Object[]} profiles - Array of batch profile configuration objects
+ * @returns {Object} 200 - Success message and full updated profiles array
+ * @returns {Object} 400 - If profiles payload is not an array
+ * @returns {Object} 500 - Server error
+ */
 // Update/Save batch profiles
 export const saveBatchProfiles = async (req, res) => {
   try {
@@ -152,5 +192,82 @@ export const saveBatchProfiles = async (req, res) => {
   } catch (error) {
     console.error("Error saving batch profiles:", error);
     res.status(500).json({ success: false, message: "Error saving batch profiles", error: error.message });
+  }
+};
+
+/**
+ * @desc Delete a registered batch by document ID
+ * @route DELETE /api/batches/:id
+ * @access Private (Admin / Coordinator)
+ * @params {string} id - Batch ObjectId
+ * @returns {Object} 200 - Confirmation and deleted document
+ */
+export const deleteBatchById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let deleted = null;
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      deleted = await BatchName.findByIdAndDelete(id);
+    }
+    if (!deleted) {
+      deleted = await BatchName.findOneAndDelete({ _id: id }).catch(() => null);
+    }
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: "Batch not found" });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Batch deleted successfully",
+      data: deleted,
+    });
+  } catch (error) {
+    console.error("Error deleting batch by ID:", error);
+    return res.status(500).json({ success: false, message: "Error deleting batch", error: error.message });
+  }
+};
+
+/**
+ * @desc Delete a registered batch by name
+ * @route DELETE /api/batches/name/:name
+ * @access Private (Admin / Coordinator)
+ * @params {string} name - Batch cohort name
+ * @returns {Object} 200 - Confirmation and deleted document
+ */
+export const deleteBatchByName = async (req, res) => {
+  try {
+    const { name } = req.params;
+    if (!name || !name.trim()) {
+      return res.status(400).json({ success: false, message: "Batch name is required" });
+    }
+
+    const decodedName = decodeURIComponent(name).trim();
+    let normalizedName = decodedName;
+    if (!normalizedName.toLowerCase().startsWith("the uniques") && !normalizedName.toLowerCase().startsWith("uniques")) {
+      normalizedName = `The Uniques ${normalizedName}`;
+    } else if (normalizedName.toLowerCase().startsWith("uniques")) {
+      normalizedName = `The ${normalizedName}`;
+    }
+
+    const escapedDecoded = decodedName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const deleted = await BatchName.findOneAndDelete({
+      $or: [
+        { name: decodedName },
+        { name: normalizedName },
+        { name: new RegExp(`^${escapedDecoded}$`, 'i') },
+      ],
+    });
+
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: "Batch not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Batch deleted successfully",
+      data: deleted,
+    });
+  } catch (error) {
+    console.error("Error deleting batch by name:", error);
+    return res.status(500).json({ success: false, message: "Error deleting batch by name", error: error.message });
   }
 };

@@ -1,4 +1,4 @@
-import axios from "axios";
+import apiClient from "@/services/apiClient";
 import { BASE_URL } from "@/config";
 
 export const DEFAULT_STATS = {
@@ -32,7 +32,7 @@ export const getStoredStats = () => {
 
 export const fetchStats = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/api/stats`);
+    const response = await apiClient.get(`${BASE_URL}/api/stats`);
     if (response.data && response.data.success && response.data.data) {
       const stats = {
         Earnings: Number(response.data.data.Earnings) || DEFAULT_STATS.Earnings,
@@ -62,7 +62,7 @@ export const saveStoredStats = async (newStats) => {
 
   // 1. Save to MongoDB database first
   try {
-    const response = await axios.post(`${BASE_URL}/api/stats/update`, payload);
+    const response = await apiClient.post(`${BASE_URL}/api/stats/update`, payload);
     if (response.data && response.data.success && response.data.data) {
       const data = response.data.data;
       savedData = {

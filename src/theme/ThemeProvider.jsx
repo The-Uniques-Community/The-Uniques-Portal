@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ThemeProvider as MUIThemeProvider, CssBaseline } from '@mui/material';
 import { lightTheme, darkTheme } from './themes';
 
@@ -6,6 +6,10 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDarkMode);
+  }, [isDarkMode]);
 
   const toggleTheme = () => {
     setIsDarkMode((prevMode) => !prevMode);
@@ -21,5 +25,7 @@ export const ThemeProvider = ({ children }) => {
   );
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const useThemeContext = () => useContext(ThemeContext);
+export const useThemeContext = () => {
+  const context = useContext(ThemeContext);
+  return context || { isDarkMode: false, toggleTheme: () => {} };
+};

@@ -1,8 +1,20 @@
+/**
+ * @file migrationController.js
+ * @description Database migration controller converting legacy event-member relationships into structured bidirectional contribution subdocuments.
+ * @architecture Mounted at `/api/admin/migration` via `migrationRoutes.js`, performing batch transformations across Member and Event collections.
+ * @agent_note Safely back up database before executing live migration. Old fields are preserved during migration; rollback removes new contribution arrays.
+ */
 // controllers/migrationController.js
 import Member from '../../models/member/memberModel.js';
 import Event from '../../models/member/eventModel.js';
 
 // Main migration function to update existing data to new schema structure
+/**
+ * @desc    Migrate legacy event participation references into bidirectional eventContributions and memberContributions schemas
+ * @route   POST /api/admin/migration/migrate-event-relationships
+ * @access  Private (Admin)
+ * @returns {Object} JSON response containing counts of updated, skipped, and unaffected documents
+ */
 const migrateEventMemberRelationship = async (req, res) => {
   try {
     console.log("Starting database migration for event-member relationships...");
@@ -141,6 +153,12 @@ const migrateEventMemberRelationship = async (req, res) => {
 };
 
 // Optional: Function to verify the migration was successful
+/**
+ * @desc    Verify migration status by counting Member and Event documents populated with new contribution schemas
+ * @route   GET /api/admin/migration/verify-migration
+ * @access  Private (Admin)
+ * @returns {Object} Stats showing counts of migrated Member and Event documents
+ */
 const verifyMigration = async (req, res) => {
   try {
     // Count documents with new fields
@@ -169,6 +187,12 @@ const verifyMigration = async (req, res) => {
 };
 
 // Optional: Rollback function (in case something goes wrong)
+/**
+ * @desc    Rollback migration by unsetting eventContributions and memberContributions fields across all documents
+ * @route   POST /api/admin/migration/rollback-migration
+ * @access  Private (Admin)
+ * @returns {Object} Confirmation of rollback completion
+ */
 const rollbackMigration = async (req, res) => {
   try {
     // Only remove the new fields, don't touch existing data

@@ -1,5 +1,16 @@
+/**
+ * @file Report.js
+ * @description Mongoose schema and model for student progress reports on assigned tasks.
+ * @architecture Forms the progress reporting subsystem under Uniques 360, linking student members to assigned tasks.
+ * @agent_note Foreign keys reference Task (taskId) and Member (studentId); progressPercent is bounded between 0 and 100.
+ */
+
 import mongoose from "mongoose";
 
+/**
+ * Mongoose schema definition for student task reports.
+ * Tracks progress percentages, submission text, and file attachments per task assignment.
+ */
 const reportSchema = new mongoose.Schema({
   taskId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -8,7 +19,7 @@ const reportSchema = new mongoose.Schema({
   },
   studentId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Member",
+    ref: "User",
     required: true,
   },
   reportContent: {
@@ -30,5 +41,9 @@ const reportSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-const Report = mongoose.model("Report", reportSchema);
+const Report = mongoose.models.Report || mongoose.model("Report", reportSchema);
+
+/**
+ * @module Report
+ */
 export default Report;

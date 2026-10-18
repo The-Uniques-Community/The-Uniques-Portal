@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import Loader from "@/utils/Loader";
+import Loader from "@/components/common/loaders/RouteLoader";
 import ProtectedRoute from "@/routes/ProtectedRoute";
 import { element } from "prop-types";
 

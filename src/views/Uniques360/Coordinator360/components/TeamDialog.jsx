@@ -23,7 +23,8 @@ import {
   Grid,
   useTheme,
 } from "@mui/material";
-import { DeleteOutlined as DeleteIcon, GroupAddOutlined as AddTeamIcon } from "@mui/icons-material";
+import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import AddTeamIcon from '@mui/icons-material/GroupAddOutlined';
 
 const TeamDialog = ({
   open,

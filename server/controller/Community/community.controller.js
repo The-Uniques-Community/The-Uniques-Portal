@@ -1,9 +1,26 @@
+/**
+ * @file community.controller.js
+ * @description Controller managing community administrator creation and the Campus Ambassador program (student applications, reviews, status transitions, and aggregate metrics).
+ * @architecture Mounted at `/api/community` and `/api/campus-ambassador` via `community.routes.js` and `campusAmbassadorRoute.js`. Interacts with `CommunityAdmin` and `CampusAmbassador` models.
+ * @agent_note Accepts resume upload paths on applications (`req.file.path`) and automatically records programStart timestamp when status becomes 'accepted'.
+ */
 import CommunityAdmin from "../../models/community/communityAdmin.js";
 import CampusAmbassador from "../../models/community/campusAmbassadorModel.js";
 import bcrypt from "bcryptjs";
 
+/**
+ * @desc Provision a new community administrator account with bcrypt hashed password
+ * @route POST /api/community/createCommunityAdmin
+ * @route POST /api/admin/create
+ * @access Public/Admin
+ * @body {string} email - Admin email address
+ * @body {string} password - Raw password
+ * @returns {Object} 200 - Confirmation message
+ * @returns {Object} 400 - If admin already exists
+ * @returns {Object} 500 - Server error
+ */
 export const createCommunityAdmin = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, role } = req.body;
   try {
     const admin = await CommunityAdmin.findOne({ email });
     if (admin) {
@@ -14,6 +31,7 @@ export const createCommunityAdmin = async (req, res) => {
     const newAdmin = new CommunityAdmin({
       email,
       password: hashedPassword,
+      role: role || "communityadmin",
     });
     await newAdmin.save();
     res.status(200).json({ message: "Admin created successfully" });
@@ -22,6 +40,23 @@ export const createCommunityAdmin = async (req, res) => {
   }
 };
 
+/**
+ * @desc Submit student application for the Campus Ambassador program
+ * @route POST /api/campus-ambassador/apply
+ * @access Public
+ * @body {string} fullName - Applicant's full name
+ * @body {string} email - Applicant email
+ * @body {string} phone - Contact number
+ * @body {string} college - College/University name
+ * @body {string} course - Course of study
+ * @body {string} graduationYear - Expected graduation year
+ * @body {string} [linkedinProfile] - LinkedIn profile URL
+ * @body {string} whyJoin - Statement of purpose/motivation
+ * @body {string} [heardFrom] - Referral source
+ * @returns {Object} 201 - Success response with new application ID
+ * @returns {Object} 400 - If application with email already exists
+ * @returns {Object} 500 - Server error
+ */
 export const applyForCampusAmbassador = async (req, res) => {
   try {
     const {
@@ -82,6 +117,17 @@ export const applyForCampusAmbassador = async (req, res) => {
   }
 };
 
+/**
+ * @desc Retrieve paginated campus ambassador applications with status and keyword search
+ * @route GET /api/campus-ambassador
+ * @access Private (Admin)
+ * @query {string} [status] - Filter by status ('pending'|'reviewing'|'accepted'|'rejected')
+ * @query {number} [page=1] - Page number
+ * @query {number} [limit=10] - Items per page
+ * @query {string} [search] - Keyword search on fullName, email, or college
+ * @returns {Object} 200 - Paginated application records and counts
+ * @returns {Object} 500 - Server error
+ */
 // Get all campus ambassador applications with optional status filter
 export const getCampusAmbassadorApplications = async (req, res) => {
   try {
@@ -133,6 +179,15 @@ export const getCampusAmbassadorApplications = async (req, res) => {
   }
 };
 
+/**
+ * @desc Retrieve details of a specific campus ambassador application by document ID
+ * @route GET /api/campus-ambassador/:id
+ * @access Private (Admin)
+ * @params {string} id - Application document ID
+ * @returns {Object} 200 - Application document
+ * @returns {Object} 404 - If application not found
+ * @returns {Object} 500 - Server error
+ */
 // Get a specific application by ID
 export const getCampusAmbassadorById = async (req, res) => {
   try {
@@ -160,6 +215,18 @@ export const getCampusAmbassadorById = async (req, res) => {
   }
 };
 
+/**
+ * @desc Update application review status and reason
+ * @route PATCH /api/campus-ambassador/:id/status
+ * @access Private (Admin)
+ * @params {string} id - Application document ID
+ * @body {string} status - New status ('pending'|'reviewing'|'accepted'|'rejected')
+ * @body {string} [statusUpdateReason] - Review feedback or reason
+ * @returns {Object} 200 - Success message and updated application document
+ * @returns {Object} 400 - If status value is invalid
+ * @returns {Object} 404 - If application not found
+ * @returns {Object} 500 - Server error
+ */
 // Update application status
 export const updateCampusAmbassadorStatus = async (req, res) => {
   try {
@@ -211,6 +278,13 @@ export const updateCampusAmbassadorStatus = async (req, res) => {
   }
 };
 
+/**
+ * @desc Retrieve aggregate application statistics by status and top applicant colleges
+ * @route GET /api/campus-ambassador/stats
+ * @access Private (Admin)
+ * @returns {Object} 200 - Breakdown of status counts and top colleges array
+ * @returns {Object} 500 - Server error
+ */
 // Get application statistics
 export const getCampusAmbassadorStats = async (req, res) => {
   try {

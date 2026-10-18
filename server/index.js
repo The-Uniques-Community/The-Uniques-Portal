@@ -1,6 +1,14 @@
+/**
+ * @file index.js
+ * @description Main application server bootstrap that configures middleware, database connectivity, and mounts API routing tables.
+ * @architecture Central HTTP server entry point for both standalone Node.js environments and Vercel serverless functions, wiring Express middleware and routing modules.
+ * @agent_note When adding new routes, mount them with their corresponding route prefix below and ensure any custom headers or credentials required are handled in CORS configuration.
+ */
+import "dotenv/config";
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import mongoose from "mongoose";
 import dbconnect from "./config/dbConfig.js";
 import cookieParser from "cookie-parser";
 import memberRoute from "./routes/member/memberRoute.js";
@@ -20,7 +28,7 @@ import publicMemberRouter from "./routes/landing/publicMemberRouter.js";
 import memberFineRoute from "./routes/member/fineRoute.js";
 import publicEnquiryRouter from "./routes/landing/publicRoute.js";
 import enquiryRoute from "./routes/admin/enquiryRoute.js";
-import { getAuth } from "./controller/googleDriveService.js";
+import { getAuth, getDrive } from "./controller/googleDriveService.js";
 import { google } from 'googleapis';
 import campusAmbassadorRouter from "./routes/community/campusAmbassadorRoute.js";
 import migrationRouter from "./routes/admin/migrationRoutes.js";
@@ -35,24 +43,35 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-// Robust CORS middleware handling all origins and preflight requests
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.CLIENT_URL,
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://theuniquesportal.vercel.app"
+].filter(Boolean);
+
+// Explicit CORS origin whitelist configuration
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  if (origin) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-  } else {
-    res.setHeader("Access-Control-Allow-Origin", "*");
+  if (!origin) {
+    return next();
   }
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Content-Type, Authorization, token, X-Requested-With, Accept, Origin"
-  );
-  res.setHeader("Access-Control-Expose-Headers", "Content-Type, Authorization, token");
+
+  const isAllowed = allowedOrigins.includes(origin) || process.env.NODE_ENV !== "production";
+  if (isAllowed) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization, token, X-Requested-With, Accept, Origin"
+    );
+    res.setHeader("Access-Control-Expose-Headers", "Content-Type, Authorization, token");
+  }
 
   if (req.method === "OPTIONS") {
-    return res.status(204).end();
+    return isAllowed ? res.status(204).end() : res.status(403).end();
   }
   next();
 });
@@ -60,7 +79,12 @@ app.use((req, res, next) => {
 app.use(
   cors({
     origin: (origin, callback) => {
-      callback(null, true);
+      // Allow requests with no origin (like mobile apps, curl, server-to-server)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== "production") {
+        return callback(null, true);
+      }
+      return callback(new Error("CORS policy violation: Access denied for this origin."));
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -69,54 +93,93 @@ app.use(
 );
 app.use(passport.initialize());
 
-// Ensure database connection in serverless environment
-app.use(async (req, res, next) => {
-  if (req.path === "/") {
-    return next();
+// Decoupled public endpoints (Zero DB dependency)
+app.get("/", (req, res) => res.send("hello its working"));
+
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "alive", timestamp: new Date().toISOString() });
+});
+
+app.get("/api/health", (req, res) => {
+  const isConnected = mongoose.connection.readyState === 1;
+  res.status(isConnected ? 200 : 503).json({
+    status: isConnected ? "healthy" : "degraded",
+    database: {
+      connected: isConnected,
+      readyState: mongoose.connection.readyState,
+    },
+    uptime: process.uptime(),
+  });
+});
+
+/**
+ * @desc Proxies and streams images directly from Google Drive with 24-hour cache headers.
+ * @route GET /api/image-proxy/:fileId
+ * @access Public
+ * @param {string} req.params.fileId - Google Drive file ID
+ * @returns {ReadableStream} Image binary stream
+ */
+app.get("/api/image-proxy/:fileId", async (req, res) => {
+  try {
+    const fileId = req.params.fileId;
+    if (!fileId) {
+      return res.status(400).send("File ID is required");
+    }
+    const drive = getDrive();
+    if (!drive) {
+      return res.status(503).send("Google Drive service not available");
+    }
+    const response = await drive.files.get(
+      { fileId, alt: "media" },
+      { responseType: "stream" }
+    );
+    res.setHeader("Content-Type", response.headers["content-type"] || "image/jpeg");
+    res.setHeader("Cache-Control", "public, max-age=86400");
+    response.data.pipe(res);
+  } catch (error) {
+    console.error("Error proxying Google Drive image:", error.message);
+    if (error.code === 404 || error.status === 404) {
+      return res.status(404).send("Image not found");
+    }
+    res.status(500).send("Error retrieving image");
   }
+});
+
+// Ensure active DB connection for all downstream API routes
+app.use(async (req, res, next) => {
   try {
     await dbconnect();
     next();
   } catch (error) {
-    console.error("Database connection error on request:", error.message);
-    const hasUri = Boolean(
-      process.env.MONGODB_URI ||
-      process.env.MONGO_URI ||
-      process.env.MONGODB_URL ||
-      process.env.DATABASE_URL
-    );
-    return res.status(500).json({
-      error: "Database Connection Failed",
-      message: error.message,
-      hint: !hasUri
-        ? "MONGODB_URI is not set in Vercel. Go to Project Settings -> Environment Variables, add MONGODB_URI, and Redeploy."
-        : "Failed to connect to MongoDB with provided URI. Check MongoDB Atlas Network Access (whitelist 0.0.0.0/0 for Vercel) and database credentials.",
+    console.error(`[DB_ERROR] ${req.method} ${req.originalUrl}:`, error.message);
+    return res.status(503).json({
+      success: false,
+      error: "Service Unavailable",
+      message: "Database service is temporarily unavailable. Please try again later.",
+      code: "DATABASE_UNAVAILABLE",
+      ...(process.env.NODE_ENV === "development" && { devDetails: error.message }),
     });
   }
 });
 
-app.get("/", (req, res) => {
-  res.send("hello its working");
-});
-
 app.use("/api/member", memberRoute);
 app.use("/api/leave", leaveRoute);
-app.use("/api/fine", memberFineRoute)
+app.use("/api/fine", memberFineRoute);
 app.use("/api/admin", adminRoute);
-app.use("/api/admin/member",memberAdminRouter)
+app.use("/api/admin/member", memberAdminRouter);
 app.use("/api/community", communityRoutes);
 app.use("/api/blogs", blogRouter);
 app.use("/auth", authRoutes);
-app.use("/auth/password-reset", passwordResetRoutes); // Add this line
+app.use("/auth/password-reset", passwordResetRoutes);
 app.use("/api/guest", guestRoute);
-app.use("/api/events", eventRouter)
-app.use('/upload', googleDriveRoutes);
+app.use("/api/events", eventRouter);
+app.use("/upload", googleDriveRoutes);
 app.use("/api/admin/fine", fineRouter);
 app.use("/api/public/members", publicMemberRouter);
-app.use('/api/contact', publicEnquiryRouter);
-app.use('/api/admin/enquiry', enquiryRoute);
-app.use('/api', campusAmbassadorRouter);
-app.use('/api/admin/migration', migrationRouter);
+app.use("/api/contact", publicEnquiryRouter);
+app.use("/api/admin/enquiry", enquiryRoute);
+app.use("/api", campusAmbassadorRouter);
+app.use("/api/admin/migration", migrationRouter);
 app.use("/api/admin/trainers", trainerRoute);
 app.use("/api/uniques360", uniques360Route);
 app.use("/api/projects", projectRouter);
@@ -125,54 +188,35 @@ app.use("/api/stats", statsRouter);
 app.use("/api/batches", batchRouter);
 app.use("/api/community-benefits", communityBenefitsRouter);
 
-app.use('/api/image-proxy/:fileId', async (req, res) => {
+// Sequential bootstrap for standalone Node.js environments
+const startServer = async () => {
+  const PORT = process.env.PORT || 5001;
   try {
-    const fileId = req.params.fileId;
-    if (!fileId) {
-      return res.status(400).send('File ID is required');
-    }
-    
-    // Get the auth client from your existing Google Drive service
-    const auth = await getAuth();
-    const drive = google.drive({ version: 'v3', auth });
-    
-    // Get the file metadata first to verify it exists
-    await drive.files.get({ fileId });
-    
-    // Get the actual file content as a stream
-    const response = await drive.files.get({
-      fileId,
-      alt: 'media'
-    }, { responseType: 'stream' });
-    
-    // Set content type and cache headers
-    res.setHeader('Content-Type', response.headers['content-type']);
-    res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 24 hours
-    
-    // Pipe the image data directly to the response
-    response.data.pipe(res);
-  } catch (error) {
-    console.error('Error proxying Google Drive image:', error);
-    res.status(500).send('Error retrieving image');
-  }
-});
+    console.log("[Bootstrap] Connecting to database...");
+    await dbconnect();
+    console.log("[Bootstrap] Database connection established.");
 
+    const server = app.listen(PORT, () => {
+      console.log(`[Bootstrap] Server is running on port ${PORT}`);
+    });
+
+    server.on("error", (err) => {
+      if (err.code === "EADDRINUSE") {
+        console.error(`[Bootstrap] Port ${PORT} is already in use.`);
+      } else {
+        console.error("[Bootstrap] Server listen error:", err);
+      }
+      process.exit(1);
+    });
+  } catch (err) {
+    console.error("[Bootstrap] FATAL: Database connection failed during startup.");
+    console.error(err.message);
+    process.exit(1);
+  }
+};
 
 if (!process.env.VERCEL) {
-  const PORT = process.env.PORT || 5001;
-  const server = app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
-
-  server.on("error", (err) => {
-    if (err.code === "EADDRINUSE") {
-      console.error(`Port ${PORT} is already in use by another process.`);
-    } else {
-      console.error("Server listen error:", err);
-    }
-  });
+  startServer();
 }
-
-dbconnect().catch((err) => console.error("Initial DB connect error:", err.message));
 
 export default app;

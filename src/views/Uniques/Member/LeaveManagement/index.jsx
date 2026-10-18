@@ -29,8 +29,8 @@ import {
   CircularProgress,
   Alert,
 } from "@mui/material";
-import ModernTable from "@/utils/Table/ModernTable";
-import ModernHeader from "@/utils/Header/ModernHeader";
+import ModernTable from "@/components/tables/ModernTable";
+import ModernHeader from "@/components/headers/ModernHeader";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";

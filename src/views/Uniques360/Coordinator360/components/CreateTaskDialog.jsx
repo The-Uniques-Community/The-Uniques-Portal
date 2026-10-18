@@ -43,13 +43,16 @@ const CreateTaskDialog = ({
       fullWidth 
       maxWidth="sm"
       PaperProps={{
+        "data-lenis-prevent": "true",
+        onWheel: (e) => e.stopPropagation(),
         sx: {
           borderRadius: "14px",
           backgroundColor: "background.paper",
           backgroundImage: "none",
           border: "1px solid",
           borderColor: "divider",
-          p: 1
+          p: 1,
+          overscrollBehavior: "contain"
         }
       }}
     >
@@ -64,7 +67,11 @@ const CreateTaskDialog = ({
         Assign New Task
       </DialogTitle>
 
-      <DialogContent sx={{ pb: 2 }}>
+      <DialogContent 
+        data-lenis-prevent="true" 
+        onWheel={(e) => e.stopPropagation()} 
+        sx={{ pb: 2, overscrollBehavior: "contain" }}
+      >
         <Box sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 2.5 }}>
           
           {/* Task Title */}
@@ -193,6 +200,8 @@ const CreateTaskDialog = ({
           {/* Inline Role Settings Interface Panel */}
           {newTask.assignedTo?.length > 0 && (
             <Box 
+              data-lenis-prevent="true"
+              onWheel={(e) => e.stopPropagation()}
               sx={{ 
                 p: 2, 
                 borderRadius: "8px", 
@@ -203,7 +212,8 @@ const CreateTaskDialog = ({
                 flexDirection: "column", 
                 gap: 1.5,
                 maxHeight: "180px",
-                overflowY: "auto"
+                overflowY: "auto",
+                overscrollBehavior: "contain"
               }}
             >
               <Typography variant="caption" sx={{ fontWeight: 700, color: "text.subtext", textTransform: "uppercase", letterSpacing: "0.5px" }}>

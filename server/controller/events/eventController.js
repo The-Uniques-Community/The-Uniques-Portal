@@ -1,8 +1,15 @@
+/**
+ * @file eventController.js
+ * @description Comprehensive event management controller handling event creation, team rosters, member assignments, registration forms and responses, guest links, financial budgets/expenses/sponsors, and media galleries.
+ * @architecture Mounted at `/api/events` via `server/routes/admin/eventRoutes.js`. Interacts with `Event`, `Form`, `FormResponse`, `Guest`, and `Member` models.
+ * @agent_note Manages complex nested schemas on the Event document including teams, sponsors, budget expenses, allocations, and dynamic registration form schemas.
+ */
 import Event from "../../models/member/eventModel.js";
 import Form from "../../models/member/formModel.js";
 import FormResponse from "../../models/member/formResponse.js";
 import Guest from "../../models/member/guestModel.js";
 import Member from "../../models/member/memberModel.js";
+import User from "../../models/user/userModel.js";
 
 import mongoose from "mongoose";
 
@@ -429,9 +436,11 @@ export const migrateEventMembers = async (req, res) => {
   }
 };
 /**
- * Get event by ID
- * @route GET /api/events/:id
- * 
+ * @desc Get total, upcoming, and past event counts
+ * @route GET /api/events/count
+ * @access Public / Private
+ * @returns {Object} 200 - Object containing totalCount, upcomingCount, and pastCount
+ * @returns {Object} 500 - Server error
  */
 export const getEventCount = async (req, res) => {
   try {
@@ -467,6 +476,16 @@ export const getEventCount = async (req, res) => {
   }
 };
 
+/**
+ * @desc Retrieve full event details by document ID with populated media, guests, and organizers
+ * @route GET /api/events/:id
+ * @access Public / Private
+ * @params {string} id - Event document ID
+ * @returns {Object} 200 - Populated event document
+ * @returns {Object} 400 - Invalid event ID format
+ * @returns {Object} 404 - If event not found
+ * @returns {Object} 500 - Server error
+ */
 export const getEventById = async (req, res) => {
   try {
     const eventId = req.params.id;
@@ -712,6 +731,12 @@ export const deleteEvent = async (req, res) => {
       { $pull: { events: { event: eventId } } }
     );
 
+    // Pull eventId from all users' event_participation array
+    await User.updateMany(
+      { event_participation: eventId },
+      { $pull: { event_participation: eventId } }
+    );
+
     // Delete the event
     await Event.findByIdAndDelete(eventId);
 
@@ -882,12 +907,22 @@ export const getEventFormResponses = async (req, res) => {
       .sort({ "metadata.submittedAt": -1 })
       .skip((parseInt(page) - 1) * parseInt(limit))
       .limit(parseInt(limit))
-      .populate("respondent.member", "memberName memberEmail memberImage")
+      .populate("respondent.member", "fullName email profilePic")
       .populate("files.fileId");
+
+    const formattedResponses = responses.map((response) => {
+      const respObj = response.toObject ? response.toObject() : { ...response };
+      return {
+        ...respObj,
+        memberName: respObj.respondent?.member?.fullName || respObj.respondent?.name || "N/A",
+        memberEmail: respObj.respondent?.member?.email || respObj.respondent?.email || "N/A",
+        memberImage: respObj.respondent?.member?.profilePic || null,
+      };
+    });
 
     res.status(200).json({
       success: true,
-      responses,
+      responses: formattedResponses,
       pagination: {
         total,
         page: parseInt(page),
@@ -2277,7 +2312,7 @@ export const getEventWithMembers = async (req, res) => {
     // Find and populate all team members
     const event = await Event.findById(id).populate({
       path: 'eventMembers.contributionTeam',
-      model: 'Member',
+      model: 'User',
       select: 'fullName batch email profilePic'
     });
 
@@ -2390,7 +2425,7 @@ export const updateAllEventTeams = async (req, res) => {
     // Return populated event members
     const updatedEvent = await Event.findById(id).populate({
       path: 'eventMembers.contributionTeam',
-      model: 'Member',
+      model: 'User',
       select: 'fullName batch email profilePic'
     });
 
@@ -2409,6 +2444,18 @@ export const updateAllEventTeams = async (req, res) => {
   }
 };
 
+/**
+ * @desc Retrieve member participants and organizers associated with an event
+ * @route GET /api/events/:id/members
+ * @access Private
+ * @params {string} id - Event document ID
+ * @query {string} [type] - Filter by contribution or member type
+ * @query {string} [search] - Keyword search
+ * @returns {Object} 200 - Array of event member details
+ * @returns {Object} 400 - Invalid event ID format
+ * @returns {Object} 404 - If event not found
+ * @returns {Object} 500 - Server error
+ */
 export const getEventMembers = async (req, res) => {
   try {
     const { id } = req.params;
@@ -2439,7 +2486,7 @@ export const getEventMembers = async (req, res) => {
     // Build lookup for members
     pipeline.push({
       $lookup: {
-        from: 'members',
+        from: 'users',
         localField: 'eventMembers.contributionTeam',
         foreignField: '_id',
         as: 'allTeamMembers'
@@ -2466,7 +2513,7 @@ export const getEventMembers = async (req, res) => {
     // Look up member details for each team
     pipeline.push({
       $lookup: {
-        from: 'members',
+        from: 'users',
         localField: 'eventMembers.contributionTeam',
         foreignField: '_id',
         as: 'teamMembers'
@@ -2655,7 +2702,7 @@ export const updateEventTeam = async (req, res) => {
     // Return the updated event with populated member details
     const updatedEvent = await Event.findById(id).populate({
       path: 'eventMembers.contributionTeam',
-      model: 'Member',
+      model: 'User',
       select: 'fullName batch email profilePic'
     });
 
@@ -2781,7 +2828,7 @@ export const addMembersToTeam = async (req, res) => {
     // Return updated event with populated member details
     const updatedEvent = await Event.findById(id).populate({
       path: 'eventMembers.contributionTeam',
-      model: 'Member',
+      model: 'User',
       select: 'fullName batch email profilePic'
     });
 
@@ -2876,7 +2923,7 @@ export const removeMembersFromTeam = async (req, res) => {
     // Return updated event with populated data
     const updatedEvent = await Event.findById(id).populate({
       path: 'eventMembers.contributionTeam',
-      model: 'Member',
+      model: 'User',
       select: 'fullName batch email profilePic'
     });
 

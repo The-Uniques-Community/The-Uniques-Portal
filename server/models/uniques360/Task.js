@@ -1,5 +1,16 @@
+/**
+ * @file Task.js
+ * @description Mongoose schema and model for project and event task management.
+ * @architecture Central task delegation and assignment model in Uniques 360; assigns tasks to members and tracks completion status.
+ * @agent_note assignedTo references Member with per-assignee roles; assignedBy references Admin model; status and priority use enums.
+ */
+
 import mongoose from "mongoose";
 
+/**
+ * Mongoose schema definition for Uniques 360 tasks.
+ * Manages task delegation, multiple member assignments, deadlines, and completion records.
+ */
 const taskSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -13,7 +24,7 @@ const taskSchema = new mongoose.Schema({
     {
       member: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Member",
+        ref: "User",
         required: true,
       },
       role: {
@@ -24,7 +35,7 @@ const taskSchema = new mongoose.Schema({
   ],
   assignedBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Admin", // Assuming coordinators are also in Admin model or there's a specific role
+    ref: "User",
     required: true,
   },
   deadline: {
@@ -59,5 +70,9 @@ const taskSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-const Task = mongoose.model("Task", taskSchema);
+const Task = mongoose.models.Task || mongoose.model("Task", taskSchema);
+
+/**
+ * @module Task
+ */
 export default Task;

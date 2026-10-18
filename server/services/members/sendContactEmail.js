@@ -1,7 +1,26 @@
+/**
+ * @file sendContactEmail.js
+ * @description Sends contact form inquiry notifications to administrators and auto-reply receipts to visitors.
+ * @architecture Dispatched by the contact/enquiry controller to handle external communications and user acknowledgment.
+ * @agent_note Generates a fallback reference number if enquiryId is missing; dispatches two separate emails (admin & user).
+ */
+
 import dotenv from 'dotenv';
 dotenv.config();
 import transporter from '../../config/emailConfig.js';
 
+/**
+ * @desc    Sends inquiry notification to the user and community admins upon contact form submission.
+ * @param   {Object} contactData - Contact form submission details.
+ * @param   {string} contactData.firstName - Submitter's first name.
+ * @param   {string} contactData.lastName - Submitter's last name.
+ * @param   {string} contactData.email - Submitter's email address.
+ * @param   {string} [contactData.phone] - Submitter's phone number.
+ * @param   {string} contactData.message - Message body.
+ * @param   {string[]} [contactData.services] - Array of requested services.
+ * @param   {string|Object} [contactData.enquiryId] - Associated enquiry ID or reference number.
+ * @returns {Promise<boolean>} True if emails were sent successfully, false otherwise.
+ */
 export const sendContactEmail = async (contactData) => {
     const { firstName, lastName, email, phone, message, services, enquiryId } = contactData;
     const referenceNumber = enquiryId ? 
@@ -253,4 +272,7 @@ export const sendContactEmail = async (contactData) => {
     }
 };
 
+/**
+ * @module sendContactEmail
+ */
 export default sendContactEmail;

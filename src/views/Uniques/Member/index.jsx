@@ -43,7 +43,7 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import XIcon from "@mui/icons-material/X";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
@@ -97,6 +97,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { BASE_URL } from "@/config";
+import apiClient from "@/services/apiClient";
 
 // API base URL
 const API_BASE_URL = BASE_URL;
@@ -232,10 +233,12 @@ const Index = () => {
   });
   const [semesterEditIndex, setSemesterEditIndex] = useState(-1);
 
-  // Menu states for item actions
-  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
-  const [menuItemType, setMenuItemType] = useState("");
-  const [menuItemIndex, setMenuItemIndex] = useState(-1);
+  // Unified menu state for item actions
+  const [menuState, setMenuState] = useState({
+    anchorEl: null,
+    type: "",
+    index: -1,
+  });
 
   // Fetch user profile data
   useEffect(() => {
@@ -406,13 +409,14 @@ const Index = () => {
 
   // Toggle edit mode for profile sections
   const toggleEditMode = (section) => {
-    setEditMode({
-      ...editMode,
-      [section]: !editMode[section],
-    });
+    const isCurrentlyEditing = editMode[section];
+    setEditMode((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
 
-    // Reset to original data if canceling edit
-    if (editMode[section]) {
+    // Reset to original data only if canceling edit
+    if (isCurrentlyEditing) {
       setEditedUser({ ...user });
     }
   };
@@ -446,20 +450,26 @@ const Index = () => {
           twitterProfile: editedUser.twitterProfile,
           instagramProfile: editedUser.instagramProfile,
           whatsappContact: editedUser.whatsappContact,
+          bio: editedUser.bio !== undefined ? editedUser.bio : (user?.bio || ""),
         };
       } else if (section === "bio") {
-        dataToUpdate = { bio: editedUser.bio };
+        dataToUpdate = { bio: editedUser.bio !== undefined ? editedUser.bio : "" };
       } else if (section === "skills") {
         dataToUpdate = {
           skills: Array.isArray(editedUser.skills) ? editedUser.skills : [],
         };
       }
 
-      await axios.put(
+      const response = await axios.put(
         `${API_BASE_URL}/api/member/members/${user._id}/editProfile`,
         dataToUpdate,
         { withCredentials: true }
       );
+
+      if (response.data && response.data.member) {
+        setUser(response.data.member);
+        setEditedUser(response.data.member);
+      }
 
       setAlert({
         open: true,
@@ -467,8 +477,10 @@ const Index = () => {
         severity: "success",
       });
 
-      toggleEditMode(section);
-      refreshData();
+      setEditMode((prev) => ({
+        ...prev,
+        [section]: false,
+      }));
     } catch (err) {
       console.error("Error updating profile:", err);
       setAlert({
@@ -552,6 +564,43 @@ const Index = () => {
       setError(
         err.response?.data?.message || "Failed to upload profile picture"
       );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRemoveProfilePicture = async () => {
+    if (!user?._id) return;
+    try {
+      setLoading(true);
+      const response = await apiClient.delete(
+        `/api/member/members/${user._id}/profilePic`
+      );
+
+      const updatedUser = response.data?.member || {
+        ...user,
+        profilePic: null,
+        avatarUrl: "",
+      };
+
+      setUser(updatedUser);
+      setEditedUser(updatedUser);
+      setProfilePicture(null);
+      setProfilePictureDialogOpen(false);
+
+      setAlert({
+        open: true,
+        message: "Profile picture removed successfully",
+        severity: "success",
+      });
+    } catch (err) {
+      console.error("Error removing profile picture:", err);
+      setAlert({
+        open: true,
+        message:
+          err.response?.data?.message || err.message || "Failed to remove profile picture",
+        severity: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -760,29 +809,29 @@ const Index = () => {
 
       const updatedCertifications = [...(user.certifications || [])];
 
-      // if (certificationEditIndex >= 0) {
-      //   // Update existing certification
-      //   updatedCertifications[certificationEditIndex] = {
-      //     ...currentCertification,
-      //     ...(certificationFile ? fileData : {}),
-      //   };
-      // } else {
-      //   // Add new certification
-      //   updatedCertifications.push({
-      //     ...currentCertification,
-      //     ...fileData,
-      //     createdAt: new Date().toISOString(),
-      //   });
-      // }
+      if (certificationEditIndex >= 0) {
+        // Update existing certification
+        updatedCertifications[certificationEditIndex] = {
+          ...currentCertification,
+          ...(certificationFile ? fileData : {}),
+        };
+      } else {
+        // Add new certification
+        updatedCertifications.push({
+          ...currentCertification,
+          ...fileData,
+          createdAt: new Date().toISOString(),
+        });
+      }
 
       // Make API call to update certifications
-      // await axios.put(
-      //   `${API_BASE_URL}/api/member/members/${user._id}/certifications`,
-      //   { certifications: updatedCertifications },
-      //   {
-      //     withCredentials: true,
-      //   }
-      // );
+      await axios.put(
+        `${API_BASE_URL}/api/member/members/${user._id}/certifications`,
+        { certifications: updatedCertifications },
+        {
+          withCredentials: true,
+        }
+      );
 
       // Show success message
       setAlert({
@@ -1461,71 +1510,78 @@ const Index = () => {
 
   // Menu handlers for item actions
   const handleMenuOpen = (event, type, index) => {
-    setMenuAnchorEl(event.currentTarget);
-    setMenuItemType(type);
-    setMenuItemIndex(index);
+    setMenuState({
+      anchorEl: event.currentTarget,
+      type,
+      index,
+    });
   };
 
   const handleMenuClose = () => {
-    setMenuAnchorEl(null);
-    setMenuItemType("");
-    setMenuItemIndex(-1);
+    setMenuState({
+      anchorEl: null,
+      type: "",
+      index: -1,
+    });
   };
 
   const handleMenuAction = (action) => {
+    const { type, index } = menuState;
     handleMenuClose();
 
+    if (index < 0 || !type) return;
+
     if (action === "edit") {
-      switch (menuItemType) {
+      switch (type) {
         case "achievement":
           openAchievementDialog(
-            user.achievements[menuItemIndex],
-            menuItemIndex
+            user?.achievements?.[index],
+            index
           );
           break;
         case "certification":
           openCertificationDialog(
-            user.certifications[menuItemIndex],
-            menuItemIndex
+            user?.certifications?.[index],
+            index
           );
           break;
         case "project":
-          openProjectDialog(user.projects[menuItemIndex], menuItemIndex);
+          openProjectDialog(user?.projects?.[index], index);
           break;
         case "internship":
-          openInternshipDialog(user.internships[menuItemIndex], menuItemIndex);
+          openInternshipDialog(user?.internships?.[index], index);
           break;
         case "event":
           openEventDialog(
-            user.event_participation[menuItemIndex],
-            menuItemIndex
+            user?.event_participation?.[index],
+            index
           );
           break;
         case "semester":
-          openSemesterDialog(user.semesterSGPA[menuItemIndex], menuItemIndex);
+          openSemesterDialog(user?.semesterSGPA?.[index], index);
           break;
         default:
           break;
       }
     } else if (action === "delete") {
-      switch (menuItemType) {
+      switch (type) {
         case "achievement":
-          deleteAchievement(menuItemIndex);
+          deleteAchievement(index);
           break;
         case "certification":
-          deleteCertification(menuItemIndex);
+          deleteCertification(index);
           break;
         case "project":
-          deleteProject(menuItemIndex);
+          deleteProject(index);
           break;
         case "internship":
-          deleteInternship(menuItemIndex);
+          deleteInternship(index);
           break;
         case "event":
-          deleteEvent(menuItemIndex);
+          deleteEvent(index);
           break;
         case "semester":
-          deleteSemester(menuItemIndex);
+          deleteSemester(index);
           break;
         default:
           break;
@@ -1693,9 +1749,32 @@ const Index = () => {
                 }}
                 size="small"
                 onClick={handleProfilePictureClick}
+                title="Update Profile Picture"
               >
                 <Upload size={16} />
               </IconButton>
+              {(user?.profilePic?.fileId || user?.profilePic) && (
+                <Tooltip title="Remove Profile Picture">
+                  <IconButton
+                    sx={{
+                      position: "absolute",
+                      bottom: 10,
+                      left: -10,
+                      bgcolor: "#ca0019",
+                      color: "white",
+                      boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+                      "&:hover": {
+                        bgcolor: "#a30014",
+                      },
+                    }}
+                    size="small"
+                    onClick={handleRemoveProfilePicture}
+                    disabled={loading}
+                  >
+                    <DeleteIcon sx={{ fontSize: 16 }} />
+                  </IconButton>
+                </Tooltip>
+              )}
             </Box>
             <div className="flex items-center gap-2 mb-2">
               <span className="text-xs text-slate-500 font-medium uppercase">
@@ -2613,76 +2692,27 @@ const Index = () => {
                   }}
                 >
                   <Typography variant="h6">Bio</Typography>
-                  {!editMode.bio && (
-                    <IconButton
-                      size="small"
-                      onClick={() => toggleEditMode("bio")}
-                    >
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                  )}
+                  <Button
+                    size="small"
+                    variant="text"
+                    startIcon={<EditIcon fontSize="small" />}
+                    onClick={() => {
+                      setValue(2);
+                      setEditMode((prev) => ({ ...prev, bio: true }));
+                    }}
+                    sx={{ color: "#ca0019" }}
+                  >
+                    Edit Bio
+                  </Button>
                 </Box>
 
-                {editMode.bio ? (
-                  <Box sx={{ mt: 1 }}>
-                    <TextField
-                      name="bio"
-                      value={editedUser.bio || ""}
-                      onChange={handleProfileInputChange}
-                      multiline
-                      rows={4}
-                      fullWidth
-                      placeholder="Tell us about yourself"
-                      variant="outlined"
-                    />
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "flex-end",
-                        gap: 1,
-                        mt: 2,
-                      }}
-                    >
-                      <Button
-                        size="small"
-                        variant="contained"
-                        onClick={() => saveProfileChanges("bio")}
-                        disabled={loading}
-                        startIcon={
-                          loading ? (
-                            <CircularProgress size={20} />
-                          ) : (
-                            <SaveIcon />
-                          )
-                        }
-                        sx={{
-                          bgcolor: "#ca0019",
-                          "&:hover": {
-                            bgcolor: "#a30014",
-                          },
-                        }}
-                      >
-                        Save
-                      </Button>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={() => toggleEditMode("bio")}
-                        startIcon={<CancelIcon />}
-                      >
-                        Cancel
-                      </Button>
-                    </Box>
-                  </Box>
-                ) : (
-                  <Typography
-                    variant="body2"
-                    color={user.bio ? "text.primary" : "text.secondary"}
-                    sx={{ mt: 1 }}
-                  >
-                    {user.bio || "No bio available"}
-                  </Typography>
-                )}
+                <Typography
+                  variant="body2"
+                  color={user?.bio ? "text.primary" : "text.secondary"}
+                  sx={{ mt: 1, whiteSpace: "pre-line" }}
+                >
+                  {user?.bio || "No bio available"}
+                </Typography>
               </Paper>
 
               {/* Supplementary Information */}
@@ -3994,23 +4024,36 @@ const Index = () => {
             </Paper>
           </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setProfilePictureDialogOpen(false)}>
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            onClick={uploadProfilePicture}
-            disabled={loading || !profilePicture}
-            startIcon={loading ? <CircularProgress size={20} /> : null}
-            sx={{
-              bgcolor: "#ca0019",
-              "&:hover": { bgcolor: "#a30014" },
-              color: "white",
-            }}
-          >
-            {loading ? "Uploading..." : "Save"}
-          </Button>
+        <DialogActions sx={{ justifyContent: "space-between", px: 3, pb: 2 }}>
+          {(user?.profilePic?.fileId || user?.profilePic) ? (
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={handleRemoveProfilePicture}
+              disabled={loading}
+              startIcon={<DeleteIcon />}
+            >
+              Remove Profile Picture
+            </Button>
+          ) : <Box />}
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Button onClick={() => setProfilePictureDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              onClick={uploadProfilePicture}
+              disabled={loading || !profilePicture}
+              startIcon={loading ? <CircularProgress size={20} /> : null}
+              sx={{
+                bgcolor: "#ca0019",
+                "&:hover": { bgcolor: "#a30014" },
+                color: "white",
+              }}
+            >
+              {loading ? "Uploading..." : "Save"}
+            </Button>
+          </Box>
         </DialogActions>
       </Dialog>
 
@@ -4692,8 +4735,8 @@ const Index = () => {
 
       {/* Item Action Menu */}
       <Menu
-        anchorEl={menuAnchorEl}
-        open={Boolean(menuAnchorEl)}
+        anchorEl={menuState.anchorEl}
+        open={Boolean(menuState.anchorEl)}
         onClose={handleMenuClose}
       >
         <MenuItem onClick={() => handleMenuAction("edit")}>

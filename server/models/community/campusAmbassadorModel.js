@@ -1,5 +1,16 @@
+/**
+ * @file campusAmbassadorModel.js
+ * @description Mongoose schema and model for campus ambassadors representing the community across colleges.
+ * @architecture Captures application data, onboarding lifecycle, performance tracking metrics, and regional college outreach.
+ * @agent_note Indexed on email, status, and college; validates 4-digit graduationYear and minimum 50 chars for whyJoin.
+ */
+
 import mongoose from 'mongoose';
 
+/**
+ * Mongoose schema definition for Campus Ambassador program applicants and active representatives.
+ * Features validation rules for outreach metrics, college affiliation, and application review status.
+ */
 const campusAmbassadorSchema = new mongoose.Schema({
   fullName: {
     type: String,
@@ -106,10 +117,12 @@ const campusAmbassadorSchema = new mongoose.Schema({
 });
 
 // Index for faster queries
-campusAmbassadorSchema.index({ email: 1 });
 campusAmbassadorSchema.index({ status: 1 });
 campusAmbassadorSchema.index({ college: 1 });
 
-const CampusAmbassador = mongoose.model('CampusAmbassador', campusAmbassadorSchema);
+const CampusAmbassador = mongoose.models.CampusAmbassador || mongoose.model('CampusAmbassador', campusAmbassadorSchema);
 
+/**
+ * @module CampusAmbassador
+ */
 export default CampusAmbassador;

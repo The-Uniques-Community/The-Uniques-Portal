@@ -1,9 +1,20 @@
+/**
+ * @file fineController.js
+ * @description Controller managing member disciplinary fines, penalty tracking, payment status workflows, and fine analytics.
+ * @architecture Mounted at `/api/admin/fine` and `/api/fine` via `fineRoute.js`, operating on embedded `fines` subdocuments in Member documents.
+ * @agent_note Fines are subdocuments inside Member schema (`member.fines`). Status transitions include 'pending', 'paid', and 'waived'. Payment receipts link to File collection.
+ */
 import Member from "../../models/member/memberModel.js";
 import mongoose from "mongoose";
 
 /**
- * Search for members by name, email or admission number
- * @route GET /api/admin/members/search
+ * @desc    Search members by name, email, or admission number for fine operations
+ * @route   GET /api/admin/members/search
+ * @access  Private (Admin)
+ * @param   {string} [req.query.query] - Search string (name, email, or exact admno pattern)
+ * @param   {string} [req.query.batch] - Filter by batch
+ * @param   {number} [req.query.limit=10] - Result limit
+ * @returns {Object} List of matching members with fine details
  */
 export const searchMembers = async (req, res) => {
   try {
@@ -14,8 +25,8 @@ export const searchMembers = async (req, res) => {
     
     if (query) {
       // Check if query is an admission number (exact match)
-      if (/^[0-9]{4}(BTCS|BTCSD)[0-9]{3}$/.test(query)) {
-        searchCriteria.admno = query;
+      if (/^[0-9]{4}(BTCS|BTCED|BTCSD|BCAPU|BCAPTU|BTAIML)[0-9]{3}$/i.test(query)) {
+        searchCriteria.admno = query.toUpperCase();
       } else {
         // Search by name or email (partial match)
         searchCriteria.$or = [
@@ -50,8 +61,15 @@ export const searchMembers = async (req, res) => {
 };
 
 /**
- * Impose a fine on a member
- * @route POST /api/admin/members/:memberId/fines
+ * @desc    Impose a monetary fine on a specified member
+ * @route   POST /api/admin/members/:memberId/fines
+ * @access  Private (Admin)
+ * @param   {string} req.params.memberId - Member ObjectId
+ * @body    {Object} req.body
+ * @body    {number} req.body.amount - Fine amount in INR
+ * @body    {string} req.body.reason - Reason for fine imposition
+ * @body    {Date} [req.body.dateImposed=new Date()] - Date fine was incurred
+ * @returns {Object} Newly created fine record and updated total pending amount
  */
 export const imposeFine = async (req, res) => {
   try {
@@ -128,8 +146,15 @@ export const imposeFine = async (req, res) => {
 };
 
 /**
- * Update fine status (mark as paid, waived or pending)
- * @route PATCH /api/admin/members/:memberId/fines/:fineId
+ * @desc    Update fine status (mark as paid, waived, or pending) with optional receipt link
+ * @route   PATCH /api/admin/members/:memberId/fines/:fineId
+ * @access  Private (Admin)
+ * @param   {string} req.params.memberId - Member ObjectId
+ * @param   {string} req.params.fineId - Fine subdocument ObjectId
+ * @body    {Object} req.body
+ * @body    {string} req.body.status - New status ('pending' | 'paid' | 'waived')
+ * @body    {string} [req.body.proofOfPaymentId] - Optional File ObjectId proof
+ * @returns {Object} Updated fine object and pending fine sum
  */
 export const updateFineStatus = async (req, res) => {
   try {
@@ -178,8 +203,14 @@ export const updateFineStatus = async (req, res) => {
     member.fines[fineIndex].status = status;
     
     // Update proof of payment if provided
-    if (proofOfPaymentId && mongoose.Types.ObjectId.isValid(proofOfPaymentId)) {
-      member.fines[fineIndex].proofOfPayment = proofOfPaymentId;
+    if (req.body.proofOfPayment && typeof req.body.proofOfPayment === 'object') {
+      member.fines[fineIndex].proofOfPayment = req.body.proofOfPayment;
+    } else if (proofOfPaymentId && mongoose.Types.ObjectId.isValid(proofOfPaymentId)) {
+      if (member.fines[fineIndex].proofOfPayment && typeof member.fines[fineIndex].proofOfPayment === 'object') {
+        member.fines[fineIndex].proofOfPayment._id = proofOfPaymentId;
+      } else {
+        member.fines[fineIndex].proofOfPayment = { _id: proofOfPaymentId };
+      }
     }
 
     await member.save();
@@ -205,8 +236,12 @@ export const updateFineStatus = async (req, res) => {
 };
 
 /**
- * Remove a fine
- * @route DELETE /api/admin/members/:memberId/fines/:fineId
+ * @desc    Remove and delete a fine record from a member's record
+ * @route   DELETE /api/admin/members/:memberId/fines/:fineId
+ * @access  Private (Admin)
+ * @param   {string} req.params.memberId - Member ObjectId
+ * @param   {string} req.params.fineId - Fine subdocument ObjectId
+ * @returns {Object} Confirmation and removed fine details
  */
 export const removeFine = async (req, res) => {
   try {
@@ -264,8 +299,11 @@ export const removeFine = async (req, res) => {
 };
 
 /**
- * Get all pending fines for a member
- * @route GET /api/admin/members/:memberId/fines/pending
+ * @desc    Get all unresolved pending fines for a specific member
+ * @route   GET /api/admin/members/:memberId/fines/pending OR GET /api/fine/profile/fines/pending
+ * @access  Private (Admin / Member)
+ * @param   {string} req.params.memberId - Member ObjectId
+ * @returns {Object} Member pending fines and outstanding amount
  */
 export const getPendingFines = async (req, res) => {
   try {
@@ -281,8 +319,7 @@ export const getPendingFines = async (req, res) => {
 
     // Find the member
     const member = await Member.findById(memberId)
-      .select('fullName admno email batch fines')
-      .populate('fines.proofOfPayment');
+      .select('fullName admno email batch fines');
     
     if (!member) {
       return res.status(404).json({
@@ -323,8 +360,12 @@ export const getPendingFines = async (req, res) => {
 };
 
 /**
- * Get fine history for a member
- * @route GET /api/admin/members/:memberId/fines
+ * @desc    Get complete fine history and summary totals for a member
+ * @route   GET /api/admin/members/:memberId/fines OR GET /api/fine/profile/fines
+ * @access  Private (Admin / Member)
+ * @param   {string} req.params.memberId - Member ObjectId
+ * @param   {string} [req.query.status] - Optional filter by status ('pending' | 'paid' | 'waived')
+ * @returns {Object} Fine history records and status sum breakdown
  */
 export const getFineHistory = async (req, res) => {
   try {
@@ -341,8 +382,7 @@ export const getFineHistory = async (req, res) => {
 
     // Find the member
     const member = await Member.findById(memberId)
-      .select('fullName admno email batch fines')
-      .populate('fines.proofOfPayment');
+      .select('fullName admno email batch fines');
     
     if (!member) {
       return res.status(404).json({
@@ -400,14 +440,15 @@ export const getFineHistory = async (req, res) => {
 };
 
 /**
- * Get fine statistics across all members
- * @route GET /api/admin/fines/statistics
+ * @desc    Aggregate fine statistics across all community members
+ * @route   GET /api/admin/fines/statistics
+ * @access  Private (Admin)
+ * @returns {Object} Aggregated totals for issued, collected, pending, and waived fines
  */
 export const getFineStatistics = async (req, res) => {
   try {
     const members = await Member.find()
-      .select('fullName fines')
-      .populate('fines.proofOfPayment');
+      .select('fullName fines');
     
     const statistics = {
       totalFinesIssued: 0,
@@ -473,6 +514,15 @@ export const getFineStatistics = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Retrieve all members with at least one fine, with filtering and stats
+ * @route   GET /api/admin/fines/members OR GET /api/admin/member/get-all-fine-history
+ * @access  Private (Admin)
+ * @param   {string} [req.query.batch] - Filter by batch
+ * @param   {string} [req.query.search] - Search by name, admno, or email
+ * @param   {string} [req.query.status] - Filter by fine status ('pending' | 'paid' | 'waived')
+ * @returns {Object} List of members with fine statistics
+ */
 export const getAllMembersWithFines = async (req, res) => {
   try {
     const { batch, search, status } = req.query;
@@ -572,27 +622,39 @@ export const getAllMembersWithFines = async (req, res) => {
 };
 
 /**
- * Get members with pending fines
- * @route GET /api/admin/fines/pending/members
+ * @desc    Get summary list of all members with currently pending fines
+ * @route   GET /api/admin/fines/pending/members
+ * @access  Private (Admin)
+ * @returns {Object} Sorted list of members by highest pending fine balance
  */
 export const getMembersWithPendingFines = async (req, res) => {
   try {
-    const members = await Member.find({
+    const filter = {
       'fines.status': 'pending'
-    }).select('fullName admno email batch fines');
+    };
+    if (req.query.batch) {
+      filter.batch = req.query.batch;
+    }
+
+    const members = await Member.find(filter).select('fullName admno email batch fines');
     
     const membersWithDetails = members.map(member => {
-      const pendingFines = member.fines.filter(fine => fine.status === 'pending');
-      const totalPendingAmount = pendingFines.reduce((sum, fine) => sum + fine.amount, 0);
+      const allFines = member.fines || [];
+      const pendingFines = allFines.filter(fine => fine.status === 'pending');
+      const totalPendingAmount = pendingFines.reduce((sum, fine) => sum + (Number(fine.amount) || 0), 0);
+      const totalAmount = allFines.reduce((sum, fine) => sum + (Number(fine.amount) || 0), 0);
       
       return {
         id: member._id,
+        _id: member._id,
         name: member.fullName,
+        fullName: member.fullName,
         admno: member.admno,
         email: member.email,
         batch: member.batch,
         pendingFinesCount: pendingFines.length,
-        totalPendingAmount
+        totalPendingAmount,
+        totalAmount
       };
     });
     
