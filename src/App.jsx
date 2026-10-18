@@ -1,7 +1,7 @@
 import React from "react";
 import router from "@/routes";
 import { RouterProvider } from "react-router-dom";
-import GridBackground from "./utils/GridBackground.jsx/GridBackground";
+import GridBackground from "@/components/common/GridBackground";
 
 
 const App = () => {

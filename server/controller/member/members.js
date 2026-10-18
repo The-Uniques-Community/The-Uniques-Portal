@@ -1,8 +1,19 @@
+/**
+ * @file members.js
+ * @description Seed data generation and bulk database synchronization utilities for initial member population and fine status migration.
+ * @architecture Service/seed utility imported by `memberController.js` and `memberRoute.js`. Directly operates on `Member` Mongoose model.
+ * @agent_note Provides default dummy member profiles with pre-hashed passwords, academic history, projects, and fine records.
+ */
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
 const createObjectId = () => new mongoose.Types.ObjectId();
 
+/**
+ * @desc Helper function to hash raw passwords with bcrypt
+ * @param {string} password - Raw text password
+ * @returns {Promise<string>} Hashed password string
+ */
 // Helper function to hash passwords
 const hashPassword = async (password) => {
   const salt = await bcrypt.genSalt(10);
@@ -17,6 +28,10 @@ const eventIds = {
   eventFour: createObjectId(),
 };
 
+/**
+ * @desc Generate sample member seed data with pre-hashed default passwords
+ * @returns {Promise<Object[]>} Array of member seed document payloads
+ */
 export const getMemberData = async () => {
     // Hash passwords
     const defaultPassword = await hashPassword('password123');
@@ -316,6 +331,11 @@ export const getMemberData = async () => {
     ];
   };
   
+  /**
+   * @desc Bulk insert sample member records into the database
+   * @param {import("mongoose").Model} Member - Mongoose Member model
+   * @returns {Promise<{success: boolean, count?: number, error?: string}>} Bulk operation outcome
+   */
   // Bulk upload controller for members
   export const bulkUploadMembers = async (Member) => {
     try {
@@ -337,6 +357,11 @@ export const getMemberData = async () => {
     }
   };
 
+  /**
+   * @desc Update fine arrays and recalculate fineStatus for sample members
+   * @param {import("mongoose").Model} Member - Mongoose Member model
+   * @returns {Promise<{success: boolean, message?: string, error?: string}>} Update operation outcome
+   */
   // New function to update fine data for existing members
   export const updateMemberFines = async (Member) => {
     try {
@@ -370,6 +395,11 @@ export const getMemberData = async () => {
     }
   };
 
+  /**
+   * @desc Calculate aggregate pending fine amount from fine objects array
+   * @param {Object[]} fines - Array of fine records
+   * @returns {string} Total pending fine amount as string
+   */
   // Helper function to calculate fineStatus from fines array
   const calculateFineStatus = (fines) => {
     // Sum up pending fines

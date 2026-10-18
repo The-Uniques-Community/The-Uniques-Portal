@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import { Lock, Storage, Layers, SyncAlt } from "@mui/icons-material";
+import Lock from '@mui/icons-material/Lock';
+import Storage from '@mui/icons-material/Storage';
+import Layers from '@mui/icons-material/Layers';
+import SyncAlt from '@mui/icons-material/SyncAlt';
 import sv from "@/assets/trainingmodel/sv.png";
 import Filter3Icon from "@mui/icons-material/Filter3";
 import Filter2Icon from "@mui/icons-material/Filter2";

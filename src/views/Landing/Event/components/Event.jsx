@@ -2,14 +2,14 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '@/config';
 import { Users, X, Calendar, Clock, MapPin, User, Users as UsersIcon, Award } from 'lucide-react';
-import Button from "@/utils/Buttons/Button";
+import Button from "@/components/buttons/Button";
 import { Tabs, Tab } from '@mui/material';
 import { CircularProgress, TextField, FormControl, InputLabel, Select, MenuItem, FormHelperText, RadioGroup, FormControlLabel, Radio, Checkbox } from '@mui/material';
 import { toast } from 'react-toastify';
 import { Dialog, DialogContent, Typography, Box, DialogTitle, IconButton } from '@mui/material';
-import { Close } from '@mui/icons-material';
+import Close from '@mui/icons-material/Close';
 import { Alert, DialogActions } from '@mui/material';
-import { ContactMail } from '@mui/icons-material';
+import ContactMail from '@mui/icons-material/ContactMail';
 
 
 // Static data for community partners (only for Bharat TechXperience Hackathon 2.0)

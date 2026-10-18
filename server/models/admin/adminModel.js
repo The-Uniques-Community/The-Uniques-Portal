@@ -1,34 +1,9 @@
-import mongoose from "mongoose";
+/**
+ * @file adminModel.js
+ * @description Backward compatibility re-export of unified User model.
+ * @architecture Re-exports canonical User model to ensure seamless backward compatibility across legacy controllers and services.
+ */
 
-const adminSchema = new mongoose.Schema({
-    fullName:{
-        type: String,
-    },
-    email:{
-        type: String,
-        unique: true
-    },
-    password:{
-        type: String,
-    },
-    role:{
-        type: String,
-        default: 'admin',
-    },
-    adminContact:{
-        type: String,
-    },
-    adminDesignation:{
-        type: String,
-    },
-    profilePic:{
-        type: String,
-    },
-    googleId:{
-        type: String,
-    }
-});
+import User from "../user/userModel.js";
 
-const Admin = mongoose.model('Admin', adminSchema);
-
-export default Admin;
+export default User;

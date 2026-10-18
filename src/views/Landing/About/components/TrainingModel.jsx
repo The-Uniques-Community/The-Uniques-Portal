@@ -5,11 +5,11 @@ import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import SettingsIcon from "@mui/icons-material/Settings";
 import Box from "@mui/material/Box";
-import InceptionTab from "../../../Landing/homComponents/InceptionTab";
+import InceptionTab from "../../../Landing/homeComponents/InceptionTab";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import WebDevTab from "../../homComponents/WebDevTab";
-import MernTab from "../../homComponents/MernTab";
-import AndroidTab from "../../homComponents/AndroidTab";
+import WebDevTab from "../../homeComponents/WebDevTab";
+import MernTab from "../../homeComponents/MernTab";
+import AndroidTab from "../../homeComponents/AndroidTab";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;

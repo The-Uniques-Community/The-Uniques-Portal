@@ -1,3 +1,10 @@
+/**
+ * @file emailConfig.js
+ * @description Configures and initializes the Nodemailer SMTP transporter for sending application emails.
+ * @architecture Central mail transportation configuration imported across all email notification services.
+ * @agent_note Relies on EMAIL_USER and EMAIL_PASS environment variables; verifies SMTP connection on initial load.
+ */
+
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 
@@ -6,6 +13,10 @@ dotenv.config();
 console.log('Email User:', process.env.EMAIL_USER);
 console.log('Password length:', process.env.EMAIL_PASS?.length);
 
+/**
+ * Nodemailer SMTP transport instance configured for Gmail service.
+ * @type {import('nodemailer').Transporter}
+ */
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     host: 'smtp.gmail.com',
@@ -29,4 +40,7 @@ transporter.verify((error, _success) => {
     }
 });
 
+/**
+ * @module emailTransporter
+ */
 export default transporter;

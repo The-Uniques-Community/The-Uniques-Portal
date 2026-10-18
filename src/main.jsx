@@ -8,9 +8,21 @@ import { ThemeProvider } from "./theme/ThemeProvider.jsx";
 import { ToastContainer } from "react-toastify";
 import store from "@/redux/store";
 import { Provider } from "react-redux";
-import ClickSpark from "./utils/clickSpark/ClickSpark";
+import ClickSpark from "@/components/ui/ClickSpark";
 import Lenis from 'lenis'
 
+// Automatically unregister any stale service workers (e.g. from other projects sharing localhost)
+if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    for (const registration of registrations) {
+      registration.unregister().then((unregistered) => {
+        if (unregistered) {
+          console.info("[SW] Unregistered stale service worker:", registration.scope);
+        }
+      });
+    }
+  });
+}
 
 // Initialize Lenis
 const lenis = new Lenis({

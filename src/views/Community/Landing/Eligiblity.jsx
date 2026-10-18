@@ -1,5 +1,5 @@
 import React from 'react';
-import SpotlightCard from '@/utils/Card/SpotLightCard';
+import SpotlightCard from '@/components/cards/SpotLightCard';
 import profileImg from '@/assets/img/Community/Sample1.png';
 
 const SevenCardsLayout = () => {

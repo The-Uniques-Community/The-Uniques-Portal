@@ -1,3 +1,9 @@
+/**
+ * @file otpRoute.js
+ * @description Password recovery router orchestrating OTP generation, email dispatch, verification, and password reset.
+ * @architecture Mounted at `/auth/password-reset` in server/index.js, providing a 3-step OTP recovery flow via passwordReset.controller.
+ * @agent_note Four-endpoint workflow: `/send-otp` -> `/verify-otp` -> `/reset-password` with optional `/resend-otp`.
+ */
 import express from 'express';
 import { 
   sendResetOTP, 

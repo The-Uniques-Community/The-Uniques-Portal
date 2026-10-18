@@ -1,5 +1,16 @@
+/**
+ * @file enquiryModel.js
+ * @description Mongoose schema and model for public inquiries and contact form submissions.
+ * @architecture Central communication model capturing visitor requests, status lifecycle, admin responses, and audit metadata.
+ * @agent_note Indexes email, status, and createdAt; responseDetails references Admin model for admin attribution.
+ */
+
 import mongoose from 'mongoose';
 
+/**
+ * Mongoose schema definition for visitor enquiries.
+ * Includes indexes on email, status, and createdAt for optimized search and dashboard filtering.
+ */
 const enquirySchema = new mongoose.Schema(
   {
     firstName: {
@@ -51,7 +62,7 @@ const enquirySchema = new mongoose.Schema(
     responseDetails: {
       respondedBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'Admin'
       },
       responseDate: Date,
       responseMessage: String
@@ -77,6 +88,9 @@ enquirySchema.index({ status: 1 });
 // Add an index on creation date for sorting
 enquirySchema.index({ createdAt: -1 });
 
-const Enquiry = mongoose.model('Enquiry', enquirySchema);
+const Enquiry = mongoose.models.Enquiry || mongoose.model('Enquiry', enquirySchema);
 
+/**
+ * @module Enquiry
+ */
 export default Enquiry;

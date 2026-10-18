@@ -11,12 +11,10 @@ import {
   Divider, 
   IconButton
 } from '@mui/material';
-import { 
-  LinkedIn as LinkedInIcon,
-  Twitter as TwitterIcon,
-  Instagram as InstagramIcon,
-  Facebook as FacebookIcon
-} from '@mui/icons-material';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import TwitterIcon from '@mui/icons-material/Twitter';
+import InstagramIcon from '@mui/icons-material/Instagram';
+import FacebookIcon from '@mui/icons-material/Facebook';
 import { Link, useLocation } from 'react-router-dom';
 import { styled } from '@mui/system';
 

@@ -1,27 +1,27 @@
 import React, { useState } from "react";
 import { useTheme } from "@mui/material/styles";
 
-import CallToAction from "./homComponents/CallToAction";
+import CallToAction from "./homeComponents/CallToAction";
 
-import AboutSection from "./homComponents/AboutSection";
-import TrainingTabs from "./homComponents/TrainingTabs";
+import AboutSection from "./homeComponents/AboutSection";
+import TrainingTabs from "./homeComponents/TrainingTabs";
 
-// import ShapedCard from "@/utils/Card/ShapedCard";
+// import ShapedCard from "@/components/cards/ShapedCard";
 
-import Gallery from "./homComponents/Gallery";
-import Counts from "./homComponents/Counts";
+import Gallery from "./homeComponents/Gallery";
+import Counts from "./homeComponents/Counts";
 
-import Startups from "./homComponents/Startups";
-import WhyUs from "./homComponents/WhyUs";
-// import TestimonialSectionCarousel from "./homComponents/TestimonialCard";
-import Batches from "./homComponents/Batches";
+import Startups from "./homeComponents/Startups";
+import WhyUs from "./homeComponents/WhyUs";
+// import TestimonialSectionCarousel from "./homeComponents/TestimonialCard";
+import Batches from "./homeComponents/Batches";
 
-import HomeHero from "./homComponents/HomeHero";
-import BlogSection from "./homComponents/BlogSection";
-import Event from "./homComponents/Event";
-import Highlight from "./homComponents/Highlight";
-// import Testimonial from "./homComponents/TestimonialCard";
-import Testimonials from "./homComponents/TestimonialCard";
+import HomeHero from "./homeComponents/HomeHero";
+import BlogSection from "./homeComponents/BlogSection";
+import Event from "./homeComponents/Event";
+import Highlight from "./homeComponents/Highlight";
+// import Testimonial from "./homeComponents/TestimonialCard";
+import Testimonials from "./homeComponents/TestimonialCard";
 
 const LandingPage = () => {
   const theme = useTheme();

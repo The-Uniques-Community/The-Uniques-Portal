@@ -1,3 +1,9 @@
+/**
+ * @file getAccessToken.js
+ * @description Standalone developer script to generate a signed JWT and exchange it for a Google Drive OAuth2 access token.
+ * @architecture Standalone utility for testing or debugging Google Drive service account authentication outside the application runtime.
+ * @agent_note Relies on a local `service.json` credential file in the same directory. Note that __dirname is used without ES module definition, so running directly in ESM requires attention.
+ */
 // getAccessToken.js
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
@@ -28,6 +34,11 @@ const token = jwt.sign(payload, privateKey, { algorithm: 'RS256' });
 console.log('Generated JWT:', token);
 
 // Exchange the JWT for an access token
+/**
+ * @desc Exchanges a signed RS256 JWT assertion with Google OAuth2 server for a scoped access token.
+ * @async
+ * @returns {Promise<void>} Logs retrieved access token to console
+ */
 async function getAccessToken() {
   try {
     const params = new URLSearchParams();

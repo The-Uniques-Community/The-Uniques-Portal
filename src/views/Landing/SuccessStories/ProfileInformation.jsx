@@ -12,14 +12,12 @@ import {
   ListItemIcon,
   Divider
 } from '@mui/material';
-import {
-  Work as WorkIcon,
-  School as SchoolIcon,
-  EmojiEvents as AchievementIcon,
-  Assignment as ProjectIcon,
-  Code as CodeIcon,
-  Group as LeadershipIcon
-} from '@mui/icons-material';
+import WorkIcon from '@mui/icons-material/Work';
+import SchoolIcon from '@mui/icons-material/School';
+import AchievementIcon from '@mui/icons-material/EmojiEvents';
+import ProjectIcon from '@mui/icons-material/Assignment';
+import CodeIcon from '@mui/icons-material/Code';
+import LeadershipIcon from '@mui/icons-material/Group';
 
 const ProfileInformation = ({
   student,

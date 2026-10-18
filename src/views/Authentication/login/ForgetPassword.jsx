@@ -16,14 +16,12 @@ import {
   Paper,
   CircularProgress,
 } from "@mui/material";
-import {
-  ArrowBack,
-  Email,
-  Security,
-  LockReset,
-  Visibility,
-  VisibilityOff,
-} from "@mui/icons-material";
+import ArrowBack from '@mui/icons-material/ArrowBack';
+import Email from '@mui/icons-material/Email';
+import Security from '@mui/icons-material/Security';
+import LockReset from '@mui/icons-material/LockReset';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";

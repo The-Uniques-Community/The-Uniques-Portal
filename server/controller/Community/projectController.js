@@ -1,3 +1,9 @@
+/**
+ * @file projectController.js
+ * @description Controller managing student and community showcase projects, including automated default project seeding and complete CRUD operations.
+ * @architecture Mounted at `/api/projects` and `/api/community/projects` via `projectRoute.js`. Interacts with `Project` model.
+ * @agent_note Automatically seeds default community showcase projects (UNI CARE, Libraria, TU Portal, Code crusade, Ideajam, etc.) when the collection is initially empty.
+ */
 import Project from "../../models/projects/projectModel.js";
 
 const INITIAL_SEED_PROJECTS = [
@@ -146,6 +152,13 @@ const INITIAL_SEED_PROJECTS = [
   },
 ];
 
+/**
+ * @desc Retrieve all showcase projects sorted newest first, seeding defaults if empty
+ * @route GET /api/projects
+ * @access Public
+ * @returns {Object} 200 - Array of project documents and total count
+ * @returns {Object} 500 - Server error
+ */
 // Get all projects (auto-seed if empty)
 export const getAllProjects = async (req, res) => {
   try {
@@ -168,6 +181,15 @@ export const getAllProjects = async (req, res) => {
   }
 };
 
+/**
+ * @desc Retrieve a single showcase project by its document ID
+ * @route GET /api/projects/:id
+ * @access Public
+ * @params {string} id - Project document ID
+ * @returns {Object} 200 - Single project document
+ * @returns {Object} 404 - If project not found
+ * @returns {Object} 500 - Server error
+ */
 // Get single project
 export const getProjectById = async (req, res) => {
   try {
@@ -185,6 +207,26 @@ export const getProjectById = async (req, res) => {
   }
 };
 
+/**
+ * @desc Create and register a new showcase project
+ * @route POST /api/projects
+ * @access Public/Admin
+ * @body {string} title - Project title
+ * @body {string} batch - Associated batch cohort
+ * @body {string} description - Summary of project
+ * @body {string} [image] - Thumbnail/banner image URL
+ * @body {string[]} [technologies] - Technologies and tools used
+ * @body {string} [category] - Project category
+ * @body {string} [link] - Live demo URL
+ * @body {string} [githubLink] - GitHub repository URL
+ * @body {string} [buttonColor] - CTA button hex color code
+ * @body {string} [status='Active'] - Current project status
+ * @body {boolean} [featured=false] - Whether project is featured
+ * @body {string[]} [contributors] - List of contributor names or IDs
+ * @returns {Object} 201 - Success confirmation and created project document
+ * @returns {Object} 400 - Validation failure
+ * @returns {Object} 500 - Server error
+ */
 // Create new project
 export const createProject = async (req, res) => {
   try {
@@ -225,6 +267,16 @@ export const createProject = async (req, res) => {
   }
 };
 
+/**
+ * @desc Update an existing showcase project by document ID
+ * @route PUT /api/projects/:id
+ * @access Public/Admin
+ * @params {string} id - Project document ID
+ * @body {Object} updates - Fields to modify
+ * @returns {Object} 200 - Success confirmation and updated project document
+ * @returns {Object} 404 - If project not found
+ * @returns {Object} 500 - Server error
+ */
 // Update project
 export const updateProject = async (req, res) => {
   try {
@@ -251,6 +303,15 @@ export const updateProject = async (req, res) => {
   }
 };
 
+/**
+ * @desc Delete a showcase project by document ID
+ * @route DELETE /api/projects/:id
+ * @access Public/Admin
+ * @params {string} id - Project document ID
+ * @returns {Object} 200 - Success confirmation and deleted project document
+ * @returns {Object} 404 - If project not found
+ * @returns {Object} 500 - Server error
+ */
 // Delete project
 export const deleteProject = async (req, res) => {
   try {

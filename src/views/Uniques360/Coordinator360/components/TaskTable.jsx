@@ -14,14 +14,12 @@ import {
   Typography,
   LinearProgress,
 } from "@mui/material";
-import ModernTable from "@/utils/Table/ModernTable";
-import {
-  Visibility as ViewIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  CheckCircle as CompleteIcon,
-  People as TeamIcon,
-} from "@mui/icons-material";
+import ModernTable from "@/components/tables/ModernTable";
+import ViewIcon from '@mui/icons-material/Visibility';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import CompleteIcon from '@mui/icons-material/CheckCircle';
+import TeamIcon from '@mui/icons-material/People';
 
 const TaskTable = ({
   title,

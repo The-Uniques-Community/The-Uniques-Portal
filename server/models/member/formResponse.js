@@ -1,5 +1,17 @@
-import mongoose from 'mongoose';
+/**
+ * @file formResponse.js
+ * @description Mongoose schema and model for dynamic custom form responses and event registrations.
+ * @architecture Captures responses to custom forms defined in formModel.js, linking members/guests with dynamic answer maps and uploaded files.
+ * @agent_note Responses are stored in a dynamic Map of Mixed types; indexes form, event, respondent, status, and createdAt; provides static helpers.
+ */
 
+import mongoose from 'mongoose';
+import fileAttachmentSchema from '../common/fileAttachmentSchema.js';
+
+/**
+ * Mongoose schema definition for dynamic form responses.
+ * Supports both authenticated member submissions and public guest responses with file attachments.
+ */
 const formResponseSchema = new mongoose.Schema({
   // Reference to the form being responded to
   form: {
@@ -19,7 +31,7 @@ const formResponseSchema = new mongoose.Schema({
     // For authenticated users
     member: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Member'
+      ref: 'User'
     },
     // For guest/public responses
     name: String,
@@ -38,10 +50,11 @@ const formResponseSchema = new mongoose.Schema({
   // For file uploads associated with the response
   files: [{
     fieldName: String,
-    fileId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'File'
-    }
+    file: {
+      type: fileAttachmentSchema,
+      default: null
+    },
+    fileId: String // For backward compatibility with existing API payloads
   }],
   
   // Response status
@@ -80,6 +93,12 @@ formResponseSchema.virtual('formResponseCount').get(function() {
   return mongoose.model('FormResponse').countDocuments({ form: this.form });
 });
 
+/**
+ * Checks if a member has already submitted a response to a specific form.
+ * @param {import('mongoose').Types.ObjectId|string} formId - Target form ID.
+ * @param {import('mongoose').Types.ObjectId|string} memberId - Submitting member ID.
+ * @returns {Promise<boolean>} True if the member has submitted a response.
+ */
 // Method to check if a user has already submitted a response
 formResponseSchema.statics.hasUserResponded = async function(formId, memberId) {
   const count = await this.countDocuments({
@@ -89,6 +108,15 @@ formResponseSchema.statics.hasUserResponded = async function(formId, memberId) {
   return count > 0;
 };
 
+/**
+ * Retrieves paginated responses for a specific form with populated member details.
+ * @param {import('mongoose').Types.ObjectId|string} formId - Target form ID.
+ * @param {Object} [options={}] - Query and pagination options.
+ * @param {string} [options.status] - Filter by response status ('pending'|'approved'|'rejected').
+ * @param {number} [options.page=1] - Page number.
+ * @param {number} [options.limit=10] - Number of responses per page.
+ * @returns {Promise<import('mongoose').Document[]>} Array of populated response documents.
+ */
 // Method to get all responses for a specific form
 formResponseSchema.statics.getFormResponses = async function(formId, options = {}) {
   const query = { form: formId };
@@ -109,5 +137,9 @@ formResponseSchema.statics.getFormResponses = async function(formId, options = {
     .limit(limit);
 };
 
-const FormResponse = mongoose.model('FormResponse', formResponseSchema);
+const FormResponse = mongoose.models.FormResponse || mongoose.model('FormResponse', formResponseSchema);
+
+/**
+ * @module FormResponse
+ */
 export default FormResponse;

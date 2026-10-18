@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '@/config';
-import Event from './Componant/Event';
-import CommunityCard from '@/utils/Card/CommunityCard';
-import ModernHeader from '@/utils/Header/ModernHeader';
-import CallToAction from '../homComponents/CallToAction';
+import Event from './components/Event';
+import CommunityCard from '@/components/cards/CommunityCard';
+import ModernHeader from '@/components/headers/ModernHeader';
+import CallToAction from '../homeComponents/CallToAction';
 import { 
   TextField, 
   Select, 
@@ -19,7 +19,9 @@ import {
   useTheme,
   Chip
 } from '@mui/material';
-import { LocalActivityOutlined, CalendarMonth, EventAvailable } from '@mui/icons-material';
+import LocalActivityOutlined from '@mui/icons-material/LocalActivityOutlined';
+import CalendarMonth from '@mui/icons-material/CalendarMonth';
+import EventAvailable from '@mui/icons-material/EventAvailable';
 
 const Index = () => {
   const theme = useTheme();

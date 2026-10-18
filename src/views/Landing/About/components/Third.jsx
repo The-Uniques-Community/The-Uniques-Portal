@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUsers, faStar } from "@fortawesome/free-solid-svg-icons";
-import Button from "@/utils/Buttons/Button";
+import Button from "@/components/buttons/Button";
 import { useTheme } from "@mui/material";
 
 const CultureOfInnovation = () => {

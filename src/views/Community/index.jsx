@@ -10,7 +10,7 @@ import CTA from "./Landing/CallToAction"
 import Sliding from "./Landing/Sliding"
 import SpotCard from './Landing/SpotCard'
 import Flight from '../Landing/HowItStarted/components/Flight'
-import CallToAction from '../Landing/homComponents/CallToAction'
+import CallToAction from '../Landing/homeComponents/CallToAction'
 
 const index = () => {
 	return (

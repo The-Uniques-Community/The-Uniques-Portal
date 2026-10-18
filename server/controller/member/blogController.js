@@ -1,10 +1,27 @@
+/**
+ * @file blogController.js
+ * @description Controller managing community blog creation, retrieval, updates, and deletion with pagination and author authorization.
+ * @architecture Mounted at `/api/blogs`. Interfaces with `Blog` model and references `Member` model for author information.
+ * @agent_note Only published blogs are visible to unauthenticated or non-admin users. Editing and deleting require authorship or admin role.
+ */
 import Blog from "../../models/member/blogModel.js";
 import mongoose from "mongoose";
 
 /**
- * Create a new blog post
+ * @desc Create a new blog post
  * @route POST /api/blogs
  * @access Private (Member)
+ * @body {string} title - Blog article title
+ * @body {string} description - Summary or excerpt
+ * @body {string} category - Blog category
+ * @body {string} readTime - Estimated read duration
+ * @body {string} image - Cover image URL
+ * @body {Object[]} [subContents] - Content sections with heading and paragraph
+ * @body {string[]} [tags] - Search tags/keywords
+ * @body {string} [status='published'] - Publication status
+ * @returns {Object} 201 - JSON response with created blog document
+ * @returns {Object} 401 - Authentication required error
+ * @returns {Object} 500 - Server error
  */
 export const createBlog = async (req, res) => {
   try {
@@ -53,9 +70,15 @@ export const createBlog = async (req, res) => {
 };
 
 /**
- * Get all blogs with author details
+ * @desc Get all blogs with author details and pagination
  * @route GET /api/blogs
  * @access Public
+ * @query {number} [page=1] - Page number
+ * @query {number} [limit=10] - Items per page
+ * @query {string} [category] - Filter by category
+ * @query {string} [status] - Filter by status (allowed for member/admin)
+ * @returns {Object} 200 - JSON response with blog list and pagination metadata
+ * @returns {Object} 500 - Server error
  */
 export const getAllBlogs = async (req, res) => {
   try {
@@ -110,9 +133,14 @@ export const getAllBlogs = async (req, res) => {
 };
 
 /**
- * Get blogs by current authenticated member
+ * @desc Get blogs authored by the currently authenticated member
  * @route GET /api/blogs/my-blogs
  * @access Private (Member)
+ * @query {number} [page=1] - Page number
+ * @query {number} [limit=10] - Items per page
+ * @returns {Object} 200 - JSON response with member's blogs and pagination metadata
+ * @returns {Object} 401 - Authentication required error
+ * @returns {Object} 500 - Server error
  */
 export const getMyBlogs = async (req, res) => {
   try {
@@ -167,9 +195,15 @@ export const getMyBlogs = async (req, res) => {
 };
 
 /**
- * Get blogs by a specific member
+ * @desc Get blogs published by a specific member ID
  * @route GET /api/blogs/member/:memberId
  * @access Public
+ * @params {string} memberId - Member author document ID
+ * @query {number} [page=1] - Page number
+ * @query {number} [limit=10] - Items per page
+ * @returns {Object} 200 - JSON response with member's blogs and pagination metadata
+ * @returns {Object} 400 - Invalid member ID format
+ * @returns {Object} 500 - Server error
  */
 export const getBlogsByMember = async (req, res) => {
   try {
@@ -226,9 +260,17 @@ export const getBlogsByMember = async (req, res) => {
 };
 
 /**
- * Edit a blog post
+ * @desc Edit an existing blog post
  * @route PUT /api/blogs/:blogId
  * @access Private (Author or Admin)
+ * @params {string} blogId - Blog document ID
+ * @body {Object} updates - Updated blog post fields
+ * @returns {Object} 200 - JSON response with updated blog document
+ * @returns {Object} 400 - Invalid blog ID format
+ * @returns {Object} 401 - Authentication required error
+ * @returns {Object} 403 - Forbidden if user is not author or admin
+ * @returns {Object} 404 - If blog not found
+ * @returns {Object} 500 - Server error
  */
 export const editBlog = async (req, res) => {
   try {
@@ -241,7 +283,13 @@ export const editBlog = async (req, res) => {
     }
     
     const blogId = req.params.blogId;
-    const updates = req.body;
+    const { title, content, tags, coverImage, summary } = req.body;
+    const allowedUpdates = {};
+    if (title !== undefined) allowedUpdates.title = title;
+    if (content !== undefined) allowedUpdates.content = content;
+    if (tags !== undefined) allowedUpdates.tags = tags;
+    if (coverImage !== undefined) allowedUpdates.coverImage = coverImage;
+    if (summary !== undefined) allowedUpdates.summary = summary;
     const userId = req.user.id;
     
     // Validate blog ID format
@@ -274,7 +322,7 @@ export const editBlog = async (req, res) => {
     // Update the blog
     const updatedBlog = await Blog.findByIdAndUpdate(
       blogId,
-      { $set: updates },
+      { $set: allowedUpdates },
       { new: true }
     ).populate('author', 'fullName profilePic email batch');
     
@@ -295,9 +343,16 @@ export const editBlog = async (req, res) => {
 };
 
 /**
- * Delete a blog post by ID
+ * @desc Delete a blog post by ID
  * @route DELETE /api/blogs/:blogId
  * @access Private (Author or Admin)
+ * @params {string} blogId - Blog document ID
+ * @returns {Object} 200 - JSON response with success message
+ * @returns {Object} 400 - Invalid blog ID format
+ * @returns {Object} 401 - Authentication required error
+ * @returns {Object} 403 - Forbidden if user is not author or admin
+ * @returns {Object} 404 - If blog not found
+ * @returns {Object} 500 - Server error
  */
 export const deleteBlogById = async (req, res) => {
   try {

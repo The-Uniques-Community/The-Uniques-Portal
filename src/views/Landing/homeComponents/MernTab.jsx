@@ -1,4 +1,7 @@
-import { Code, Storage, People, GitHub } from "@mui/icons-material";
+import Code from '@mui/icons-material/Code';
+import Storage from '@mui/icons-material/Storage';
+import People from '@mui/icons-material/People';
+import GitHub from '@mui/icons-material/GitHub';
 import mernImage from "@/assets/img/mern-training.png";
 // import industryModel from "@/assets/img/industryModel.png";
 

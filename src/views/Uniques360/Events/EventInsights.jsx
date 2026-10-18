@@ -25,16 +25,14 @@ import {
   Divider,
   useTheme,
 } from "@mui/material";
-import ModernTable from "@/utils/Table/ModernTable";
-import ModernHeader from "@/utils/Header/ModernHeader";
-import {
-  Event as EventIcon,
-  Schedule as TimelineIcon,
-  People as StudentIcon,
-  Warning as UrgencyIcon,
-  CheckCircle as DoneIcon,
-  Launch as OpenIcon,
-} from "@mui/icons-material";
+import ModernTable from "@/components/tables/ModernTable";
+import ModernHeader from "@/components/headers/ModernHeader";
+import EventIcon from '@mui/icons-material/Event';
+import TimelineIcon from '@mui/icons-material/Schedule';
+import StudentIcon from '@mui/icons-material/People';
+import UrgencyIcon from '@mui/icons-material/Warning';
+import DoneIcon from '@mui/icons-material/CheckCircle';
+import OpenIcon from '@mui/icons-material/Launch';
 import axios from "axios";
 import { BASE_URL } from "@/config";
 import { toast } from "react-toastify";

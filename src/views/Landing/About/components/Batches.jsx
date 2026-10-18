@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Typography, Grid, Card, Stack, Chip, Container } from "@mui/material";
-import Button from "@/utils/Buttons/Button";
+import Button from "@/components/buttons/Button";
 import { useTheme } from "@mui/material";
 import uniques1 from "../../../../assets/img/About/uniques1.jpg";
 import uniques2 from "../../../../assets/img/About/uniques2.jpg";

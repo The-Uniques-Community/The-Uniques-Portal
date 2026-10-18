@@ -1,3 +1,9 @@
+/**
+ * @file eventRoutes.js
+ * @description Comprehensive event management router managing events, teams, guest links, form responses, budgets, and galleries.
+ * @architecture Mounted at `/api/events` in server/index.js, bridging public access, member form responses, and coordinator/admin event controls.
+ * @agent_note Combines public routes, optional token verification (`ifTokenVerify`), and strict RBAC guards (`verifyToken, verifyRole(['admin', 'coordinator'])`).
+ */
 import express from 'express';
 import {
   createEvent,
@@ -47,12 +53,12 @@ eventRouter.get('/:id', getEventById);
 eventRouter.get('/status/:status', getEventsByStatus);
 
 // team-member addition and removal in event
-eventRouter.get('/available-members', getAvailableMembers);
-eventRouter.get('/:id/members', getEventWithMembers);
-eventRouter.put('/:id/members', updateAllEventTeams);
-eventRouter.put('/:id/members/team', updateEventTeam);
-eventRouter.post('/:id/members/team/:teamType/add', addMembersToTeam);
-eventRouter.delete('/:id/members/team/:teamType/members',  removeMembersFromTeam);
+eventRouter.get('/available-members', verifyToken, verifyRole(['admin', 'coordinator']), getAvailableMembers);
+eventRouter.get('/:id/members', verifyToken, verifyRole(['admin', 'coordinator']), getEventWithMembers);
+eventRouter.put('/:id/members', verifyToken, verifyRole(['admin', 'coordinator']), updateAllEventTeams);
+eventRouter.put('/:id/members/team', verifyToken, verifyRole(['admin', 'coordinator']), updateEventTeam);
+eventRouter.post('/:id/members/team/:teamType/add', verifyToken, verifyRole(['admin', 'coordinator']), addMembersToTeam);
+eventRouter.delete('/:id/members/team/:teamType/members', verifyToken, verifyRole(['admin', 'coordinator']), removeMembersFromTeam);
 
 // Form response submission - public or authenticated
 eventRouter.post('/:eventId/form-response', ifTokenVerify ,submitFormResponse);
@@ -62,7 +68,7 @@ eventRouter.post('/:eventId/form-response', ifTokenVerify ,submitFormResponse);
 eventRouter.post('/', verifyToken, verifyRole(['admin', 'coordinator']), createEvent);
 eventRouter.put('/:id', verifyToken, verifyRole(['admin', 'coordinator']), updateEvent);
 eventRouter.delete('/:id', verifyToken, verifyRole(['admin', 'coordinator']), deleteEvent);
-eventRouter.put('/:id/migrate/event-members', migrateEventMembers);
+eventRouter.put('/:id/migrate/event-members', verifyToken, verifyRole(['admin']), migrateEventMembers);
 
 // Member management - admin/coordinator only
 eventRouter.patch('/:id/members', verifyToken, verifyRole(['admin', 'coordinator']), addEventMembers);

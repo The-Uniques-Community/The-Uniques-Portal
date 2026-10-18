@@ -1,8 +1,8 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import { alpha } from "@mui/material/styles";
-import { Add as AddIcon } from "@mui/icons-material";
-import ModernButton from "../Buttons/ModernButton";
+import AddIcon from '@mui/icons-material/Add';
+import ModernButton from "@/components/buttons/ModernButton";
 
 const BRAND_COLOR = "#ca0019";
 

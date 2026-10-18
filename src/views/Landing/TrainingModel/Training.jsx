@@ -1,9 +1,9 @@
 import React from 'react'
-import ModernHeader from '@/utils/Header/ModernHeader';
+import ModernHeader from '@/components/headers/ModernHeader';
 import FourPhase from './components/FourPhase'
 import trainingMethod from '@/assets/img/trainingMethod.png'
 import Trainingculture from './components/Trainingculture'
-import CallToAction from '../homComponents/CallToAction'
+import CallToAction from '../homeComponents/CallToAction'
 import TrainingTimeline from './components/TrainingTimeLine'
 import Trainers from './components/Trainers'
 

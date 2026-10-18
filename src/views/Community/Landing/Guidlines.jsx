@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Effect from "@/assets/img/Community/effect.png";
-// import Modal from "@/utils/Modal/Community"
+// import Modal from "@/components/modals/CommunityModal"
 
 const cardData = [
     {

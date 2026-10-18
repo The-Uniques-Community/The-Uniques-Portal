@@ -4,7 +4,7 @@ import { Search, Award, RefreshCw, Users } from "lucide-react";
 import axios from "axios";
 import { BASE_URL } from "@/config";
 import MemberCard from "./components/MemberCard";
-import ModernHeader from "@/utils/Header/ModernHeader";
+import ModernHeader from "@/components/headers/ModernHeader";
 import { Card, CardContent, Typography, Box, Tooltip } from "@mui/material";
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import SchoolIcon from '@mui/icons-material/School';

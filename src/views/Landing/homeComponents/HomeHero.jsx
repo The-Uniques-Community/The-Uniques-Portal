@@ -1,6 +1,6 @@
 // import { Button } from '@mui/material';
-import { ArrowForward } from '@mui/icons-material';
-import Button from "@/utils/Buttons/Button"
+import ArrowForward from '@mui/icons-material/ArrowForward';
+import Button from "@/components/buttons/Button"
 import Marquee from 'react-fast-marquee';
 import tu from '@/assets/logos/tu.png';
 import { useEffect, useRef, useState } from 'react';

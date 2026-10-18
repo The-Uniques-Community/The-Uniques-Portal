@@ -1,10 +1,16 @@
+/**
+ * @file passport.js
+ * @description Configures Passport.js authentication strategies, specifically Google OAuth 2.0.
+ * @architecture Bridges external Google authentication with internal user identities across Member, Coordinator, and Admin models.
+ * @agent_note Requires GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET; links Google profile ID and creates a File record for avatar if needed.
+ */
+
 // config/passport.js
 import passport from "passport";
 import GoogleStrategy from "passport-google-oauth20";
 import Member from "../models/member/memberModel.js";
 import Coordinator from "../models/community/communityAdmin.js";
 import Admin from "../models/admin/adminModel.js";
-import File from "../models/member/fileModel.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -22,6 +28,15 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
         accessType: "offline", // Request offline access to get a refresh token
         prompt: "consent", // Always prompt for consent
       },
+      /**
+       * Google OAuth 2.0 verification callback.
+       * @desc    Matches Google profile email with Member, Coordinator, or Admin, links Google ID, and updates profile picture.
+       * @param   {string} accessToken - OAuth access token from Google.
+       * @param   {string} refreshToken - OAuth refresh token from Google.
+       * @param   {import('passport-google-oauth20').Profile} profile - Google user profile data.
+       * @param   {Function} done - Passport done callback (err, user, info).
+       * @returns {Promise<void>}
+       */
       async (accessToken, refreshToken, profile, done) => {
         console.log("🔹 Google OAuth Callback Triggered");
         console.log("🔹 Received Profile:", profile);
@@ -53,14 +68,13 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
             member.fullName = profile.displayName;
           }
 
-          if (!member.profilePic && profile.photos?.length > 0) {
-            const newFile = await File.create({
+          if ((!member.profilePic || !member.profilePic.fileUrl) && profile.photos?.length > 0) {
+            member.profilePic = {
               fileName: `${profile.displayName.replace(/\s+/g, "_")}_profile_pic`,
               fileUrl: profile.photos[0].value,
+              url: profile.photos[0].value,
               fileId: profile.id,
-              fileOwner: member._id,
-            });
-            member.profilePic = newFile._id;
+            };
           }
 
           await member.save();
@@ -78,4 +92,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
   console.warn("⚠️ Google OAuth Strategy disabled: GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET is missing.");
 }
 
+/**
+ * @module passportConfig
+ */
 export default passport;

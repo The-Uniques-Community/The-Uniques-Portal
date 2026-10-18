@@ -1,8 +1,24 @@
+/**
+ * @file sendWelcomeCredentialsEmail.js
+ * @description Sends welcome emails containing initial login credentials (email, temporary password, batch) to newly approved members.
+ * @architecture Invoked during member creation or onboarding by admin/coordinator controllers.
+ * @agent_note Relies on FRONTEND_URL environment variable for portal login redirection; delivers plaintext password once during welcome sequence.
+ */
+
 import dotenv from 'dotenv';
 dotenv.config();
 import transporter from '../../config/emailConfig.js';
 
-
+/**
+ * @desc    Sends a welcome email containing generated login credentials and onboarding guidance to a newly registered member.
+ * @param   {string} userEmail - Recipient member email address.
+ * @param   {Object} userData - Member account details.
+ * @param   {string} userData.fullName - Full name of the member.
+ * @param   {string} userData.email - Registered email address.
+ * @param   {string} userData.batch - Assigned member batch cohort.
+ * @param   {string} password - Generated initial/temporary password for first login.
+ * @returns {Promise<boolean>} True if email was sent successfully, false otherwise.
+ */
 export const sendWelcomeCredentialsEmail = async (userEmail, userData, password) => {
     const mailOptions = {
         from: process.env.EMAIL_USER,
@@ -103,4 +119,7 @@ export const sendWelcomeCredentialsEmail = async (userEmail, userData, password)
     }
 };
 
+/**
+ * @module sendWelcomeCredentialsEmail
+ */
 export default sendWelcomeCredentialsEmail;

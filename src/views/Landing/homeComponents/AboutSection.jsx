@@ -1,5 +1,9 @@
 import React, { useLayoutEffect, useRef } from "react";
-import { Groups, VolunteerActivism, Diversity3, Handshake, TipsAndUpdates } from "@mui/icons-material";
+import Groups from '@mui/icons-material/Groups';
+import VolunteerActivism from '@mui/icons-material/VolunteerActivism';
+import Diversity3 from '@mui/icons-material/Diversity3';
+import Handshake from '@mui/icons-material/Handshake';
+import TipsAndUpdates from '@mui/icons-material/TipsAndUpdates';
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 

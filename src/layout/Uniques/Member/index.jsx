@@ -23,7 +23,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useThemeContext } from "@/theme/ThemeProvider";
-import ConfirmationModal from "@/utils/Modal/ConfirmationModal";
+import ConfirmationModal from "@/components/modals/ConfirmationModal";
 import logo from "@/assets/logos/theuniquesCommunity.png";
 import uniques_white from "@/assets/logos/uniqueswhite.png";
 import Brightness4Icon from "@mui/icons-material/Brightness4"; // Dark Mode Icon

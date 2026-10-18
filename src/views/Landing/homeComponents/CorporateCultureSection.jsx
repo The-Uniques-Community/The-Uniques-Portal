@@ -1,4 +1,4 @@
-import ShapedCard from "@/utils/Card/ShapedCard";
+import ShapedCard from "@/components/cards/ShapedCard";
 import { data } from "@/assets/dummyData/corporateModel";
 
 const CorporateCultureSection = () => {

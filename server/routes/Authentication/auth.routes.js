@@ -1,3 +1,9 @@
+/**
+ * @file auth.routes.js
+ * @description Authentication router managing Google OAuth, email/password login, token verification, and role authorization checks.
+ * @architecture Mounted at `/auth` in server/index.js, coordinating Passport OAuth workflows and JWT authentication endpoints.
+ * @agent_note Handles both browser-based OAuth redirection flows and stateless API token verification endpoints (`/verify_user`, `/verify_role`).
+ */
 // routes/auth.routes.js
 import express from 'express';
 import passport from 'passport';
@@ -17,7 +23,7 @@ router.get(
 );
 
 router.post('/emaillogin', emailLogin);
-router.get('/get_user', getCurrentUser);
+router.get('/get_user', verifyToken, getCurrentUser);
 
 // Route to check if the user is authenticated and return user info
 router.get("/verify_user", verifyToken, (req, res) => {

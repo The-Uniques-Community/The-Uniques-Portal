@@ -27,14 +27,12 @@ import {
   Divider,
   CircularProgress,
 } from "@mui/material";
-import {
-  Add as AddIcon,
-  Delete as DeleteIcon,
-  Edit as EditIcon,
-  Search as SearchIcon,
-  Close as CloseIcon,
-  Save as SaveIcon,
-} from "@mui/icons-material";
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import SearchIcon from '@mui/icons-material/Search';
+import CloseIcon from '@mui/icons-material/Close';
+import SaveIcon from '@mui/icons-material/Save';
 import axios from "axios";
 import { BASE_URL } from "@/config";
 

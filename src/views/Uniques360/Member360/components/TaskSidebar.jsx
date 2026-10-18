@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { Box, Chip, List, ListItemButton, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { motion } from "framer-motion";
-import { AssignmentOutlined as TaskIcon } from "@mui/icons-material";
+import TaskIcon from '@mui/icons-material/AssignmentOutlined';
 
 const TaskSidebar = ({ tasks, selectedTask, onSelectTask }) => {
   const theme = useTheme();

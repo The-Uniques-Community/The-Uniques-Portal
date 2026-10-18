@@ -11,13 +11,11 @@ import {
   IconButton,
   Tooltip
 } from '@mui/material';
-import { 
-  LinkedIn as LinkedInIcon,
-  Twitter as TwitterIcon,
-  Instagram as InstagramIcon,
-  Facebook as FacebookIcon,
-  Home as HomeIcon
-} from '@mui/icons-material';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import TwitterIcon from '@mui/icons-material/Twitter';
+import InstagramIcon from '@mui/icons-material/Instagram';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import HomeIcon from '@mui/icons-material/Home';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/system';
 import logo from "@/assets/logos/uniqueswhite.png";

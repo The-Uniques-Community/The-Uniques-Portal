@@ -1,4 +1,7 @@
-import { Android, Cloud, Group, Store } from "@mui/icons-material";
+import Android from '@mui/icons-material/Android';
+import Cloud from '@mui/icons-material/Cloud';
+import Group from '@mui/icons-material/Group';
+import Store from '@mui/icons-material/Store';
 import androidTraining from "@/assets/img/android-training.png";
 // import industryModel from "@/assets/img/industryModel.png";
 

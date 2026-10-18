@@ -21,7 +21,8 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useThemeContext } from "@/theme/ThemeProvider";
-import ConfirmationModal from "@/utils/Modal/ConfirmationModal";
+import ConfirmationModal from "@/components/modals/ConfirmationModal";
+import authService from "@/services/authService";
 import logo from "@/assets/logos/theuniquesCommunity.png";
 import uniques_white from "@/assets/logos/uniqueswhite.png";
 import Brightness4Icon from "@mui/icons-material/Brightness4"; // Dark Mode Icon
@@ -65,20 +66,15 @@ function DashboardLayoutAppBar() {
 
   const [isOpen, setIsOpen] = React.useState(false);
   const onClose = () => setIsOpen(false);
-  const onConfirm = () => {
-    fetch("https://theuniquesportal-server.vercel.app/auth/logout", {
-      method: "POST",
-      credentials: "include",
-    })
-      .then(() => {
-        localStorage.removeItem("activeItem");
-        localStorage.removeItem("role");
-        toast.success("Logged out successfully");
-        navigate("/");
-      })
-      .catch((error) => {
-        console.error("Logout error:", error);
-      });
+  const onConfirm = async () => {
+    try {
+      await authService.logout();
+      localStorage.removeItem("activeItem");
+      toast.success("Logged out successfully");
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
     setIsOpen(false);
   };
 

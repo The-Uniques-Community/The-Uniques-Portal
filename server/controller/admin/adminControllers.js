@@ -1,11 +1,25 @@
+/**
+ * @file adminControllers.js
+ * @description Administrative controllers for approving profiles, blocking/unblocking members, imposing fines, creating events/admins, and onboarding members with temporary credentials.
+ * @architecture Mounted at `/api/admin` via `routes/admin/adminRoute.js`, mutating Member and Event documents and dispatching welcome emails.
+ * @agent_note Password hashing runs via bcrypt with 12 salt rounds. When creating or onboarding members, check both email and admno for uniqueness.
+ */
 import mongoose from 'mongoose';
 import Member from '../../models/member/memberModel.js'
 import Event from '../../models/member/eventModel.js'
 import Admin from '../../models/admin/adminModel.js';
 import bcrypt from 'bcryptjs';
 import sendWelcomeCredentialsEmail from '../../services/members/sendWelcomeCredentialsEmail.js';
-// approve pending member profile
 
+// approve pending member profile
+/**
+ * @desc    Approve a pending member profile and mark verified
+ * @route   POST /api/admin/approveProfile
+ * @access  Private (Admin)
+ * @body    {Object} req.body
+ * @body    {string} req.body.email - Member email address
+ * @returns {Object} Success or failure message
+ */
 export const approveProfile = async (req, res) => {
     try {
         const { email } = req.body;
@@ -27,6 +41,14 @@ export const approveProfile = async (req, res) => {
     }
 }
 
+/**
+ * @desc    Block and suspend a member account
+ * @route   POST /api/admin/blockMember
+ * @access  Private (Admin)
+ * @body    {Object} req.body
+ * @body    {string} req.body.email - Member email address
+ * @returns {Object} Success or failure message
+ */
 export const blockMember = async (req, res) => {
     try {
         const { email } = req.body;
@@ -48,6 +70,14 @@ export const blockMember = async (req, res) => {
     }
 }
 
+/**
+ * @desc    Unblock and restore an active member account
+ * @route   POST /api/admin/unblockMember
+ * @access  Private (Admin)
+ * @body    {Object} req.body
+ * @body    {string} req.body.email - Member email address
+ * @returns {Object} Success or failure message
+ */
 export const unblockMember = async (req, res) => {
     try {
         const { email } = req.body;
@@ -70,6 +100,15 @@ export const unblockMember = async (req, res) => {
 }
 
 // impose fine
+/**
+ * @desc    Impose legacy fine status on a member
+ * @route   POST /api/admin/imposeFine
+ * @access  Private (Admin)
+ * @body    {Object} req.body
+ * @body    {string} req.body.email - Member email address
+ * @body    {string|number} req.body.fine - Fine amount or status string
+ * @returns {Object} Success or failure message
+ */
 export const imposeFine = async (req, res) => {
     try {
         const { email, fine } = req.body;
@@ -77,10 +116,18 @@ export const imposeFine = async (req, res) => {
         if (!member) {
             return res.status(400).json({ message: "User does not exist" });
         }
+        const fineAmount = typeof fine === 'number' ? fine : Number(fine) || 0;
         await Member.updateOne(
             { email },
             {
-                fineStatus: fine
+                $push: {
+                    fines: {
+                        amount: fineAmount,
+                        reason: req.body.reason || "Administrative fine",
+                        dateImposed: new Date(),
+                        status: "pending"
+                    }
+                }
             }
         );
         res.status(200).json({ message: "Fine imposed successfully" });
@@ -89,17 +136,25 @@ export const imposeFine = async (req, res) => {
         res.status(500).json({ message: "Something went wrong" });
     }
 }
+
 // list a new event
+/**
+ * @desc    Create and list a new event in the system
+ * @route   POST /api/admin/listNewEvent
+ * @access  Private (Admin)
+ * @body    {Object} req.body - Event metadata
+ * @returns {Object} Success or failure message
+ */
 export const listNewEvent = async (req, res) => {
     try {
-        const { eventName, eventDescription, eventDate, eventTime, eventVenue, eventOrganizer, eventType } = req.body;
+        const { eventName, eventDescription, eventDate, eventTime, eventVenue, eventOrganizer, eventOrganizerBatch, eventType } = req.body;
         const event = new Event({
             eventName,
             eventDescription,
             eventDate,
             eventTime,
             eventVenue,
-            eventOrganizer,
+            eventOrganizerBatch: eventOrganizer || eventOrganizerBatch || "The Uniques 1.0",
             eventType
         });
         await event.save();
@@ -110,6 +165,15 @@ export const listNewEvent = async (req, res) => {
     }
 }
 
+/**
+ * @desc    Create a new administrator account with hashed password
+ * @route   POST /api/admin/createAdmin
+ * @access  Private (Admin)
+ * @body    {Object} req.body
+ * @body    {string} req.body.email - Admin email
+ * @body    {string} req.body.password - Admin plaintext password
+ * @returns {Object} Success or failure message
+ */
 export const createAdmin = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -118,7 +182,7 @@ export const createAdmin = async (req, res) => {
             return res.status(400).json({ message: "Admin already exists" });
         }
         const hashedPassword = await bcrypt.hash(password, 12);
-        const admin = new Admin({ email, password: hashedPassword });
+        const admin = new Admin({ email, password: hashedPassword, role: "admin" });
         await admin.save();
         res.status(200).json({ message: "Admin created successfully" });
     }
@@ -128,6 +192,11 @@ export const createAdmin = async (req, res) => {
 }
 
 // Utility function to generate random passwords
+/**
+ * @desc    Generate a randomized alphanumeric password string
+ * @param   {number} [length=8] - Number of characters to generate
+ * @returns {string} Random password string
+ */
 export const generateRandomPassword = (length = 8) => {
     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+";
     let password = "";
@@ -140,6 +209,19 @@ export const generateRandomPassword = (length = 8) => {
     return password;
   };
 // Add a new member (by admin)
+/**
+ * @desc    Onboard a new member, generate temporary password, and dispatch welcome credentials email
+ * @route   POST /api/admin/member/add
+ * @access  Private (Admin)
+ * @body    {Object} req.body - Member onboarding details
+ * @body    {string} req.body.fullName - Full name
+ * @body    {string} req.body.email - Member email address
+ * @body    {string} req.body.batch - Batch name (e.g., "The Uniques 1.0")
+ * @body    {string} req.body.admno - Admission number
+ * @body    {string} [req.body.course='B.Tech CSE'] - Course
+ * @body    {string} [req.body.password] - Plaintext password (auto-generated if omitted)
+ * @returns {Object} JSON response containing created member document and plaintext temporary password
+ */
 export const addMember = async (req, res) => {
     try {
       // Extract member details from request
@@ -236,6 +318,13 @@ export const addMember = async (req, res) => {
 
 // You'll need a separate endpoint to hash the password after it's been shared
 // This could be triggered when the member first logs in or by an admin
+/**
+ * @desc    Hash an existing member's stored password using bcrypt
+ * @route   PUT /api/admin/member/:memberId/hash-password
+ * @access  Private (Admin)
+ * @param   {string} req.params.memberId - Member ObjectId
+ * @returns {Object} JSON response confirming password hash update
+ */
 export const hashMemberPassword = async (req, res) => {
   try {
     const { memberId } = req.params;

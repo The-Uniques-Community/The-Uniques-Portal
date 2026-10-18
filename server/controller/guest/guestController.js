@@ -1,7 +1,26 @@
+/**
+ * @file guestController.js
+ * @description Controller handling guest speaker operations including creation, listing, bulk seeding, detail retrieval, and event associations.
+ * @architecture Interacts with the Mongoose Guest model (server/models/member/guestModel.js) and serves endpoints mounted on `/api/guest`.
+ * @agent_note When linking guests to events or bulk uploading, ensure the schema accommodates dynamic event association objects.
+ */
 import Guest from "../../models/member/guestModel.js";
-import { guests } from "./guest.js";
+import { guests } from "../../seeds/guestsSeed.js";
 
-// Add a new guest
+/**
+ * @desc    Add a new guest profile to the database
+ * @route   POST /api/guest/add-guest
+ * @access  Public / Admin
+ * @body    {Object} req.body - Guest creation payload
+ * @body    {string} req.body.guestName - Name of the guest (required)
+ * @body    {string} [req.body.guestEmail] - Contact email address
+ * @body    {string} [req.body.guestContact] - Contact phone number
+ * @body    {string} [req.body.guestLinkedin] - LinkedIn profile URL
+ * @body    {string} [req.body.guestCompany] - Organization / Company affiliation
+ * @body    {string} [req.body.guestDesignation] - Professional title or designation
+ * @body    {string} [req.body.guestImage] - Remote profile image URL
+ * @returns {Object} JSON response containing success flag and created Guest record
+ */
 export const addGuest = async (req, res) => {
     try {
         const { guestName, guestEmail, guestContact, guestLinkedin, guestCompany, guestDesignation, guestImage } = req.body;
@@ -37,7 +56,12 @@ export const addGuest = async (req, res) => {
     }
 };
 
-// Get all guests
+/**
+ * @desc    Retrieve all guest profiles from the database
+ * @route   GET /api/guest/get-all-guests
+ * @access  Public
+ * @returns {Object} JSON response containing count and array of guest records
+ */
 export const getAllGuests = async (req, res) => {
     try {
         const guests = await Guest.find();
@@ -57,7 +81,12 @@ export const getAllGuests = async (req, res) => {
     }
 };
 
-
+/**
+ * @desc    Bulk upload/seed static guest profiles into the database
+ * @route   POST /api/guest/bulkUpload
+ * @access  Public / Admin
+ * @returns {Object} JSON response indicating count of records cleared and re-inserted
+ */
 export const bulkUploadGuests = async (req, res) => {
     try {
       // Check if there are any guests to upload
@@ -94,7 +123,14 @@ export const bulkUploadGuests = async (req, res) => {
 
   // ...existing code...
 
-// Get guest by ID
+/**
+ * @desc    Fetch a single guest profile by its database identifier
+ * @route   GET /api/guest/get-guest/:id
+ * @access  Public
+ * @param   {Object} req - Express request
+ * @param   {string} req.params.id - Mongoose ObjectId string of target guest
+ * @returns {Object} JSON response containing guest document or error message
+ */
 export const getGuestById = async (req, res) => {
     try {
         const guestId = req.params.id;
@@ -138,6 +174,16 @@ export const getGuestById = async (req, res) => {
     }
 };
 
+/**
+ * @desc    Associate a guest speaker with a designated event and role tag
+ * @route   POST /api/guest/link-event
+ * @access  Private (Admin / Coordinator)
+ * @body    {Object} req.body - Link payload
+ * @body    {string} req.body.guestId - Target guest ObjectId string
+ * @body    {string} req.body.eventId - Target event ObjectId string
+ * @body    {string} [req.body.guestTag="others"] - Event guest category tag (e.g., keynote, panelist)
+ * @returns {Object} JSON response with updated guest profile and associated events
+ */
 export const linkGuestToEvent = async (req, res) => {
     try {
         const { guestId, eventId, guestTag } = req.body;

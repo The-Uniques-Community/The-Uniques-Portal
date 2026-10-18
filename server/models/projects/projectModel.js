@@ -1,5 +1,15 @@
+/**
+ * @file projectModel.js
+ * @description Mongoose schema and model for showcase and community projects.
+ * @architecture Defines portfolio project records displayed across the public portal and member showcases; re-exported by community/projectModel.js.
+ * @agent_note Uses mongoose.models check to avoid overwrite errors during hot reloading; tracks contributors as string arrays.
+ */
+
 import mongoose from "mongoose";
 
+/**
+ * Mongoose schema definition for student and community projects.
+ */
 const projectSchema = new mongoose.Schema(
   {
     title: {
@@ -68,4 +78,7 @@ const projectSchema = new mongoose.Schema(
 // Prevent mongoose model overwrite error during hot reload
 const Project = mongoose.models.Project || mongoose.model("Project", projectSchema);
 
+/**
+ * @module Project
+ */
 export default Project;

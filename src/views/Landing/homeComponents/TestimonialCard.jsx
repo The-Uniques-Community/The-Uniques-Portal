@@ -3,12 +3,10 @@ import React from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import { useRef, useState, useEffect } from "react"
 import { BASE_URL } from "@/config";
-import { 
-  School, 
-  Work, 
-  Computer,
-  Star
-} from "@mui/icons-material"
+import School from '@mui/icons-material/School';
+import Work from '@mui/icons-material/Work';
+import Computer from '@mui/icons-material/Computer';
+import Star from '@mui/icons-material/Star';
 import { Avatar } from "@mui/material";
 
 const colors = {

@@ -1,3 +1,9 @@
+/**
+ * @file leaveController.js
+ * @description Controller managing student member leave applications, status updates, administrative approvals, rejections, and email notifications.
+ * @architecture Mounted at `/api/leave`. Coordinates between `Leave` and `Member` models and triggers email notifications via `leaveEmailService.js`.
+ * @agent_note Only pending leaves can be modified or deleted by the applying member, or transitioned to approved/rejected by coordinators/admins.
+ */
 import Leave from "../../models/member/leaveModel.js";
 import Member from "../../models/member/memberModel.js";
 import {
@@ -8,6 +14,20 @@ import {
 
 // Member Controllers
 
+/**
+ * @desc Submit a new leave request application
+ * @route POST /api/leave/submit
+ * @access Private (Member)
+ * @body {string} type - Leave type/category
+ * @body {string|Date} startDate - Leave starting date
+ * @body {string|Date} endDate - Leave ending date
+ * @body {string} reason - Justification for leave
+ * @body {string} [memberId] - Optional explicit member ID override
+ * @returns {Object} 201 - JSON with success message and new leave document
+ * @returns {Object} 400 - Validation failure or invalid date range
+ * @returns {Object} 404 - If member not found
+ * @returns {Object} 500 - Server error
+ */
 export const submitLeaveRequest = async (req, res) => {
   try {
     const { type, startDate, endDate, reason } = req.body;
@@ -71,6 +91,15 @@ export const submitLeaveRequest = async (req, res) => {
   }
 };
 
+/**
+ * @desc Retrieve all leave applications submitted by the current member
+ * @route GET /api/leave/my-leaves
+ * @access Private (Member)
+ * @query {string} [memberId] - Optional fallback member ID
+ * @returns {Object} 200 - JSON with array of leave documents sorted by application date
+ * @returns {Object} 400 - If member ID missing
+ * @returns {Object} 500 - Server error
+ */
 export const getMyLeaves = async (req, res) => {
   try {
     const memberId = req.user?.id || req.query.memberId;
@@ -91,6 +120,21 @@ export const getMyLeaves = async (req, res) => {
   }
 };
 
+/**
+ * @desc Update an existing pending leave request
+ * @route PUT /api/leave/:id
+ * @access Private (Member)
+ * @params {string} id - Leave document ID
+ * @body {string} type - Updated leave type
+ * @body {string|Date} startDate - Updated start date
+ * @body {string|Date} endDate - Updated end date
+ * @body {string} reason - Updated reason
+ * @returns {Object} 200 - JSON with updated leave document
+ * @returns {Object} 400 - If leave is not in pending status or dates invalid
+ * @returns {Object} 403 - If user is not the leave owner
+ * @returns {Object} 404 - If leave not found
+ * @returns {Object} 500 - Server error
+ */
 export const updateLeaveRequest = async (req, res) => {
   try {
     const { id } = req.params;
@@ -135,6 +179,17 @@ export const updateLeaveRequest = async (req, res) => {
   }
 };
 
+/**
+ * @desc Cancel/delete an existing pending leave request
+ * @route DELETE /api/leave/:id
+ * @access Private (Member)
+ * @params {string} id - Leave document ID
+ * @returns {Object} 200 - JSON success message
+ * @returns {Object} 400 - If leave is not in pending status
+ * @returns {Object} 403 - If user is not the leave owner
+ * @returns {Object} 404 - If leave not found
+ * @returns {Object} 500 - Server error
+ */
 export const deleteLeaveRequest = async (req, res) => {
   try {
     const { id } = req.params;
@@ -168,6 +223,13 @@ export const deleteLeaveRequest = async (req, res) => {
 
 // Coordinator/Admin Controllers
 
+/**
+ * @desc Retrieve all pending leave requests requiring review
+ * @route GET /api/leave/pending
+ * @access Private (Admin/Coordinator)
+ * @returns {Object} 200 - JSON with pending leaves and populated member details
+ * @returns {Object} 500 - Server error
+ */
 export const getAllPendingLeaves = async (req, res) => {
   try {
     const leaves = await Leave.find({ status: "Pending" })
@@ -184,6 +246,14 @@ export const getAllPendingLeaves = async (req, res) => {
   }
 };
 
+/**
+ * @desc Retrieve all leave requests with optional status filtering
+ * @route GET /api/leave/all
+ * @access Private (Admin/Coordinator)
+ * @query {string} [status] - Filter by leave status (e.g., Pending, Approved, Rejected)
+ * @returns {Object} 200 - JSON with leave documents and populated member details
+ * @returns {Object} 500 - Server error
+ */
 export const getAllLeaves = async (req, res) => {
   try {
     const { status } = req.query;
@@ -207,6 +277,17 @@ export const getAllLeaves = async (req, res) => {
   }
 };
 
+/**
+ * @desc Approve a pending leave request and send email notifications
+ * @route PUT /api/leave/:id/approve
+ * @access Private (Admin/Coordinator)
+ * @params {string} id - Leave document ID
+ * @body {string} [approvedBy='Admin'] - Name or identifier of approver
+ * @returns {Object} 200 - JSON with approved leave document
+ * @returns {Object} 400 - If leave is not in pending status
+ * @returns {Object} 404 - If leave not found
+ * @returns {Object} 500 - Server error
+ */
 export const approveLeave = async (req, res) => {
   try {
     const { id } = req.params;
@@ -243,6 +324,18 @@ export const approveLeave = async (req, res) => {
   }
 };
 
+/**
+ * @desc Reject a pending leave request with a stated reason and dispatch notifications
+ * @route PUT /api/leave/:id/reject
+ * @access Private (Admin/Coordinator)
+ * @params {string} id - Leave document ID
+ * @body {string} rejectionReason - Justification for leave refusal
+ * @body {string} [rejectedBy='Admin'] - Name or identifier of rejector
+ * @returns {Object} 200 - JSON with rejected leave document
+ * @returns {Object} 400 - If rejection reason missing or leave not pending
+ * @returns {Object} 404 - If leave not found
+ * @returns {Object} 500 - Server error
+ */
 export const rejectLeave = async (req, res) => {
   try {
     const { id } = req.params;
@@ -284,13 +377,40 @@ export const rejectLeave = async (req, res) => {
   }
 };
 
+/**
+ * @desc Retrieve single leave request details by document ID
+ * @route GET /api/leave/:id
+ * @access Private (Member/Admin/Coordinator)
+ * @params {string} id - Leave document ID
+ * @returns {Object} 200 - JSON with leave document and populated member details
+ * @returns {Object} 404 - If leave not found
+ * @returns {Object} 500 - Server error
+ */
 export const getLeaveById = async (req, res) => {
   try {
     const { id } = req.params;
 
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authenticated. Please log in first.",
+      });
+    }
+
     const leave = await Leave.findById(id).populate("memberId", "fullName email contact");
     if (!leave) {
       return res.status(404).json({ message: "Leave request not found" });
+    }
+
+    const requesterId = (req.user.id || req.user._id || "").toString();
+    const userRole = (req.user.role || "").toLowerCase();
+    const leaveOwnerId = (leave.memberId && leave.memberId._id ? leave.memberId._id : leave.memberId).toString();
+
+    if (leaveOwnerId !== requesterId && !["admin", "coordinator"].includes(userRole)) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden: Not authorized to view this leave request",
+      });
     }
 
     res.status(200).json({

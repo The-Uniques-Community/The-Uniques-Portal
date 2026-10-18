@@ -1,7 +1,20 @@
+/**
+ * @file sendPendingApprovalEmail.js
+ * @description Sends notification emails to newly registered members informing them that their account is pending approval.
+ * @architecture Dispatched by the member registration/onboarding flow prior to account activation.
+ * @agent_note Notifies the user of account review status; catches errors internally without throwing to avoid blocking registration.
+ */
+
 import dotenv from 'dotenv';
 dotenv.config();
 import transporter from '../../config/emailConfig.js';
 
+/**
+ * @desc    Sends an account pending approval notification email to a newly signed up user.
+ * @param   {string} userEmail - Recipient user email address.
+ * @param   {string} fname - User's first name.
+ * @returns {Promise<void>} Resolves when email attempt finishes.
+ */
 export const sendPendingApprovalEmail = async (userEmail, fname) => {
     const mailOptions = {
         from: process.env.EMAIL_USER,
@@ -65,5 +78,10 @@ export const sendPendingApprovalEmail = async (userEmail, fname) => {
         console.error('Error sending pending approval email:', error);
     }
 };
+
+/**
+ * @module sendPendingApprovalEmail
+ */
+export default sendPendingApprovalEmail;
 
 

@@ -1,7 +1,7 @@
 import { useRef } from "react"
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt"
 import tu_red from "@/assets/logos/tu-red.png"
-import "@/utils/Card/weirdcard.css"
+import "@/components/cards/weirdcard.css"
 // Import SimpleBar
 import SimpleBar from 'simplebar-react';
 import 'simplebar-react/dist/simplebar.min.css';

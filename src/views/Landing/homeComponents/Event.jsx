@@ -3,7 +3,7 @@ import axios from 'axios';
 import { BASE_URL } from '@/config';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
-import Eventmodel from '../Event/Componant/Event';
+import Eventmodel from '../Event/components/Event';
 import { motion, AnimatePresence } from 'framer-motion';
 import useEmblaCarousel from 'embla-carousel-react';
 // Import MUI icons for the card
@@ -11,7 +11,7 @@ import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import ScheduleOutlinedIcon from "@mui/icons-material/ScheduleOutlined";
 // Import community card CSS
-import "../../../utils/Card/communitycard.css";
+import "@/components/cards/communitycard.css";
 // Import logo
 import logo from "@/assets/logos/theuniquesCommunity.png";
 

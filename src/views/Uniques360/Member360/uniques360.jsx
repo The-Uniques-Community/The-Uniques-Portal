@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Avatar, Box, Button, Chip, Grid, Paper, Typography, CircularProgress } from "@mui/material";
-import { CheckCircleOutline as CompleteIcon, FolderOutlined as ProjectIcon, CalendarTodayOutlined as DateIcon } from "@mui/icons-material";
+import CompleteIcon from '@mui/icons-material/CheckCircleOutline';
+import ProjectIcon from '@mui/icons-material/FolderOutlined';
+import DateIcon from '@mui/icons-material/CalendarTodayOutlined';
 import axios from "axios";
 import { BASE_URL } from "@/config";
 import { toast } from "react-toastify";

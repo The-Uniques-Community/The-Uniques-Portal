@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
 import ankursir from "../../../../assets/img/About/ankursir.jpg";
-import Button from "../../../../utils/Buttons/HoverButton";
+import Button from "@/components/buttons/HoverButton";
 import ProfileCard from "./Ankur1";
 
 export default function MentorSection() {

@@ -1,5 +1,8 @@
 import img from '@/assets/img/web-dev-training.png';
-import { Code, Web, Palette, Layers } from "@mui/icons-material";
+import Code from '@mui/icons-material/Code';
+import Web from '@mui/icons-material/Web';
+import Palette from '@mui/icons-material/Palette';
+import Layers from '@mui/icons-material/Layers';
 import model from "@/assets/img/trainingMethod.png";
 
 const WebDevTab = () => {

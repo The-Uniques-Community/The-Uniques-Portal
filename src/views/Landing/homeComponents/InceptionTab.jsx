@@ -1,4 +1,7 @@
-import { Brush, Movie, Campaign, Work } from "@mui/icons-material";
+import Brush from '@mui/icons-material/Brush';
+import Movie from '@mui/icons-material/Movie';
+import Campaign from '@mui/icons-material/Campaign';
+import Work from '@mui/icons-material/Work';
 import inception from "@/assets/img/inception.png";
 import model from "@/assets/img/trainingMethod.png";
 

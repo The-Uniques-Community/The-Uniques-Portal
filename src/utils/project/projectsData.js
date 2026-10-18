@@ -1,5 +1,4 @@
-import axios from "axios";
-import { BASE_URL } from "@/config";
+import projectService from "@/services/projectService";
 
 export const INITIAL_PROJECTS = [
   {
@@ -416,9 +415,9 @@ export const getStoredProjects = () => {
 // Fetch latest projects from MongoDB backend API and sync with localStorage cache
 export const fetchProjects = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/api/projects`);
-    if (response.data && response.data.success && Array.isArray(response.data.data)) {
-      const normalized = response.data.data.map((item) => {
+    const data = await projectService.getProjects();
+    if (data && data.success && Array.isArray(data.data)) {
+      const normalized = data.data.map((item) => {
         const initialMatch = INITIAL_PROJECTS.find(
           (init) => String(init.id) === String(item.id) || init.title === item.title
         );
@@ -440,9 +439,9 @@ export const fetchProjects = async () => {
 // Add new project - calls MongoDB Backend API + falls back to cache
 export const addProject = async (projectData) => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/projects`, projectData);
-    if (response.data && response.data.success && response.data.data) {
-      const saved = normalizeProject(response.data.data);
+    const data = await projectService.createProject(projectData);
+    if (data && data.success && data.data) {
+      const saved = normalizeProject(data.data);
       const current = getStoredProjects();
       const updated = [saved, ...current.filter((p) => String(p._id) !== String(saved._id))];
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
@@ -473,9 +472,9 @@ export const addProject = async (projectData) => {
 // Update existing project in MongoDB Backend API
 export const updateProject = async (id, projectData) => {
   try {
-    const response = await axios.put(`${BASE_URL}/api/projects/${id}`, projectData);
-    if (response.data && response.data.success && response.data.data) {
-      const updatedItem = normalizeProject(response.data.data);
+    const data = await projectService.updateProject(id, projectData);
+    if (data && data.success && data.data) {
+      const updatedItem = normalizeProject(data.data);
       const current = getStoredProjects();
       const updated = current.map((p) =>
         String(p._id) === String(id) || String(p.id) === String(id) ? updatedItem : p
@@ -502,7 +501,7 @@ export const updateProject = async (id, projectData) => {
 // Delete project in MongoDB Backend API
 export const deleteProject = async (id) => {
   try {
-    await axios.delete(`${BASE_URL}/api/projects/${id}`);
+    await projectService.deleteProject(id);
   } catch (err) {
     console.error("Backend delete project error:", err);
   }
@@ -542,3 +541,23 @@ export const getProjectById = (id) => {
 
   return findInList(INITIAL_PROJECTS.map(normalizeProject));
 };
+
+/**
+ * Uploads a project thumbnail to Google Drive via backend multipart endpoint.
+ * @param {File} file - Image file to upload
+ * @param {string} [batch] - Target batch name
+ * @param {string} [title] - Project title
+ * @param {string} [projectId] - Optional existing project ObjectId to link
+ * @returns {Promise<{fileId: string, fileUrl: string, fileName: string, proxyUrl: string}>}
+ */
+export const uploadProjectThumbnail = async (file, batch = "General Projects", title = "Project", projectId = null) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("batch", batch);
+  formData.append("title", title);
+  if (projectId) formData.append("projectId", projectId);
+
+  const data = await projectService.uploadProjectThumbnail(formData);
+  return data.file;
+};
+

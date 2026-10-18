@@ -1,9 +1,9 @@
 import React from "react";
 import { createPortal } from "react-dom";
 import { Box, Typography, LinearProgress } from "@mui/material";
-import { useThemeContext } from "../../theme/ThemeProvider";
-import logoCommunity from "../../assets/logos/theuniquesCommunity.png";
-import logoWhite from "../../assets/logos/uniqueswhite.png";
+import { useThemeContext } from "@/theme/ThemeProvider";
+import logoCommunity from "@/assets/logos/theuniquesCommunity.png";
+import logoWhite from "@/assets/logos/uniqueswhite.png";
 
 const CustomLoader = () => {
   const { isDarkMode } = useThemeContext();

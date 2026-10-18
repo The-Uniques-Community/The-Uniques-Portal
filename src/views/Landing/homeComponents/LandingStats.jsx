@@ -1,9 +1,12 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
-import { ViewList, Language, Group, Email } from "@mui/icons-material";
+import ViewList from '@mui/icons-material/ViewList';
+import Language from '@mui/icons-material/Language';
+import Group from '@mui/icons-material/Group';
+import Email from '@mui/icons-material/Email';
 import project from "@/assets/img/project.jpg";
 import { useTheme } from "@mui/material/styles";
-import Button from "@/utils/Buttons/Button";
+import Button from "@/components/buttons/Button";
 const stats = [
   { icon: <ViewList fontSize="large" />, number: "1,394", label: "Successful Projects" },
   { icon: <Language fontSize="large" />, number: "477", label: "Happy Clients" },

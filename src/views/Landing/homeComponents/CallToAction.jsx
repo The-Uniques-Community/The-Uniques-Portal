@@ -1,5 +1,5 @@
-import Button from '@/utils/Buttons/Button'
-import ContainerFull from '@/utils/Container/ContainerFull'
+import Button from '@/components/buttons/Button'
+import ContainerFull from '@/components/layout/ContainerFull'
 
 const CallToAction = () => {
   return (

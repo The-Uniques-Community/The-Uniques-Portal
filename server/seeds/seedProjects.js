@@ -1,9 +1,19 @@
+/**
+ * @file seedProjects.js
+ * @description Standalone migration and seeding utility script that upserts initial project records into MongoDB.
+ * @architecture Standalone database utility using Mongoose and Project model to initialize or synchronize predefined projects data.
+ * @agent_note Can be invoked directly via CLI (`node server/seedProjects.js`) or imported as a module function `seedProjects()`. Ensure MongoDB connection credentials exist in `.env`.
+ */
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import dbconnect from "./config/dbConfig.js";
-import Project from "./models/projects/projectModel.js";
+import path from "path";
+import { fileURLToPath } from "url";
+import dbconnect from "../config/dbConfig.js";
+import Project from "../models/projects/projectModel.js";
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const ALL_PROJECTS = [
   {
@@ -151,6 +161,11 @@ const ALL_PROJECTS = [
   },
 ];
 
+/**
+ * @desc Connects to MongoDB and synchronizes all predefined project documents via upsert.
+ * @async
+ * @returns {Promise<void>} Resolves when all projects have been seeded.
+ */
 export const seedProjects = async () => {
   try {
     await dbconnect();
@@ -169,15 +184,31 @@ export const seedProjects = async () => {
     console.log(`\n🎉 Success! Total ${total} projects stored in database.`);
   } catch (error) {
     console.error("Error seeding projects:", error);
-  } finally {
-    if (mongoose.connection.readyState !== 0) {
-      await mongoose.disconnect();
-      console.log("MongoDB disconnected.");
-    }
+    throw error;
   }
 };
 
 // If run directly
-if (process.argv[1]?.includes("seedProjects.js")) {
-  seedProjects();
+const isDirectRun = process.argv[1] && (
+  process.argv[1].endsWith("seedProjects.js") || process.argv[1].includes("seedProjects.js")
+);
+
+if (isDirectRun) {
+  seedProjects()
+    .then(async () => {
+      console.log("Seeding completed.");
+      if (mongoose.connection.readyState !== 0) {
+        await mongoose.disconnect();
+        console.log("MongoDB disconnected.");
+      }
+      process.exit(0);
+    })
+    .catch(async (err) => {
+      console.error("Seeding failed:", err);
+      if (mongoose.connection.readyState !== 0) {
+        await mongoose.disconnect();
+        console.log("MongoDB disconnected.");
+      }
+      process.exit(1);
+    });
 }

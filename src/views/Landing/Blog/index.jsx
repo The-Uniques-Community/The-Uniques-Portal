@@ -20,9 +20,9 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import BlogCard from "@/utils/Card/BlogCard";
-import CelebrationComponent from "@/utils/Header";
-import CallToAction from "../homComponents/CallToAction";
+import BlogCard from "@/components/cards/BlogCard";
+import CelebrationComponent from "@/components/headers/CelebrationHeader";
+import CallToAction from "../homeComponents/CallToAction";
 import { blogData } from "@/assets/dummyData/blogData";
 
 const BlogPage = () => {

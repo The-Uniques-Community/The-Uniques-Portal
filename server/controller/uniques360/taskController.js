@@ -1,3 +1,9 @@
+/**
+ * @file taskController.js
+ * @description Controller handling Uniques360 task lifecycle, team assignment, progress calculations, and status transitions.
+ * @architecture Manages Task (server/models/uniques360/Task.js), Member, and Report documents under `/api/uniques360/tasks`.
+ * @agent_note Tasks support multi-member assignments with specific roles and automated progress aggregation from associated reports.
+ */
 import Task from "../../models/uniques360/Task.js";
 import Member from "../../models/member/memberModel.js";
 import Report from "../../models/uniques360/Report.js";
@@ -53,7 +59,20 @@ const populateTaskProgress = async (tasks) => {
   }));
 };
 
-// Create a new task (Coordinator/Admin only)
+/**
+ * @desc    Create a new task and assign to members
+ * @route   POST /api/uniques360/tasks
+ * @access  Private (Coordinator / Admin)
+ * @body    {Object} req.body - Task creation data
+ * @body    {string} req.body.title - Task title
+ * @body    {string} req.body.description - Detailed task instructions
+ * @body    {Array<{member: string, role?: string}>|string} req.body.assignedTo - Assigned member IDs
+ * @body    {Date|string} req.body.deadline - Target completion date
+ * @body    {string} [req.body.priority="medium"] - Priority level (low, medium, high, urgent)
+ * @body    {string} [req.body.projectCategory] - Category or domain tag
+ * @body    {string} [req.body.taskType] - Task classification
+ * @returns {Object} JSON response with populated task record
+ */
 export const createTask = async (req, res) => {
   try {
     const { title, description, assignedTo, deadline, priority, projectCategory, taskType } = req.body;
@@ -98,7 +117,14 @@ export const createTask = async (req, res) => {
   }
 };
 
-// Get tasks assigned to a member
+/**
+ * @desc    Fetch all tasks assigned to a particular member (or 'me')
+ * @route   GET /api/uniques360/tasks/member/:memberId
+ * @access  Private (Member / Coordinator / Admin)
+ * @param   {Object} req - Express request
+ * @param   {string} req.params.memberId - Member ObjectId or 'me' for authenticated caller
+ * @returns {Array<Object>} JSON array of enriched task objects with dynamic progress
+ */
 export const getMemberTasks = async (req, res) => {
   try {
     const { memberId } = req.params;
@@ -126,7 +152,14 @@ export const getMemberTasks = async (req, res) => {
   }
 };
 
-// Get tasks created by a coordinator
+/**
+ * @desc    Fetch all tasks created/managed by a coordinator (or 'current')
+ * @route   GET /api/uniques360/tasks/coordinator/:coordinatorId
+ * @access  Private (Coordinator / Admin / CommunityAdmin)
+ * @param   {Object} req - Express request
+ * @param   {string} req.params.coordinatorId - Coordinator ObjectId or 'current'
+ * @returns {Array<Object>} JSON array of enriched tasks created by coordinator
+ */
 export const getCoordinatorTasks = async (req, res) => {
   try {
     const { coordinatorId } = req.params;
@@ -169,7 +202,15 @@ export const getCoordinatorTasks = async (req, res) => {
   }
 };
 
-// Update task status
+/**
+ * @desc    Update the lifecycle status of a task (pending, in-progress, completed)
+ * @route   PATCH /api/uniques360/tasks/:taskId
+ * @access  Private (Coordinator or Assigned Member for completion)
+ * @param   {Object} req - Express request
+ * @param   {string} req.params.taskId - Target Task ObjectId string
+ * @body    {string} req.body.status - New task status
+ * @returns {Object} JSON response with updated task document
+ */
 export const updateTaskStatus = async (req, res) => {
   try {
     const { taskId } = req.params;
@@ -212,7 +253,16 @@ export const updateTaskStatus = async (req, res) => {
   }
 };
 
-// Add a member to an existing task (Existing team member only)
+/**
+ * @desc    Add an existing community member to a task team roster
+ * @route   POST /api/uniques360/tasks/:taskId/members
+ * @access  Private (Coordinator or existing Team Member)
+ * @param   {Object} req - Express request
+ * @param   {string} req.params.taskId - Task ObjectId string
+ * @body    {string} req.body.newMemberId - Mongoose ObjectId string of member to invite
+ * @body    {string} [req.body.role] - Optional role assignment within the task
+ * @returns {Object} JSON response with populated task record
+ */
 export const addMemberToTask = async (req, res) => {
   try {
     const { taskId } = req.params;
@@ -263,7 +313,15 @@ export const addMemberToTask = async (req, res) => {
   }
 };
 
-// Update a task (Coordinator only)
+/**
+ * @desc    Update task details (title, description, deadline, assigned members, category)
+ * @route   PUT /api/uniques360/tasks/:taskId
+ * @access  Private (Task assigning Coordinator only)
+ * @param   {Object} req - Express request
+ * @param   {string} req.params.taskId - Task ObjectId string
+ * @body    {Object} req.body - Updated task properties
+ * @returns {Object} JSON response with updated task document
+ */
 export const updateTask = async (req, res) => {
   try {
     const { taskId } = req.params;
@@ -323,7 +381,14 @@ export const updateTask = async (req, res) => {
   }
 };
 
-// Delete a task (Coordinator only)
+/**
+ * @desc    Permanently delete a task
+ * @route   DELETE /api/uniques360/tasks/:taskId
+ * @access  Private (Task assigning Coordinator only)
+ * @param   {Object} req - Express request
+ * @param   {string} req.params.taskId - Task ObjectId string
+ * @returns {Object} JSON response confirming deletion
+ */
 export const deleteTask = async (req, res) => {
   try {
     const { taskId } = req.params;
@@ -336,6 +401,9 @@ export const deleteTask = async (req, res) => {
       return res.status(403).json({ message: "Unauthorized to delete this task" });
     }
 
+    // Delete child reports tied to taskId
+    await Report.deleteMany({ taskId });
+
     await Task.findByIdAndDelete(taskId);
     res.status(200).json({ message: "Task deleted successfully" });
   } catch (error) {
@@ -343,7 +411,15 @@ export const deleteTask = async (req, res) => {
   }
 };
 
-// Remove a member from a task
+/**
+ * @desc    Remove an assigned member from a task
+ * @route   POST /api/uniques360/tasks/:taskId/members/remove
+ * @access  Private (Coordinator or existing Team Member)
+ * @param   {Object} req - Express request
+ * @param   {string} req.params.taskId - Task ObjectId string
+ * @body    {string} req.body.memberIdToRemove - Member ObjectId string to remove
+ * @returns {Object} JSON response with updated task team
+ */
 export const removeMemberFromTask = async (req, res) => {
   try {
     const { taskId } = req.params;

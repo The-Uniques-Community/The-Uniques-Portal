@@ -1,4 +1,4 @@
-import { ArrowOutward } from "@mui/icons-material";
+import ArrowOutward from '@mui/icons-material/ArrowOutward';
 import { Card, CardContent, CardMedia, Typography, Box } from "@mui/material";
 
 export default function BlogCard2({ title, subtitle, imgSrc }) {

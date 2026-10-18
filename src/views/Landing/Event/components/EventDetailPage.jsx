@@ -37,11 +37,12 @@ import {
   IconButton,
   Alert
 } from '@mui/material';
-import { Close, ContactMail } from '@mui/icons-material';
+import Close from '@mui/icons-material/Close';
+import ContactMail from '@mui/icons-material/ContactMail';
 import { FaLinkedinIn, FaWhatsapp, FaTwitter, FaFacebookF } from "react-icons/fa";
 import { toast } from 'react-toastify';
 import { BASE_URL } from "@/config";
-import Button from "@/utils/Buttons/Button";
+import Button from "@/components/buttons/Button";
 
 // Static data for community partners (only for Bharat TechXperience Hackathon 2.0)
 const COMMUNITY_PARTNERS = [

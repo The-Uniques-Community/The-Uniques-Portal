@@ -1,5 +1,5 @@
 import React from 'react'
-import SpotlightCard from "@/utils/Card/SpotLightCard";
+import SpotlightCard from "@/components/cards/SpotLightCard";
 
 const SpotCard = () => {
   return (

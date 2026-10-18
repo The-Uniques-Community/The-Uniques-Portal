@@ -1,3 +1,9 @@
+/**
+ * @file statsController.js
+ * @description Controller managing top-level community metrics (earnings, clients, projects, events) displayed on the landing page hero counter.
+ * @architecture Mounted at `/api/stats` via `statsRoute.js`. Interacts with `Stats` model.
+ * @agent_note Automatically creates default metrics document if no statistical record exists in the database.
+ */
 import Stats from "../../models/community/statsModel.js";
 
 const DEFAULT_STATS = {
@@ -7,6 +13,15 @@ const DEFAULT_STATS = {
   Events: 40,
 };
 
+/**
+ * @desc Retrieve the latest community statistics counter document, creating defaults if not yet initialized
+ * @route GET /api/stats
+ * @route GET /api/stats/all
+ * @route GET /api/stats/counts
+ * @access Public
+ * @returns {Object} 200 - Statistics document containing Earnings, Clients, Projects, and Events
+ * @returns {Object} 500 - Server error
+ */
 export const getStats = async (req, res) => {
   try {
     let stats = await Stats.findOne().sort({ updatedAt: -1 });
@@ -20,6 +35,20 @@ export const getStats = async (req, res) => {
   }
 };
 
+/**
+ * @desc Update numerical community achievement metrics
+ * @route POST /api/stats
+ * @route POST /api/stats/update
+ * @route PUT /api/stats
+ * @route PUT /api/stats/update
+ * @access Public/Admin
+ * @body {number} [Earnings] - Total revenue/earnings figure
+ * @body {number} [Clients] - Count of clients served
+ * @body {number} [Projects] - Count of completed projects
+ * @body {number} [Events] - Count of hosted events
+ * @returns {Object} 200 - Confirmation message and updated stats document
+ * @returns {Object} 500 - Server error
+ */
 export const updateStats = async (req, res) => {
   try {
     const { Earnings, Clients, Projects, Events } = req.body;

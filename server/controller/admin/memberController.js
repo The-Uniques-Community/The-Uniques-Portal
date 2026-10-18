@@ -1,5 +1,24 @@
+/**
+ * @file memberController.js
+ * @description Administrative member management controller for querying, updating, blocking, suspending, and filtering community members.
+ * @architecture Mounted at `/api/admin/member` via `memberRoute.js`, operating on the primary Member Mongoose model and populated relations.
+ * @agent_note Sensitive fields such as password, role, and email are restricted from direct update via updateMemberProfile to ensure security.
+ */
 import Member from "../../models/member/memberModel.js";
+import File from "../../models/member/fileModel.js";
+import Leave from "../../models/member/leaveModel.js";
+import Event from "../../models/member/eventModel.js";
+import Task from "../../models/uniques360/Task.js";
+import Report from "../../models/uniques360/Report.js";
 import mongoose from "mongoose";
+
+/**
+ * @desc    Fetch a single member profile by ID with populated relations (excluding password)
+ * @route   GET /api/admin/member/:id
+ * @access  Private (Admin)
+ * @param   {string} req.params.id - Member ObjectId
+ * @returns {Object} JSON response containing member profile details
+ */
 export const getSingleMember = async (req, res) => {
   try {
     const { id } = req.params;
@@ -14,8 +33,6 @@ export const getSingleMember = async (req, res) => {
 
     const member = await Member.findById(id)
       .select('-password') // Exclude password from the response
-      .populate('certifications')
-      .populate('profilePic')
       .populate('event_participation');
 
     if (!member) {
@@ -39,6 +56,13 @@ export const getSingleMember = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Toggle profile status between 'blocked' and 'active'
+ * @route   PATCH /api/admin/member/:id/block
+ * @access  Private (Admin)
+ * @param   {string} req.params.id - Member ObjectId
+ * @returns {Object} JSON response with updated block status
+ */
 export const toggleBlockStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -85,6 +109,15 @@ export const toggleBlockStatus = async (req, res) => {
 };
 
 // Suspend or Unsuspend Member
+/**
+ * @desc    Toggle member suspension flag with required audit reason
+ * @route   PATCH /api/admin/member/:id/suspend
+ * @access  Private (Admin)
+ * @param   {string} req.params.id - Member ObjectId
+ * @body    {Object} req.body
+ * @body    {string} [req.body.reason] - Justification reason required when suspending
+ * @returns {Object} JSON response indicating updated suspension state
+ */
 export const toggleSuspendStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -139,6 +172,14 @@ export const toggleSuspendStatus = async (req, res) => {
 };
 
 // Edit Member Profile
+/**
+ * @desc    Update editable member profile fields with validation, protecting restricted attributes
+ * @route   PUT /api/admin/member/:id
+ * @access  Private (Admin)
+ * @param   {string} req.params.id - Member ObjectId
+ * @body    {Object} req.body - Profile update attributes (excluding restricted fields)
+ * @returns {Object} Updated member profile document
+ */
 export const updateMemberProfile = async (req, res) => {
   try {
     const { id } = req.params;
@@ -201,6 +242,13 @@ export const updateMemberProfile = async (req, res) => {
 };
 
 // Delete a member
+/**
+ * @desc    Permanently delete a member record by ID
+ * @route   DELETE /api/admin/member/:id
+ * @access  Private (Admin)
+ * @param   {string} req.params.id - Member ObjectId
+ * @returns {Object} Deletion confirmation message
+ */
 export const deleteMember = async (req, res) => {
   try {
     const { id } = req.params;
@@ -226,13 +274,27 @@ export const deleteMember = async (req, res) => {
     if (member.profilePic) {
       try {
         const fileId = member.profilePic._id || member.profilePic;
-        const File = mongoose.model("File"); // Ensure File model is available
         await File.findByIdAndDelete(fileId);
       } catch (fileError) {
         console.error("Error deleting member profile picture:", fileError);
         // Continue with member deletion
       }
     }
+
+    // Delete associated Leave records
+    await Leave.deleteMany({ memberId: id });
+
+    // Pull member ID from Event contribution teams
+    await Event.updateMany(
+      { "eventMembers.contributionTeam": id },
+      { $pull: { "eventMembers.$[].contributionTeam": id } }
+    );
+
+    // Remove from Task assignments
+    await Task.updateMany({ "assignedTo.member": id }, { $pull: { assignedTo: { member: id } } });
+
+    // Clean up student reports
+    await Report.deleteMany({ studentId: id });
 
     // Delete the member
     await Member.findByIdAndDelete(id);
@@ -253,6 +315,14 @@ export const deleteMember = async (req, res) => {
 
 
 // Get all members with pagination
+/**
+ * @desc    Retrieve all community members with sort options and populated relations
+ * @route   GET /api/admin/member
+ * @access  Private (Admin)
+ * @param   {string} [req.query.sortBy='createdAt'] - Field to sort by
+ * @param   {string} [req.query.order='desc'] - Sort direction ('asc' | 'desc')
+ * @returns {Object} List of members and total count
+ */
 export const getAllMembers = async (req, res) => {
   try {
     const { sortBy = 'createdAt', order = 'desc' } = req.query;
@@ -267,8 +337,6 @@ export const getAllMembers = async (req, res) => {
     // Fetch all members without pagination and populate needed fields
     const members = await Member.find()
       .select('-password')
-      .populate('certifications')
-      .populate('profilePic')
       .populate('event_participation')
       .sort(sortOptions);
 
@@ -288,6 +356,13 @@ export const getAllMembers = async (req, res) => {
 };
 
 // Get members by profile status
+/**
+ * @desc    Filter members by profile status ('inactive' | 'active' | 'pending' | 'blocked')
+ * @route   GET /api/admin/member/status/:status
+ * @access  Private (Admin)
+ * @param   {string} req.params.status - Profile status string
+ * @returns {Object} Filtered member records and count
+ */
 export const getMembersByProfileStatus = async (req, res) => {
   try {
     const { status } = req.params;
@@ -320,6 +395,13 @@ export const getMembersByProfileStatus = async (req, res) => {
 };
 
 // Get members by batch
+/**
+ * @desc    Retrieve member records belonging to a specified cohort/batch
+ * @route   GET /api/admin/member/batch/:batch
+ * @access  Private (Admin)
+ * @param   {string} req.params.batch - Cohort name (e.g., "The Uniques 1.0")
+ * @returns {Object} Members in the specified batch and count
+ */
 export const getMembersByBatch = async (req, res) => {
   try {
     const { batch } = req.params;
@@ -358,6 +440,12 @@ export const getMembersByBatch = async (req, res) => {
 };
 
 // Get members with fine
+/**
+ * @desc    Get members who have non-zero outstanding fines
+ * @route   GET /api/admin/member/fines/all
+ * @access  Private (Admin)
+ * @returns {Object} Members with outstanding fines and count
+ */
 export const getMembersByFineStatus = async (req, res) => {
   try {
     // If fineStatus is a string that represents a number, we can query members with fines > 0
@@ -381,6 +469,13 @@ export const getMembersByFineStatus = async (req, res) => {
 };
 
 // Get members with supplementary exams by semester
+/**
+ * @desc    Get members with supplementary exam records for a specific semester
+ * @route   GET /api/admin/member/supplementary/semester/:semester
+ * @access  Private (Admin)
+ * @param   {string|number} req.params.semester - Semester number (1 to 8)
+ * @returns {Object} Members with matching supplementary exam details
+ */
 export const getMembersBySupplementary = async (req, res) => {
   try {
     const { semester } = req.params;
@@ -425,6 +520,12 @@ export const getMembersBySupplementary = async (req, res) => {
 };
 
 // Get members with pending supplementary exams
+/**
+ * @desc    Get all members with unresolved pending supplementary exams
+ * @route   GET /api/admin/member/supplementary/pending
+ * @access  Private (Admin)
+ * @returns {Object} Members with pending supplementary exam records
+ */
 export const getMembersWithPendingSupplementary = async (req, res) => {
   try {
     // Find members who have at least one supplementary exam with "pending" status
@@ -463,5 +564,43 @@ export const getMembersWithPendingSupplementary = async (req, res) => {
       message: 'Server error',
       error: error.message
     });
+  }
+};
+
+/**
+ * @desc    Get aggregated member tab counts for admin and coordinator dashboards
+ * @route   GET /api/admin/member/counts
+ * @access  Private (Admin, Coordinator)
+ */
+export const getAdminMemberCounts = async (req, res) => {
+  try {
+    const [total, batch1, batch2, batch3, batch4, batch5, batch6, blocked] = await Promise.all([
+      Member.countDocuments(),
+      Member.countDocuments({ batch: "The Uniques 1.0" }),
+      Member.countDocuments({ batch: "The Uniques 2.0" }),
+      Member.countDocuments({ batch: "The Uniques 3.0" }),
+      Member.countDocuments({ batch: "The Uniques 4.0" }),
+      Member.countDocuments({ batch: "The Uniques 5.0" }),
+      Member.countDocuments({ batch: "The Uniques 6.0" }),
+      Member.countDocuments({ $or: [{ isSuspended: true }, { profileStatus: "blocked" }] }),
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      message: "Admin member counts retrieved successfully",
+      data: {
+        all: total,
+        batch1,
+        batch2,
+        batch3,
+        batch4,
+        batch5,
+        batch6,
+        blocked,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching admin member counts:", error);
+    return res.status(500).json({ success: false, message: error.message });
   }
 };

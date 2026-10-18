@@ -1,3 +1,9 @@
+/**
+ * @file batchController.js
+ * @description Controller managing Uniques batch cohorts, batch name registrations, and batch profile descriptions with fallback seeding.
+ * @architecture Mounted at `/api/batches` via `batchRoute.js`. Interacts with `BatchName` and `BatchProfile` models.
+ * @agent_note Automatically seeds default batch cohorts (1.0 to 6.0) and descriptive batch profile cards when database collections are initially empty.
+ */
 import { BatchProfile, BatchName } from "../../models/community/batchModel.js";
 
 const DEFAULT_BATCHES = [
@@ -66,6 +72,13 @@ const DEFAULT_PROFILES = [
   },
 ];
 
+/**
+ * @desc Retrieve all registered batch cohort names, seeding defaults if empty
+ * @route GET /api/batches/all
+ * @access Public
+ * @returns {Object} 200 - Array of batch name strings
+ * @returns {Object} 500 - Server error
+ */
 // Get all batch names
 export const getAllBatches = async (req, res) => {
   try {
@@ -82,6 +95,15 @@ export const getAllBatches = async (req, res) => {
   }
 };
 
+/**
+ * @desc Register a new batch cohort name with automatic prefix normalization
+ * @route POST /api/batches/add
+ * @access Public/Admin
+ * @body {string} name - Raw batch name string (e.g., '7.0' or 'The Uniques 7.0')
+ * @returns {Object} 200 - Success message and normalized batch name
+ * @returns {Object} 400 - If batch name is missing
+ * @returns {Object} 500 - Server error
+ */
 // Add new batch name
 export const addBatch = async (req, res) => {
   try {
@@ -108,6 +130,13 @@ export const addBatch = async (req, res) => {
   }
 };
 
+/**
+ * @desc Retrieve all descriptive batch profile cards, seeding defaults if empty
+ * @route GET /api/batches/profiles
+ * @access Public
+ * @returns {Object} 200 - Array of batch profile objects
+ * @returns {Object} 500 - Server error
+ */
 // Get all batch profiles
 export const getBatchProfiles = async (req, res) => {
   try {
@@ -123,6 +152,16 @@ export const getBatchProfiles = async (req, res) => {
   }
 };
 
+/**
+ * @desc Upsert multiple batch profile configuration objects
+ * @route POST /api/batches/profiles/update
+ * @route PUT /api/batches/profiles/update
+ * @access Public/Admin
+ * @body {Object[]} profiles - Array of batch profile configuration objects
+ * @returns {Object} 200 - Success message and full updated profiles array
+ * @returns {Object} 400 - If profiles payload is not an array
+ * @returns {Object} 500 - Server error
+ */
 // Update/Save batch profiles
 export const saveBatchProfiles = async (req, res) => {
   try {

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
-import ModernTable from "@/utils/Table/ModernTable";
-import ModernButton from "@/utils/Buttons/ModernButton";
-import ModernStatCard from "@/utils/Card/ModernStatCard";
-import ModernHeader from "@/utils/Header/ModernHeader";
+import ModernTable from "@/components/tables/ModernTable";
+import ModernButton from "@/components/buttons/ModernButton";
+import ModernStatCard from "@/components/cards/ModernStatCard";
+import ModernHeader from "@/components/headers/ModernHeader";
 import { alpha } from "@mui/material/styles";
 import {
   Box,
@@ -20,14 +20,12 @@ import {
   Typography,
 } from "@mui/material";
 
-import {
-  Add as AddIcon,
-  Refresh as RefreshIcon,
-  Assignment as TaskIcon,
-  HourglassEmpty as PendingIcon,
-  TrendingUp as ProgressIcon,
-  CheckCircleOutline as CompleteIcon,
-} from "@mui/icons-material";
+import AddIcon from '@mui/icons-material/Add';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import TaskIcon from '@mui/icons-material/Assignment';
+import PendingIcon from '@mui/icons-material/HourglassEmpty';
+import ProgressIcon from '@mui/icons-material/TrendingUp';
+import CompleteIcon from '@mui/icons-material/CheckCircleOutline';
 
 import axios from "axios";
 import { BASE_URL } from "@/config";

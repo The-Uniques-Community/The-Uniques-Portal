@@ -1,10 +1,20 @@
+/**
+ * @file leaveModel.js
+ * @description Mongoose schema and model for member leave requests and approval workflows.
+ * @architecture Captures absence requests, duration calculations, approval/rejection audits, and triggers leave email notifications.
+ * @agent_note memberId references Member; status transitions between Pending, Approved, and Rejected with approver/rejector metadata.
+ */
+
 import mongoose from "mongoose";
 
+/**
+ * Mongoose schema definition for member leave requests.
+ */
 const leaveSchema = new mongoose.Schema(
   {
     memberId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Member",
+      ref: "User",
       required: true,
     },
     memberName: {
@@ -67,4 +77,9 @@ const leaveSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("Leave", leaveSchema);
+const Leave = mongoose.models.Leave || mongoose.model("Leave", leaveSchema);
+
+/**
+ * @module Leave
+ */
+export default Leave;

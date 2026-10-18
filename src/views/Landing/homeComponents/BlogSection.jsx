@@ -1,5 +1,5 @@
 import { Container, Typography, Grid, Box, Button } from "@mui/material";
-import BlogCard2 from "@/utils/Card/BlogCard2";
+import BlogCard2 from "@/components/cards/BlogCard2";
 
 const BlogSection = () => {
   const blogPosts = [

@@ -1,4 +1,7 @@
-import { Memory, AutoAwesome, Psychology, Insights } from "@mui/icons-material";
+import Memory from '@mui/icons-material/Memory';
+import AutoAwesome from '@mui/icons-material/AutoAwesome';
+import Psychology from '@mui/icons-material/Psychology';
+import Insights from '@mui/icons-material/Insights';
 import androidTraining from "@/assets/img/android-training.png";
 
 const GenAiTab = () => {

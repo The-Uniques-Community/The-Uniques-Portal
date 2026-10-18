@@ -1,6 +1,22 @@
+/**
+ * @file memberController.js
+ * @description Public-facing controller exposing sanitized member directory listings, public profile lookups, batch counts, and visitor contact submissions.
+ * @architecture Mounted at `/api/public/members` via `publicMemberRouter.js`. Interfaces with `Member`, `Enquiry`, and `sendContactEmail` service.
+ * @agent_note Strips sensitive member information (passwords, phone numbers, fines) before returning JSON to public consumers.
+ */
 import Member from "../../models/member/memberModel.js";
 import Enquiry from "../../models/Enquiry/enquiryModel.js";
 import sendContactEmail from "../../services/members/sendContactEmail.js";
+
+/**
+ * @desc Retrieve all public member profiles formatted for directory display with search and batch filtering
+ * @route GET /api/public/members
+ * @access Public
+ * @query {string} [batch] - Filter by batch name (e.g., 'The Uniques 1.0')
+ * @query {string} [search] - Keyword search across name, bio, course, and skills
+ * @returns {Object} 200 - Sanitized member list and count
+ * @returns {Object} 500 - Server error
+ */
 // Get all public members with pagination and filters
 export const getPublicMembers = async (req, res) => {
     try {
@@ -28,8 +44,6 @@ export const getPublicMembers = async (req, res) => {
       
       // Execute query without pagination and order by complete profiles first
       const members = await Member.find(queryConditions)
-        .populate('profilePic')
-        .populate('certifications')
         .sort({ 
           // Sort complete profiles first, then by batch and name
           profileStatus: -1, // 'active' comes before other statuses alphabetically
@@ -100,6 +114,15 @@ export const getPublicMembers = async (req, res) => {
       });
     }
   };
+/**
+ * @desc Retrieve a single active, verified, non-suspended member profile by document ID
+ * @route GET /api/public/members/:id
+ * @access Public
+ * @params {string} id - Member document ID
+ * @returns {Object} 200 - Sanitized member profile details
+ * @returns {Object} 404 - If member not found or profile not public
+ * @returns {Object} 500 - Server error
+ */
 // Get a single public member by ID
 export const getPublicMemberById = async (req, res) => {
   try {
@@ -110,7 +133,7 @@ export const getPublicMemberById = async (req, res) => {
       profileStatus: "active",
       isVerified: true,
       isSuspended: false
-    }).populate('profilePic').populate('certifications');
+    });
     
     if (!member) {
       return res.status(404).json({
@@ -155,6 +178,13 @@ export const getPublicMemberById = async (req, res) => {
   }
 };
 
+/**
+ * @desc Retrieve total and per-batch active member counts
+ * @route GET /api/public/members/counts
+ * @access Public
+ * @returns {Object} 200 - Object mapping batch names to active member counts
+ * @returns {Object} 500 - Server error
+ */
 // Add this method to get member counts by batch
 export const getMemberCounts = async (req, res) => {
     try {
@@ -232,6 +262,20 @@ export const getMemberCounts = async (req, res) => {
     }
   };
 
+/**
+ * @desc Process public contact form submission, persist inquiry, and send email alert
+ * @route POST /api/contact
+ * @access Public
+ * @body {string} firstName - Sender first name
+ * @body {string} lastName - Sender last name
+ * @body {string} email - Sender contact email
+ * @body {string} [phone] - Sender contact phone
+ * @body {string} message - Message text
+ * @body {string[]} [services] - Array of requested services
+ * @returns {Object} 200 - Success message and created enquiry ID
+ * @returns {Object} 400 - Validation failure
+ * @returns {Object} 500 - Server error
+ */
   export const submitContactForm = async (req, res) => {
     try {
         // Extract contact form data

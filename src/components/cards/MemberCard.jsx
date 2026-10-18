@@ -5,9 +5,9 @@ import { FaXTwitter } from "react-icons/fa6";
 import { Link, useNavigate } from "react-router";
 import * as React from "react";
 import Box from "@mui/material/Box";
-import Button from "../Buttons/Button";
+import Button from "@/components/buttons/Button";
 import Modal from "@mui/material/Modal";
-import { BorderAllRounded } from "@mui/icons-material";
+import BorderAllRounded from '@mui/icons-material/BorderAllRounded';
 const style = {
   position: "absolute",
   BorderAllRounded:0,

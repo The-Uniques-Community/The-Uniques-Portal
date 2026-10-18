@@ -1,8 +1,8 @@
 import React from 'react'
 import ContactForm from './components/ContactForm'
-import ContainerFull from '@/utils/Container/ContainerFull'
-import CallToAction from '../homComponents/CallToAction'
-import CelebrationComponent from '@/utils/Header'
+import ContainerFull from '@/components/layout/ContainerFull'
+import CallToAction from '../homeComponents/CallToAction'
+import CelebrationComponent from '@/components/headers/CelebrationHeader'
 
 const index = () => {
   return (

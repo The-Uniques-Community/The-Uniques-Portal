@@ -10,17 +10,15 @@ import tu from "@/assets/logos/tu.png";
 import { Link } from "react-router";
 
 import { Modal, Box, Tabs, Tab, Typography } from "@mui/material";
-import {
-  LinkedIn,
-  Instagram,
-  Twitter,
-  GitHub,
-  Email,
-  Edit,
-  Delete,
-} from "@mui/icons-material";
+import LinkedIn from '@mui/icons-material/LinkedIn';
+import Instagram from '@mui/icons-material/Instagram';
+import Twitter from '@mui/icons-material/Twitter';
+import GitHub from '@mui/icons-material/GitHub';
+import Email from '@mui/icons-material/Email';
+import Edit from '@mui/icons-material/Edit';
+import Delete from '@mui/icons-material/Delete';
 import "tailwindcss/tailwind.css";
-import ProfileModal from "../Modal/ProfileModal";
+import ProfileModal from "@/components/modals/ProfileModal";
 import userIcon from "@/assets/img/user-icon.png";
 const UserProfileModal = ({ open, handleClose, userData }) => {
   const theme = useTheme();

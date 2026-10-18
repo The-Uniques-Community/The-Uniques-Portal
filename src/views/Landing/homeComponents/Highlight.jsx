@@ -6,7 +6,7 @@ import { Play, ChevronRight, ChevronLeft } from "lucide-react"
 import useEmblaCarousel from "embla-carousel-react"
 import Autoplay from "embla-carousel-autoplay"
 import { Calendar as CalendarIcon, MapPin as MapPinIcon } from 'lucide-react'
-import Eventmodel from '../Event/Componant/Event' // Import the EventModel component
+import Eventmodel from '../Event/components/Event' // Import the EventModel component
 
 // Update the helper function to use your proxy endpoint
 const getProxiedImageUrl = (fileId) => {

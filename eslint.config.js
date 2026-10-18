@@ -27,6 +27,17 @@ export default defineConfig([
           caughtErrors: 'none',
         },
       ],
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@mui/icons-material',
+              message: "Do not import from '@mui/icons-material' barrel. Use direct path imports instead: import AddIcon from '@mui/icons-material/Add';",
+            },
+          ],
+        },
+      ],
     },
   },
   {

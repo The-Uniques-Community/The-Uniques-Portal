@@ -10,10 +10,8 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
-import { 
-  AssignmentOutlined as ReportIcon, 
-  AccessTimeOutlined as TimeIcon 
-} from "@mui/icons-material";
+import ReportIcon from '@mui/icons-material/AssignmentOutlined';
+import TimeIcon from '@mui/icons-material/AccessTimeOutlined';
 
 const ReportsDialog = ({ open, onClose, task, reports, loading }) => {
   return (

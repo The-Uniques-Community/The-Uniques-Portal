@@ -1,7 +1,7 @@
 import React from 'react'
-import ModernHeader from "@/utils/Header/ModernHeader";
+import ModernHeader from "@/components/headers/ModernHeader";
 import TimeLine from "@/views/Landing/HowItStarted/components/TimeLine"
-import CallToAction from '../homComponents/CallToAction'
+import CallToAction from '../homeComponents/CallToAction'
 import Flight from './components/Flight'
 
 const index = () => {
