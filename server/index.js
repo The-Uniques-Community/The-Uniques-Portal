@@ -229,6 +229,7 @@ app.use("/auth/password-reset", passwordResetRoutes);
 app.use("/api/guest", guestRoute);
 app.use("/api/events", eventRouter);
 app.use("/upload", googleDriveRoutes);
+app.use("/api/upload", googleDriveRoutes);
 app.use("/api/admin/fine", fineRouter);
 app.use("/api/public/members", publicMemberRouter);
 app.use("/api/contact", publicEnquiryRouter);
