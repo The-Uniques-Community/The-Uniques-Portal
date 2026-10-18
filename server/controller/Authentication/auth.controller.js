@@ -10,14 +10,18 @@ import Admin from "../../models/admin/adminModel.js";
 import bcrypt from "bcryptjs";
 import CommunityAdmin from "../../models/community/communityAdmin.js";
 
-const getJwtSecret = () =>
-  process.env.JWT_SECRET || (process.env.NODE_ENV !== "production" ? "the_uniques_portal_jwt_secret_dev_key" : undefined);
+const getJwtSecret = () => {
+  if (process.env.JWT_SECRET) {
+    return process.env.JWT_SECRET;
+  }
+  console.warn(
+    "[Security Warning] JWT_SECRET environment variable is missing. Using fallback secret. Please configure JWT_SECRET in production!"
+  );
+  return "the_uniques_portal_jwt_secret_dev_key";
+};
 
 const generateToken = (member, fallbackRole) => {
   const secret = getJwtSecret();
-  if (!secret) {
-    throw new Error("JWT_SECRET environment variable is not defined");
-  }
   const payload = {
     id: member._id || member.id,
     email: member.email,
@@ -51,7 +55,7 @@ export const googleCallback = (req, res, _next) => {
   if (safeUser.password) delete safeUser.password;
   if (safeUser.__v !== undefined) delete safeUser.__v;
 
-  const targetOrigin = process.env.FRONTEND_URL || process.env.CLIENT_URL || "";
+  const targetOrigin = process.env.FRONTEND_URL || process.env.CLIENT_URL || "https://the-uniques-portal.vercel.app";
 
   const htmlResponse = `
     <!DOCTYPE html>
@@ -63,12 +67,22 @@ export const googleCallback = (req, res, _next) => {
         <script>
           (function() {
             if (window.opener) {
-              const targetOrigin = "${targetOrigin}" || window.location.origin;
-              window.opener.postMessage({
-                token: "${token}",
-                role: "${userRole}",
-                user: ${JSON.stringify(safeUser)}
-              }, targetOrigin);
+              const configuredTarget = "${targetOrigin}";
+              const target = configuredTarget || window.location.origin;
+              try {
+                window.opener.postMessage({
+                  token: "${token}",
+                  role: "${userRole}",
+                  user: ${JSON.stringify(safeUser)}
+                }, target);
+              } catch (e) {
+                // Fallback to wildcard if origin handshake fails across preview domains
+                window.opener.postMessage({
+                  token: "${token}",
+                  role: "${userRole}",
+                  user: ${JSON.stringify(safeUser)}
+                }, "*");
+              }
               window.close();
             }
           })();

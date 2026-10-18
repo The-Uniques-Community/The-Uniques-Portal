@@ -43,13 +43,42 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-const allowedOrigins = [
+// Dynamic CORS origin configuration with environment overrides and hardcoded defaults
+const parseEnvOrigins = () => {
+  const rawOrigins = process.env.ALLOWED_ORIGINS || process.env.CORS_ORIGINS || "";
+  return rawOrigins
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+};
+
+const defaultOrigins = [
   process.env.FRONTEND_URL,
   process.env.CLIENT_URL,
   "http://localhost:5173",
   "http://localhost:3000",
-  "https://theuniquesportal.vercel.app"
+  "https://theuniquesportal.vercel.app",
+  "https://the-uniques-portal.vercel.app",
 ].filter(Boolean);
+
+const allowedOrigins = Array.from(new Set([...defaultOrigins, ...parseEnvOrigins()]));
+
+/**
+ * Checks if a given origin is allowed under the application's CORS policy.
+ * @param {string|undefined} origin
+ * @returns {boolean}
+ */
+export const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  if (process.env.NODE_ENV !== "production") return true;
+  if (allowedOrigins.includes(origin)) return true;
+
+  // Pattern matches the-uniques-portal, theuniquesportal, theuniquesportal-server and preview deployments on Vercel
+  const vercelPortalRegex = /^https:\/\/(the-?uniques-?portal|theuniquesportal-server)(-[a-z0-9-]+)?\.vercel\.app$/i;
+  if (vercelPortalRegex.test(origin)) return true;
+
+  return false;
+};
 
 // Explicit CORS origin whitelist configuration
 app.use((req, res, next) => {
@@ -58,7 +87,7 @@ app.use((req, res, next) => {
     return next();
   }
 
-  const isAllowed = allowedOrigins.includes(origin) || process.env.NODE_ENV !== "production";
+  const isAllowed = isAllowedOrigin(origin);
   if (isAllowed) {
     res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader("Access-Control-Allow-Credentials", "true");
@@ -79,12 +108,12 @@ app.use((req, res, next) => {
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl, server-to-server)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== "production") {
+      // Allow requests with no origin (like mobile apps, curl, server-to-server) or verified origins
+      if (!origin || isAllowedOrigin(origin)) {
         return callback(null, true);
       }
-      return callback(new Error("CORS policy violation: Access denied for this origin."));
+      // Return false instead of throwing Error to prevent Express crashing with 500 status
+      return callback(null, false);
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -188,6 +217,17 @@ app.use("/api/stats", statsRouter);
 app.use("/api/batches", batchRouter);
 app.use("/api/community-benefits", communityBenefitsRouter);
 
+// Centralized Express error handler to guarantee structured JSON errors instead of HTML 500 stack traces
+app.use((err, req, res, _next) => {
+  console.error(`[Unhandled Error] ${req.method} ${req.originalUrl}:`, err.message || err);
+  const status = err.status || err.statusCode || 500;
+  res.status(status).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+    ...(process.env.NODE_ENV !== "production" && { stack: err.stack }),
+  });
+});
+
 // Sequential bootstrap for standalone Node.js environments
 const startServer = async () => {
   const PORT = process.env.PORT || 5001;
@@ -215,7 +255,7 @@ const startServer = async () => {
   }
 };
 
-if (!process.env.VERCEL) {
+if (!process.env.VERCEL && process.env.NODE_ENV !== "test") {
   startServer();
 }
 

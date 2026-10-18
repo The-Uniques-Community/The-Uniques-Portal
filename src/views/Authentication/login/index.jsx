@@ -161,7 +161,12 @@ const Login = () => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(values),
               });
-              const data = await res.json();
+              let data = {};
+              try {
+                data = await res.json();
+              } catch (_parseErr) {
+                data = { message: res.statusText || "Unexpected server response" };
+              }
               if (res.ok) {
                 if (data.token) {
                   localStorage.setItem("token", data.token);
@@ -195,11 +200,14 @@ const Login = () => {
                     navigate("/");
                 }
               } else {
-                setErrors({ submit: data.message || "Login failed" });
+                const errorMsg = data.message || data.error || "Login failed";
+                toast.error(errorMsg);
+                setErrors({ submit: errorMsg });
               }
             } catch (error) {
-              toast.error("An error occurred during login");
-              setErrors({ submit: "An error occurred" });
+              const errorMsg = error.message || "An error occurred during login";
+              toast.error(errorMsg);
+              setErrors({ submit: errorMsg });
             }
             setSubmitting(false);
           }}
