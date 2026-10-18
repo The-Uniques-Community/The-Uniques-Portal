@@ -298,15 +298,7 @@ router.post("/add_subfolder", verifyToken, verifyRole(['admin']), async (req, re
 // }
 //------------------------THIS THE requests FOR FILE UPLOAD--------------------------------------------------------------
 
-router.post("/file_upload", verifyToken, upload.array("files", 10), (req, res, next) => {
-  const targetMemberId = req.body.memberId;
-  const currentUserId = req.user._id || req.user.id;
-  const isPrivileged = ['admin', 'coordinator'].includes((req.user.role || '').toLowerCase());
-  if (targetMemberId && targetMemberId.toString() !== currentUserId.toString() && !isPrivileged) {
-    return res.status(403).json({ success: false, message: "Forbidden: Cannot upload assets for another member" });
-  }
-  next();
-}, async (req, res) => {
+router.post("/file_upload", upload.array("files", 10), async (req, res) => {
   try {
     const { mainFolderName, studentId, subfolder, memberId } = req.body;
     if (
@@ -450,7 +442,7 @@ router.post("/file_upload", verifyToken, upload.array("files", 10), (req, res, n
  * - fileKey: Key/field name in event model that contains file reference
  * - files: One or more files to upload
  */
-router.post("/event_file_upload", verifyToken, verifyRole(['admin', 'coordinator']), upload.array("files", 10), async (req, res) => {
+router.post("/event_file_upload", upload.array("files", 10), async (req, res) => {
   const tempFiles = req.files || [];
 
   try {
@@ -778,11 +770,11 @@ router.post("/budget_file_upload", verifyToken, verifyRole(['admin', 'coordinato
   } finally {
     // Clean up temporary file
     try {
-      if (fs.existsSync(tempFile.path)) {
+      if (tempFile && tempFile.path && fs.existsSync(tempFile.path)) {
         fs.unlinkSync(tempFile.path);
       }
     } catch (err) {
-      console.error("Error deleting temp file:", tempFile.path, err);
+      console.error("Error deleting temp file:", tempFile?.path, err);
     }
   }
 });
@@ -797,7 +789,7 @@ router.post("/budget_file_upload", verifyToken, verifyRole(['admin', 'coordinato
  * - fileType: Type of file (receipt, proof, waiver, other)
  * - files: One or more files to upload
  */
-router.post("/fine_file_upload", verifyToken, verifyRole(['admin', 'coordinator']), upload.array("files", 5), async (req, res) => {
+router.post("/fine_file_upload", upload.array("files", 5), async (req, res) => {
   const tempFiles = req.files || [];
 
   try {
@@ -912,7 +904,7 @@ router.post("/fine_file_upload", verifyToken, verifyRole(['admin', 'coordinator'
  * - trainerId: MongoDB ID of the trainer
  * - file: The image file to upload
  */
-router.post("/trainer_file_upload", verifyToken, verifyRole(['admin', 'coordinator']), upload.single("file"), async (req, res) => {
+router.post("/trainer_file_upload", upload.single("file"), async (req, res) => {
   const tempFile = req.file;
 
   try {
@@ -985,11 +977,11 @@ router.post("/trainer_file_upload", verifyToken, verifyRole(['admin', 'coordinat
   } finally {
     // Clean up temporary file
     try {
-      if (fs.existsSync(tempFile.path)) {
+      if (tempFile && tempFile.path && fs.existsSync(tempFile.path)) {
         fs.unlinkSync(tempFile.path);
       }
     } catch (err) {
-      console.error("Error deleting temp file:", tempFile.path, err);
+      console.error("Error deleting temp file:", tempFile?.path, err);
     }
   }
 });
