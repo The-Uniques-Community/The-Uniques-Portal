@@ -55,6 +55,19 @@ async function runTests() {
   );
   console.log("   ✅ Vercel preview URLs match pattern correctly");
 
+  // Test 3b: Production custom domain theuniques.in & www.theuniques.in
+  assert.strictEqual(
+    isAllowedOrigin("https://www.theuniques.in"),
+    true,
+    "Should allow https://www.theuniques.in"
+  );
+  assert.strictEqual(
+    isAllowedOrigin("https://theuniques.in"),
+    true,
+    "Should allow https://theuniques.in"
+  );
+  console.log("   ✅ https://www.theuniques.in and https://theuniques.in are allowed");
+
   // Test 4: Dynamic origins from ALLOWED_ORIGINS
   assert.strictEqual(
     isAllowedOrigin("https://custom-domain.org"),
@@ -156,6 +169,25 @@ async function runTests() {
     "Should return Access-Control-Allow-Origin for https://the-uniques-portal.vercel.app"
   );
   console.log("   ✅ OPTIONS preflight for https://the-uniques-portal.vercel.app returned 204 with CORS headers");
+
+  // Test 7b: OPTIONS Preflight from https://www.theuniques.in
+  const preflightResUniques = await testRequest({
+    path: "/api/public/members?batch=The+Uniques+1.0",
+    method: "OPTIONS",
+    headers: {
+      Origin: "https://www.theuniques.in",
+      "Access-Control-Request-Method": "GET",
+      "Access-Control-Request-Headers": "Content-Type",
+    },
+  });
+
+  assert.strictEqual(preflightResUniques.statusCode, 204, "Preflight OPTIONS should return 204 for https://www.theuniques.in");
+  assert.strictEqual(
+    preflightResUniques.headers["access-control-allow-origin"],
+    "https://www.theuniques.in",
+    "Should return Access-Control-Allow-Origin for https://www.theuniques.in"
+  );
+  console.log("   ✅ OPTIONS preflight for https://www.theuniques.in returned 204 with CORS headers");
 
   // Test 8: Disallowed origin does NOT return 500 error
   const disallowedRes = await testRequest(
