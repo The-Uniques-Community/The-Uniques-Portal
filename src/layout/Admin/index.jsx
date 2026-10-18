@@ -144,14 +144,9 @@ function AdminLayout() {
             marginLeft: "16px",
             backgroundColor: theme.palette.background.drawer,
             borderRadius: "8px",
-            overflowX: "hidden",
-            overflowY: "auto",
-            overscrollBehavior: "contain",
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
-            "&::-webkit-scrollbar": {
-              display: "none",
-            },
+            overflow: "hidden",
+            display: "flex",
+            flexDirection: "column",
             transition: "width 0.3s",
             boxSizing: "border-box",
           },
@@ -162,6 +157,7 @@ function AdminLayout() {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            flexShrink: 0,
           }}
         >
           {drawerOpen && !isMobile && (
@@ -182,7 +178,26 @@ function AdminLayout() {
           </Box>
         </Box>
 
-        <List sx={{ padding: 2 }}>
+        <List
+          data-lenis-prevent="true"
+          onWheel={(e) => e.stopPropagation()}
+          sx={{
+            padding: 2,
+            flexGrow: 1,
+            overflowY: "auto",
+            overflowX: "hidden",
+            minHeight: 0,
+            overscrollBehavior: "contain",
+            scrollbarWidth: "thin",
+            "&::-webkit-scrollbar": {
+              width: "4px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "rgba(255, 255, 255, 0.2)",
+              borderRadius: "4px",
+            },
+          }}
+        >
           {ADMIN_NAVIGATION.map((item) => {
             const isActive = activeItem === item.title;
 
@@ -229,7 +244,7 @@ function AdminLayout() {
             );
           })}
         </List>
-        <List sx={{ padding: 2, marginTop: "auto" }}>
+        <List sx={{ padding: 2, flexShrink: 0, marginTop: "auto" }}>
           <ListItem disablePadding sx={{ marginY: "4px" }}>
             <ListItemButton
               onClick={toggleTheme}

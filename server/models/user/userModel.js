@@ -93,14 +93,7 @@ const userSchema = new mongoose.Schema(
     },
     batch: {
       type: String,
-      enum: [
-        "The Uniques 1.0",
-        "The Uniques 2.0",
-        "The Uniques 3.0",
-        "The Uniques 4.0",
-        "The Uniques 5.0",
-        "The Uniques 6.0",
-      ],
+      trim: true,
     },
     course: {
       type: String,

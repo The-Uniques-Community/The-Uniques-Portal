@@ -51,7 +51,7 @@ const Trainingculture = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-6 md:px-12 xl:px-6"  id="features">
-      <div className="md:w-3/3 mx-auto text-center lg:w-2/2">
+      <div className="w-full max-w-4xl mx-auto text-center">
         <h2 className="my-8 text-5xl font-bold text-gray-900 md:text-5xl">
           Technical Training Culture
         </h2>
@@ -66,7 +66,7 @@ const Trainingculture = () => {
           generation, creating a cycle of growth and innovation.
         </p>
       </div>
-      <div className="mt-16 grid  divide-gray-200 overflow-hidden rounded-3xl   text-gray-800 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
+      <div className="mt-16 grid gap-6 overflow-hidden rounded-3xl text-gray-800 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
         {features.map((feature, index) => (
           <FeatureCard key={index} {...feature} />
         ))}

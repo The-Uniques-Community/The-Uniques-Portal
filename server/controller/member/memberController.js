@@ -9,6 +9,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { bulkUploadMembers } from "./members.js";
 import Member from "../../models/member/memberModel.js";
+import { deleteFile } from "../googleDriveService.js";
 dotenv.config();
 
 /**
@@ -240,7 +241,9 @@ export const editProfile = async (req, res) => {
       member.contact = contact || member.contact;
       member.githubProfile = githubProfile || member.githubProfile;
       member.linkedinProfile = linkedinProfile || member.linkedinProfile;
-      member.bio = bio || member.bio;
+      if (bio !== undefined) {
+        member.bio = bio;
+      }
       member.instagramProfile = instagramProfile || member.instagramProfile;
   
       // Update skills and certifications
@@ -487,4 +490,50 @@ export const updateAcademics = async (req, res) => {
       res.status(500).json({ message: "Failed to update academic data", error: error.message });
     }
   };
+
+/**
+ * @desc Remove profile picture for a member
+ * @route DELETE /api/member/members/:id/profilePic
+ * @access Private (Member, Admin)
+ * @params {string} id - Member document ID
+ * @returns {Object} 200 - Success message and updated member object
+ * @returns {Object} 404 - If member not found
+ * @returns {Object} 500 - Server error
+ */
+export const deleteProfilePicture = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const member = await Member.findById(id);
+    if (!member) {
+      return res.status(404).json({ success: false, message: "Member not found" });
+    }
+
+    if (member.profilePic && member.profilePic.fileId) {
+      try {
+        await deleteFile(member.profilePic.fileId);
+      } catch (fileErr) {
+        console.error("Error deleting profile pic file from Drive:", fileErr);
+      }
+    }
+
+    member.profilePic = null;
+    member.avatarUrl = "";
+    await member.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile picture removed successfully",
+      member,
+    });
+  } catch (error) {
+    console.error("Error removing profile picture:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to remove profile picture",
+      error: error.message,
+    });
+  }
+};
+
 

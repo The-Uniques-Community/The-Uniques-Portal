@@ -40,8 +40,8 @@ const TrainerCard = ({ trainer }) => {
                 alt={trainer.name}
                 className="w-full h-full object-cover rounded-lg transform hover:rotate-0 transition-transform duration-300"
               />
-              <div className="absolute -right-2 -bottom-2 w-6 h-6 bg-[#ca0019] rounded flex items-center justify-center text-white text-xs font-mono">
-                {trainer.program.charAt(0)}
+              <div className="absolute -right-2 -bottom-2 min-w-6 h-6 px-1 bg-[#ca0019] rounded flex items-center justify-center text-white text-xs font-mono">
+                {trainer.program.match(/\d+\.\d+/)?.[0] || 'TU'}
               </div>
             </div>
             
@@ -198,7 +198,7 @@ const Trainers = () => {
       position: "Business Head, MindCodeLab",
       program: "Taught Uniques 1.0 & 2.0",
       image: "https://media.licdn.com/dms/image/v2/D5603AQFNTzTH8mq59w/profile-displayphoto-shrink_800_800/B56ZRLIxkMG8Ag-/0/1736427379944?e=1756339200&v=beta&t=BjOb7ejzjeE1HjemF5YGaOIu3XGQeb_V_nq1aYFaUq0",
-      bio: "Kapil specializes in ML, PowerBI and Full Stack Deve	lopment, bringing business insights to technical training.",
+      bio: "Kapil specializes in ML, PowerBI and Full Stack Development, bringing business insights to technical training.",
       expertise: ["ML", "PowerBI", "Full Stack"],
       social: {
         linkedin: "https://www.linkedin.com/in/kapilpartap/"

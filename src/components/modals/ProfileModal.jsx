@@ -26,7 +26,7 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import XIcon from "@mui/icons-material/X";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import BookmarkIcon from "@mui/icons-material/Bookmark";

@@ -80,7 +80,7 @@ const EventInsights = () => {
       fetchEventTasks();
     } catch (error) {
       console.error("Error marking task completed:", error);
-      toast.error("Failed to mark task completed");
+      toast.error(error.response?.data?.message || "Failed to mark task completed");
     }
   };
 

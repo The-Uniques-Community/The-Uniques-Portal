@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "@/assets/logos/theuniquesCommunity.png";
 import { RiMenu3Line, RiCloseLine } from "react-icons/ri";
 import Box from "@mui/material/Box";

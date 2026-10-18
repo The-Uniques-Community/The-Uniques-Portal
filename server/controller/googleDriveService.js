@@ -261,3 +261,27 @@ export async function getAuth() {
   getDrive();
   return auth;
 }
+
+/**
+ * @desc    Safely delete a file from Google Drive
+ * @param   {string} fileId - The ID of the file to delete
+ * @returns {Promise<boolean>} True if deleted successfully, false otherwise
+ */
+export async function deleteFile(fileId) {
+  if (!fileId) return false;
+  const driveClient = getDrive();
+  if (!driveClient) {
+    console.warn('Warning: Google Drive client not initialized. Skipping file deletion on Drive.');
+    return false;
+  }
+  try {
+    await driveClient.files.delete({
+      fileId,
+      supportsAllDrives: true,
+    });
+    return true;
+  } catch (error) {
+    console.error(`Error deleting file ${fileId} from Google Drive:`, error.message);
+    return false;
+  }
+}

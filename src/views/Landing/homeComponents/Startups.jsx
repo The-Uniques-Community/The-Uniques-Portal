@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getYouTubeEmbedUrl, isYouTubeUrl } from "@/utils/videoUtils";
 
 function Startups() {
   // Default to step 2 (Copy The Snippet) if desired
@@ -134,26 +135,29 @@ function Startups() {
             <div className="relative w-full">
               {activeStep === 1 && (
                 <iframe
-                  src="https://godigitify.com/"
-
+                  src={isYouTubeUrl("https://godigitify.com/") ? getYouTubeEmbedUrl("https://godigitify.com/") : "https://godigitify.com/"}
                   title="Find The Perfect Component"
                   className="w-full h-[315px] rounded-lg shadow-3xl"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 ></iframe>
               )}
               {activeStep === 2 && (
                 <iframe
-                  src="https://techlearns.in/"
-
+                  src={isYouTubeUrl("https://techlearns.in/") ? getYouTubeEmbedUrl("https://techlearns.in/") : "https://techlearns.in/"}
                   title="Copy The Snippet"
                   className="w-full h-[315px] rounded-lg shadow-3xl"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 ></iframe>
               )}
               {activeStep === 3 && (
                 <iframe
-                  // src="https://img.freepik.com/free-vector/abstract-coming-soon-new-arrival-background-with-splatter-effect_1017-54591.jpg?t=st=1743371449~exp=1743375049~hmac=16cb316dc6831d63ec18fbf3c259c8f415f6c9c88952fbb5ccd4ea9f1cd4eb83&w=370&auto=format"
-                  src="https://www.wirely.in/"
+                  src={isYouTubeUrl("https://www.wirely.in/") ? getYouTubeEmbedUrl("https://www.wirely.in/") : "https://www.wirely.in/"}
                   title="Make It Yours"
-                  className="w-full h-[315px] rounded-lg shadow-3xl"z
+                  className="w-full h-[315px] rounded-lg shadow-3xl"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 ></iframe>
               )}
             </div>

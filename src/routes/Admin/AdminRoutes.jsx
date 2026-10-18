@@ -33,6 +33,10 @@ const AdminRoutes = {
       element: <AdminDashboard />,
     },
     {
+      path: "/admin/dashboard",
+      element: <AdminDashboard />,
+    },
+    {
       path: "/admin/members-overview",
       element: <Member />,
     },

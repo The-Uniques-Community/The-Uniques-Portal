@@ -1,7 +1,7 @@
 import { useTheme } from "@mui/material";
 import { FaLinkedinIn, FaTwitter, FaInstagram, FaGithub, FaWhatsapp } from "react-icons/fa";
 import logo from "@/assets/logos/theuniquesCommunity.png";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import WhatsApp from '@mui/icons-material/WhatsApp';
 
 const Footer = () => {

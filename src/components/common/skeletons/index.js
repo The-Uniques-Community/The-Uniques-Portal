@@ -9,3 +9,4 @@ export { default as TableSkeleton } from "./TableSkeleton";
 export { default as StatsSkeleton } from "./StatsSkeleton";
 export { default as FeedSkeleton } from "./FeedSkeleton";
 export { default as WorkspaceSkeleton } from "./WorkspaceSkeleton";
+export { default as PageSkeleton } from "./PageSkeleton";

@@ -1,4 +1,4 @@
-import axios from "axios";
+import apiClient from "@/services/apiClient";
 import { BASE_URL } from "@/config";
 import uniques1 from "@/assets/img/About/uniques1.webp";
 import uniques2 from "@/assets/img/About/uniques2.webp";
@@ -107,7 +107,7 @@ export const getStoredBatchProfiles = () => {
 
 export const fetchBatchProfiles = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/api/batches/profiles`);
+    const response = await apiClient.get(`${BASE_URL}/api/batches/profiles`);
     if (response.data && response.data.success && Array.isArray(response.data.data)) {
       const remoteProfiles = response.data.data.map((p) => {
         const defaultMatch = DEFAULT_BATCH_PROFILES.find((d) => d.label === p.label || d.id === p.id);
@@ -146,7 +146,7 @@ export const saveStoredBatchProfiles = async (profiles) => {
 
     localStorage.setItem(PROFILES_STORAGE_KEY, JSON.stringify(toSave));
     window.dispatchEvent(new CustomEvent("batch-profiles-updated", { detail: profiles }));
-    await axios.post(`${BASE_URL}/api/batches/profiles/update`, { profiles: toSave });
+    await apiClient.post(`${BASE_URL}/api/batches/profiles/update`, { profiles: toSave });
     return true;
   } catch (err) {
     console.error("Error saving batch profiles:", err);

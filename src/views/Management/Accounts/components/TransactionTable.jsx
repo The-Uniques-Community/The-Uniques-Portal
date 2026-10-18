@@ -70,7 +70,7 @@ import Preview from '@mui/icons-material/Preview';
 import Close from '@mui/icons-material/Close';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
-import axios from "axios";
+import apiClient from "@/services/apiClient";
 // Import date-fns without destructuring to avoid the missing module error
 import * as dateFns from 'date-fns';
 import tu from '@/assets/logos/tu.png';
@@ -137,7 +137,7 @@ const FinePaymentModal = ({ open, onClose, memberId, fine, onPaymentComplete }) 
       });
 
       // Upload the file
-      const uploadResponse = await axios.post(
+      const uploadResponse = await apiClient.post(
         UPLOAD_API_URL,
         formData,
         {
@@ -156,7 +156,7 @@ const FinePaymentModal = ({ open, onClose, memberId, fine, onPaymentComplete }) 
         const fileId = uploadResponse.data.files[0]._id;
         
         // Update the fine status and attach the proof
-        const updateResponse = await axios.patch(
+        const updateResponse = await apiClient.patch(
           `${API_BASE_URL}/members/${memberId}/fines/${fine._id}`,
           {
             status: 'paid',
@@ -453,7 +453,7 @@ const FineTable = () => {
   // Get fine statistics
   const fetchFineStatistics = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/fines/statistics`);
+      const response = await apiClient.get(`${API_BASE_URL}/fines/statistics`);
       setStatistics(response.data.data);
     } catch (error) {
       console.error("Error fetching fine statistics:", error);
@@ -493,7 +493,7 @@ const FineTable = () => {
         params.status = statusFilter.toLowerCase();
       }
       
-      const response = await axios.get(endpoint, { params });
+      const response = await apiClient.get(endpoint, { params });
       
       if (response.data && response.data.success) {
         setFines(response.data.data.members || []);
@@ -528,7 +528,8 @@ const FineTable = () => {
     try {
       setLoading(true);
       
-      await axios.post(`${API_BASE_URL}/members/${selectedMember._id}/fines`, {
+      const targetMemberId = selectedMember._id || selectedMember.id;
+      await apiClient.post(`${API_BASE_URL}/members/${targetMemberId}/fines`, {
         amount: Number(fineAmount),
         reason: fineReason,
         dateImposed: fineDate
@@ -564,7 +565,7 @@ const FineTable = () => {
     try {
       setLoading(true);
       
-      await axios.patch(`${API_BASE_URL}/members/${memberId}/fines/${fineId}`, {
+      await apiClient.patch(`${API_BASE_URL}/members/${memberId}/fines/${fineId}`, {
         status: newStatus
       });
       
@@ -594,7 +595,8 @@ const FineTable = () => {
     try {
       setLoading(true);
       
-      await axios.delete(`${API_BASE_URL}/members/${fineToDelete.memberId}/fines/${fineToDelete.fineId}`);
+      const targetMemberId = fineToDelete.memberId || fineToDelete.member?._id || fineToDelete.member?.id;
+      await apiClient.delete(`${API_BASE_URL}/members/${targetMemberId}/fines/${fineToDelete.fineId}`);
       
       setAlert({
         open: true,
@@ -602,6 +604,27 @@ const FineTable = () => {
         severity: "success"
       });
       
+      // Update selectedFine dialog state on successful deletion so the dialog immediately updates without closing
+      if (selectedFine && selectedFine.fines) {
+        const updatedFines = selectedFine.fines.filter(f => (f._id || f.id) !== fineToDelete.fineId);
+        const removedAmount = Number(fineToDelete.amount) || 0;
+        setSelectedFine(prev => {
+          if (!prev) return prev;
+          const oldTotals = prev.totals || {};
+          return {
+            ...prev,
+            fines: updatedFines,
+            totals: {
+              ...oldTotals,
+              totalAmount: Math.max(0, (oldTotals.totalAmount || 0) - removedAmount),
+              pendingAmount: Math.max(0, (oldTotals.pendingAmount || 0) - removedAmount),
+              pendingCount: Math.max(0, (oldTotals.pendingCount || 0) - 1),
+              totalCount: Math.max(0, (oldTotals.totalCount || 0) - 1),
+            }
+          };
+        });
+      }
+
       // Reset state and close modal
       setFineToDelete(null);
       setOpenDeleteConfirmModal(false);
@@ -623,11 +646,13 @@ const FineTable = () => {
     try {
       setLoading(true);
       
+      const targetMemberId = member._id || member.id;
       // Get complete fine history for the member
-      const response = await axios.get(`${API_BASE_URL}/members/${member.id}/fines`);
+      const response = await apiClient.get(`${API_BASE_URL}/members/${targetMemberId}/fines`);
       
       setSelectedFine({
         member,
+        memberId: targetMemberId,
         fines: response.data.data.fines,
         totals: response.data.data.totals
       });
@@ -652,7 +677,7 @@ const FineTable = () => {
     try {
       setSearchLoading(true);
       
-      const response = await axios.get(`${API_BASE_URL}/members/search`, {
+      const response = await apiClient.get(`${API_BASE_URL}/members/search`, {
         params: {
           query: searchQuery,
           batch: batchFilter !== "All Batches" ? batchFilter : undefined,
@@ -1152,7 +1177,7 @@ const FineTable = () => {
                                 sx={{ ml: 1 }}
                                 onClick={() => {
                                   setFineToDelete({
-                                    memberId: selectedFine.member.id,
+                                    memberId: selectedFine.memberId || selectedFine.member?._id || selectedFine.member?.id || selectedFine._id || selectedFine.id,
                                     fineId: fine._id,
                                     amount: fine.amount
                                   });
@@ -1231,7 +1256,7 @@ const FineTable = () => {
                                     color="error"
                                     onClick={() => {
                                       setFineToDelete({
-                                        memberId: selectedFine.member.id,
+                                        memberId: selectedFine.memberId || selectedFine.member?._id || selectedFine.member?.id || selectedFine._id || selectedFine.id,
                                         fineId: fine._id,
                                         amount: fine.amount
                                       });
@@ -1608,7 +1633,7 @@ const FineTable = () => {
       <FinePaymentModal
         open={openPaymentModal}
         onClose={() => setOpenPaymentModal(false)}
-        memberId={selectedFine?.member?.id}
+        memberId={selectedFine?.memberId || selectedFine?.member?._id || selectedFine?.member?.id || selectedFine?._id || selectedFine?.id}
         fine={selectedFineForPayment}
         onPaymentComplete={handlePaymentComplete}
       />

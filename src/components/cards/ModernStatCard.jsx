@@ -114,7 +114,9 @@ const ModernStatCard = ({
     </Paper>
   );
 
-  if (link) {
+  const hasValidLink = Boolean(link && typeof link === "string" && link.trim() !== "");
+
+  if (hasValidLink) {
     return (
       <Link to={link} style={{ textDecoration: "none", width: "100%" }}>
         {cardContent}
@@ -122,7 +124,11 @@ const ModernStatCard = ({
     );
   }
 
-  return cardContent;
+  return (
+    <Box sx={{ width: "100%" }}>
+      {cardContent}
+    </Box>
+  );
 };
 
 export default ModernStatCard;

@@ -111,3 +111,5 @@ export const updateBenefitsCards = async (req, res) => {
     res.status(500).json({ success: false, message: "Error updating benefits cards", error: error.message });
   }
 };
+
+export const updateCommunityBenefits = updateBenefitsCards;

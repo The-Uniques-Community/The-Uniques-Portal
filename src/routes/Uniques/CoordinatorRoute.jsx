@@ -33,6 +33,10 @@ const CoordinatorRoute = {
       element: <CoordinatorDashboard />,
     },
     {
+      path: "/coordinator/dashboard",
+      element: <CoordinatorDashboard />,
+    },
+    {
       path: "/coordinator/members-overview",
       element: <Member />,
     },

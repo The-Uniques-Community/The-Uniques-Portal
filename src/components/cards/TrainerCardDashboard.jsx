@@ -29,7 +29,7 @@ import LoginIcon from "@mui/icons-material/Login";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import tu from "@/assets/logos/tu.png";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import userIcon from "@/assets/img/user-icon.png";
 import "tailwindcss/tailwind.css";
 

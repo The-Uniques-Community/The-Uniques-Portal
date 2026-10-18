@@ -1,7 +1,7 @@
 import React from 'react'
 import ModernHeader from '@/components/headers/ModernHeader';
 import FourPhase from './components/FourPhase'
-import trainingMethod from '@/assets/img/trainingMethod.png'
+import TrainingFlow from './components/TrainingFlow'
 import Trainingculture from './components/Trainingculture'
 import CallToAction from '../homeComponents/CallToAction'
 import TrainingTimeline from './components/TrainingTimeLine'
@@ -18,8 +18,8 @@ const Training = () => {
 		<FourPhase />
 		<div className='p-10 '></div>
 		<Trainingculture />
-		<div className='container w-9/12 mx-auto px-4 py-8'>
-			<img src={trainingMethod} />
+		<div className='container max-w-6xl mx-auto px-4 py-8'>
+			<TrainingFlow />
 		</div>
 		<div className='p-10 '></div>
 		<Trainers />

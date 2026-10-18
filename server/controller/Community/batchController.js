@@ -4,6 +4,7 @@
  * @architecture Mounted at `/api/batches` via `batchRoute.js`. Interacts with `BatchName` and `BatchProfile` models.
  * @agent_note Automatically seeds default batch cohorts (1.0 to 6.0) and descriptive batch profile cards when database collections are initially empty.
  */
+import mongoose from "mongoose";
 import { BatchProfile, BatchName } from "../../models/community/batchModel.js";
 
 const DEFAULT_BATCHES = [
@@ -191,5 +192,82 @@ export const saveBatchProfiles = async (req, res) => {
   } catch (error) {
     console.error("Error saving batch profiles:", error);
     res.status(500).json({ success: false, message: "Error saving batch profiles", error: error.message });
+  }
+};
+
+/**
+ * @desc Delete a registered batch by document ID
+ * @route DELETE /api/batches/:id
+ * @access Private (Admin / Coordinator)
+ * @params {string} id - Batch ObjectId
+ * @returns {Object} 200 - Confirmation and deleted document
+ */
+export const deleteBatchById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let deleted = null;
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      deleted = await BatchName.findByIdAndDelete(id);
+    }
+    if (!deleted) {
+      deleted = await BatchName.findOneAndDelete({ _id: id }).catch(() => null);
+    }
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: "Batch not found" });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Batch deleted successfully",
+      data: deleted,
+    });
+  } catch (error) {
+    console.error("Error deleting batch by ID:", error);
+    return res.status(500).json({ success: false, message: "Error deleting batch", error: error.message });
+  }
+};
+
+/**
+ * @desc Delete a registered batch by name
+ * @route DELETE /api/batches/name/:name
+ * @access Private (Admin / Coordinator)
+ * @params {string} name - Batch cohort name
+ * @returns {Object} 200 - Confirmation and deleted document
+ */
+export const deleteBatchByName = async (req, res) => {
+  try {
+    const { name } = req.params;
+    if (!name || !name.trim()) {
+      return res.status(400).json({ success: false, message: "Batch name is required" });
+    }
+
+    const decodedName = decodeURIComponent(name).trim();
+    let normalizedName = decodedName;
+    if (!normalizedName.toLowerCase().startsWith("the uniques") && !normalizedName.toLowerCase().startsWith("uniques")) {
+      normalizedName = `The Uniques ${normalizedName}`;
+    } else if (normalizedName.toLowerCase().startsWith("uniques")) {
+      normalizedName = `The ${normalizedName}`;
+    }
+
+    const escapedDecoded = decodedName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const deleted = await BatchName.findOneAndDelete({
+      $or: [
+        { name: decodedName },
+        { name: normalizedName },
+        { name: new RegExp(`^${escapedDecoded}$`, 'i') },
+      ],
+    });
+
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: "Batch not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Batch deleted successfully",
+      data: deleted,
+    });
+  } catch (error) {
+    console.error("Error deleting batch by name:", error);
+    return res.status(500).json({ success: false, message: "Error deleting batch by name", error: error.message });
   }
 };

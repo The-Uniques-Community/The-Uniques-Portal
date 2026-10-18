@@ -10,6 +10,8 @@ import {
   addBatch,
   getBatchProfiles,
   saveBatchProfiles,
+  deleteBatchById,
+  deleteBatchByName,
 } from "../../controller/Community/batchController.js";
 import verifyToken from "../../middlewares/verifyToken.js";
 import verifyRole from "../../middlewares/verifyRole.js";
@@ -21,5 +23,7 @@ router.post("/add", verifyToken, verifyRole(["admin", "coordinator"]), addBatch)
 router.get("/profiles", getBatchProfiles);
 router.post("/profiles/update", verifyToken, verifyRole(["admin", "coordinator"]), saveBatchProfiles);
 router.put("/profiles/update", verifyToken, verifyRole(["admin", "coordinator"]), saveBatchProfiles);
+router.delete("/name/:name", verifyToken, verifyRole(["admin", "coordinator"]), deleteBatchByName);
+router.delete("/:id", verifyToken, verifyRole(["admin", "coordinator"]), deleteBatchById);
 
 export default router;

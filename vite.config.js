@@ -37,6 +37,7 @@ function muiIconsDirectImport() {
 export default defineConfig({
   plugins: [muiIconsDirectImport(), react()],
   resolve: {
+    dedupe: ['react', 'react-dom', 'react-router', 'react-router-dom', '@emotion/react', '@mui/material'],
     alias: {
       '@': path.resolve(__dirname, 'src')
     }

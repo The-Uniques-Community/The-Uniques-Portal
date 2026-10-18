@@ -53,7 +53,7 @@ import * as Yup from "yup";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import RefreshIcon from "@mui/icons-material/Refresh";
-import CustomLoader from "@/components/common/loaders/CustomLoader";
+import { CardSkeleton } from "@/components/common/skeletons";
 import tu from "@/assets/logos/tu.png";
 import ModernTable from "@/components/tables/ModernTable";
 
@@ -262,7 +262,6 @@ const Trainers = () => {
     return (
         <Box sx={{ width: "100%", typography: "body1", p: 3 }}>
             <ToastContainer position="top-right" autoClose={3000} />
-            {loading && <CustomLoader />}
             <ModernHeader
                 title="Trainers"
                 highlight="Overview"
@@ -336,26 +335,31 @@ const Trainers = () => {
 
                 {/* Profiles Tab */}
                 <TabPanel value="1" sx={{ p: 0 }}>
-                    <div className="grid xl:grid-cols-4 md:grid-cols-3 grid-cols-1 sm:grid-cols-1 gap-4">
-                        {filteredTrainers.length > 0 ? (
-                            filteredTrainers.map((trainer) => (
-                                <TrainerCardDashboard
-                                    key={trainer._id}
-                                    user={trainer}
-                                />
-                            ))
-                        ) : (
-                            <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center', mt: 4 }}>
-                                No trainers found matching your search.
-                            </Typography>
-                        )}
-                    </div>
+                    {loading ? (
+                        <CardSkeleton type="trainer" count={8} />
+                    ) : (
+                        <div className="grid xl:grid-cols-4 md:grid-cols-3 grid-cols-1 sm:grid-cols-1 gap-4">
+                            {filteredTrainers.length > 0 ? (
+                                filteredTrainers.map((trainer) => (
+                                    <TrainerCardDashboard
+                                        key={trainer._id}
+                                        user={trainer}
+                                    />
+                                ))
+                            ) : (
+                                <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center', mt: 4 }}>
+                                    No trainers found matching your search.
+                                </Typography>
+                            )}
+                        </div>
+                    )}
                 </TabPanel>
 
                 {/* Manage Tab */}
                 <TabPanel value="2" sx={{ p: 0 }}>
                     <ModernTable
                         title="Manage Trainers"
+                        loading={loading}
                         columns={[
                             { id: "name", label: "Name" },
                             { id: "email", label: "Email" },
@@ -422,11 +426,26 @@ const Trainers = () => {
             </TabContext>
 
             {/* Add/Edit Dialog */}
-            <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
+            <Dialog 
+                open={openDialog} 
+                onClose={handleCloseDialog} 
+                fullWidth 
+                maxWidth="sm"
+                PaperProps={{
+                    "data-lenis-prevent": "true",
+                    onWheel: (e) => e.stopPropagation(),
+                    sx: { overscrollBehavior: "contain" }
+                }}
+            >
                 <DialogTitle sx={{ fontWeight: 'bold' }}>
                     {selectedTrainer ? "Edit Trainer" : "Add New Trainer"}
                 </DialogTitle>
-                <DialogContent dividers>
+                <DialogContent 
+                    dividers
+                    data-lenis-prevent="true"
+                    onWheel={(e) => e.stopPropagation()}
+                    sx={{ overscrollBehavior: "contain" }}
+                >
                     <form onSubmit={formik.handleSubmit}>
                         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: 2 }}>
                             <Box sx={{ gridColumn: 'span 12' }}>

@@ -260,7 +260,7 @@ export const NewMember = ({ user, refreshData }) => {
           backgroundColor: theme.palette.background.paper,
           borderColor: theme.palette.divider,
         }}
-        className="rounded-2xl shadow-lg border p-4 xl:max-w-[30px] xl:min-w-[350px] max-w-80 min-w-80"
+        className="rounded-2xl shadow-lg border p-4 xl:max-w-[350px] xl:min-w-[350px] max-w-80 min-w-80"
       >
         <CardContent className="flex flex-col gap-2">
           {/* Status Tags */}
@@ -275,11 +275,11 @@ export const NewMember = ({ user, refreshData }) => {
             </div>
             <span
               className={`${getStatusColor(
-                user.profileStatus
+                user?.profileStatus || "active"
               )} text-white text-sm px-3 py-1 rounded-full`}
             >
-              {user.profileStatus.charAt(0).toUpperCase() +
-                user.profileStatus.slice(1)}
+              {(user?.profileStatus || "active").charAt(0).toUpperCase() +
+                (user?.profileStatus || "active").slice(1)}
             </span>
           </div>
 
@@ -400,8 +400,8 @@ export const NewMember = ({ user, refreshData }) => {
             <div className="flex flex-wrap gap-2">
               <Chip
                 icon={<BadgeIcon />}
-                label={user.profileStatus.toUpperCase()}
-                className={`${getStatusColor(user.profileStatus)} text-white`}
+                label={(user?.profileStatus || "active").toUpperCase()}
+                className={`${getStatusColor(user?.profileStatus || "active")} text-white`}
               />
               {user.isSuspended && (
                 <Chip

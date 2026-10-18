@@ -325,17 +325,28 @@ export const deleteMember = async (req, res) => {
  */
 export const getAllMembers = async (req, res) => {
   try {
-    const { sortBy = 'createdAt', order = 'desc' } = req.query;
+    const { sortBy = 'createdAt', order = 'desc', search } = req.query;
 
     // Create sort object
     const sortOptions = {};
     sortOptions[sortBy] = order === 'desc' ? -1 : 1;
 
+    const query = {};
+    if (search && search.trim() !== '') {
+      const escaped = search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const searchRegex = new RegExp(escaped, 'i');
+      query.$or = [
+        { fullName: searchRegex },
+        { email: searchRegex },
+        { admno: searchRegex },
+      ];
+    }
+
     // Get total count
-    const total = await Member.countDocuments();
+    const total = await Member.countDocuments(query);
 
     // Fetch all members without pagination and populate needed fields
-    const members = await Member.find()
+    const members = await Member.find(query)
       .select('-password')
       .populate('event_participation')
       .sort(sortOptions);
@@ -448,15 +459,32 @@ export const getMembersByBatch = async (req, res) => {
  */
 export const getMembersByFineStatus = async (req, res) => {
   try {
-    // If fineStatus is a string that represents a number, we can query members with fines > 0
-    const members = await Member.find({
-      fineStatus: { $ne: "0" }
-    }).select('-password');
+    const filter = { 'fines.0': { $exists: true } };
+    if (req.query.batch) {
+      filter.batch = req.query.batch;
+    }
+
+    const members = await Member.find(filter).select('-password');
+
+    const formattedMembers = members.map(member => {
+      const memberObj = member.toObject ? member.toObject() : { ...member };
+      const fines = memberObj.fines || [];
+      const totalAmount = fines.reduce((sum, f) => sum + (Number(f.amount) || 0), 0);
+      const totalPendingAmount = fines
+        .filter(f => f.status === 'pending')
+        .reduce((sum, f) => sum + (Number(f.amount) || 0), 0);
+
+      return {
+        ...memberObj,
+        totalAmount,
+        totalPendingAmount
+      };
+    });
 
     return res.status(200).json({
       success: true,
-      count: members.length,
-      data: members
+      count: formattedMembers.length,
+      data: formattedMembers
     });
   } catch (error) {
     console.error('Error fetching members with fines:', error);

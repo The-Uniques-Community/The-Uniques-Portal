@@ -14,19 +14,21 @@ import {
   Typography,
   LinearProgress,
 } from "@mui/material";
+import { TableSkeleton } from "@/components/common/skeletons";
 
 const ModernTable = ({
   title,
   description,
   columns,
-  data,
+  data = [],
   renderRow,
   containerStyles = {},
+  loading = false,
+  skeletonRows = 6,
 }) => {
   return (
     <Paper
       elevation={0}
-      data-lenis-prevent="true"
       sx={{
         borderRadius: "12px",
         overflow: "hidden",
@@ -65,9 +67,7 @@ const ModernTable = ({
 
       {/* Structured Content Grid Container */}
       <TableContainer
-        data-lenis-prevent="true"
         className="hide-scrollbar"
-        onWheel={(e) => e.stopPropagation()}
         style={{
           scrollbarWidth: "none",
           msOverflowStyle: "none",
@@ -75,7 +75,7 @@ const ModernTable = ({
         sx={{
           maxHeight: 520,
           overflowY: "auto",
-          overscrollBehavior: "contain",
+          overscrollBehavior: "auto",
           scrollbarWidth: "none",
           msOverflowStyle: "none",
           "&::-webkit-scrollbar": {
@@ -119,18 +119,36 @@ const ModernTable = ({
           </TableHead>
 
           <TableBody>
-            {data.map((row, index) => (
-              <TableRow
-                key={row._id || index}
-                hover
-                sx={{
-                  "&:last-child td, &:last-child th": { border: 0 },
-                  transition: "background-color 0.15s ease",
-                }}
-              >
-                {renderRow(row)}
+            {loading ? (
+              <TableSkeleton
+                rows={skeletonRows}
+                columns={columns.length}
+                insideTable={true}
+              />
+            ) : Array.isArray(data) && data.length > 0 ? (
+              data.map((row, index) => (
+                <TableRow
+                  key={row._id || index}
+                  hover
+                  sx={{
+                    "&:last-child td, &:last-child th": { border: 0 },
+                    transition: "background-color 0.15s ease",
+                  }}
+                >
+                  {renderRow(row)}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  align="center"
+                  sx={{ py: 6, color: "text.secondary" }}
+                >
+                  No records found
+                </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </TableContainer>

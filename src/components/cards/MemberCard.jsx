@@ -2,7 +2,7 @@ import { useTheme } from "@mui/material/styles";
 import { FaLinkedinIn, FaInstagram } from "react-icons/fa";
 import { GoArrowUpRight } from "react-icons/go";
 import { FaXTwitter } from "react-icons/fa6";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@/components/buttons/Button";

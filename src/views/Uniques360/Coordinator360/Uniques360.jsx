@@ -182,7 +182,7 @@ const Uniques360Coordinator = () => {
   };
 
   // ================= UPDATE STATUS =================
-  const handleStatusUpdate = async (taskId, newStatus) => {
+  const handleStatusUpdate = async (taskId, newStatus = "completed") => {
     try {
       await axios.patch(
         `${BASE_URL}/api/uniques360/tasks/${taskId}`,
@@ -624,7 +624,7 @@ const Uniques360Coordinator = () => {
               setTeamSelectedRole("");
               setTeamOpen(true);
             }}
-            onMarkComplete={handleStatusUpdate}
+            onMarkComplete={(taskId) => handleStatusUpdate(taskId, "completed")}
             onDelete={handleDeleteTask}
           />
         </Box>

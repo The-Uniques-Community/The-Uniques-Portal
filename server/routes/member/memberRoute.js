@@ -18,6 +18,7 @@ import {
   updateInternships,
   updateEvents,
   updateAcademics,
+  deleteProfilePicture,
 } from '../../controller/member/memberController.js';
 import { updateMemberFines } from '../../controller/member/members.js';
 import Member from '../../models/member/memberModel.js';
@@ -33,6 +34,7 @@ memberRoute.post('/logout', logout);
 
 // Self-service member endpoints guarded by verifyToken and verifySelfOrAdmin
 memberRoute.put('/members/:id/editProfile', verifyToken, verifySelfOrAdmin('id'), editProfile);
+memberRoute.delete('/members/:id/profilePic', verifyToken, verifySelfOrAdmin('id'), deleteProfilePicture);
 memberRoute.get('/getProfile', verifyToken, getProfile);
 memberRoute.post('/bulk-upload', verifyToken, verifyRole(['admin']), uploadDummyMembers);
 

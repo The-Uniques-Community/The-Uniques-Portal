@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { NewMember } from "../dashboardComponents/NewMember";
 import ModernStatCard from "@/components/cards/ModernStatCard";
 import Groups2 from '@mui/icons-material/Groups2';
@@ -570,6 +571,8 @@ const FineDetailsModal = ({ open, onClose, selectedFine, onPayFine, loading, onV
 
 const ManagementDashboard = () => {
   const theme = useTheme();
+  const location = useLocation();
+  const basePath = location.pathname.startsWith('/coordinator') ? '/coordinator' : '/admin';
 
   // State for storing fetched data
   const [members, setMembers] = useState([]);
@@ -890,6 +893,7 @@ const ManagementDashboard = () => {
               value={stats.totalMembers}
               color="#2196F3"
               gradient="radial-gradient(circle at 80% 20%, rgba(33, 150, 243, 0.15) 0%, transparent 50%)"
+              link={`${basePath}/members-overview`}
             />
             <ModernStatCard
               icon={<CurrencyRupeeIcon fontSize="large" />}
@@ -897,6 +901,7 @@ const ManagementDashboard = () => {
               value={stats.totalFine}
               color="#FFA500"
               gradient="radial-gradient(circle at 80% 20%, rgba(255, 165, 0, 0.15) 0%, transparent 50%)"
+              link={`${basePath}/accounts`}
             />
             <ModernStatCard
               icon={<EventAvailableIcon fontSize="large" />}
@@ -904,6 +909,7 @@ const ManagementDashboard = () => {
               value={stats.totalEvents}
               color="#4CAF50"
               gradient="radial-gradient(circle at 80% 20%, rgba(76, 175, 80, 0.15) 0%, transparent 50%)"
+              link={`${basePath}/events-overview`}
             />
             <ModernStatCard
               icon={<LocationCityIcon fontSize="large" />}
@@ -1002,7 +1008,7 @@ const ManagementDashboard = () => {
           Member Filters
         </h2>
 
-        <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
+        <Box sx={{ borderBottom: (theme) => `1px solid ${theme.palette.divider}`, mb: 2 }}>
           <Tabs
             value={tableView}
             onChange={handleTableViewChange}

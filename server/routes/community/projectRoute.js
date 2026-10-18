@@ -19,8 +19,8 @@ const router = express.Router();
 
 router.get("/", getAllProjects);
 router.get("/:id", getProjectById);
-router.post("/", verifyToken, verifyRole(["admin", "coordinator"]), createProject);
-router.put("/:id", verifyToken, verifyRole(["admin", "coordinator"]), updateProject);
-router.delete("/:id", verifyToken, verifyRole(["admin", "coordinator"]), deleteProject);
+router.post("/", verifyToken, verifyRole(["admin", "coordinator", "communityadmin"]), createProject);
+router.put("/:id", verifyToken, verifyRole(["admin", "coordinator", "communityadmin"]), updateProject);
+router.delete("/:id", verifyToken, verifyRole(["admin", "coordinator", "communityadmin"]), deleteProject);
 
 export default router;

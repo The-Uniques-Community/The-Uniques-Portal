@@ -17,7 +17,6 @@ import {
   Alert,
   Button,
   Snackbar,
-  Badge,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -51,18 +50,6 @@ const MembersIndex = () => {
   // Search state
   const [search, setSearch] = useState("");
   const [searchTimeout, setSearchTimeout] = useState(null);
-
-  // Tab counts (for badges)
-  const [tabCounts, setTabCounts] = useState({
-    all: 0,
-    batch1: 0,
-    batch2: 0,
-    batch3: 0,
-    batch4: 0,
-    batch5: 0,
-    batch6: 0,
-    blocked: 0
-  });
 
   // Alert state
   const [alert, setAlert] = useState({
@@ -107,59 +94,8 @@ const MembersIndex = () => {
     }
   };
 
-  // Fetch tab counts for badges
-  const fetchTabCounts = async () => {
-    try {
-      // Get total count
-      const totalResponse = await axios.get(`${BASE_URL}/api/admin/member/count`);
-
-      // Get batch counts
-      const batch1Response = await axios.get(`${BASE_URL}/api/admin/member/count`, {
-        params: { batch: "The Uniques 1.0" }
-      });
-
-      const batch2Response = await axios.get(`${BASE_URL}/api/admin/member/count`, {
-        params: { batch: "The Uniques 2.0" }
-      });
-
-      const batch3Response = await axios.get(`${BASE_URL}/api/admin/member/count`, {
-        params: { batch: "The Uniques 3.0" }
-      });
-
-      const batch4Response = await axios.get(`${BASE_URL}/api/admin/member/count`, {
-        params: { batch: "The Uniques 4.0" }
-      });
-
-      const batch5Response = await axios.get(`${BASE_URL}/api/admin/member/count`, {
-        params: { batch: "The Uniques 5.0" }
-      });
-
-      const batch6Response = await axios.get(`${BASE_URL}/api/admin/member/count`, {
-        params: { batch: "The Uniques 6.0" }
-      });
-
-      // Get blocked count
-      const blockedResponse = await axios.get(`${BASE_URL}/api/admin/member/count`, {
-        params: { isSuspended: true }
-      });
-
-      setTabCounts({
-        all: totalResponse.data.count || 0,
-        batch1: batch1Response.data.count || 0,
-        batch2: batch2Response.data.count || 0,
-        batch3: batch3Response.data.count || 0,
-        batch4: batch4Response.data.count || 0,
-        batch5: batch5Response.data.count || 0,
-        batch6: batch6Response.data.count || 0,
-        blocked: blockedResponse.data.count || 0
-      });
-    } catch (err) {
-      console.error("Error fetching tab counts:", err);
-    }
-  };
-
   // Fetch members data
-  const fetchMembers = async () => {
+  const fetchMembers = async (searchQuery = search) => {
     try {
       setLoading(true);
 
@@ -167,7 +103,7 @@ const MembersIndex = () => {
       const params = {
         page,
         limit,
-        search: search || undefined
+        search: searchQuery || undefined
       };
 
       // Add batch filter if on batch-specific tab
@@ -202,12 +138,12 @@ const MembersIndex = () => {
       } else if (value === "7") {
         filteredMembers = filteredMembers.filter(member => member.batch === "The Uniques 6.0");
       } else if (value === "8") {
-        filteredMembers = filteredMembers.filter(member => member.isSuspended === true);
+        filteredMembers = filteredMembers.filter(member => member.isSuspended === true || member.profileStatus === "blocked");
       }
 
       // Update state with filtered data
       setMembers(filteredMembers);
-      setTotalPages(Math.ceil((response.data.pagination?.total || 0) / limit));
+      setTotalPages(Math.ceil((response.data.pagination?.total || response.data.count || 0) / limit));
       setError(null);
     } catch (err) {
       console.error("Error fetching members:", err);
@@ -236,7 +172,7 @@ const MembersIndex = () => {
     // Set new timeout to delay API call while typing
     const timeout = setTimeout(() => {
       setPage(1); // Reset to first page when searching
-      fetchMembers();
+      fetchMembers(query);
     }, 500);
 
     setSearchTimeout(timeout);
@@ -337,7 +273,6 @@ const MembersIndex = () => {
 
         // Refresh data
         fetchMembers();
-        fetchTabCounts();
 
         // Reset form
         setNewMember({
@@ -418,7 +353,6 @@ const MembersIndex = () => {
         });
         setEditMemberOpen(false);
         fetchMembers(); // Refresh list
-        fetchTabCounts(); // Refresh counts
       }
     } catch (err) {
       console.error("Error updating member:", err);
@@ -460,7 +394,6 @@ const MembersIndex = () => {
         setDeleteConfirmationOpen(false);
         setMemberToDelete(null);
         fetchMembers(); // Refresh list
-        fetchTabCounts(); // Refresh counts
       }
     } catch (err) {
       console.error("Error deleting member:", err);
@@ -474,11 +407,6 @@ const MembersIndex = () => {
       setDeleteMemberLoading(false);
     }
   };
-
-  // Initialize data on component mount
-  useEffect(() => {
-    fetchTabCounts();
-  }, []);
 
   // Fetch members when tab, page changes, or after a search
   useEffect(() => {
@@ -521,70 +449,14 @@ const MembersIndex = () => {
               }
             }}
           >
-            <Tab
-              label={
-                <Badge badgeContent={tabCounts.all} color="primary" max={999}>
-                  All Members
-                </Badge>
-              }
-              value="1"
-            />
-            <Tab
-              label={
-                <Badge badgeContent={tabCounts.batch1} color="primary" max={999}>
-                  The Uniques 1.0
-                </Badge>
-              }
-              value="2"
-            />
-            <Tab
-              label={
-                <Badge badgeContent={tabCounts.batch2} color="primary" max={999}>
-                  The Uniques 2.0
-                </Badge>
-              }
-              value="3"
-            />
-            <Tab
-              label={
-                <Badge badgeContent={tabCounts.batch3} color="primary" max={999}>
-                  The Uniques 3.0
-                </Badge>
-              }
-              value="4"
-            />
-            <Tab
-              label={
-                <Badge badgeContent={tabCounts.batch4} color="primary" max={999}>
-                  The Uniques 4.0
-                </Badge>
-              }
-              value="5"
-            />
-            <Tab
-              label={
-                <Badge badgeContent={tabCounts.batch5} color="primary" max={999}>
-                  The Uniques 5.0
-                </Badge>
-              }
-              value="6"
-            />
-            <Tab
-              label={
-                <Badge badgeContent={tabCounts.batch6} color="primary" max={999}>
-                  The Uniques 6.0
-                </Badge>
-              }
-              value="7"
-            />
-            <Tab
-              label={
-                <Badge badgeContent={tabCounts.blocked} color="error" max={999}>
-                  Blocked Members
-                </Badge>
-              }
-              value="8"
-            />
+            <Tab label="All Members" value="1" />
+            <Tab label="The Uniques 1.0" value="2" />
+            <Tab label="The Uniques 2.0" value="3" />
+            <Tab label="The Uniques 3.0" value="4" />
+            <Tab label="The Uniques 4.0" value="5" />
+            <Tab label="The Uniques 5.0" value="6" />
+            <Tab label="The Uniques 6.0" value="7" />
+            <Tab label="Blocked Members" value="8" />
           </TabList>
 
           {/* Add Member Button */}
@@ -625,7 +497,7 @@ const MembersIndex = () => {
               startIcon={<FilterListIcon />}
               onClick={() => {
                 setSearch("");
-                fetchMembers();
+                fetchMembers("");
               }}
               variant="outlined"
               color="secondary"
@@ -635,8 +507,7 @@ const MembersIndex = () => {
             <Button
               startIcon={<RefreshIcon />}
               onClick={() => {
-                fetchMembers();
-                fetchTabCounts();
+                fetchMembers(search);
               }}
               variant="contained"
               sx={{ bgcolor: "#ca0019", "&:hover": { bgcolor: "#a30014" } }}
@@ -647,7 +518,7 @@ const MembersIndex = () => {
         </Box>
 
         {/* Tab panels for different batches */}
-        {["1", "2", "3", "4", "5", "6"].map((tabValue) => (
+        {["1", "2", "3", "4", "5", "6", "7", "8"].map((tabValue) => (
           <TabPanel value={tabValue} key={tabValue} sx={{ px: 0 }}>
             {/* Loading indicator */}
             {loading && (
@@ -672,9 +543,11 @@ const MembersIndex = () => {
                 <Typography variant="body2" color="text.secondary">
                   {search
                     ? `No results matching "${search}". Try a different search term.`
-                    : tabValue === "6"
+                    : tabValue === "8"
                       ? "There are no blocked members."
-                      : "No members in this batch yet."}
+                      : tabValue === "1"
+                        ? "No members found."
+                        : "No members in this batch yet."}
                 </Typography>
               </Box>
             )}
@@ -694,7 +567,6 @@ const MembersIndex = () => {
                       key={member._id || index}
                       refreshData={() => {
                         fetchMembers();
-                        fetchTabCounts();
                       }}
                       onEdit={handleEditClick}
                       onDelete={handleDeleteClick}

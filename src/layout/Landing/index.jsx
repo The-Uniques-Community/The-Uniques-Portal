@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 import { motion } from "framer-motion";
 import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
-import CustomLoader from "@/components/common/loaders/CustomLoader";
+import { PageSkeleton } from "@/components/common/skeletons";
 
 const LandingLayout = () => {
   const footerRef = useRef(null);
@@ -23,7 +23,7 @@ const LandingLayout = () => {
 
   return (
     <div className="relative min-h-screen">
-      <Suspense fallback={<CustomLoader />}>
+      <Suspense fallback={<PageSkeleton />}>
         <Navbar />
 
         {/* Main Content: Slides over the footer */}

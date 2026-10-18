@@ -1,4 +1,4 @@
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { GoArrowUpRight } from "react-icons/go";
 
 const Button = ({children, path,bgColor,color,iconColor,border,borderColor, onClick}) => {

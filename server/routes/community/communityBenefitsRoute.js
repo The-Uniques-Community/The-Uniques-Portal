@@ -8,6 +8,7 @@ import express from "express";
 import {
   getBenefitsCards,
   updateBenefitsCards,
+  updateCommunityBenefits,
 } from "../../controller/Community/communityBenefitsController.js";
 import verifyToken from "../../middlewares/verifyToken.js";
 import verifyRole from "../../middlewares/verifyRole.js";
@@ -15,6 +16,8 @@ import verifyRole from "../../middlewares/verifyRole.js";
 const router = express.Router();
 
 router.get("/", getBenefitsCards);
+router.post("/", verifyToken, verifyRole(["admin", "coordinator"]), updateCommunityBenefits);
+router.put("/", verifyToken, verifyRole(["admin", "coordinator"]), updateCommunityBenefits);
 router.post("/update", verifyToken, verifyRole(["admin", "coordinator"]), updateBenefitsCards);
 router.put("/update", verifyToken, verifyRole(["admin", "coordinator"]), updateBenefitsCards);
 

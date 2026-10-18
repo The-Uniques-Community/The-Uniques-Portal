@@ -4,6 +4,7 @@
  * @architecture Mounted at `/api/projects` and `/api/community/projects` via `projectRoute.js`. Interacts with `Project` model.
  * @agent_note Automatically seeds default community showcase projects (UNI CARE, Libraria, TU Portal, Code crusade, Ideajam, etc.) when the collection is initially empty.
  */
+import mongoose from "mongoose";
 import Project from "../../models/projects/projectModel.js";
 
 const INITIAL_SEED_PROJECTS = [
@@ -194,10 +195,13 @@ export const getAllProjects = async (req, res) => {
 export const getProjectById = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({ success: false, message: "Project not found or invalid ID format" });
+    }
     const project = await Project.findById(id);
 
     if (!project) {
-      return res.status(404).json({ success: false, message: "Project not found" });
+      return res.status(404).json({ success: false, message: "Project not found or invalid ID format" });
     }
 
     res.status(200).json({ success: true, data: project });
@@ -281,6 +285,9 @@ export const createProject = async (req, res) => {
 export const updateProject = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({ success: false, message: "Project not found or invalid ID format" });
+    }
     const updates = req.body;
 
     const updated = await Project.findByIdAndUpdate(id, updates, {
@@ -289,7 +296,7 @@ export const updateProject = async (req, res) => {
     });
 
     if (!updated) {
-      return res.status(404).json({ success: false, message: "Project not found" });
+      return res.status(404).json({ success: false, message: "Project not found or invalid ID format" });
     }
 
     res.status(200).json({
@@ -316,10 +323,13 @@ export const updateProject = async (req, res) => {
 export const deleteProject = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({ success: false, message: "Project not found or invalid ID format" });
+    }
     const deleted = await Project.findByIdAndDelete(id);
 
     if (!deleted) {
-      return res.status(404).json({ success: false, message: "Project not found" });
+      return res.status(404).json({ success: false, message: "Project not found or invalid ID format" });
     }
 
     res.status(200).json({

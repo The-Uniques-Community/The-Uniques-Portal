@@ -202,7 +202,7 @@ const TaskTable = ({
                   </IconButton>
                 )}
                 {onMarkComplete && task.status !== "completed" && (
-                  <IconButton size="small" onClick={() => onMarkComplete(task._id)} title="Mark as Complete">
+                  <IconButton size="small" onClick={() => onMarkComplete(task._id, "completed")} title="Mark as Complete">
                     <CompleteIcon fontSize="small" />
                   </IconButton>
                 )}

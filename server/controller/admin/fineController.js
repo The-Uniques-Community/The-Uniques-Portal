@@ -629,22 +629,32 @@ export const getAllMembersWithFines = async (req, res) => {
  */
 export const getMembersWithPendingFines = async (req, res) => {
   try {
-    const members = await Member.find({
+    const filter = {
       'fines.status': 'pending'
-    }).select('fullName admno email batch fines');
+    };
+    if (req.query.batch) {
+      filter.batch = req.query.batch;
+    }
+
+    const members = await Member.find(filter).select('fullName admno email batch fines');
     
     const membersWithDetails = members.map(member => {
-      const pendingFines = member.fines.filter(fine => fine.status === 'pending');
-      const totalPendingAmount = pendingFines.reduce((sum, fine) => sum + fine.amount, 0);
+      const allFines = member.fines || [];
+      const pendingFines = allFines.filter(fine => fine.status === 'pending');
+      const totalPendingAmount = pendingFines.reduce((sum, fine) => sum + (Number(fine.amount) || 0), 0);
+      const totalAmount = allFines.reduce((sum, fine) => sum + (Number(fine.amount) || 0), 0);
       
       return {
         id: member._id,
+        _id: member._id,
         name: member.fullName,
+        fullName: member.fullName,
         admno: member.admno,
         email: member.email,
         batch: member.batch,
         pendingFinesCount: pendingFines.length,
-        totalPendingAmount
+        totalPendingAmount,
+        totalAmount
       };
     });
     

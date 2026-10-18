@@ -128,7 +128,9 @@ const Uniques360Member = () => {
         { status: "completed" },
         { withCredentials: true }
       );
-      toast.success("Project marked completed");
+      toast.success("Task marked completed");
+      setSelectedTask((prev) => (prev ? { ...prev, status: "completed" } : prev));
+      setTasks((prev) => prev.map((t) => (t._id === selectedTask._id ? { ...t, status: "completed" } : t)));
       fetchTasks();
     } catch (error) {
       console.error(error);

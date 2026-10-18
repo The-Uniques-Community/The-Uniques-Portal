@@ -4,7 +4,7 @@ import Button from "@/components/buttons/Button"
 import Marquee from 'react-fast-marquee';
 import tu from '@/assets/logos/tu.png';
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 const images = [
   'https://kmz0l2g36g.ufs.sh/f/szSqTLNNPY1rEz8jr2og9AYBbcu0eXTH81rnVdpozvG6K4WI',

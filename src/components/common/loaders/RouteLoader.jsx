@@ -1,10 +1,9 @@
 import { Suspense } from "react";
+import { PageSkeleton } from "@/components/common/skeletons";
 
-import CustomLoader from "./CustomLoader";
-
-const index = (Component, hasFallback = true) => (props) =>
+const index = (Component, hasFallback = true, FallbackComponent = PageSkeleton) => (props) =>
   hasFallback ? (
-    <Suspense fallback={<CustomLoader />}>
+    <Suspense fallback={<FallbackComponent />}>
       <Component {...props} />
     </Suspense>
   ) : (

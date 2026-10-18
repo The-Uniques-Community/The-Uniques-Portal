@@ -19,7 +19,7 @@ import {
   deleteMember,
   getAdminMemberCounts,
 } from '../../controller/admin/memberController.js';
-import { getAllMembersWithFines } from '../../controller/admin/fineController.js';
+import { getAllMembersWithFines, imposeFine } from '../../controller/admin/fineController.js';
 import verifyToken from '../../middlewares/verifyToken.js';
 import verifyRole from '../../middlewares/verifyRole.js';
 
@@ -57,6 +57,10 @@ memberAdminRouter.patch('/:id/block', toggleBlockStatus);
 // Suspend/unsuspend member
 memberAdminRouter.patch('/:id/suspend', toggleSuspendStatus);
 memberAdminRouter.get('/get-all-fine-history', getAllMembersWithFines);
+
+// Impose fine alias
+memberAdminRouter.post('/:memberId/fine', imposeFine);
+memberAdminRouter.post('/:memberId/fines', imposeFine);
 
 // Update member profile
 memberAdminRouter.put('/:id', updateMemberProfile);

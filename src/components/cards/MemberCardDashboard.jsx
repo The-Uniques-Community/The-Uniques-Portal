@@ -7,7 +7,7 @@ import GitHubIcon from "@mui/icons-material/GitHub";
 import XIcon from "@mui/icons-material/X";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import tu from "@/assets/logos/tu.png";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 
 import { Modal, Box, Tabs, Tab, Typography } from "@mui/material";
 import LinkedIn from '@mui/icons-material/LinkedIn';

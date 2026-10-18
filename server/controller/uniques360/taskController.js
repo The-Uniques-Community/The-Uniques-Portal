@@ -214,40 +214,67 @@ export const getCoordinatorTasks = async (req, res) => {
 export const updateTaskStatus = async (req, res) => {
   try {
     const { taskId } = req.params;
-    const { status } = req.body;
+    let { status } = req.body;
+
+    // Default to 'completed' if not provided (e.g. from single-click mark complete buttons)
+    if (!status) {
+      status = "completed";
+    }
+
+    const normalizedStatus = String(status).toLowerCase().trim();
+    if (!["pending", "in-progress", "completed"].includes(normalizedStatus)) {
+      return res.status(400).json({ message: `Invalid status: ${status}. Expected pending, in-progress, or completed.` });
+    }
 
     const task = await Task.findById(taskId);
     if (!task) return res.status(404).json({ message: "Task not found" });
 
     const requesterId = getRequesterId(req);
+    const userRole = (req.user?.role || "").toLowerCase();
+    const isManager = ["admin", "superadmin", "coordinator", "communityadmin"].includes(userRole);
 
-    // If marking as completed, allow assigned member(s) or the coordinator who assigned it
-    if (status === "completed") {
-      // Normalize assignedTo to array of member ids
-      const team = Array.isArray(task.assignedTo) ? task.assignedTo.map(a => a.member ? a.member.toString() : null).filter(Boolean) : [];
+    // Normalize assignedTo to array of member id strings
+    const team = Array.isArray(task.assignedTo)
+      ? task.assignedTo
+          .map((a) => {
+            if (!a) return null;
+            if (typeof a === "object") {
+              if (a.member) {
+                return a.member._id ? a.member._id.toString() : a.member.toString();
+              }
+              if (a._id) return a._id.toString();
+            }
+            return a.toString();
+          })
+          .filter(Boolean)
+      : [];
 
-      const isAssigned = team.some(memberId => idsEqual(memberId, requesterId));
-      const isCoordinator = idsEqual(task.assignedBy, requesterId);
+    const isAssigned = team.some((memberId) => idsEqual(memberId, requesterId));
+    const isCreator = idsEqual(task.assignedBy, requesterId);
 
-      if (!isAssigned && !isCoordinator) {
+    // If marking as completed, allow assigned member(s), coordinator who assigned it, or any coordinator/admin
+    if (normalizedStatus === "completed") {
+      if (!isAssigned && !isCreator && !isManager) {
         return res.status(403).json({ message: "Unauthorized to mark this task completed" });
       }
 
       task.status = "completed";
-      task.completedBy = toObjectId(requesterId);
+      task.completedBy = requesterId ? String(requesterId) : null;
       task.completedAt = new Date();
       await task.save();
       return res.status(200).json({ message: "Task marked completed", task });
     }
 
-    // For other status updates, only allow coordinator (assignedBy)
-    if (task.assignedBy && !idsEqual(task.assignedBy, requesterId)) {
+    // For other status updates (pending, in-progress), allow coordinator/admin or creator
+    if (!isCreator && !isManager) {
       return res.status(403).json({ message: "Unauthorized to update task status" });
     }
 
-    task.status = status;
+    task.status = normalizedStatus;
+    task.completedBy = null;
+    task.completedAt = null;
     await task.save();
-    res.status(200).json({ message: "Task status updated", task });
+    return res.status(200).json({ message: "Task status updated", task });
   } catch (error) {
     res.status(500).json({ message: "Error updating task", error: error.message });
   }
@@ -266,7 +293,8 @@ export const updateTaskStatus = async (req, res) => {
 export const addMemberToTask = async (req, res) => {
   try {
     const { taskId } = req.params;
-    const { newMemberId, role } = req.body;
+    const { role } = req.body;
+    const memberId = req.body.newMemberId || req.body.memberId;
 
     const task = await Task.findById(taskId);
     if (!task) return res.status(404).json({ message: "Task not found" });
@@ -274,10 +302,11 @@ export const addMemberToTask = async (req, res) => {
     // Normalize existing team member ids
     const team = Array.isArray(task.assignedTo) ? task.assignedTo.map(a => a.member ? a.member.toString() : null).filter(Boolean) : [];
 
-    // Coordinator can manage their own task team, and existing members can invite as well.
+    // Coordinator can manage their own task team, and existing members can invite as well. Admin has full rights.
     const currentUserId = getRequesterId(req);
-    const isCoordinator = idsEqual(task.assignedBy, currentUserId);
-    const isMember = team.some(memberId => idsEqual(memberId, currentUserId));
+    const isAdmin = req.user?.role === 'admin';
+    const isCoordinator = idsEqual(task.assignedBy, currentUserId) || isAdmin;
+    const isMember = team.some(mId => idsEqual(mId, currentUserId));
     
     if (!isCoordinator && !isMember) {
       return res.status(403).json({ 
@@ -286,20 +315,20 @@ export const addMemberToTask = async (req, res) => {
     }
 
     // Check if member to be added exists
-    if (!newMemberId) {
+    if (!memberId) {
       return res.status(400).json({ message: "New member ID is required" });
     }
 
-    const newMember = await Member.findById(newMemberId);
+    const newMember = await Member.findById(memberId);
     if (!newMember) return res.status(404).json({ message: "New member not found" });
 
     // Add member if not already present
-    if (team.includes(newMemberId)) {
+    if (team.includes(memberId.toString())) {
       return res.status(400).json({ message: 'Member is already part of this project' });
     }
 
     // Push new subdocument { member, role }
-    task.assignedTo.push({ member: newMemberId, role: role || null });
+    task.assignedTo.push({ member: toObjectId(memberId), role: role || null });
     await task.save();
 
     const updatedTask = await Task.findById(taskId).populate('assignedTo.member', 'fullName email');
@@ -330,8 +359,10 @@ export const updateTask = async (req, res) => {
     const task = await Task.findById(taskId);
     if (!task) return res.status(404).json({ message: "Task not found" });
 
-    // Check if user is the one who assigned the task
-    if (!idsEqual(task.assignedBy, getRequesterId(req))) {
+    // Check if user is the one who assigned the task or is an admin/coordinator
+    const userRole = (req.user?.role || "").toLowerCase();
+    const isManager = ["admin", "superadmin", "coordinator", "communityadmin"].includes(userRole);
+    if (!isManager && !idsEqual(task.assignedBy, getRequesterId(req))) {
       return res.status(403).json({ message: "Unauthorized to update this task" });
     }
 
@@ -346,13 +377,17 @@ export const updateTask = async (req, res) => {
     };
 
     if (Array.isArray(assignedTo)) {
-      // assignedTo may be array of ids or array of { member, role }
+      // assignedTo may be array of ids or array of { member, role } where member may be populated object or id
       const normalized = assignedTo.map((item) => {
-        if (item && typeof item === 'object' && (item.member || item.member === 0)) {
-          return { member: item.member, role: item.role || null };
+        if (item && typeof item === 'object') {
+          const rawMember = item.member !== undefined ? item.member : item;
+          const memberId = rawMember?._id || rawMember?.id || (typeof rawMember === 'string' || typeof rawMember === 'number' || (rawMember instanceof mongoose.Types.ObjectId) ? rawMember : null);
+          if (memberId) {
+            return { member: toObjectId(memberId), role: item.role || null };
+          }
         }
-        return { member: item, role: null };
-      }).filter(Boolean);
+        return { member: toObjectId(item), role: null };
+      }).filter(a => a && a.member);
 
       const memberIds = normalized.map(a => a.member).filter(Boolean);
       const members = memberIds.length ? await Member.find({ _id: { $in: memberIds } }).select('_id') : [];
@@ -384,7 +419,7 @@ export const updateTask = async (req, res) => {
 /**
  * @desc    Permanently delete a task
  * @route   DELETE /api/uniques360/tasks/:taskId
- * @access  Private (Task assigning Coordinator only)
+ * @access  Private (Task assigning Coordinator or Admin)
  * @param   {Object} req - Express request
  * @param   {string} req.params.taskId - Task ObjectId string
  * @returns {Object} JSON response confirming deletion
@@ -396,8 +431,10 @@ export const deleteTask = async (req, res) => {
     const task = await Task.findById(taskId);
     if (!task) return res.status(404).json({ message: "Task not found" });
 
-    // Check if user is the one who assigned the task
-    if (!idsEqual(task.assignedBy, getRequesterId(req))) {
+    // Check if user is the one who assigned the task or is an admin/coordinator
+    const userRole = (req.user?.role || "").toLowerCase();
+    const isManager = ["admin", "superadmin", "coordinator", "communityadmin"].includes(userRole);
+    if (!isManager && !idsEqual(task.assignedBy, getRequesterId(req))) {
       return res.status(403).json({ message: "Unauthorized to delete this task" });
     }
 
@@ -414,35 +451,40 @@ export const deleteTask = async (req, res) => {
 /**
  * @desc    Remove an assigned member from a task
  * @route   POST /api/uniques360/tasks/:taskId/members/remove
- * @access  Private (Coordinator or existing Team Member)
+ * @access  Private (Coordinator, existing Team Member, or Admin)
  * @param   {Object} req - Express request
  * @param   {string} req.params.taskId - Task ObjectId string
- * @body    {string} req.body.memberIdToRemove - Member ObjectId string to remove
+ * @body    {string} [req.body.memberIdToRemove] - Member ObjectId string to remove
+ * @body    {string} [req.body.memberId] - Alternate Member ObjectId string to remove
  * @returns {Object} JSON response with updated task team
  */
 export const removeMemberFromTask = async (req, res) => {
   try {
     const { taskId } = req.params;
-    const { memberIdToRemove } = req.body;
+    const memberIdToRemove = req.body.memberIdToRemove || req.body.memberId;
 
     const task = await Task.findById(taskId);
     if (!task) return res.status(404).json({ message: "Task not found" });
 
-    // Check authorization: Must be the coordinator OR an existing team member
+    // Check authorization: Must be the coordinator OR an existing team member OR admin
     const requesterId = getRequesterId(req);
-    const isCoordinator = idsEqual(task.assignedBy, requesterId);
+    const isAdmin = req.user?.role === 'admin';
+    const isCoordinator = idsEqual(task.assignedBy, requesterId) || isAdmin;
     const isTeamMember = task.assignedTo.some(a => idsEqual(a.member, requesterId));
 
     if (!isCoordinator && !isTeamMember) {
       return res.status(403).json({ message: "Unauthorized to manage this team" });
     }
 
-    // Cannot remove yourself if you are a member (optional policy, but usually you can leave)
-    // For now, allow removal. 
+    if (!memberIdToRemove) {
+      return res.status(400).json({ message: "Member ID to remove is required" });
+    }
+
+    const targetId = toObjectId(memberIdToRemove);
 
     const updatedTask = await Task.findByIdAndUpdate(
       taskId,
-      { $pull: { assignedTo: { member: memberIdToRemove } } },
+      { $pull: { assignedTo: { member: targetId } } },
       { new: true }
     ).populate('assignedTo.member', 'fullName email');
 
