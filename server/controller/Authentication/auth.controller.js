@@ -9,6 +9,7 @@ import Member from "../../models/member/memberModel.js";
 import Admin from "../../models/admin/adminModel.js";
 import bcrypt from "bcryptjs";
 import CommunityAdmin from "../../models/community/communityAdmin.js";
+import mongoose from "mongoose";
 
 const getJwtSecret = () => {
   if (process.env.JWT_SECRET) {
@@ -23,7 +24,7 @@ const getJwtSecret = () => {
 const generateToken = (member, fallbackRole) => {
   const secret = getJwtSecret();
   const payload = {
-    id: member._id || member.id,
+    id: member._id ? member._id.toString() : (member.id ? member.id.toString() : ""),
     email: member.email,
     role: member.role || fallbackRole,
     batch: member.batch || null,
@@ -141,6 +142,48 @@ export const emailLogin = async (req, res) => {
       }
     }
 
+    // 4. Fallback to direct legacy collection queries if unified model returned null (e.g. pre-migration or split-state)
+    if (!member && mongoose.connection.readyState === 1 && mongoose.connection.db) {
+      const emailRegex = new RegExp(`^${normalizedEmail.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i");
+
+      // Check legacy 'members' collection
+      try {
+        const rawMember = await mongoose.connection.db.collection("members").findOne({ email: emailRegex });
+        if (rawMember) {
+          member = rawMember;
+          role = rawMember.role || "member";
+        }
+      } catch (err) {
+        console.error("Error querying legacy members collection:", err.message);
+      }
+
+      // Check legacy 'admins' collection
+      if (!member) {
+        try {
+          const rawAdmin = await mongoose.connection.db.collection("admins").findOne({ email: emailRegex });
+          if (rawAdmin) {
+            member = rawAdmin;
+            role = rawAdmin.role || "admin";
+          }
+        } catch (err) {
+          console.error("Error querying legacy admins collection:", err.message);
+        }
+      }
+
+      // Check legacy 'communityadmins' collection
+      if (!member) {
+        try {
+          const rawCommAdmin = await mongoose.connection.db.collection("communityadmins").findOne({ email: emailRegex });
+          if (rawCommAdmin) {
+            member = rawCommAdmin;
+            role = rawCommAdmin.role || "coordinator";
+          }
+        } catch (err) {
+          console.error("Error querying legacy communityadmins collection:", err.message);
+        }
+      }
+    }
+
     if (!member) {
       return res.status(401).json({ message: "Not a member, please contact tech team." });
     }
@@ -166,6 +209,7 @@ export const emailLogin = async (req, res) => {
 
     const memberObj = member.toObject ? member.toObject() : { ...member };
     delete memberObj.password;
+    if (memberObj.__v !== undefined) delete memberObj.__v;
 
     const token = generateToken(member, role);
     res.cookie("token", token, {
