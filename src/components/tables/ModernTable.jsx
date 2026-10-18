@@ -74,7 +74,9 @@ const ModernTable = ({
         }}
         sx={{
           maxHeight: 520,
+          overflowX: "auto",
           overflowY: "auto",
+          maxWidth: "100%",
           overscrollBehavior: "auto",
           scrollbarWidth: "none",
           msOverflowStyle: "none",
@@ -125,7 +127,29 @@ const ModernTable = ({
                 columns={columns.length}
                 insideTable={true}
               />
-            ) : Array.isArray(data) && data.length > 0 ? (
+            ) : !Array.isArray(data) || data.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} sx={{ py: 6, px: 2, textAlign: "center" }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      position: { xs: "sticky", md: "static" },
+                      left: 0,
+                      width: { xs: "calc(100vw - 48px)", md: "100%" },
+                      maxWidth: "100%",
+                      mx: "auto",
+                    }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      No records found
+                    </Typography>
+                  </Box>
+                </TableCell>
+              </TableRow>
+            ) : (
               data.map((row, index) => (
                 <TableRow
                   key={row._id || index}
@@ -138,16 +162,6 @@ const ModernTable = ({
                   {renderRow(row)}
                 </TableRow>
               ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  align="center"
-                  sx={{ py: 6, color: "text.secondary" }}
-                >
-                  No records found
-                </TableCell>
-              </TableRow>
             )}
           </TableBody>
         </Table>

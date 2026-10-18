@@ -207,7 +207,7 @@ const LeaveManagement = () => {
   };
 
   const LeaveTable = ({ leavesToDisplay }) => (
-    <TableContainer component={Paper} sx={{ mt: 2 }}>
+    <TableContainer component={Paper} sx={{ mt: 2, overflowX: "auto", maxWidth: "100%" }}>
       <Table>
         <TableHead sx={{ backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : theme.palette.primary.main }}>
           <TableRow>
@@ -299,7 +299,7 @@ const LeaveManagement = () => {
   );
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: { xs: 2, sm: 4 }, px: { xs: 1, sm: 2, md: 3 } }}>
       <Box sx={{ mb: 4 }}>
         <ModernHeader
           title="Leave"
@@ -429,7 +429,13 @@ const LeaveManagement = () => {
             )}
 
             <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
-              <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)}>
+              <Tabs 
+                value={tabValue} 
+                onChange={(e, newValue) => setTabValue(newValue)}
+                variant="scrollable"
+                scrollButtons="auto"
+                allowScrollButtonsMobile
+              >
                 <Tab label={`Pending (${pendingLeaves.length})`} />
                 <Tab label={`Approved (${approvedLeaves.length})`} />
                 <Tab label={`Rejected (${rejectedLeaves.length})`} />

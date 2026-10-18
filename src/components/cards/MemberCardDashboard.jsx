@@ -34,12 +34,12 @@ const UserProfileModal = ({ open, handleClose, userData }) => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "80%",
+    width: { xs: "94%", sm: "85%", md: "80%" },
     maxWidth: "800px",
     bgcolor: "background.paper",
     boxShadow: 24,
-    p: 4,
-    borderRadius: "8px",
+    p: { xs: 2, sm: 3, md: 4 },
+    borderRadius: "12px",
     maxHeight: "90vh",
     overflowY: "auto",
     color: "text.primary",
@@ -316,7 +316,7 @@ export const MemberCardDashboard = ({ user, onEdit, onDelete, refreshData }) => 
           backgroundColor: theme.palette.background.paper,
           borderColor: theme.palette.divider,
         }}
-        className="rounded-2xl shadow-lg border p-4 max-w-96 h-full flex flex-col"
+        className="rounded-2xl shadow-lg border p-4 w-full max-w-full sm:max-w-96 h-full flex flex-col"
       >
         <CardContent className="flex flex-col gap-2 h-full">
           {/* Status Tags */}

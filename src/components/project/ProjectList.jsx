@@ -184,7 +184,7 @@ const ProjectList = ({ createRoutePrefix = "/coordinator/projects-overview" }) =
   );
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
       <Typography variant="h4" sx={{ mb: 4, fontWeight: "bold" }}>
         Project Management
       </Typography>
@@ -256,8 +256,10 @@ const ProjectList = ({ createRoutePrefix = "/coordinator/projects-overview" }) =
       <Box
         sx={{
           display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
           justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: { xs: "stretch", sm: "center" },
+          gap: 2,
           mb: 2,
         }}
       >
@@ -267,7 +269,7 @@ const ProjectList = ({ createRoutePrefix = "/coordinator/projects-overview" }) =
           color="primary"
           startIcon={<AddCircleOutline />}
           onClick={handleCreateProject}
-          sx={{ borderRadius: 2 }}
+          sx={{ borderRadius: 2, whiteSpace: "nowrap" }}
         >
           Create New Project
         </Button>

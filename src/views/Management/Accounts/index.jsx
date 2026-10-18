@@ -149,7 +149,7 @@ const Accounts = () => {
   ];
 
   return (
-    <div className="p-4">
+    <div className="p-2 sm:p-4">
       <ModernHeader
         title="Financial"
         highlight="Management"

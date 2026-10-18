@@ -428,61 +428,94 @@ const MembersIndex = () => {
           borderBottom: 1,
           borderColor: "divider",
           display: "flex",
+          flexDirection: { xs: "column", md: "row" },
           justifyContent: "space-between",
-          alignItems: "center"
+          alignItems: { xs: "stretch", md: "center" },
+          gap: { xs: 1.5, md: 2 },
+          pb: { xs: 1.5, md: 0 },
+          width: "100%",
+          maxWidth: "100%",
         }}>
-          <TabList
-            onChange={handleChange}
-            aria-label="members tabs"
-            variant="scrollable"
-            scrollButtons="auto"
-            sx={{
-              '& .MuiTab-root': {
-                fontWeight: 500,
-                transition: '0.3s',
-                '&.Mui-selected': {
-                  color: '#ca0019',
+          <Box sx={{ flex: 1, minWidth: 0, maxWidth: "100%", overflowX: "auto" }}>
+            <TabList
+              onChange={handleChange}
+              aria-label="members tabs"
+              variant="scrollable"
+              scrollButtons="auto"
+              allowScrollButtonsMobile
+              sx={{
+                maxWidth: "100%",
+                '& .MuiTabs-scroller': {
+                  overflowX: 'auto !important',
+                },
+                '& .MuiTab-root': {
+                  fontWeight: 500,
+                  transition: '0.3s',
+                  minWidth: { xs: 'auto', sm: 100, md: 110 },
+                  px: { xs: 1.5, sm: 2 },
+                  whiteSpace: 'nowrap',
+                  '&.Mui-selected': {
+                    color: '#ca0019',
+                  }
+                },
+                '& .MuiTabs-indicator': {
+                  backgroundColor: '#ca0019',
                 }
-              },
-              '& .MuiTabs-indicator': {
-                backgroundColor: '#ca0019',
-              }
-            }}
-          >
-            <Tab label="All Members" value="1" />
-            <Tab label="The Uniques 1.0" value="2" />
-            <Tab label="The Uniques 2.0" value="3" />
-            <Tab label="The Uniques 3.0" value="4" />
-            <Tab label="The Uniques 4.0" value="5" />
-            <Tab label="The Uniques 5.0" value="6" />
-            <Tab label="The Uniques 6.0" value="7" />
-            <Tab label="Blocked Members" value="8" />
-          </TabList>
+              }}
+            >
+              <Tab label="All Members" value="1" />
+              <Tab label="The Uniques 1.0" value="2" />
+              <Tab label="The Uniques 2.0" value="3" />
+              <Tab label="The Uniques 3.0" value="4" />
+              <Tab label="The Uniques 4.0" value="5" />
+              <Tab label="The Uniques 5.0" value="6" />
+              <Tab label="The Uniques 6.0" value="7" />
+              <Tab label="Blocked Members" value="8" />
+            </TabList>
+          </Box>
 
           {/* Add Member Button */}
-          <Button
-            variant="contained"
-            startIcon={<PersonAddIcon />}
-            onClick={() => setAddMemberOpen(true)}
-            sx={{
-              bgcolor: "#ca0019",
-              "&:hover": { bgcolor: "#a30014" },
-              mr: 2
-            }}
-          >
-            Add Member
-          </Button>
+          <Box sx={{
+            display: "flex",
+            justifyContent: { xs: "stretch", sm: "flex-end", md: "center" },
+            width: { xs: "100%", md: "auto" },
+            px: { xs: 0, md: 0 }
+          }}>
+            <Button
+              variant="contained"
+              startIcon={<PersonAddIcon />}
+              onClick={() => setAddMemberOpen(true)}
+              sx={{
+                bgcolor: "#ca0019",
+                "&:hover": { bgcolor: "#a30014" },
+                mr: { xs: 0, md: 2 },
+                width: { xs: "100%", sm: "auto" },
+                whiteSpace: "nowrap",
+                flexShrink: 0
+              }}
+            >
+              Add Member
+            </Button>
+          </Box>
         </Box>
 
         {/* Search and filter controls */}
-        <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box sx={{ 
+          p: { xs: 1.5, sm: 2 }, 
+          display: 'flex', 
+          flexDirection: { xs: 'column', md: 'row' },
+          gap: { xs: 1.5, md: 2 },
+          justifyContent: 'space-between', 
+          alignItems: { xs: 'stretch', md: 'center' },
+          width: "100%"
+        }}>
           <TextField
             placeholder="Search members..."
             value={search}
             onChange={handleSearchChange}
             variant="outlined"
             size="small"
-            sx={{ width: '300px' }}
+            sx={{ width: { xs: '100%', md: '300px' } }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -492,8 +525,14 @@ const MembersIndex = () => {
             }}
           />
 
-          <div className="flex gap-2">
+          <Box sx={{ 
+            display: "flex", 
+            gap: 1.5, 
+            width: { xs: '100%', md: 'auto' },
+            justifyContent: { xs: 'stretch', md: 'flex-end' } 
+          }}>
             <Button
+              fullWidth
               startIcon={<FilterListIcon />}
               onClick={() => {
                 setSearch("");
@@ -501,20 +540,27 @@ const MembersIndex = () => {
               }}
               variant="outlined"
               color="secondary"
+              sx={{ flex: { xs: 1, md: 'initial' }, whiteSpace: 'nowrap' }}
             >
               Clear Filters
             </Button>
             <Button
+              fullWidth
               startIcon={<RefreshIcon />}
               onClick={() => {
                 fetchMembers(search);
               }}
               variant="contained"
-              sx={{ bgcolor: "#ca0019", "&:hover": { bgcolor: "#a30014" } }}
+              sx={{ 
+                bgcolor: "#ca0019", 
+                "&:hover": { bgcolor: "#a30014" },
+                flex: { xs: 1, md: 'initial' },
+                whiteSpace: 'nowrap'
+              }}
             >
               Refresh
             </Button>
-          </div>
+          </Box>
         </Box>
 
         {/* Tab panels for different batches */}
@@ -554,13 +600,13 @@ const MembersIndex = () => {
 
             {/* Member cards */}
             {!loading && !error && members.length > 0 && (
-              <div className="px-4">
+              <div className="px-1 sm:px-4">
                 <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 500 }}>
                   Showing {members.length} {members.length === 1 ? 'member' : 'members'}
                   {search && ` matching "${search}"`}
                 </Typography>
 
-                <div className="grid xl:grid-cols-4 md:grid-cols-3 grid-cols-1 sm:grid-cols-1  gap-4">
+                <div className="grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-4">
                   {members.map((member, index) => (
                     <MemberCardDashboard
                       user={member}
