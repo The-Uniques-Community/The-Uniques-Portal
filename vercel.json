@@ -31,13 +31,7 @@
       }
     },
     {
-      "source": "/auth/(.*)",
-      "destination": {
-        "service": "server"
-      }
-    },
-    {
-      "source": "/auth",
+      "source": "/auth/(google.*|emaillogin|get_user|verify_user|verify_role|logout|password-reset.*)",
       "destination": {
         "service": "server"
       }

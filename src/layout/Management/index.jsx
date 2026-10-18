@@ -1,11 +1,6 @@
-/**
- * @file index.jsx
- * @description Unified Management Layout Shell for both Admin (/admin) and Coordinator (/coordinator) portals.
- * Features URL-based reactive active navigation detection, theme switching, mobile responsive drawer,
- * and centralized session termination using authService.
- */
-
+/* eslint-disable no-unused-vars */
 import React from "react";
+import { useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -14,6 +9,7 @@ import IconButton from "@mui/material/IconButton";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -21,20 +17,8 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import EventIcon from "@mui/icons-material/Event";
 import GroupIcon from "@mui/icons-material/Group";
 import LogoutIcon from "@mui/icons-material/Logout";
-import AccountBalance from "@mui/icons-material/AccountBalance";
-import Brightness4Icon from "@mui/icons-material/Brightness4";
-import Brightness7Icon from "@mui/icons-material/Brightness7";
-import AnnouncementIcon from "@mui/icons-material/Announcement";
-import PersonIcon from "@mui/icons-material/Person";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
-import AccountTreeIcon from "@mui/icons-material/AccountTree";
-import SchoolIcon from "@mui/icons-material/School";
-import BarChartIcon from "@mui/icons-material/BarChart";
-import ClassIcon from "@mui/icons-material/Class";
-import Diversity3Icon from "@mui/icons-material/Diversity3";
 import { toast } from "react-toastify";
-import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useThemeContext } from "@/theme/ThemeProvider";
@@ -42,7 +26,19 @@ import ConfirmationModal from "@/components/modals/ConfirmationModal";
 import authService from "@/services/authService";
 import logo from "@/assets/logos/theuniquesCommunity.png";
 import uniques_white from "@/assets/logos/uniqueswhite.png";
+import AccountBalance from "@mui/icons-material/AccountBalance";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import AnnouncementIcon from "@mui/icons-material/Announcement";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
+import AccountTreeIcon from "@mui/icons-material/AccountTree";
+import SchoolIcon from "@mui/icons-material/School";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import ClassIcon from "@mui/icons-material/Class";
+import PersonIcon from "@mui/icons-material/Person";
 
+// Navigation items with paths relative to the active management portal (/admin or /coordinator)
 const MANAGEMENT_NAVIGATION = [
   { segment: "", title: "Dashboard", icon: <DashboardIcon /> },
   { segment: "members-overview", title: "Members", icon: <GroupIcon /> },
@@ -56,7 +52,6 @@ const MANAGEMENT_NAVIGATION = [
   { segment: "uniques360", title: "Uniques 360", icon: <AssignmentTurnedInIcon /> },
   { segment: "stats", title: "Stats", icon: <BarChartIcon /> },
   { segment: "batches", title: "Batches", icon: <ClassIcon /> },
-  { segment: "community", title: "Community", icon: <Diversity3Icon /> },
 ];
 
 function Branding() {
@@ -76,7 +71,7 @@ export default function ManagementLayout({ role: explicitRole }) {
   const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const isCoordinator = explicitRole
     ? explicitRole === "coordinator"
@@ -101,12 +96,14 @@ export default function ManagementLayout({ role: explicitRole }) {
     setActiveItem(getActiveItemFromPath());
   }, [getActiveItemFromPath]);
 
-  const onConfirmLogout = async () => {
+  const onClose = () => setIsOpen(false);
+
+  const onConfirm = async () => {
     try {
       await authService.logout();
       localStorage.removeItem("activeItem");
       toast.success("Logged out successfully");
-      navigate("/auth/login");
+      navigate("/", { replace: true });
     } catch (error) {
       console.error("Logout error:", error);
     }
@@ -115,140 +112,271 @@ export default function ManagementLayout({ role: explicitRole }) {
 
   const handleNavigation = (segment, itemTitle) => {
     setActiveItem(itemTitle);
+    localStorage.setItem("activeItem", itemTitle);
     const targetPath = segment ? `${basePath}/${segment}` : basePath;
     navigate(targetPath);
     if (isMobile) setDrawerOpen(false);
   };
 
+  const toggleDrawer = () => {
+    setDrawerOpen((prev) => !prev);
+  };
+
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh" }}>
-      {/* App Bar */}
-      <AppBar
-        position="fixed"
-        sx={{
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-          bgcolor: isDarkMode ? "#121212" : "#ca0019",
-          borderBottom: "1px solid",
-          borderColor: isDarkMode ? "rgba(255, 255, 255, 0.12)" : "transparent",
-        }}
-      >
-        <Toolbar sx={{ justifyContent: "space-between" }}>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            {isMobile && (
-              <IconButton
-                color="inherit"
-                edge="start"
-                onClick={() => setDrawerOpen(!drawerOpen)}
-                sx={{ mr: 2 }}
-              >
-                <MenuIcon />
-              </IconButton>
-            )}
-            <Branding />
-          </Box>
+    <>
+      <ConfirmationModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onConfirm={onConfirm}
+        message={"You sure you want to log out?"}
+      />
 
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <IconButton color="inherit" onClick={toggleTheme} sx={{ mr: 1 }}>
-              {isDarkMode ? <Brightness7Icon /> : <Brightness4Icon />}
-            </IconButton>
-
-            <IconButton color="inherit" onClick={() => setIsOpen(true)}>
-              <LogoutIcon />
-            </IconButton>
-          </Box>
-        </Toolbar>
-      </AppBar>
-
-      {/* Navigation Drawer */}
+      {/* Floating Shiny Black Sidebar */}
       <Drawer
         variant={isMobile ? "temporary" : "permanent"}
-        open={isMobile ? drawerOpen : true}
-        onClose={() => setDrawerOpen(false)}
+        open={drawerOpen}
+        onClose={toggleDrawer}
+        data-lenis-prevent="true"
+        PaperProps={{
+          "data-lenis-prevent": "true",
+        }}
         sx={{
-          width: 240,
+          width: isMobile ? 260 : drawerOpen ? 240 : 75,
           flexShrink: 0,
-          [`& .MuiDrawer-paper`]: {
-            width: 240,
+          zIndex: 2000,
+          ml: isMobile ? 0 : 2,
+          "& .MuiDrawer-paper": {
+            width: isMobile ? 260 : drawerOpen ? 240 : 75,
+            height: isMobile ? "100vh" : "96vh",
+            marginTop: isMobile ? 0 : "16px",
+            marginLeft: isMobile ? 0 : "16px",
+            backgroundColor: theme.palette.background.drawer,
+            borderRadius: isMobile ? "0 16px 16px 0" : "8px",
+            overflowX: "hidden",
+            overflowY: "auto",
+            overscrollBehavior: "contain",
+            display: "flex",
+            flexDirection: "column",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            "&::-webkit-scrollbar": {
+              display: "none",
+            },
+            transition: "width 0.3s",
             boxSizing: "border-box",
-            bgcolor: isDarkMode ? "#1a1a1a" : "#fff",
-            borderRight: "1px solid",
-            borderColor: isDarkMode ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.12)",
           },
         }}
       >
-        <Toolbar />
-        <Box sx={{ overflow: "auto", py: 2 }}>
-          <List>
-            {MANAGEMENT_NAVIGATION.map((item) => {
-              const isSelected = activeItem === item.title;
-              return (
-                <ListItem
-                  button
-                  key={item.title}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexShrink: 0,
+            px: 2,
+            pt: 2,
+            pb: 1,
+          }}
+        >
+          {(drawerOpen || isMobile) && (
+            <Box sx={{ width: 140 }}>
+              <img src={uniques_white} alt="Logo" style={{ maxWidth: "100%" }} />
+            </Box>
+          )}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+            }}
+          >
+            <IconButton onClick={toggleDrawer}>
+              <MenuIcon sx={{ color: theme.palette.primary.light }} />
+            </IconButton>
+          </Box>
+        </Box>
+
+        <List
+          data-lenis-prevent="true"
+          onWheel={(e) => e.stopPropagation()}
+          sx={{
+            padding: 2,
+            flexGrow: 1,
+            overflowY: "auto",
+            overflowX: "hidden",
+            minHeight: 0,
+            overscrollBehavior: "contain",
+            scrollbarWidth: "thin",
+            "&::-webkit-scrollbar": {
+              width: "4px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "rgba(255, 255, 255, 0.2)",
+              borderRadius: "4px",
+            },
+          }}
+        >
+          {MANAGEMENT_NAVIGATION.map((item) => {
+            const isActive = activeItem === item.title;
+
+            return (
+              <ListItem key={item.title} disablePadding sx={{ marginY: "4px" }}>
+                <ListItemButton
                   onClick={() => handleNavigation(item.segment, item.title)}
                   sx={{
-                    mb: 0.5,
-                    mx: 1,
+                    backgroundColor: isActive ? "white" : "inherit",
+                    color: isActive ? "black" : "white",
+                    padding: "10px",
                     borderRadius: "8px",
-                    bgcolor: isSelected
-                      ? isDarkMode
-                        ? "rgba(202, 0, 25, 0.25)"
-                        : "rgba(202, 0, 25, 0.08)"
-                      : "transparent",
-                    color: isSelected ? "#ca0019" : "inherit",
                     "&:hover": {
-                      bgcolor: isDarkMode
-                        ? "rgba(255, 255, 255, 0.08)"
-                        : "rgba(202, 0, 25, 0.04)",
+                      backgroundColor: "white !important",
+                      color: "black !important",
+                      "& .MuiListItemIcon-root, & .MuiListItemText-root, & .MuiTypography-root": {
+                        color: "black !important",
+                      },
                     },
                   }}
                 >
                   <ListItemIcon
+                    className="MuiListItemIcon-root"
                     sx={{
-                      color: isSelected ? "#ca0019" : isDarkMode ? "#fff" : "rgba(0, 0, 0, 0.54)",
-                      minWidth: 40,
+                      color: isActive ? "black" : "white",
+                      minWidth: "40px",
+                      transition: "color 0.3s",
                     }}
                   >
                     {item.icon}
                   </ListItemIcon>
-                  <ListItemText
-                    primary={item.title}
-                    primaryTypographyProps={{
-                      fontWeight: isSelected ? 700 : 500,
-                      fontSize: "0.9rem",
-                    }}
-                  />
-                </ListItem>
-              );
-            })}
-          </List>
-        </Box>
+                  {drawerOpen && (
+                    <ListItemText
+                      className="MuiListItemText-root"
+                      primary={item.title}
+                      sx={{
+                        color: isActive ? "black" : "white",
+                        transition: "color 0.3s",
+                      }}
+                    />
+                  )}
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
+        </List>
+
+        <List sx={{ padding: 2, flexShrink: 0, marginTop: "auto" }}>
+          <ListItem disablePadding sx={{ marginY: "4px" }}>
+            <ListItemButton
+              onClick={toggleTheme}
+              sx={{
+                backgroundColor: "inherit",
+                color: theme.palette.primary.light,
+                "&:hover": {
+                  backgroundColor: theme.palette.action.hover,
+                  color: theme.palette.primary.dark,
+                },
+                padding: "10px",
+                borderRadius: "8px",
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  color: "inherit",
+                  minWidth: "40px !important",
+                }}
+              >
+                {isDarkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+              </ListItemIcon>
+              {drawerOpen && (
+                <ListItemText
+                  sx={{
+                    color: "inherit",
+                  }}
+                  primary={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                />
+              )}
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding sx={{ marginY: "4px" }}>
+            <ListItemButton
+              onClick={() => {
+                if (isMobile) {
+                  setDrawerOpen(false);
+                }
+                setIsOpen(true);
+              }}
+              sx={{
+                backgroundColor: "inherit",
+                color: theme.palette.primary.light,
+                "&:hover": {
+                  backgroundColor: theme.palette.action.hover,
+                  color: theme.palette.primary.dark,
+                },
+                padding: "10px",
+                borderRadius: "8px",
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  color: "inherit",
+                  minWidth: "40px",
+                }}
+              >
+                <LogoutIcon />
+              </ListItemIcon>
+              {drawerOpen && (
+                <ListItemText
+                  sx={{
+                    color: "inherit",
+                  }}
+                  primary="Logout"
+                />
+              )}
+            </ListItemButton>
+          </ListItem>
+        </List>
       </Drawer>
+
+      {/* Top Header - Seamless & borderless matching background */}
+      <AppBar
+        position="fixed"
+        sx={{
+          backgroundColor: theme.palette.background.appBar,
+          boxShadow: "none !important",
+          height: 56,
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          left: isMobile ? 0 : drawerOpen ? 256 : 91,
+          width: isMobile ? "100%" : `calc(100% - ${drawerOpen ? 256 : 91}px)`,
+          marginTop: isMobile ? 0 : "16px",
+          transition: "left 0.3s, width 0.3s",
+        }}
+      >
+        <Toolbar sx={{ minHeight: "56px !important", px: { xs: 1.5, sm: 2 } }}>
+          {isMobile && !drawerOpen && (
+            <IconButton edge="start" aria-label="menu" onClick={toggleDrawer} sx={{ mr: 1 }}>
+              <MenuIcon sx={{ color: theme.palette.primary.main }} />
+            </IconButton>
+          )}
+          {(!drawerOpen || isMobile) && <Branding />}
+        </Toolbar>
+      </AppBar>
 
       {/* Main Content Area */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          p: { xs: 2, sm: 3 },
-          width: { sm: `calc(100% - 240px)` },
-          minHeight: "100vh",
-          bgcolor: isDarkMode ? "background.default" : "#fbfbfb",
+          p: { xs: 1.5, sm: 2, md: 3 },
+          mt: { xs: 7, sm: 8 },
+          ml: isMobile ? 0 : drawerOpen ? "272px" : "107px",
+          width: isMobile ? "100%" : `calc(100% - ${drawerOpen ? 272 : 107}px)`,
+          maxWidth: "100vw",
+          boxSizing: "border-box",
+          overflowX: "hidden",
+          transition: "margin-left 0.3s, width 0.3s",
         }}
       >
-        <Toolbar />
         <Outlet />
       </Box>
-
-      {/* Logout Confirmation Modal */}
-      <ConfirmationModal
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        onConfirm={onConfirmLogout}
-        title="Confirm Logout"
-        message="Are you sure you want to log out of your operational management portal?"
-      />
-    </Box>
+    </>
   );
 }
 

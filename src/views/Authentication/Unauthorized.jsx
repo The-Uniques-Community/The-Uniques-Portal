@@ -5,21 +5,7 @@ import { useNavigate } from "react-router-dom";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-
-const getRoleDashboard = (role) => {
-  switch ((role || "").toLowerCase()) {
-    case "admin":
-      return "/admin";
-    case "coordinator":
-      return "/coordinator";
-    case "member":
-      return "/member";
-    case "communityadmin":
-      return "/community";
-    default:
-      return "/auth/login";
-  }
-};
+import { getRoleDashboard } from "@/routes/paths";
 
 const Unauthorized = () => {
   const theme = useTheme();
@@ -122,7 +108,7 @@ const Unauthorized = () => {
             variant="outlined"
             size="large"
             startIcon={<ArrowBackIcon />}
-            onClick={() => navigate("/auth/login")}
+            onClick={() => navigate("/")}
             sx={{ px: 3, py: 1.2, borderRadius: "8px" }}
           >
             Login Page

@@ -5,6 +5,7 @@
  * @architecture Replaces all raw axios/fetch calls and global monkey-patching in config.js.
  */
 import axios from 'axios';
+import { clearAuthStorage } from '@/utils/authUtils';
 
 let _storeInstance = null;
 
@@ -21,7 +22,7 @@ export const setStoreInstance = (store) => {
  */
 export const API_BASE_URL = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL !== undefined
   ? import.meta.env.VITE_API_BASE_URL
-  : ((typeof import.meta !== 'undefined' && import.meta.env?.DEV) ? 'http://localhost:5001' : (typeof process !== 'undefined' ? process.env?.VITE_API_BASE_URL || 'http://localhost:5001' : ''));
+  : ((typeof import.meta !== 'undefined' && import.meta.env?.DEV) ? 'http://localhost:5001' : ((typeof globalThis !== 'undefined' && globalThis.process) ? globalThis.process.env?.VITE_API_BASE_URL || 'http://localhost:5001' : ''));
 
 /**
  * Custom application error class standardizing API failure representations.
@@ -92,9 +93,7 @@ apiClient.interceptors.response.use(
     // Global 401 Unauthorized handling (token expired or invalidated)
     if (status === 401) {
       console.warn('[ApiClient] 401 Unauthorized received - resetting session');
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      localStorage.removeItem('role');
+      clearAuthStorage();
 
       if (_storeInstance) {
         try {
@@ -105,8 +104,8 @@ apiClient.interceptors.response.use(
       }
 
       // Avoid infinite redirects if already on auth routes
-      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/auth/')) {
-        window.location.replace('/auth/login');
+      if (typeof window !== 'undefined' && window.location.pathname !== '/' && !window.location.pathname.startsWith('/auth') && window.location.pathname !== '/forget-password') {
+        window.location.replace('/');
       }
     }
 

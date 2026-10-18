@@ -8,6 +8,7 @@
 // config/passport.js
 import passport from "passport";
 import GoogleStrategy from "passport-google-oauth20";
+import mongoose from "mongoose";
 import Member from "../models/member/memberModel.js";
 import Coordinator from "../models/community/communityAdmin.js";
 import Admin from "../models/admin/adminModel.js";
