@@ -34,6 +34,7 @@ export const isAuthenticated = async (req, res, next) => {
       });
     }
     
+    try {
       // Verify token
       const secret = process.env.JWT_SECRET || (process.env.NODE_ENV !== "production" ? "the_uniques_portal_jwt_secret_dev_key" : undefined);
       if (!secret) {

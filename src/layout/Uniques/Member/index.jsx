@@ -29,24 +29,16 @@ import uniques_white from "@/assets/logos/uniqueswhite.png";
 import Brightness4Icon from "@mui/icons-material/Brightness4"; // Dark Mode Icon
 import Brightness7Icon from "@mui/icons-material/Brightness7"; // Light Mode Icon
 
-// Navigation items with full paths
+// Navigation items with relative paths
 const STUDENT_NAVIGATION = [
   { segment: "", title: "Dashboard", icon: <DashboardIcon /> },
-  { segment: "createBlog", title: "Create Blog", icon: <BookIcon /> },
+  { segment: "create-blog", title: "Create Blog", icon: <BookIcon /> },
   { segment: "uniques360", title: "Uniques 360", icon: <AssignmentTurnedInIcon /> },
-  { segment: "leaveManagement", title: "Leave Management", icon: <CalendarMonthIcon/> },
-
-  // { segment: "JobPosting", title: "Post Job", icon: <PublishIcon /> },
-  // { segment: "profile", title: "Profile", icon: <AccountCircleIcon /> },
-  // { segment: "applicants", title: "Applicants", icon: <GroupIcon /> },
-  // {
-  //   segment: "joboffers",
-  //   title: "Manage Offers",
-  //   icon: <AssignmentTurnedInIcon />,
-  // },
+  { segment: "leave-management", title: "Leave Management", icon: <CalendarMonthIcon /> },
 ];
 
 import { BASE_URL } from "@/config";
+import authService from "@/services/authService";
 
 function Branding() {
   const { isDarkMode } = useThemeContext()
@@ -54,7 +46,7 @@ function Branding() {
     <Box
       component="img"
       src={isDarkMode ? uniques_white : logo}
-      alt="Placera Logo"
+      alt="The Uniques Logo"
       sx={{ width: 120, mr: 2 }}
     />
   );
@@ -73,20 +65,14 @@ function DashboardLayoutAppBar() {
 
   const [isOpen, setIsOpen] = React.useState(false);
   const onClose = () => setIsOpen(false);
-  const onConfirm = () => {
-    fetch(`${BASE_URL}/auth/logout`, {
-      method: "POST",
-      credentials: "include",
-    })
-      .then(() => {
-        localStorage.removeItem("activeItem");
-        localStorage.removeItem("role");
-        toast.success("Logged out successfully");
-        navigate("/");
-      })
-      .catch((error) => {
-        console.error("Logout error:", error);
-      });
+  const onConfirm = async () => {
+    try {
+      await authService.logout();
+      toast.success("Logged out successfully");
+      navigate("/", { replace: true });
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
     setIsOpen(false);
   };
 

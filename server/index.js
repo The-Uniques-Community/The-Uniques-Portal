@@ -38,6 +38,7 @@ import projectRouter from "./routes/community/projectRoute.js";
 import statsRouter from "./routes/community/statsRoute.js";
 import batchRouter from "./routes/community/batchRoute.js";
 import communityBenefitsRouter from "./routes/community/communityBenefitsRoute.js";
+import customMemberRouter from "./routes/community/customMemberRoute.js";
 dotenv.config();
 
 const app = express();
@@ -235,6 +236,7 @@ app.use("/api/community/projects", projectRouter);
 app.use("/api/stats", statsRouter);
 app.use("/api/batches", batchRouter);
 app.use("/api/community-benefits", communityBenefitsRouter);
+app.use("/api/custom-members", customMemberRouter);
 
 // Centralized Express error handler to guarantee structured JSON errors instead of HTML 500 stack traces
 app.use((err, req, res, _next) => {

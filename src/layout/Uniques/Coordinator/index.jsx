@@ -97,7 +97,7 @@ function CoordinatorLayout() {
       await authService.logout();
       localStorage.removeItem("activeItem");
       toast.success("Logged out successfully");
-      navigate("/auth/login");
+      navigate("/", { replace: true });
     } catch (error) {
       console.error("Logout error:", error);
     }

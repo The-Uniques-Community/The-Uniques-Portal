@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 import GoogleIcon from "@mui/icons-material/Google";
@@ -22,45 +23,43 @@ import "react-toastify/dist/ReactToastify.css";
 import logo from "@/assets/logos/theuniquesCommunity.png";
 import loginImage from "@/assets/img/login/login.svg";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setUser } from "@/redux/slices/userSlice";
 import bg from "@/assets/img/login/bg.png";
 import { BASE_URL } from "@/config";
+import { getRoleDashboard } from "@/routes/paths";
+import authService from "@/services/authService";
+import { storeAuth } from "@/utils/authUtils";
 
 const Login = () => {
   const theme = useTheme();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((prev) => !prev);
   const handleMouseDownPassword = (event) => event.preventDefault();
 
-  // Listen for the message from the popup. The backend sends only the role.
+  // Listen for the message from the popup. The backend sends token, role, and user.
   useEffect(() => {
     const receiveMessage = (event) => {
-      // Optionally verify event.origin for security
-      if (event.data && event.data.role) {
-        toast.success("Logged in successfully");
-        switch (event.data.role) {
-          case "member":
-            navigate("/member");
-            break;
-          case "coordinator":
-            navigate("/coordinator");
-            break;
-          case "communityadmin":
-            navigate("/community");
-            break;
-          case "admin":
-            navigate("/admin");
-            break;
-          default:
-            navigate("/");
+      if (event.data && (event.data.role || event.data.token)) {
+        const { token, role, user } = event.data;
+        const normalizedRole = (role || user?.role || "member").toLowerCase();
+        const userData = user || { role: normalizedRole };
+
+        if (token) {
+          storeAuth({ token, role: normalizedRole, user: userData });
         }
+        dispatch(setUser({ ...userData, role: normalizedRole }));
+        toast.success("Logged in successfully");
+        navigate(getRoleDashboard(normalizedRole), { replace: true });
       }
     };
 
     window.addEventListener("message", receiveMessage);
     return () => window.removeEventListener("message", receiveMessage);
-  }, [navigate]);
+  }, [navigate, dispatch]);
 
   // Google login using a popup
   const handleGoogleLogin = () => {
@@ -155,61 +154,22 @@ const Login = () => {
           })}
           onSubmit={async (values, { setErrors, setSubmitting }) => {
             try {
-              const res = await fetch(`${BASE_URL}/auth/emaillogin`, {
-                method: "POST",
-                credentials: "include", // include cookie with the request
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(values),
-              });
-              let data = {};
-              try {
-                data = await res.json();
-              } catch (_parseErr) {
-                data = { message: res.statusText || "Unexpected server response" };
-              }
-              if (res.ok) {
-                if (data.token) {
-                  localStorage.setItem("token", data.token);
-                }
-                const memberData = data.member || { email: values.email, role: data.role };
-                localStorage.setItem("user", JSON.stringify(memberData));
-                localStorage.setItem("role", data.role || memberData.role);
-                console.log("Login successful, role received:", data.role);
-                toast.success("Logged in successfully");
-                // Use the role from the response to navigate accordingly
-                const userRole = (data.role || data.member?.role || "").toLowerCase();
-                switch (userRole) {
-                  case "member":
-                    console.log("Navigating to /member");
-                    navigate("/member");
-                    break;
-                  case "coordinator":
-                    console.log("Navigating to /coordinator");
-                    navigate("/coordinator");
-                    break;
-                  case "communityadmin":
-                    console.log("Navigating to /community");
-                    navigate("/community");
-                    break;
-                  case "admin":
-                    console.log("Navigating to /admin");
-                    navigate("/admin");
-                    break;
-                  default:
-                    console.log("Navigating to / (default)");
-                    navigate("/");
-                }
-              } else {
-                const errorMsg = data.message || data.error || "Login failed";
-                toast.error(errorMsg);
-                setErrors({ submit: errorMsg });
-              }
+              const data = await authService.emailLogin(values);
+              toast.success("Logged in successfully");
+              const userRole = (data.role || data.member?.role || "").toLowerCase();
+              navigate(getRoleDashboard(userRole), { replace: true });
             } catch (error) {
-              const errorMsg = error.message || "An error occurred during login";
+              const errorMsg =
+                error.data?.message ||
+                error.data?.error ||
+                error.response?.data?.message ||
+                error.message ||
+                "Login failed";
               toast.error(errorMsg);
               setErrors({ submit: errorMsg });
+            } finally {
+              setSubmitting(false);
             }
-            setSubmitting(false);
           }}
         >
           {({
@@ -288,7 +248,7 @@ const Login = () => {
                   variant="body2"
                   onClick={(e) => {
                     e.preventDefault();
-                    navigate("/auth/forget-password");
+                    navigate("/forget-password");
                   }}
                   sx={{
                     color: theme.palette.primary.main,

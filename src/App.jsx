@@ -4,10 +4,25 @@ import { RouterProvider } from "react-router-dom";
 import GridBackground from "@/components/common/GridBackground";
 import CustomLoader from "@/components/common/loaders/CustomLoader";
 
+import authService from "@/services/authService";
+import { getStoredAuth, isTokenExpired, clearAuthStorage } from "@/utils/authUtils";
+
 const App = () => {
   const [isBooting, setIsBooting] = useState(true);
 
   useEffect(() => {
+    // Session integrity check on cold boot
+    const stored = getStoredAuth();
+    if (stored.token) {
+      if (isTokenExpired(stored.token)) {
+        clearAuthStorage();
+      } else {
+        authService.verifySession().catch((err) => {
+          console.warn("[App] Cold boot session verification failed:", err);
+        });
+      }
+    }
+
     // Main booting animation occurs on cold load / page refresh
     const timer = setTimeout(() => {
       setIsBooting(false);

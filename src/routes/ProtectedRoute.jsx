@@ -1,80 +1,45 @@
-// ProtectedRoute.jsx
-import React, { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
-import axios from "axios";
-import { BASE_URL } from "@/config";
-import { PageSkeleton } from "@/components/common/skeletons";
+/**
+ * @file ProtectedRoute.jsx
+ * @description Role-based access control guard synchronizing Redux authentication state
+ * with server token verification. Prevents unauthenticated access, role escalation,
+ * and eliminates layout shift/waterfalls during client-side navigation.
+ */
+/* eslint-disable no-unused-vars */
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { PATHS } from "@/routes/paths";
+import { isRoleAuthorized, isTokenExpired } from "@/utils/authUtils";
 
-const ProtectedRoute = ({ role, element, redirectPath = "/401" }) => {
-  const [authorized, setAuthorized] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [targetRedirect, setTargetRedirect] = useState(redirectPath);
+/**
+ * Route protection gate ensuring user authentication and matching authorization role.
+ * @param {Object} props
+ * @param {string|string[]} [props.role] - Required role (or array of permitted roles) for access
+ * @param {React.ReactElement} [props.element] - Child element to render if authorized
+ * @param {string} [props.redirectPath] - Target path if unauthorized (defaults to PATHS.FORBIDDEN)
+ * @returns {React.ReactElement}
+ */
+const ProtectedRoute = ({ role, element, redirectPath = PATHS.FORBIDDEN }) => {
+  const { isAuthenticated, role: userRole, token } = useAuth();
+  const location = useLocation();
 
-  // Function to log out the user (clearing the token on the backend)
-  const logout = async () => {
-    try {
-      await axios.post(`${BASE_URL}/auth/logout`, {}, { withCredentials: true });
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
+  const activeToken = token || (typeof window !== "undefined" ? localStorage.getItem("token") : null);
+  const activeRole = userRole || (typeof window !== "undefined" ? localStorage.getItem("role") : null);
+  const isExpired = isTokenExpired(activeToken);
+  const hasAuth = Boolean(activeToken && !isExpired && (isAuthenticated || activeRole));
 
-  useEffect(() => {
-    const verifyUserRole = async () => {
-      try {
-        console.log(`Verifying role: ${role}`);
-        if (role) {
-          // Call the backend endpoint that verifies the role using the verifyRole middleware
-          const response = await axios.get(`${BASE_URL}/auth/verify_role?role=${role}`, {
-            withCredentials: true,
-          });
-          console.log("Verification successful:", response.data);
-        }
-        setAuthorized(true);
-      } catch (error) {
-        console.error("Authorization failed detailed:", error.response?.data);
-        console.error("Authorization failed message:", error.message);
+  // 1. Unauthenticated or expired gate: Redirect to login with source location state
+  if (!hasAuth) {
+    return <Navigate to={PATHS.AUTH.LOGIN} state={{ from: location }} replace />;
+  }
 
-        const storedRole =
-          localStorage.getItem("role") ||
-          (() => {
-            try {
-              return JSON.parse(localStorage.getItem("user") || "{}").role;
-            } catch {
-              return null;
-            }
-          })();
+  // 2. Role authorization gate: Verify role permissions
+  if (role && !isRoleAuthorized(role, activeRole)) {
+    console.warn(`[ProtectedRoute] Role mismatch: required "${role}", found "${activeRole}". Redirecting.`);
+    return <Navigate to={redirectPath} replace />;
+  }
 
-        const isRoleMismatch =
-          error.response?.status === 403 ||
-          (storedRole && role && storedRole.toLowerCase() !== role.toLowerCase()) ||
-          error.response?.data?.message?.toLowerCase().includes("role");
-
-        if (isRoleMismatch) {
-          console.warn(
-            `Role mismatch detected (required: ${role}, user: ${storedRole}). Preserving session.`
-          );
-          setTargetRedirect(redirectPath);
-        } else if (error.response && error.response.status === 401) {
-          // If the error is genuine token expiry or invalid token, log out
-          await logout();
-          setTargetRedirect("/auth/login");
-        } else {
-          setTargetRedirect(redirectPath);
-        }
-
-        setAuthorized(false);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    verifyUserRole();
-  }, [role, redirectPath]);
-
-  if (loading) return <PageSkeleton />;
-  if (!authorized) return <Navigate to={targetRedirect} replace />;
-  return element;
+  // 3. Authorized: Render element or Outlet
+  return element ? element : <Outlet />;
 };
 
 export default ProtectedRoute;
