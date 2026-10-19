@@ -2992,6 +2992,112 @@ export const getAvailableMembers = async (req, res) => {
   }
 };
 
+/**
+ * Register for an event (guest or authenticated member)
+ * @route POST /api/events/:id/register
+ * @access Public (with optional token verification via ifTokenVerify)
+ */
+export const registerForEvent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({
+        success: false,
+        message: "Invalid event ID",
+      });
+    }
+
+    const event = await Event.findById(id);
+    if (!event) {
+      return res.status(404).json({
+        success: false,
+        message: "Event not found",
+      });
+    }
+
+    let attendeeData = {};
+    if (req.user) {
+      // Authenticated user
+      const userId = req.user._id || req.user.id;
+      const userEmail = (req.user.email || "").toLowerCase().trim();
+      const userName = req.user.fullName || req.user.name || "Member";
+
+      // Check if already registered
+      const isAlreadyRegistered = event.attendees?.some(
+        (a) => (a.user && a.user.toString() === userId.toString()) || (a.email && a.email.toLowerCase() === userEmail)
+      );
+
+      if (isAlreadyRegistered) {
+        return res.status(400).json({
+          success: false,
+          message: "You are already registered for this event",
+        });
+      }
+
+      attendeeData = {
+        user: userId,
+        name: userName,
+        email: userEmail,
+        phone: req.user.phone || req.body?.phone || "",
+      };
+
+      // Add to user's event_participation if not present
+      await User.findByIdAndUpdate(userId, {
+        $addToSet: { event_participation: event._id }
+      });
+    } else {
+      // Guest user
+      const { name, email, phone } = req.body;
+      if (!name || !email) {
+        return res.status(400).json({
+          success: false,
+          message: "Name and email are required for registration",
+        });
+      }
+
+      const cleanEmail = email.toLowerCase().trim();
+      const isAlreadyRegistered = event.attendees?.some(
+        (a) => a.email && a.email.toLowerCase() === cleanEmail
+      );
+
+      if (isAlreadyRegistered) {
+        return res.status(400).json({
+          success: false,
+          message: "This email is already registered for this event",
+        });
+      }
+
+      attendeeData = {
+        name: name.trim(),
+        email: cleanEmail,
+        phone: (phone || "").trim(),
+      };
+    }
+
+    if (!event.attendees) {
+      event.attendees = [];
+    }
+    event.attendees.push(attendeeData);
+    await event.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Successfully registered for event",
+      data: {
+        eventId: event._id,
+        registeredCount: event.attendees.length,
+      },
+    });
+  } catch (error) {
+    console.error("Error in registerForEvent:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error registering for event",
+      error: error.message,
+    });
+  }
+};
+
 
 export default {
   createEvent,
@@ -3018,4 +3124,5 @@ export default {
   updateEventGallery,
   getEventGallery,
   updateReceiptId, // not used
+  registerForEvent,
 };

@@ -4,6 +4,7 @@
  * @architecture Interacts with CustomMember model and handles endpoints mounted at /api/custom-members.
  */
 
+import mongoose from "mongoose";
 import { CustomMember } from "../../models/community/customMemberModel.js";
 
 /**
@@ -11,20 +12,11 @@ import { CustomMember } from "../../models/community/customMemberModel.js";
  * @route GET /api/custom-members
  */
 export const getCustomMembers = async (req, res) => {
-  try {
-    const members = await CustomMember.find().sort({ createdAt: -1 });
-    return res.status(200).json({
-      success: true,
-      data: members,
-    });
-  } catch (error) {
-    console.error("Error fetching custom members:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch custom members",
-      error: error.message,
-    });
-  }
+  return res.status(200).json({
+    success: true,
+    data: [],
+    message: "Route deprecated. Use /api/public/members",
+  });
 };
 
 /**
@@ -106,7 +98,10 @@ export const updateCustomMember = async (req, res) => {
 export const deleteCustomMember = async (req, res) => {
   try {
     const { id } = req.params;
-    await CustomMember.findByIdAndDelete(id);
+    let deleted = await CustomMember.findByIdAndDelete(id);
+    if (!deleted && mongoose.isValidObjectId(id)) {
+      deleted = await CustomMember.findByIdAndDelete(new mongoose.Types.ObjectId(id));
+    }
 
     return res.status(200).json({
       success: true,
