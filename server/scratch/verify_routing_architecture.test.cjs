@@ -14,13 +14,20 @@ console.log('--- [ROUTING ARCHITECTURE TEST SUITE] ---');
 // Test 1: Verify Vercel Rewrites Regex
 console.log('1. Testing Vercel Edge Rewrites regex matching...');
 const vercelConfig = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../vercel.json'), 'utf8'));
-const authRewrites = vercelConfig.rewrites.filter(r => r.source && r.source.startsWith('/auth/'));
-assert(authRewrites.length >= 2, 'Auth rewrite rules must exist in vercel.json');
+const pathToRegexp = require('path-to-regexp');
 
-const authRegexes = authRewrites.map(r => {
-  const authRegexStr = r.source.replace(/^\//, '^\\/').replace(/\$$/, '') + '$';
-  return new RegExp(authRegexStr);
-});
+const compiledRewrites = vercelConfig.rewrites.map(r => ({
+  re: pathToRegexp(r.source),
+  source: r.source,
+  dest: r.destination
+}));
+
+function routeRequest(url) {
+  for (const r of compiledRewrites) {
+    if (r.re.test(url)) return r.dest;
+  }
+  return null;
+}
 
 // Backend API requests that MUST route to server
 const backendPaths = [
@@ -31,29 +38,39 @@ const backendPaths = [
   '/auth/verify_user',
   '/auth/verify_role',
   '/auth/logout',
+  '/auth/password-reset',
   '/auth/password-reset/send-otp',
-  '/auth/password-reset/verify-otp'
+  '/auth/password-reset/verify-otp',
+  '/health',
+  '/api/member',
+  '/upload/test.png'
 ];
 
 for (const p of backendPaths) {
-  const matches = authRegexes.some(re => re.test(p));
-  assert(matches, `Backend path ${p} must match an auth rewrite for server`);
+  const dest = routeRequest(p);
+  assert(dest && dest.service === 'server', `Backend path ${p} must route to service "server", got: ${JSON.stringify(dest)}`);
 }
-console.log('  ✓ All backend API auth endpoints correctly route to server');
+console.log('  ✓ All backend API auth and endpoint routes correctly route to server');
 
-// Client-side SPA routes that MUST NOT route to server (must fall through to Vite app)
+// Client-side SPA routes that MUST route to app service with path /index.html
 const clientPaths = [
+  '/coordinator',
+  '/coordinator/events-overview',
+  '/coordinator/projects-overview/view/123',
+  '/admin',
+  '/admin/dashboard',
+  '/member',
+  '/member/leave-management',
+  '/forget-password',
   '/auth/login',
-  '/auth/forget-password',
-  '/auth/signup',
-  '/auth'
+  '/auth/forget-password'
 ];
 
 for (const p of clientPaths) {
-  const matches = authRegexes.some(re => re.test(p));
-  assert(!matches, `Client SPA route ${p} must NOT route to backend server`);
+  const dest = routeRequest(p);
+  assert(dest && dest.service === 'app' && dest.path === '/index.html', `Client SPA route ${p} must route to app with path /index.html, got: ${JSON.stringify(dest)}`);
 }
-console.log('  ✓ All frontend client auth routes correctly fall through to Vite SPA');
+console.log('  ✓ All frontend client routes correctly route to app with path /index.html');
 
 // Test 2: Role Dashboard Resolution Logic
 console.log('2. Testing getRoleDashboard mapping logic...');
@@ -142,18 +159,24 @@ console.log('  ✓ Master router correctly mounts login at /, workspaces, and er
 
 // Test 5: Verify Vercel SPA Fallback Rewrite Rule
 console.log('5. Testing Vercel SPA fallback rewrite...');
-assert.strictEqual(vercelConfig.buildCommand, 'vite build', 'vercel.json buildCommand must be vite build');
-assert.strictEqual(vercelConfig.outputDirectory, 'dist', 'vercel.json outputDirectory must be dist');
-const spaRewrite = vercelConfig.rewrites.find(
-  r => r.destination === '/index.html'
-);
-assert(spaRewrite, 'vercel.json must contain an explicit SPA fallback rewrite with destination /index.html');
-assert.strictEqual(spaRewrite.source, '/(.*)', 'SPA rewrite source must be /(.*)');
+assert(vercelConfig.services && vercelConfig.services.app && vercelConfig.services.server, 'vercel.json must configure multi-service architecture (app and server)');
+assert.strictEqual(vercelConfig.services.app.framework, 'vite', 'app framework must be vite');
+assert.strictEqual(vercelConfig.services.server.framework, 'express', 'server framework must be express');
 
-// Verify API rewrites route to /api/index.js
-const apiRewrites = vercelConfig.rewrites.filter(r => r.destination === '/api/index.js');
-assert(apiRewrites.length >= 4, 'Must have at least 4 API rewrite rules routing to /api/index.js');
-console.log('  ✓ Vercel SPA fallback correctly intercepts client routes and rewrites to /index.html');
+// Verify static assets route to app service without /index.html rewrite
+const staticAssets = [
+  '/assets/index-BZRCIG34.js',
+  '/assets/index-CD36EnlC.css',
+  '/favicon.png',
+  '/icons.svg',
+  '/projects/banner.png'
+];
+
+for (const a of staticAssets) {
+  const dest = routeRequest(a);
+  assert(dest && dest.service === 'app' && !dest.path, `Static asset ${a} must route to app without /index.html path mutation, got: ${JSON.stringify(dest)}`);
+}
+console.log('  ✓ Vercel SPA fallback correctly intercepts client routes while preserving raw static asset delivery');
 
 // Test 6: Verify Server-Side SPA Static Serving and Fallback
 console.log('6. Testing Express server SPA static fallback in server/index.js...');
