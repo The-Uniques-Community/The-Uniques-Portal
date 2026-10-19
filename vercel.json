@@ -1,36 +1,133 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "vite build",
-  "outputDirectory": "dist",
+  "services": {
+    "app": {
+      "root": ".",
+      "framework": "vite"
+    },
+    "server": {
+      "root": "server",
+      "framework": "express",
+      "entrypoint": "index.js"
+    }
+  },
   "rewrites": [
     {
       "source": "/health",
-      "destination": "/api/index.js"
+      "destination": {
+        "service": "server"
+      }
     },
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.js"
+      "source": "/api/:match*",
+      "destination": {
+        "service": "server"
+      }
     },
     {
-      "source": "/upload/(.*)",
-      "destination": "/api/index.js"
+      "source": "/upload/:match*",
+      "destination": {
+        "service": "server"
+      }
     },
     {
-      "source": "/auth/password-reset/(.*)",
-      "destination": "/api/index.js"
+      "source": "/auth/password-reset/:match*",
+      "destination": {
+        "service": "server"
+      }
     },
     {
-      "source": "/auth/(google.*|emaillogin|get_user|verify_user|verify_role|logout)",
-      "destination": "/api/index.js"
+      "source": "/auth/password-reset",
+      "destination": {
+        "service": "server"
+      }
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "source": "/auth/google/:match*",
+      "destination": {
+        "service": "server"
+      }
+    },
+    {
+      "source": "/auth/google",
+      "destination": {
+        "service": "server"
+      }
+    },
+    {
+      "source": "/auth/:endpoint(emaillogin|get_user|verify_user|verify_role|logout)",
+      "destination": {
+        "service": "server"
+      }
+    },
+    {
+      "source": "/coordinator",
+      "destination": {
+        "service": "app",
+        "path": "/index.html"
+      }
+    },
+    {
+      "source": "/coordinator/:match*",
+      "destination": {
+        "service": "app",
+        "path": "/index.html"
+      }
+    },
+    {
+      "source": "/admin",
+      "destination": {
+        "service": "app",
+        "path": "/index.html"
+      }
+    },
+    {
+      "source": "/admin/:match*",
+      "destination": {
+        "service": "app",
+        "path": "/index.html"
+      }
+    },
+    {
+      "source": "/member",
+      "destination": {
+        "service": "app",
+        "path": "/index.html"
+      }
+    },
+    {
+      "source": "/member/:match*",
+      "destination": {
+        "service": "app",
+        "path": "/index.html"
+      }
+    },
+    {
+      "source": "/forget-password",
+      "destination": {
+        "service": "app",
+        "path": "/index.html"
+      }
+    },
+    {
+      "source": "/:path((?!assets|favicon|icons|projects)[^/]+)",
+      "destination": {
+        "service": "app",
+        "path": "/index.html"
+      }
+    },
+    {
+      "source": "/:path((?!assets|favicon|icons|projects)[^/]+)/:sub*",
+      "destination": {
+        "service": "app",
+        "path": "/index.html"
+      }
+    },
+    {
+      "source": "/:match*",
+      "destination": {
+        "service": "app"
+      }
     }
-  ],
-  "functions": {
-    "api/index.js": {
-      "maxDuration": 30
-    }
-  }
+  ]
 }
