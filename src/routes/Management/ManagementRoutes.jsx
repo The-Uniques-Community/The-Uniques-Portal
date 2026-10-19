@@ -5,6 +5,7 @@
  * Shares view definitions, lazy loading, and the unified ManagementLayout shell, eliminating code duplication.
  */
 import { lazy } from "react";
+import { Navigate } from "react-router-dom";
 import Loader from "@/components/common/loaders/RouteLoader";
 import ProtectedRoute from "@/routes/ProtectedRoute";
 import ManagementLayout from "@/layout/Management";
@@ -42,13 +43,19 @@ export const createManagementRoutes = (baseRole) => ({
     { index: true, element: <Dashboard /> },
     { path: "dashboard", element: <Dashboard /> },
     { path: "members-overview", element: <Member /> },
+    { path: "members", element: <Navigate to="members-overview" replace /> },
     { path: "events-overview", element: <Event /> },
+    { path: "events", element: <Navigate to="events-overview" replace /> },
     { path: "events-overview/create", element: <EventForm /> },
     { path: "events-overview/view/:id", element: <EventView /> },
+    { path: "events/:id", element: <EventView /> },
+    { path: "events/:id/gallery", element: <EventView /> },
     { path: "events-overview/:id/budget", element: <EventBudget /> },
     { path: "projects-overview", element: <Projects /> },
+    { path: "projects", element: <Navigate to="projects-overview" replace /> },
     { path: "projects-overview/create", element: <ProjectForm /> },
     { path: "projects-overview/view/:id", element: <ProjectView /> },
+    { path: "projects/:id", element: <ProjectView /> },
     { path: "accounts", element: <Account /> },
     { path: "profile", element: <Profile /> },
     { path: "enquiry", element: <Enquiry /> },

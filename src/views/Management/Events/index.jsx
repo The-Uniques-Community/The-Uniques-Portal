@@ -191,7 +191,7 @@ const EventsManagement = () => {
   };
 
   const handleViewGallery = (eventId) => {
-    navigate(`${basePath}/events/${eventId}/gallery`);
+    navigate(`${basePath}/events-overview/view/${eventId}`, { state: { initialTab: 1 } });
   };
 
   const handleDeleteClick = (eventId) => {

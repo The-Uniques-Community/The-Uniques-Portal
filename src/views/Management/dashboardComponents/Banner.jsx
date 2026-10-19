@@ -15,6 +15,9 @@ export default function Banner(props) {
     ? (props.role.toLowerCase() === "coordinator" ? "Coordinator" : "Admin")
     : (location.pathname.startsWith("/coordinator") ? "Coordinator" : "Admin");
 
+  const isCoordinator = roleName === "Coordinator";
+  const basePath = isCoordinator ? "/coordinator" : "/admin";
+
   return (
     <Box
       sx={{
@@ -89,7 +92,7 @@ export default function Banner(props) {
         </Typography>
 
         <Stack direction={{ xs: "column", sm: "row" }} alignItems={{ xs: "stretch", sm: "center" }} spacing={2}>
-          <Link to="members-overview" style={{ textDecoration: "none" }}>
+          <Link to={`${basePath}/members-overview`} style={{ textDecoration: "none" }}>
             <Button
               variant="contained"
               startIcon={<PeopleAltOutlinedIcon />}
@@ -110,7 +113,7 @@ export default function Banner(props) {
             </Button>
           </Link>
 
-          <Link to="events-overview" style={{ textDecoration: "none" }}>
+          <Link to={`${basePath}/events-overview`} style={{ textDecoration: "none" }}>
             <Button
               variant="outlined"
               startIcon={<EventAvailableOutlinedIcon />}

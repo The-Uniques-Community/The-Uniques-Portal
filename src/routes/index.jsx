@@ -67,6 +67,18 @@ const router = createBrowserRouter([
         path: "/auth/forget-password",
         element: <Navigate to="/forget-password" replace />,
       },
+      {
+        path: "/auth/password-reset",
+        element: <Navigate to="/forget-password" replace />,
+      },
+      {
+        path: "/password-reset",
+        element: <Navigate to="/forget-password" replace />,
+      },
+      {
+        path: "/reset-password",
+        element: <Navigate to="/forget-password" replace />,
+      },
 
       // Workspace Portals (Role Protected)
       AdminRoutes,

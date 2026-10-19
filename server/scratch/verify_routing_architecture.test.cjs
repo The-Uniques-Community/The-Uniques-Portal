@@ -137,4 +137,67 @@ assert(rootLayoutContent.includes('Outlet'), 'Outlet must be mounted in RootLayo
 assert(masterRouterContent.includes('ErrorBoundary'), 'ErrorBoundary must be configured on root route');
 console.log('  ✓ Master router correctly mounts login at /, workspaces, and error boundary with community cleanly removed');
 
+// Test 5: Verify Vercel SPA Fallback Rewrite Rule
+console.log('5. Testing Vercel SPA fallback rewrite...');
+const spaRewrite = vercelConfig.rewrites.find(
+  r => r.destination && r.destination.service === 'app' && r.destination.path === '/index.html'
+);
+assert(spaRewrite, 'vercel.json must contain an explicit SPA fallback rewrite to app service with path /index.html');
+const spaSourceRegex = new RegExp(spaRewrite.source.replace(/^\//, '^\\/').replace(/\$$/, '') + '$');
+
+const spaRoutes = [
+  '/admin/dashboard',
+  '/admin/events-overview',
+  '/coordinator/projects-overview',
+  '/member/leave-management',
+  '/forget-password',
+  '/auth/login',
+  '/auth/forget-password',
+  '/auth/password-reset'
+];
+
+for (const route of spaRoutes) {
+  assert(spaSourceRegex.test(route), `Client route ${route} must match SPA fallback rewrite`);
+}
+
+const staticAssets = [
+  '/assets/index-D8x2.js',
+  '/assets/style.css',
+  '/favicon.png',
+  '/icons.svg',
+  '/projects/unicare.webp'
+];
+
+for (const asset of staticAssets) {
+  assert(!spaSourceRegex.test(asset), `Static asset ${asset} must NOT match SPA index.html fallback`);
+}
+console.log('  ✓ Vercel SPA fallback correctly intercepts client routes while preserving static assets');
+
+// Test 6: Verify Server-Side SPA Static Serving and Fallback
+console.log('6. Testing Express server SPA static fallback in server/index.js...');
+const serverIndexContent = fs.readFileSync(path.resolve(__dirname, '../index.js'), 'utf8');
+assert(serverIndexContent.includes('express.static(distPath)'), 'server/index.js must mount express.static on distPath');
+assert(serverIndexContent.includes('app.get("*",'), 'server/index.js must mount wildcard SPA catch-all handler');
+assert(serverIndexContent.includes('res.sendFile(indexPath)'), 'server/index.js must send index.html for client routes');
+console.log('  ✓ Express server includes full-stack static asset serving and SPA fallback');
+
+// Test 7: Verify Banner.jsx Absolute Navigation Paths
+console.log('7. Testing Banner.jsx navigation links...');
+const bannerContent = fs.readFileSync(path.resolve(__dirname, '../../src/views/Management/dashboardComponents/Banner.jsx'), 'utf8');
+assert(bannerContent.includes('${basePath}/members-overview'), 'Banner.jsx must use absolute basePath for members-overview');
+assert(bannerContent.includes('${basePath}/events-overview'), 'Banner.jsx must use absolute basePath for events-overview');
+assert(!bannerContent.includes('to="members-overview"'), 'Banner.jsx must not have relative to="members-overview"');
+assert(!bannerContent.includes('to="events-overview"'), 'Banner.jsx must not have relative to="events-overview"');
+console.log('  ✓ Banner.jsx uses absolute basePath paths preventing nested 404s');
+
+// Test 8: Verify ManagementRoutes.jsx Aliases
+console.log('8. Testing ManagementRoutes.jsx aliases...');
+const mgmtRoutesContent = fs.readFileSync(path.resolve(__dirname, '../../src/routes/Management/ManagementRoutes.jsx'), 'utf8');
+assert(mgmtRoutesContent.includes('path: "events", element: <Navigate to="events-overview"'), 'ManagementRoutes must have events alias');
+assert(mgmtRoutesContent.includes('path: "projects", element: <Navigate to="projects-overview"'), 'ManagementRoutes must have projects alias');
+assert(mgmtRoutesContent.includes('path: "members", element: <Navigate to="members-overview"'), 'ManagementRoutes must have members alias');
+assert(mgmtRoutesContent.includes('path: "events/:id"'), 'ManagementRoutes must handle events/:id');
+assert(mgmtRoutesContent.includes('path: "projects/:id"'), 'ManagementRoutes must handle projects/:id');
+console.log('  ✓ ManagementRoutes contains robust backward-compatible route aliases');
+
 console.log('\n--- ALL ROUTING ARCHITECTURE TESTS PASSED SUCCESSFULLY! ---');
