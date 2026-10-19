@@ -4,6 +4,7 @@
  * @architecture Mounted at `/api/public/members` via `publicMemberRouter.js`. Interfaces with `Member`, `Enquiry`, and `sendContactEmail` service.
  * @agent_note Strips sensitive member information (passwords, phone numbers, fines) before returning JSON to public consumers.
  */
+import mongoose from "mongoose";
 import Member from "../../models/member/memberModel.js";
 import Enquiry from "../../models/Enquiry/enquiryModel.js";
 import sendContactEmail from "../../services/members/sendContactEmail.js";
@@ -128,11 +129,16 @@ export const getPublicMemberById = async (req, res) => {
   try {
     const { id } = req.params;
     
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({
+        success: false,
+        message: "Member not found or profile is not public"
+      });
+    }
+
     const member = await Member.findOne({
       _id: id,
-      profileStatus: "active",
-      isVerified: true,
-      isSuspended: false
+      isSuspended: { $ne: true }
     });
     
     if (!member) {
@@ -188,68 +194,34 @@ export const getPublicMemberById = async (req, res) => {
 // Add this method to get member counts by batch
 export const getMemberCounts = async (req, res) => {
     try {
-      // Get count of all active members
-      const totalCount = await Member.countDocuments({
-        profileStatus: "active",
-        isVerified: true,
-        isSuspended: false
-      });
-      
-      // Get count for each batch
-      const batch1Count = await Member.countDocuments({
-        batch: "The Uniques 1.0",
-        profileStatus: "active",
-        isVerified: true,
-        isSuspended: false
-      });
-      
-      const batch2Count = await Member.countDocuments({
-        batch: "The Uniques 2.0",
-        profileStatus: "active",
-        isVerified: true,
-        isSuspended: false
-      });
-      
-      const batch3Count = await Member.countDocuments({
-        batch: "The Uniques 3.0",
-        profileStatus: "active", 
-        isVerified: true,
-        isSuspended: false
+      const baseFilter = { isSuspended: { $ne: true } };
+      const totalCount = await Member.countDocuments(baseFilter);
+
+      const batchAgg = await Member.aggregate([
+        { $match: baseFilter },
+        { $group: { _id: "$batch", count: { $sum: 1 } } }
+      ]);
+
+      const counts = {
+        "All": totalCount,
+        "The Uniques 1.0": 0,
+        "The Uniques 2.0": 0,
+        "The Uniques 3.0": 0,
+        "The Uniques 4.0": 0,
+        "The Uniques 5.0": 0,
+        "The Uniques 6.0": 0,
+      };
+
+      batchAgg.forEach((item) => {
+        if (item._id) {
+          counts[item._id] = item.count;
+        }
       });
 
-      const batch4Count = await Member.countDocuments({
-        batch: "The Uniques 4.0",
-        profileStatus: "active",
-        isVerified: true,
-        isSuspended: false
-      });
-
-      const batch5Count = await Member.countDocuments({
-        batch: "The Uniques 5.0",
-        profileStatus: "active",
-        isVerified: true,
-        isSuspended: false
-      });
-
-      const batch6Count = await Member.countDocuments({
-        batch: "The Uniques 6.0",
-        profileStatus: "active",
-        isVerified: true,
-        isSuspended: false
-      });
-      
       return res.status(200).json({
         success: true,
         message: "Batch counts retrieved successfully",
-        data: {
-          "All": totalCount,
-          "The Uniques 1.0": batch1Count,
-          "The Uniques 2.0": batch2Count,
-          "The Uniques 3.0": batch3Count,
-          "The Uniques 4.0": batch4Count,
-          "The Uniques 5.0": batch5Count,
-          "The Uniques 6.0": batch6Count
-        }
+        data: counts
       });
       
     } catch (error) {

@@ -38,7 +38,8 @@ import {
   updateEventTeam,
   addMembersToTeam,
   removeMembersFromTeam,
-  getAvailableMembers
+  getAvailableMembers,
+  registerForEvent
 } from '../../controller/events/eventController.js';
 import verifyRole from '../../middlewares/verifyRole.js';
 import verifyToken from '../../middlewares/verifyToken.js';
@@ -50,18 +51,19 @@ const eventRouter = express.Router();
 eventRouter.get('/counts', getEventCount);
 eventRouter.get('/', getAllEvents);
 eventRouter.get('/:id', getEventById);
+eventRouter.get('/:id/members', getEventWithMembers);
 eventRouter.get('/status/:status', getEventsByStatus);
+
+// Event registration & Form response submission - public or authenticated
+eventRouter.post('/:id/register', ifTokenVerify, registerForEvent);
+eventRouter.post('/:eventId/form-response', ifTokenVerify ,submitFormResponse);
 
 // team-member addition and removal in event
 eventRouter.get('/available-members', verifyToken, verifyRole(['admin', 'coordinator']), getAvailableMembers);
-eventRouter.get('/:id/members', verifyToken, verifyRole(['admin', 'coordinator']), getEventWithMembers);
 eventRouter.put('/:id/members', verifyToken, verifyRole(['admin', 'coordinator']), updateAllEventTeams);
 eventRouter.put('/:id/members/team', verifyToken, verifyRole(['admin', 'coordinator']), updateEventTeam);
 eventRouter.post('/:id/members/team/:teamType/add', verifyToken, verifyRole(['admin', 'coordinator']), addMembersToTeam);
 eventRouter.delete('/:id/members/team/:teamType/members', verifyToken, verifyRole(['admin', 'coordinator']), removeMembersFromTeam);
-
-// Form response submission - public or authenticated
-eventRouter.post('/:eventId/form-response', ifTokenVerify ,submitFormResponse);
 
 // Protected routes (authentication required)
 // Admin/Coordinator only routes - using verifyRole middleware
