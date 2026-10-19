@@ -31,9 +31,16 @@
       }
     },
     {
-      "source": "/auth/(google.*|emaillogin|get_user|verify_user|verify_role|logout|password-reset.*)",
+      "source": "/auth/(google.*|emaillogin|get_user|verify_user|verify_role|logout|password-reset/(send-otp|verify-otp|reset-password|resend-otp).*)",
       "destination": {
         "service": "server"
+      }
+    },
+    {
+      "source": "/((?!assets/|favicon|icons|projects/).*)",
+      "destination": {
+        "service": "app",
+        "path": "/index.html"
       }
     },
     {

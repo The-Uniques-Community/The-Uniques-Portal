@@ -5,12 +5,19 @@
  * @agent_note When adding new routes, mount them with their corresponding route prefix below and ensure any custom headers or credentials required are handled in CORS configuration.
  */
 import "dotenv/config";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import mongoose from "mongoose";
 import dbconnect from "./config/dbConfig.js";
 import cookieParser from "cookie-parser";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const distPath = path.resolve(__dirname, "../dist");
 import memberRoute from "./routes/member/memberRoute.js";
 import adminRoute from "./routes/admin/adminRoute.js";
 import blogRouter from "./routes/member/blogRoute.js";
@@ -244,6 +251,29 @@ app.use("/api/stats", statsRouter);
 app.use("/api/batches", batchRouter);
 app.use("/api/community-benefits", communityBenefitsRouter);
 app.use("/api/custom-members", customMemberRouter);
+
+// Static asset serving and SPA fallback for standalone/production deployments
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+
+  app.get("*", (req, res, next) => {
+    // Pass through backend API / health routes so they return proper 404 JSON instead of index.html
+    const isBackendApi =
+      req.path.startsWith("/api") ||
+      req.path.startsWith("/upload") ||
+      req.path === "/health" ||
+      /^\/auth\/(google|emaillogin|get_user|verify_user|verify_role|logout|password-reset\/(send-otp|verify-otp|reset-password|resend-otp))/.test(req.path);
+
+    if (isBackendApi) {
+      return next();
+    }
+    const indexPath = path.join(distPath, "index.html");
+    if (fs.existsSync(indexPath)) {
+      return res.sendFile(indexPath);
+    }
+    next();
+  });
+}
 
 // Centralized Express error handler to guarantee structured JSON errors instead of HTML 500 stack traces
 app.use((err, req, res, _next) => {

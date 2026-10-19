@@ -187,7 +187,7 @@ const EventView = () => {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
-  const [tabValue, setTabValue] = useState(0);
+  const [tabValue, setTabValue] = useState(location.state?.initialTab ?? 0);
   const [editedEvent, setEditedEvent] = useState({});
   const [gallery, setGallery] = useState([]);
   const [formResponses, setFormResponses] = useState([]);
