@@ -52,8 +52,9 @@ for (const p of backendPaths) {
 }
 console.log('  ✓ All backend API auth and endpoint routes correctly route to server');
 
-// Client-side SPA routes that MUST route to app service with path /index.html
+// Client-side SPA routes that MUST route to app service
 const clientPaths = [
+  '/',
   '/coordinator',
   '/coordinator/events-overview',
   '/coordinator/projects-overview/view/123',
@@ -68,9 +69,9 @@ const clientPaths = [
 
 for (const p of clientPaths) {
   const dest = routeRequest(p);
-  assert(dest && dest.service === 'app' && dest.path === '/index.html', `Client SPA route ${p} must route to app with path /index.html, got: ${JSON.stringify(dest)}`);
+  assert(dest && dest.service === 'app', `Client SPA route ${p} must route to service "app", got: ${JSON.stringify(dest)}`);
 }
-console.log('  ✓ All frontend client routes correctly route to app with path /index.html');
+console.log('  ✓ All frontend client routes correctly route to service "app"');
 
 // Test 2: Role Dashboard Resolution Logic
 console.log('2. Testing getRoleDashboard mapping logic...');
@@ -162,6 +163,8 @@ console.log('5. Testing Vercel SPA fallback rewrite...');
 assert(vercelConfig.services && vercelConfig.services.app && vercelConfig.services.server, 'vercel.json must configure multi-service architecture (app and server)');
 assert.strictEqual(vercelConfig.services.app.framework, 'vite', 'app framework must be vite');
 assert.strictEqual(vercelConfig.services.server.framework, 'express', 'server framework must be express');
+assert(Array.isArray(vercelConfig.services.app.rewrites), 'services.app must define rewrites array');
+assert(vercelConfig.services.app.rewrites.some(r => r.destination === '/index.html'), 'services.app.rewrites must define fallback to /index.html');
 
 // Verify static assets route to app service without /index.html rewrite
 const staticAssets = [

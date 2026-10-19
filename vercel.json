@@ -3,7 +3,14 @@
   "services": {
     "app": {
       "root": ".",
-      "framework": "vite"
+      "framework": "vite",
+      "outputDirectory": "dist",
+      "rewrites": [
+        {
+          "source": "/(.*)",
+          "destination": "/index.html"
+        }
+      ]
     },
     "server": {
       "root": "server",
@@ -19,7 +26,19 @@
       }
     },
     {
+      "source": "/api",
+      "destination": {
+        "service": "server"
+      }
+    },
+    {
       "source": "/api/:match*",
+      "destination": {
+        "service": "server"
+      }
+    },
+    {
+      "source": "/upload",
       "destination": {
         "service": "server"
       }
@@ -61,66 +80,9 @@
       }
     },
     {
-      "source": "/coordinator",
+      "source": "/",
       "destination": {
-        "service": "app",
-        "path": "/index.html"
-      }
-    },
-    {
-      "source": "/coordinator/:match*",
-      "destination": {
-        "service": "app",
-        "path": "/index.html"
-      }
-    },
-    {
-      "source": "/admin",
-      "destination": {
-        "service": "app",
-        "path": "/index.html"
-      }
-    },
-    {
-      "source": "/admin/:match*",
-      "destination": {
-        "service": "app",
-        "path": "/index.html"
-      }
-    },
-    {
-      "source": "/member",
-      "destination": {
-        "service": "app",
-        "path": "/index.html"
-      }
-    },
-    {
-      "source": "/member/:match*",
-      "destination": {
-        "service": "app",
-        "path": "/index.html"
-      }
-    },
-    {
-      "source": "/forget-password",
-      "destination": {
-        "service": "app",
-        "path": "/index.html"
-      }
-    },
-    {
-      "source": "/:path((?!assets|favicon|icons|projects)[^/]+)",
-      "destination": {
-        "service": "app",
-        "path": "/index.html"
-      }
-    },
-    {
-      "source": "/:path((?!assets|favicon|icons|projects)[^/]+)/:sub*",
-      "destination": {
-        "service": "app",
-        "path": "/index.html"
+        "service": "app"
       }
     },
     {
