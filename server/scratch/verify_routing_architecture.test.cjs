@@ -14,12 +14,13 @@ console.log('--- [ROUTING ARCHITECTURE TEST SUITE] ---');
 // Test 1: Verify Vercel Rewrites Regex
 console.log('1. Testing Vercel Edge Rewrites regex matching...');
 const vercelConfig = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../vercel.json'), 'utf8'));
-const authRewrite = vercelConfig.rewrites.find(r => r.source && r.source.includes('/auth/'));
-assert(authRewrite, 'Auth rewrite rule must exist in vercel.json');
+const authRewrites = vercelConfig.rewrites.filter(r => r.source && r.source.startsWith('/auth/'));
+assert(authRewrites.length >= 2, 'Auth rewrite rules must exist in vercel.json');
 
-// Convert Vercel source pattern to RegExp
-const authRegexStr = authRewrite.source.replace(/^\//, '^\\/').replace(/\$$/, '') + '$';
-const authRegex = new RegExp(authRegexStr);
+const authRegexes = authRewrites.map(r => {
+  const authRegexStr = r.source.replace(/^\//, '^\\/').replace(/\$$/, '') + '$';
+  return new RegExp(authRegexStr);
+});
 
 // Backend API requests that MUST route to server
 const backendPaths = [
@@ -35,7 +36,8 @@ const backendPaths = [
 ];
 
 for (const p of backendPaths) {
-  assert(authRegex.test(p), `Backend path ${p} must match auth rewrite for server`);
+  const matches = authRegexes.some(re => re.test(p));
+  assert(matches, `Backend path ${p} must match an auth rewrite for server`);
 }
 console.log('  ✓ All backend API auth endpoints correctly route to server');
 
@@ -48,7 +50,8 @@ const clientPaths = [
 ];
 
 for (const p of clientPaths) {
-  assert(!authRegex.test(p), `Client SPA route ${p} must NOT route to backend server`);
+  const matches = authRegexes.some(re => re.test(p));
+  assert(!matches, `Client SPA route ${p} must NOT route to backend server`);
 }
 console.log('  ✓ All frontend client auth routes correctly fall through to Vite SPA');
 

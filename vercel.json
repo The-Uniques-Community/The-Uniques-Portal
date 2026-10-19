@@ -31,7 +31,13 @@
       }
     },
     {
-      "source": "/auth/(google.*|emaillogin|get_user|verify_user|verify_role|logout|password-reset/(send-otp|verify-otp|reset-password|resend-otp).*)",
+      "source": "/auth/password-reset/(.*)",
+      "destination": {
+        "service": "server"
+      }
+    },
+    {
+      "source": "/auth/(google.*|emaillogin|get_user|verify_user|verify_role|logout)",
       "destination": {
         "service": "server"
       }
