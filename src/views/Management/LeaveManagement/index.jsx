@@ -63,7 +63,6 @@ const LeaveManagement = () => {
     query: leaveService.getAllLeaves,
     defaultLimit: 10,
     defaultFilters: { status: "Pending" },
-    syncUrlParams: true,
   });
 
   const handleTabChange = (event, newValue) => {

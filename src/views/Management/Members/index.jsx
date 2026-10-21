@@ -77,7 +77,6 @@ const MembersIndex = () => {
   } = usePaginatedQuery({
     query: memberService.getAdminMembers,
     defaultLimit: 12,
-    syncUrlParams: true,
   });
 
   const handleTabChange = (event, newValue) => {

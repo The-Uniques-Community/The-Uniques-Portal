@@ -1,12 +1,11 @@
 /**
  * @file usePaginatedQuery.js
- * @description Centralized, race-condition-safe pagination, search, filter, and sort hook.
- * Uses queryRef and stabilized dependencies to eliminate infinite re-rendering loops.
- * Synchronizes with URLSearchParams safely without triggering circular updates.
+ * @description Centralized, stable pagination, search, filter, and sort hook.
+ * Fully decoupled from URLSearchParams to eliminate React Router infinite re-render loops.
+ * Guarantees loading state resolution and race condition safety via AbortController.
  */
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import apiClient from '@/services/apiClient';
 
 /**
@@ -29,26 +28,29 @@ const normalizeResponse = (response, limit = 10, page = 1, customTransformer = n
       total = response.pagination?.total ?? response.count ?? response.total ?? items.length;
     } else if (response.data && Array.isArray(response.data.members)) {
       items = response.data.members;
-      total = response.data.count ?? response.data.total ?? items.length;
+      total = response.pagination?.total ?? response.data.count ?? response.data.total ?? items.length;
     } else if (response.data && Array.isArray(response.data.data)) {
       items = response.data.data;
-      total = response.data.count ?? response.data.total ?? items.length;
+      total = response.pagination?.total ?? response.data.count ?? response.data.total ?? items.length;
     } else if (Array.isArray(response.leaves)) {
       items = response.leaves;
-      total = response.count ?? response.total ?? items.length;
+      total = response.pagination?.total ?? response.count ?? response.total ?? items.length;
     } else if (Array.isArray(response.projects)) {
       items = response.projects;
-      total = response.count ?? response.total ?? items.length;
+      total = response.pagination?.total ?? response.count ?? response.total ?? items.length;
     } else if (Array.isArray(response.trainers)) {
       items = response.trainers;
-      total = response.count ?? response.total ?? items.length;
+      total = response.pagination?.total ?? response.count ?? response.total ?? items.length;
     } else if (Array.isArray(response.tasks)) {
       items = response.tasks;
-      total = response.count ?? response.total ?? items.length;
+      total = response.pagination?.total ?? response.count ?? response.total ?? items.length;
+    } else if (Array.isArray(response.members)) {
+      items = response.members;
+      total = response.pagination?.total ?? response.count ?? response.total ?? items.length;
     } else {
       const arrayField = Object.values(response).find((val) => Array.isArray(val));
       items = arrayField || [];
-      total = response.count || response.total || items.length;
+      total = response.pagination?.total ?? response.count ?? response.total ?? items.length;
     }
   }
 
@@ -76,13 +78,10 @@ export const usePaginatedQuery = ({
   defaultSortBy = 'createdAt',
   defaultSortOrder = 'desc',
   debounceMs = 350,
-  syncUrlParams = false,
   transformResponse = null,
   dependencies = [],
 }) => {
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  // Keep query and transformer in refs so inline function definitions do NOT trigger re-fetches
+  // Store dynamic references in refs so inline function definitions do NOT trigger re-fetches
   const queryRef = useRef(query);
   queryRef.current = query;
 
@@ -91,37 +90,11 @@ export const usePaginatedQuery = ({
 
   const defaultFiltersRef = useRef(defaultFilters);
 
-  // Initialize state once from URL params (if sync enabled) or defaults
-  const [page, setPageState] = useState(() => {
-    if (syncUrlParams) {
-      const p = parseInt(searchParams.get('page'), 10);
-      return !isNaN(p) && p > 0 ? p : defaultPage;
-    }
-    return defaultPage;
-  });
-
-  const [limit, setLimitState] = useState(() => {
-    if (syncUrlParams) {
-      const l = parseInt(searchParams.get('limit'), 10);
-      return !isNaN(l) && l > 0 ? l : defaultLimit;
-    }
-    return defaultLimit;
-  });
-
-  const [search, setSearchState] = useState(() => {
-    if (syncUrlParams) {
-      return searchParams.get('search') || '';
-    }
-    return '';
-  });
-
-  const [debouncedSearch, setDebouncedSearch] = useState(() => {
-    if (syncUrlParams) {
-      return searchParams.get('search') || '';
-    }
-    return '';
-  });
-
+  // Core state strictly in React state
+  const [page, setPageState] = useState(defaultPage);
+  const [limit, setLimitState] = useState(defaultLimit);
+  const [search, setSearchState] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [filters, setFiltersState] = useState(defaultFilters);
   const [sortBy, setSortByState] = useState(defaultSortBy);
   const [sortOrder, setSortOrderState] = useState(defaultSortOrder);
@@ -133,8 +106,8 @@ export const usePaginatedQuery = ({
 
   const [pagination, setPagination] = useState({
     total: 0,
-    page,
-    limit,
+    page: defaultPage,
+    limit: defaultLimit,
     pages: 1,
     hasNextPage: false,
     hasPrevPage: false,
@@ -144,7 +117,7 @@ export const usePaginatedQuery = ({
   const abortControllerRef = useRef(null);
   const hasMountedRef = useRef(false);
 
-  // Debounce search input changes
+  // Debounce search input changes (350ms)
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -153,72 +126,21 @@ export const usePaginatedQuery = ({
     return () => clearTimeout(timer);
   }, [search, debounceMs]);
 
-  // Reset to page 1 whenever debouncedSearch changes after initial mount
+  // Reset to page 1 whenever debouncedSearch changes (after initial mount)
   useEffect(() => {
     if (!hasMountedRef.current) return;
     setPageState(1);
   }, [debouncedSearch]);
 
+  // Memoize filters into a stable JSON string to prevent reference mismatch re-triggers
   const filterKey = useMemo(() => JSON.stringify(filters), [filters]);
 
-  // Synchronize state to URL query parameters safely without infinite loop
+  // Track dependencies via stable key
+  const depsKey = useMemo(() => JSON.stringify(dependencies), [dependencies]);
+
+  // Primary Data Fetching Effect: depends ONLY on stable primitive strings and numbers
   useEffect(() => {
-    if (!syncUrlParams) return;
-
-    const currentUrlParams = new URLSearchParams(window.location.search);
-    const newParams = new URLSearchParams(window.location.search);
-
-    if (page > 1) newParams.set('page', String(page));
-    else newParams.delete('page');
-
-    if (limit !== defaultLimit) newParams.set('limit', String(limit));
-    else newParams.delete('limit');
-
-    if (debouncedSearch && debouncedSearch.trim()) newParams.set('search', debouncedSearch.trim());
-    else newParams.delete('search');
-
-    Object.entries(filters).forEach(([key, val]) => {
-      if (
-        val !== undefined &&
-        val !== null &&
-        val !== '' &&
-        val !== 'all' &&
-        val !== 'All' &&
-        val !== 'All Batches'
-      ) {
-        newParams.set(key, String(val));
-      } else {
-        newParams.delete(key);
-      }
-    });
-
-    if (sortBy !== defaultSortBy) newParams.set('sortBy', sortBy);
-    else newParams.delete('sortBy');
-
-    if (sortOrder !== defaultSortOrder) newParams.set('sortOrder', sortOrder);
-    else newParams.delete('sortOrder');
-
-    // Only update if serialized query string actually changed
-    if (currentUrlParams.toString() !== newParams.toString()) {
-      setSearchParams(newParams, { replace: true });
-    }
-  }, [
-    page,
-    limit,
-    debouncedSearch,
-    filterKey,
-    sortBy,
-    sortOrder,
-    syncUrlParams,
-    defaultLimit,
-    defaultSortBy,
-    defaultSortOrder,
-    setSearchParams,
-  ]);
-
-  // Primary Data Fetching Effect: depends ONLY on stable primitives
-  useEffect(() => {
-    // Abort previous in-flight request
+    // Abort previous in-flight request if still running
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
@@ -299,7 +221,8 @@ export const usePaginatedQuery = ({
         setError(err?.message || 'Failed to fetch paginated data');
         setData([]);
       } finally {
-        if (isMountedRef.current && !abortController.signal.aborted) {
+        // ALWAYS reset loading state when active request completes
+        if (isMountedRef.current) {
           setLoading(false);
         }
       }
@@ -318,9 +241,10 @@ export const usePaginatedQuery = ({
     sortBy,
     sortOrder,
     refreshTrigger,
-    ...dependencies,
+    depsKey,
   ]);
 
+  // Track component mount status
   useEffect(() => {
     hasMountedRef.current = true;
     isMountedRef.current = true;
