@@ -77,6 +77,10 @@ const leaveSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Optimized compound indexes for leave pagination and filtering
+leaveSchema.index({ memberId: 1, appliedDate: -1 });
+leaveSchema.index({ status: 1, appliedDate: -1 });
+
 const Leave = mongoose.models.Leave || mongoose.model("Leave", leaveSchema);
 
 /**

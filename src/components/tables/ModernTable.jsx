@@ -1,10 +1,14 @@
+/**
+ * @file ModernTable.jsx
+ * @description Standard table with integrated sticky headers, skeleton loaders,
+ * optional toolbar slot, and integrated DataTablePagination.
+ */
+
 import React from "react";
+import PropTypes from "prop-types";
 import {
   Box,
-  Chip,
-  IconButton,
   Paper,
-  Stack,
   Table,
   TableBody,
   TableCell,
@@ -12,9 +16,9 @@ import {
   TableHead,
   TableRow,
   Typography,
-  LinearProgress,
 } from "@mui/material";
 import { TableSkeleton } from "@/components/common/skeletons";
+import DataTablePagination from "@/components/common/pagination/DataTablePagination";
 
 const ModernTable = ({
   title,
@@ -25,6 +29,10 @@ const ModernTable = ({
   containerStyles = {},
   loading = false,
   skeletonRows = 6,
+  toolbar = null,
+  headerAction = null,
+  pagination = null,
+  emptyMessage = "No records found",
 }) => {
   return (
     <Paper
@@ -38,54 +46,61 @@ const ModernTable = ({
         ...containerStyles,
       }}
     >
-      {/* Table Header Section */}
-      {(title || description) && (
-        <Box sx={{ p: 2.5, borderBottom: "1px solid", borderColor: "divider" }}>
-          {title && (
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 700,
-                fontSize: "16px",
-                color: "text.primary",
-              }}
-            >
-              {title}
-            </Typography>
-          )}
-          {description && (
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ mt: 0.5, fontSize: "13px" }}
-            >
-              {description}
-            </Typography>
-          )}
+      {(title || description || headerAction) && (
+        <Box
+          sx={{
+            p: 2.5,
+            borderBottom: "1px solid",
+            borderColor: "divider",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 1.5,
+          }}
+        >
+          <Box>
+            {title && (
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 700,
+                  fontSize: "16px",
+                  color: "text.primary",
+                }}
+              >
+                {title}
+              </Typography>
+            )}
+            {description && (
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mt: 0.5, fontSize: "13px" }}
+              >
+                {description}
+              </Typography>
+            )}
+          </Box>
+          {headerAction && <Box>{headerAction}</Box>}
         </Box>
       )}
 
-      {/* Structured Content Grid Container */}
+      {toolbar && (
+        <Box sx={{ p: 2, borderBottom: "1px solid", borderColor: "divider" }}>
+          {toolbar}
+        </Box>
+      )}
+
       <TableContainer
         className="hide-scrollbar"
-        style={{
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-        }}
         sx={{
-          maxHeight: 520,
+          maxHeight: 560,
           overflowX: "auto",
           overflowY: "auto",
           maxWidth: "100%",
-          overscrollBehavior: "auto",
           scrollbarWidth: "none",
-          msOverflowStyle: "none",
-          "&::-webkit-scrollbar": {
-            display: "none !important",
-            width: "0px !important",
-            height: "0px !important",
-            background: "transparent !important",
-          },
+          "&::-webkit-scrollbar": { display: "none" },
         }}
       >
         <Table stickyHeader size="small">
@@ -129,22 +144,20 @@ const ModernTable = ({
               />
             ) : !Array.isArray(data) || data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={columns.length} sx={{ py: 6, px: 2, textAlign: "center" }}>
+                <TableCell
+                  colSpan={columns.length}
+                  sx={{ py: 6, px: 2, textAlign: "center" }}
+                >
                   <Box
                     sx={{
                       display: "flex",
                       flexDirection: "column",
                       alignItems: "center",
                       justifyContent: "center",
-                      position: { xs: "sticky", md: "static" },
-                      left: 0,
-                      width: { xs: "calc(100vw - 48px)", md: "100%" },
-                      maxWidth: "100%",
-                      mx: "auto",
                     }}
                   >
                     <Typography variant="body2" color="text.secondary">
-                      No records found
+                      {emptyMessage}
                     </Typography>
                   </Box>
                 </TableCell>
@@ -152,22 +165,64 @@ const ModernTable = ({
             ) : (
               data.map((row, index) => (
                 <TableRow
-                  key={row._id || index}
+                  key={row._id || row.id || index}
                   hover
                   sx={{
                     "&:last-child td, &:last-child th": { border: 0 },
                     transition: "background-color 0.15s ease",
                   }}
                 >
-                  {renderRow(row)}
+                  {renderRow(row, index)}
                 </TableRow>
               ))
             )}
           </TableBody>
         </Table>
       </TableContainer>
+
+      {pagination && (
+        <DataTablePagination
+          page={pagination.page}
+          limit={pagination.limit}
+          total={pagination.total}
+          pages={pagination.pages}
+          onPageChange={pagination.onPageChange}
+          onLimitChange={pagination.onLimitChange}
+          loading={loading}
+        />
+      )}
     </Paper>
   );
+};
+
+ModernTable.propTypes = {
+  title: PropTypes.string,
+  description: PropTypes.string,
+  columns: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+      align: PropTypes.oneOf(["left", "center", "right"]),
+      width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      headerStyles: PropTypes.object,
+    })
+  ).isRequired,
+  data: PropTypes.array,
+  renderRow: PropTypes.func.isRequired,
+  containerStyles: PropTypes.object,
+  loading: PropTypes.bool,
+  skeletonRows: PropTypes.number,
+  toolbar: PropTypes.node,
+  headerAction: PropTypes.node,
+  pagination: PropTypes.shape({
+    page: PropTypes.number.isRequired,
+    limit: PropTypes.number.isRequired,
+    total: PropTypes.number.isRequired,
+    pages: PropTypes.number.isRequired,
+    onPageChange: PropTypes.func.isRequired,
+    onLimitChange: PropTypes.func,
+  }),
+  emptyMessage: PropTypes.string,
 };
 
 export default ModernTable;

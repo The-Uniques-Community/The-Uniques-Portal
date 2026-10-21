@@ -6,6 +6,7 @@
  */
 import mongoose from "mongoose";
 import Project from "../../models/projects/projectModel.js";
+import { paginateQuery, buildSearchQuery } from "../../utils/queryHelper.js";
 
 const INITIAL_SEED_PROJECTS = [
   {
@@ -163,18 +164,38 @@ const INITIAL_SEED_PROJECTS = [
 // Get all projects (auto-seed if empty)
 export const getAllProjects = async (req, res) => {
   try {
-    let projects = await Project.find().sort({ createdAt: -1 });
-    
-    if (!projects || projects.length === 0) {
+    const { page, limit, search, batch, category, status } = req.query;
+
+    const count = await Project.estimatedDocumentCount();
+    if (count === 0) {
       // Seed default initial projects
       await Project.insertMany(INITIAL_SEED_PROJECTS);
-      projects = await Project.find().sort({ createdAt: -1 });
     }
+
+    const filter = { ...buildSearchQuery(search, ["title", "description", "category", "technologies"]) };
+    if (batch && batch !== "All" && batch !== "All Batches") {
+      filter.batch = batch;
+    }
+    if (category && category !== "All") {
+      filter.category = category;
+    }
+    if (status && status !== "All") {
+      filter.status = status;
+    }
+
+    const result = await paginateQuery(Project, filter, {
+      page,
+      limit,
+      sort: { featured: -1, createdAt: -1 },
+      lean: true,
+    });
 
     res.status(200).json({
       success: true,
-      count: projects.length,
-      data: projects,
+      count: result.pagination.total,
+      data: result.data,
+      projects: result.data,
+      pagination: result.pagination,
     });
   } catch (error) {
     console.error("Error fetching projects:", error);

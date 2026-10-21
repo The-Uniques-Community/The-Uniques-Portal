@@ -67,8 +67,19 @@ const taskSchema = new mongoose.Schema({
   },
   completedAt: {
     type: Date,
-  }
+  },
+  progressPercent: {
+    type: Number,
+    min: 0,
+    max: 100,
+    default: 0,
+  },
 }, { timestamps: true });
+
+// Optimized compound indexes for task querying and assignment lookups
+taskSchema.index({ "assignedTo.member": 1, status: 1, createdAt: -1 });
+taskSchema.index({ assignedBy: 1, status: 1, createdAt: -1 });
+taskSchema.index({ status: 1, deadline: 1 });
 
 const Task = mongoose.models.Task || mongoose.model("Task", taskSchema);
 

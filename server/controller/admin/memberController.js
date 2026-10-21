@@ -11,6 +11,7 @@ import Event from "../../models/member/eventModel.js";
 import Task from "../../models/uniques360/Task.js";
 import Report from "../../models/uniques360/Report.js";
 import mongoose from "mongoose";
+import { paginateQuery, buildSearchQuery } from "../../utils/queryHelper.js";
 
 /**
  * @desc    Fetch a single member profile by ID with populated relations (excluding password)
@@ -326,43 +327,46 @@ export const deleteMember = async (req, res) => {
  */
 export const getAllMembers = async (req, res) => {
   try {
-    const { sortBy = 'createdAt', order = 'desc', search } = req.query;
+    const { page, limit, sortBy = 'createdAt', order = 'desc', search, batch, status } = req.query;
+    const sort = { [sortBy]: order === 'asc' ? 1 : -1 };
+    const filter = { ...buildSearchQuery(search, ['fullName', 'email', 'admno']) };
 
-    // Create sort object
-    const sortOptions = {};
-    sortOptions[sortBy] = order === 'desc' ? -1 : 1;
-
-    const query = {};
-    if (search && search.trim() !== '') {
-      const escaped = search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const searchRegex = new RegExp(escaped, 'i');
-      query.$or = [
-        { fullName: searchRegex },
-        { email: searchRegex },
-        { admno: searchRegex },
-      ];
+    if (batch && batch !== 'All Batches' && batch !== 'All') {
+      filter.batch = batch;
     }
 
-    // Get total count
-    const total = await Member.countDocuments(query);
+    if (status) {
+      if (status === 'blocked' || status === 'suspended') {
+        filter.isSuspended = true;
+      } else if (status === 'pending') {
+        filter.isVerified = false;
+      } else {
+        filter.isSuspended = false;
+        filter.status = status;
+      }
+    }
 
-    // Fetch all members without pagination and populate needed fields
-    const members = await Member.find(query)
-      .select('-password')
-      .populate('event_participation')
-      .sort(sortOptions);
+    const result = await paginateQuery(Member, filter, {
+      page,
+      limit,
+      sort,
+      select: '-password',
+      populate: 'event_participation',
+      lean: true,
+    });
 
     return res.status(200).json({
       success: true,
-      data: members,
-      count: total
+      data: result.data,
+      count: result.pagination.total,
+      pagination: result.pagination,
     });
   } catch (error) {
     console.error('Error fetching members:', error);
     return res.status(500).json({
       success: false,
       message: 'Server error',
-      error: error.message
+      error: error.message,
     });
   }
 };

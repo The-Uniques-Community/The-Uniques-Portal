@@ -11,6 +11,7 @@ import {
   sendLeaveApprovalNotification,
   sendLeaveRejectionNotification,
 } from "../../services/leaveEmailService.js";
+import { paginateQuery, buildSearchQuery } from "../../utils/queryHelper.js";
 
 // Member Controllers
 
@@ -106,18 +107,30 @@ export const getMyLeaves = async (req, res) => {
     const memberId = req.user?.id || req.query.memberId;
 
     if (!memberId) {
-      return res.status(400).json({ message: "Member ID is required" });
+      return res.status(400).json({ success: false, message: "Member ID is required" });
     }
 
-    const leaves = await Leave.find({ memberId }).sort({ appliedDate: -1 });
+    const { page, limit, status } = req.query;
+    const filter = { memberId };
+    if (status) filter.status = status;
+
+    const result = await paginateQuery(Leave, filter, {
+      page,
+      limit,
+      sort: { appliedDate: -1 },
+      lean: true,
+    });
 
     res.status(200).json({
+      success: true,
       message: "Leaves retrieved successfully",
-      leaves,
+      leaves: result.data,
+      data: result.data,
+      pagination: result.pagination,
     });
   } catch (error) {
     console.error("Error retrieving leaves:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
 
@@ -257,24 +270,34 @@ export const getAllPendingLeaves = async (req, res) => {
  */
 export const getAllLeaves = async (req, res) => {
   try {
-    const { status } = req.query;
+    const { page, limit, status, type, search } = req.query;
 
-    let query = {};
+    const filter = { ...buildSearchQuery(search, ["memberName", "memberEmail", "reason"]) };
     if (status) {
-      query.status = status;
+      filter.status = status;
+    }
+    if (type) {
+      filter.type = type;
     }
 
-    const leaves = await Leave.find(query)
-      .populate("memberId", "fullName email contact")
-      .sort({ appliedDate: -1 });
+    const result = await paginateQuery(Leave, filter, {
+      page,
+      limit,
+      sort: { appliedDate: -1 },
+      populate: { path: "memberId", select: "fullName email contact" },
+      lean: true,
+    });
 
     res.status(200).json({
+      success: true,
       message: "Leaves retrieved successfully",
-      leaves,
+      leaves: result.data,
+      data: result.data,
+      pagination: result.pagination,
     });
   } catch (error) {
     console.error("Error retrieving leaves:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
 

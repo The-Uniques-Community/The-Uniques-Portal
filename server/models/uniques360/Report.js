@@ -41,6 +41,10 @@ const reportSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
+// Optimized compound indexes for task reports
+reportSchema.index({ taskId: 1, submissionDate: -1 });
+reportSchema.index({ studentId: 1, submissionDate: -1 });
+
 const Report = mongoose.models.Report || mongoose.model("Report", reportSchema);
 
 /**
