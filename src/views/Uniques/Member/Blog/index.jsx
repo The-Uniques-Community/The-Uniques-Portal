@@ -27,6 +27,7 @@ import {
   Divider,
   CircularProgress,
 } from "@mui/material";
+import { BlogCardSkeleton } from "@/components/common/skeletons";
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -690,9 +691,13 @@ const BlogManagement = () => {
         </Typography>
 
         {isLoading && !showForm ? (
-          <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
-            <CircularProgress />
-          </Box>
+          <Grid container spacing={3}>
+            {Array.from({ length: 6 }).map((_, index) => (
+              <Grid item xs={12} md={6} lg={4} key={index}>
+                <BlogCardSkeleton />
+              </Grid>
+            ))}
+          </Grid>
         ) : (
           <Grid container spacing={3}>
             {filteredBlogs.map((blog) => (

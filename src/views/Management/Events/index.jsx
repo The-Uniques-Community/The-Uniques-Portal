@@ -402,11 +402,7 @@ const EventsManagement = () => {
         </Button>
       </Box>
 
-      {loading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-          <CircularProgress />
-        </Box>
-      ) : events.length === 0 ? (
+      {!loading && events.length === 0 ? (
         <Paper sx={{ p: 4, textAlign: "center", borderRadius: 2 }}>
           <Typography variant="h6" sx={{ mb: 2, color: "text.secondary" }}>
             No events found
@@ -424,6 +420,7 @@ const EventsManagement = () => {
       ) : (
         <>
           <ModernTable
+            loading={loading}
             title="Events List"
             columns={[
               { id: "eventName", label: "Event Name" },

@@ -144,6 +144,10 @@ app.get("/health", (req, res) => {
 });
 
 app.get("/api/health", async (req, res) => {
+  // Warm or establish connection if not already in readyState 1
+  if (mongoose.connection.readyState !== 1) {
+    await dbconnect().catch(() => {});
+  }
   const isConnected = mongoose.connection.readyState === 1;
   let documentCounts = null;
   let databaseName = null;

@@ -437,6 +437,7 @@ const EnquiryManagement = () => {
 
       {/* Enquiries Table */}
       <ModernTable
+        loading={loading}
         title="Enquiries"
         columns={[
           { id: "name", label: "Name" },
@@ -541,7 +542,6 @@ const EnquiryManagement = () => {
             </TableCell>
           </>
         )}
-        loading={loading}
       />
 
       {/* Pagination */}

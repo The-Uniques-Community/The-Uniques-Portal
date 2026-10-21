@@ -346,7 +346,7 @@ const Trainers = () => {
                 {/* Profiles Tab */}
                 <TabPanel value="1" sx={{ p: 0 }}>
                     {loading ? (
-                        <CardSkeleton type="trainer" count={8} />
+                        <CardSkeleton type="trainer" count={8} className="grid xl:grid-cols-4 md:grid-cols-3 grid-cols-1 sm:grid-cols-1 gap-4" />
                     ) : (
                         <div className="grid xl:grid-cols-4 md:grid-cols-3 grid-cols-1 sm:grid-cols-1 gap-4">
                             {filteredTrainers.length > 0 ? (

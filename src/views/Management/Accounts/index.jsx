@@ -26,6 +26,7 @@ import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import { BASE_URL } from '@/config';
 import ModernHeader from '@/components/headers/ModernHeader';
+import { BaseSkeleton } from '@/components/common/skeletons';
 
 const API_BASE_URL = `${BASE_URL}/api/admin`;
 
@@ -170,7 +171,7 @@ const Accounts = () => {
         <ModernStatCard 
           icon={<GroupsIcon fontSize="large" />}
           label='Total Members' 
-          value={loading ? <CircularProgress size={24} /> : stats.totalMembers}
+          value={loading ? <BaseSkeleton variant="text" width={80} height={44} /> : stats.totalMembers}
           link={`${basePath}/members-overview`}
           color="#2196F3"
           gradient="radial-gradient(circle at 80% 20%, rgba(33, 150, 243, 0.15) 0%, transparent 50%)"
@@ -178,21 +179,21 @@ const Accounts = () => {
         <ModernStatCard 
           icon={<ReceiptIcon fontSize="large" />}
           label='Total Fines Issued' 
-          value={loading ? <CircularProgress size={24} /> : stats.totalFinesIssued}
+          value={loading ? <BaseSkeleton variant="text" width={80} height={44} /> : stats.totalFinesIssued}
           color="#9C27B0"
           gradient="radial-gradient(circle at 80% 20%, rgba(156, 39, 176, 0.15) 0%, transparent 50%)"
         />
         <ModernStatCard 
           icon={<CurrencyRupeeIcon fontSize="large" />}
           label='Total Fine Amount' 
-          value={loading ? <CircularProgress size={24} /> : `₹${stats.totalAmount}`}
+          value={loading ? <BaseSkeleton variant="text" width={110} height={44} /> : `₹${stats.totalAmount}`}
           color="#FF9800"
           gradient="radial-gradient(circle at 80% 20%, rgba(255, 152, 0, 0.15) 0%, transparent 50%)"
         />
         <ModernStatCard 
           icon={<PendingActionsIcon fontSize="large" />}
           label='Pending Amount' 
-          value={loading ? <CircularProgress size={24} /> : `₹${stats.totalPendingAmount}`}
+          value={loading ? <BaseSkeleton variant="text" width={110} height={44} /> : `₹${stats.totalPendingAmount}`}
           color="#f44336"
           gradient="radial-gradient(circle at 80% 20%, rgba(244, 67, 54, 0.15) 0%, transparent 50%)"
         />
@@ -206,28 +207,28 @@ const Accounts = () => {
         <ModernStatCard 
           icon={<PaidIcon fontSize="large" />}
           label='Paid Amount' 
-          value={loading ? <CircularProgress size={24} /> : `₹${stats.totalPaidAmount}`}
+          value={loading ? <BaseSkeleton variant="text" width={110} height={44} /> : `₹${stats.totalPaidAmount}`}
           color="#4CAF50"
           gradient="radial-gradient(circle at 80% 20%, rgba(76, 175, 80, 0.15) 0%, transparent 50%)"
         />
         <ModernStatCard 
           icon={<ThumbUpIcon fontSize="large" />}
           label='Waived Amount' 
-          value={loading ? <CircularProgress size={24} /> : `₹${stats.totalWaivedAmount}`}
+          value={loading ? <BaseSkeleton variant="text" width={110} height={44} /> : `₹${stats.totalWaivedAmount}`}
           color="#3F51B5"
           gradient="radial-gradient(circle at 80% 20%, rgba(63, 81, 181, 0.15) 0%, transparent 50%)"
         />
         <ModernStatCard 
           icon={<PaidIcon fontSize="large" />}
           label='Members with No Fine' 
-          value={loading ? <CircularProgress size={24} /> : stats.paidMembers}
+          value={loading ? <BaseSkeleton variant="text" width={80} height={44} /> : stats.paidMembers}
           color="#10B981"
           gradient="radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.15) 0%, transparent 50%)"
         />
         <ModernStatCard 
           icon={<WarningAmberIcon fontSize="large" />}
           label='Members with Pending Fine' 
-          value={loading ? <CircularProgress size={24} /> : stats.membersWithPendingFines}
+          value={loading ? <BaseSkeleton variant="text" width={80} height={44} /> : stats.membersWithPendingFines}
           color="#F43F5E"
           gradient="radial-gradient(circle at 80% 20%, rgba(244, 63, 94, 0.15) 0%, transparent 50%)"
         />
@@ -245,8 +246,8 @@ const Accounts = () => {
               Fine Distribution by Batch
             </Typography>
             {loading ? (
-              <Box className="flex justify-center items-center" height={300}>
-                <CircularProgress />
+              <Box height={300} sx={{ display: "flex", alignItems: "center" }}>
+                <BaseSkeleton variant="rounded" width="100%" height={260} sx={{ borderRadius: "8px" }} />
               </Box>
             ) : (
               <ResponsiveContainer width="100%" height={300}>
@@ -278,8 +279,12 @@ const Accounts = () => {
               Fine Payment Status
             </Typography>
             {loading ? (
-              <Box className="flex justify-center items-center" height={300}>
-                <CircularProgress />
+              <Box height={300} sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                <BaseSkeleton variant="circular" width={180} height={180} />
+                <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+                  <BaseSkeleton variant="rounded" width={90} height={18} sx={{ borderRadius: "6px" }} />
+                  <BaseSkeleton variant="rounded" width={80} height={18} sx={{ borderRadius: "6px" }} />
+                </Box>
               </Box>
             ) : (
               <Box className="flex flex-col items-center">

@@ -8,6 +8,7 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { useDispatch, useSelector } from 'react-redux';
+import { ProfilePageSkeleton } from '@/components/common/skeletons';
 import {
   Avatar,
   Box,
@@ -280,38 +281,7 @@ export default function CoordinatorProfile() {
   const completedTasksCount = tasks?.filter((t) => t.status?.toLowerCase() === 'completed')?.length || 0;
 
   if (isLoading && !activeProfile) {
-    return (
-      <Container maxWidth="xl" sx={{ py: 4 }}>
-        <Paper
-          elevation={0}
-          sx={{
-            p: 4,
-            mb: 4,
-            borderRadius: 3,
-            border: '1px solid',
-            borderColor: 'divider',
-            bgcolor: 'background.paper',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-            <Skeleton variant="circular" width={100} height={100} />
-            <Box sx={{ flex: 1 }}>
-              <Skeleton variant="text" width="40%" height={40} />
-              <Skeleton variant="text" width="25%" height={25} />
-              <Skeleton variant="text" width="60%" height={20} />
-            </Box>
-          </Box>
-        </Paper>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={8}>
-            <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 3 }} />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 3 }} />
-          </Grid>
-        </Grid>
-      </Container>
-    );
+    return <ProfilePageSkeleton />;
   }
 
   return (

@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Avatar, Box, Chip, CircularProgress, Paper, Typography } from "@mui/material";
 import HistoryIcon from '@mui/icons-material/History';
 import ProgressIcon from '@mui/icons-material/QueryStats';
+import { FeedSkeleton } from "@/components/common/skeletons";
 
 const ReportFeed = ({ reports, reportsLoading, scrollRef }) => {
   return (
@@ -33,9 +34,7 @@ const ReportFeed = ({ reports, reportsLoading, scrollRef }) => {
       )}
 
       {reportsLoading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", p: 8 }}>
-          <CircularProgress size={36} sx={{ color: "primary.main" }} />
-        </Box>
+        <FeedSkeleton count={3} />
       ) : Array.isArray(reports) && reports.length > 0 ? (
         <AnimatePresence>
           {reports.map((report) => (

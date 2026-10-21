@@ -38,6 +38,7 @@ import CreateTaskDialog from "./components/CreateTaskDialog";
 import ReportsDialog from "./components/ReportsDialog";
 import EditTaskDialog from "./components/EditTaskDialog";
 import TeamDialog from "./components/TeamDialog";
+import { Coordinator360Skeleton, TableSkeleton } from "@/components/common/skeletons";
 
 const BRAND_COLOR = "#ca0019";
 const BRAND_HOVER = "#a30014";
@@ -310,38 +311,7 @@ const Uniques360Coordinator = () => {
   };
 
   if (loading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "80vh",
-          gap: 3,
-        }}
-      >
-        <Box
-          component="img"
-          src={isDarkMode ? logoWhite : logoCommunity}
-          alt="logo"
-          sx={{ height: isDarkMode ? 60 : 80 }}
-        />
-        <Box sx={{ width: 280 }}>
-          <LinearProgress
-            sx={{
-              height: 4,
-              borderRadius: 2,
-              backgroundColor: "action.hover",
-              "& .MuiLinearProgress-bar": { backgroundColor: BRAND_COLOR },
-            }}
-          />
-        </Box>
-        <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 500, letterSpacing: "0.3px" }}>
-          Loading system workspace...
-        </Typography>
-      </Box>
-    );
+    return <Coordinator360Skeleton />;
   }
 
   return (
@@ -545,9 +515,7 @@ const Uniques360Coordinator = () => {
 
       {/* DYNAMIC DATA VIEWS */}
       {tasksLoading && (
-        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 8 }}>
-          <CircularProgress size={38} sx={{ color: BRAND_COLOR }} />
-        </Box>
+        <TableSkeleton rows={5} columns={7} />
       )}
 
       {!tasksLoading && tasks.length === 0 && (

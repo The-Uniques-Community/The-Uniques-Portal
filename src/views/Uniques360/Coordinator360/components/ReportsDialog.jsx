@@ -10,6 +10,7 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
+import { FeedSkeleton } from "@/components/common/skeletons";
 import ReportIcon from '@mui/icons-material/AssignmentOutlined';
 import TimeIcon from '@mui/icons-material/AccessTimeOutlined';
 
@@ -44,9 +45,9 @@ const ReportsDialog = ({ open, onClose, task, reports, loading }) => {
 
       <DialogContent sx={{ minHeight: "200px" }}>
         {loading ? (
-          /* Loading Overlay State */
-          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 8 }}>
-            <CircularProgress size={36} sx={{ color: "primary.main" }} />
+          /* Loading Skeleton State */
+          <Box sx={{ py: 1 }}>
+            <FeedSkeleton count={3} />
           </Box>
         ) : Array.isArray(reports) && reports.length > 0 ? (
           /* Active Scrollable Stream List Container */

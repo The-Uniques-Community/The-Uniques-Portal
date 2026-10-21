@@ -27,6 +27,7 @@ import {
 } from "@mui/material";
 import ModernTable from "@/components/tables/ModernTable";
 import ModernHeader from "@/components/headers/ModernHeader";
+import { EventInsightsSkeleton } from "@/components/common/skeletons";
 import EventIcon from '@mui/icons-material/Event';
 import TimelineIcon from '@mui/icons-material/Schedule';
 import StudentIcon from '@mui/icons-material/People';
@@ -120,11 +121,7 @@ const EventInsights = () => {
   };
 
   if (loading) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh" }}>
-        <CircularProgress sx={{ color: BRAND_COLOR }} />
-      </Box>
-    );
+    return <EventInsightsSkeleton />;
   }
 
   return (
@@ -182,6 +179,7 @@ const EventInsights = () => {
         {/* Core Task Registry View */}
         <Grid item xs={12} lg={7}>
           <ModernTable
+            loading={loading}
             title="Active Event Matrix Stream"
             columns={[
               { id: "title", label: "EVENT OPERATIONAL LOG" },
