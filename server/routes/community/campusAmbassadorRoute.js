@@ -24,6 +24,7 @@ campusAmbassadorRouter.post('/admin/create', verifyToken, verifyRole(['admin']),
 
 // Campus Ambassador routes - public
 campusAmbassadorRouter.post('/campus-ambassador/apply', applyForCampusAmbassador);
+campusAmbassadorRouter.post('/apply-campus-ambassador', applyForCampusAmbassador);
 
 // Campus Ambassador routes - protected
 campusAmbassadorRouter.get('/campus-ambassador', verifyToken, verifyRole(['admin', 'coordinator']), getCampusAmbassadorApplications);

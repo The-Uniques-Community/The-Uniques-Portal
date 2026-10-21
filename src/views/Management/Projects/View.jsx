@@ -164,7 +164,7 @@ const ProjectView = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!validateFile(file, FILE_VALIDATION_PRESETS.IMAGE, { inputTarget: e })) {
+    if (!validateFile(file, FILE_VALIDATION_PRESETS.AVATAR, { inputTarget: e })) {
       return;
     }
 

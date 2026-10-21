@@ -35,7 +35,7 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { toast } from "react-toastify";
-import { BASE_URL } from "@/config";
+import leaveService from "@/services/leaveService";
 
 const LeaveManagement = () => {
   const theme = useTheme();
@@ -61,28 +61,19 @@ const LeaveManagement = () => {
   const fetchLeaves = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${BASE_URL}/api/leave/my-leaves`, {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          toast.error("Please login to view your leaves");
-          return;
-        }
-        throw new Error("Failed to fetch leaves");
-      }
-
-      const data = await response.json();
+      const data = await leaveService.getMyLeaves();
       setLeaves(data.leaves || []);
     } catch (error) {
       console.error("Error fetching leaves:", error);
-      toast.error("Failed to load leave requests");
+      if (error?.status === 401 || error?.response?.status === 401) {
+        toast.error("Please login to view your leaves");
+        return;
+      }
+      toast.error(error?.message || "Failed to load leave requests");
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
 
   const handleOpenDialog = (leave = null) => {
@@ -132,24 +123,10 @@ const LeaveManagement = () => {
       setIsLoading(true);
 
       if (editingId) {
-        const response = await fetch(`${BASE_URL}/api/leave/${editingId}`, {
-          method: "PUT",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message || "Failed to update leave request");
+        await leaveService.updateLeaveRequest(editingId, formData);
         toast.success("Leave request updated successfully");
       } else {
-        const response = await fetch(`${BASE_URL}/api/leave/submit`, {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message || "Failed to submit leave request");
+        await leaveService.submitLeaveRequest(formData);
         toast.success("Leave request submitted successfully");
       }
 
@@ -157,7 +134,7 @@ const LeaveManagement = () => {
       fetchLeaves();
     } catch (error) {
       console.error("Error saving leave:", error);
-      toast.error(error.message || "Failed to save leave request");
+      toast.error(error.response?.data?.message || error?.message || "Failed to save leave request");
     } finally {
       setIsLoading(false);
     }
@@ -170,20 +147,12 @@ const LeaveManagement = () => {
 
     try {
       setIsLoading(true);
-      const response = await fetch(`${BASE_URL}/api/leave/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete leave request");
-      }
-
+      await leaveService.deleteLeaveRequest(id);
       toast.success("Leave request deleted successfully");
       fetchLeaves();
     } catch (error) {
       console.error("Error deleting leave:", error);
-      toast.error("Failed to delete leave request");
+      toast.error(error?.message || "Failed to delete leave request");
     } finally {
       setIsLoading(false);
     }

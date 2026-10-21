@@ -26,12 +26,14 @@ export const leaveService = {
   },
 
   async approveLeave(id, remarks = '') {
-    const response = await apiClient.put(`/api/leave/${id}/approve`, { remarks });
+    const payload = typeof remarks === 'object' ? remarks : { remarks, approvedBy: 'Admin' };
+    const response = await apiClient.put(`/api/leave/${id}/approve`, payload);
     return response.data;
   },
 
   async rejectLeave(id, remarks = '') {
-    const response = await apiClient.put(`/api/leave/${id}/reject`, { remarks });
+    const payload = typeof remarks === 'object' ? remarks : { rejectionReason: remarks, remarks, rejectedBy: 'Admin' };
+    const response = await apiClient.put(`/api/leave/${id}/reject`, payload);
     return response.data;
   },
 

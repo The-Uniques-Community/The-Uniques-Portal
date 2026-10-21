@@ -122,7 +122,7 @@ const CoordinatorBatches = () => {
   const processSelectedFile = async (file) => {
     if (!file) return;
 
-    if (!validateFile(file, FILE_VALIDATION_PRESETS.IMAGE, { inputTarget: fileInputRef })) {
+    if (!validateFile(file, FILE_VALIDATION_PRESETS.AVATAR, { inputTarget: fileInputRef })) {
       return;
     }
 

@@ -38,6 +38,7 @@ import {
   updateEventTeam,
   addMembersToTeam,
   removeMembersFromTeam,
+  removeEventMemberREST,
   getAvailableMembers,
   registerForEvent
 } from '../../controller/events/eventController.js';
@@ -61,6 +62,8 @@ eventRouter.post('/:eventId/form-response', ifTokenVerify ,submitFormResponse);
 // team-member addition and removal in event
 eventRouter.get('/available-members', verifyToken, verifyRole(['admin', 'coordinator']), getAvailableMembers);
 eventRouter.put('/:id/members', verifyToken, verifyRole(['admin', 'coordinator']), updateAllEventTeams);
+eventRouter.post('/:id/members', verifyToken, verifyRole(['admin', 'coordinator']), addEventMembers);
+eventRouter.delete('/:id/members/:memberId', verifyToken, verifyRole(['admin', 'coordinator']), removeEventMemberREST);
 eventRouter.put('/:id/members/team', verifyToken, verifyRole(['admin', 'coordinator']), updateEventTeam);
 eventRouter.post('/:id/members/team/:teamType/add', verifyToken, verifyRole(['admin', 'coordinator']), addMembersToTeam);
 eventRouter.delete('/:id/members/team/:teamType/members', verifyToken, verifyRole(['admin', 'coordinator']), removeMembersFromTeam);

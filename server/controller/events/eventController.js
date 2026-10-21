@@ -3113,6 +3113,66 @@ export const removeMembersFromTeam = async (req, res) => {
 };
 
 /**
+ * Remove a specific member from an event across all teams/roles via REST
+ * @route DELETE /api/events/:id/members/:memberId
+ * @access Private (Admin / Coordinator)
+ */
+export const removeEventMemberREST = async (req, res) => {
+  try {
+    const { id, memberId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(memberId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid event ID or member ID format',
+      });
+    }
+
+    const event = await Event.findById(id);
+    if (!event) {
+      return res.status(404).json({
+        success: false,
+        message: 'Event not found',
+      });
+    }
+
+    // 1. Remove from all team arrays in eventMembers
+    if (Array.isArray(event.eventMembers)) {
+      event.eventMembers.forEach((team) => {
+        if (Array.isArray(team.contributionTeam)) {
+          team.contributionTeam = team.contributionTeam.filter(
+            (m) => m && m.toString() !== memberId.toString()
+          );
+        }
+      });
+    }
+
+    // 2. Remove from attendees if present
+    if (Array.isArray(event.attendees)) {
+      event.attendees = event.attendees.filter(
+        (a) => (a.user ? a.user.toString() : null) !== memberId.toString()
+      );
+    }
+
+    await event.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Member removed from event successfully',
+      event,
+    });
+  } catch (error) {
+    console.error('Error removing event member via REST:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error removing event member',
+      error: error.message,
+    });
+  }
+};
+
+
+/**
  * Get available members for selection with search and filters
  * @route GET /api/events/available-members
  * @query search - Search by name, email, or admission number

@@ -9,6 +9,12 @@ import verifyToken from '../../middlewares/verifyToken.js';
 
 const memberFineRoute = express.Router();
 
+// Root route for member's fines (GET /api/fine)
+memberFineRoute.get('/', verifyToken, async (req, res) => {
+  req.params.memberId = req.user?._id || req.user?.id;
+  return getFineHistory(req, res);
+});
+
 memberFineRoute.get('/profile/fines/pending', verifyToken, async (req, res) => {
   req.params.memberId = req.user?._id || req.user?.id;
   return getPendingFines(req, res);

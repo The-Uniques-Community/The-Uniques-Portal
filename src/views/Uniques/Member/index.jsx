@@ -528,7 +528,7 @@ const Index = () => {
   const handleProfilePictureChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (!validateFile(file, FILE_VALIDATION_PRESETS.IMAGE, { inputTarget: e })) {
+      if (!validateFile(file, FILE_VALIDATION_PRESETS.AVATAR, { inputTarget: e })) {
         setProfilePicture(null);
         return;
       }
@@ -945,7 +945,7 @@ const Index = () => {
   const handleProjectImageChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (!validateFile(file, FILE_VALIDATION_PRESETS.IMAGE, { inputTarget: e })) {
+      if (!validateFile(file, FILE_VALIDATION_PRESETS.AVATAR, { inputTarget: e })) {
         setProjectImage(null);
         return;
       }

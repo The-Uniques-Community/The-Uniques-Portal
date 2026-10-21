@@ -4,6 +4,7 @@
  * @architecture Interacts with the Mongoose Guest model (server/models/member/guestModel.js) and serves endpoints mounted on `/api/guest`.
  * @agent_note When linking guests to events or bulk uploading, ensure the schema accommodates dynamic event association objects.
  */
+import mongoose from "mongoose";
 import Guest from "../../models/member/guestModel.js";
 import { guests } from "../../seeds/guestsSeed.js";
 
@@ -233,6 +234,210 @@ export const linkGuestToEvent = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: 'Failed to link guest to event',
+            error: error.message
+        });
+    }
+};
+
+/**
+ * @desc    Update a guest speaker profile
+ * @route   PUT /api/guest/:id or PUT /api/guest/update-guest/:id
+ * @access  Private (Admin / Coordinator)
+ * @param   {string} req.params.id - Guest ObjectId string
+ * @body    {Object} req.body - Updated guest fields
+ * @returns {Object} JSON response with updated guest profile
+ */
+export const updateGuest = async (req, res) => {
+    try {
+        const guestId = req.params.id;
+
+        if (!guestId) {
+            return res.status(400).json({
+                success: false,
+                message: "Guest ID is required"
+            });
+        }
+
+        const stringFields = [
+            "guestName",
+            "guestEmail",
+            "guestContact",
+            "guestLinkedin",
+            "guestCompany",
+            "guestDesignation",
+            "guestImage"
+        ];
+
+        for (const field of stringFields) {
+            if (req.body[field] !== undefined) {
+                if (typeof req.body[field] !== "string") {
+                    return res.status(400).json({
+                        success: false,
+                        message: `Invalid ${field}: must be a string`
+                    });
+                }
+                if (field === "guestName" && !req.body[field].trim()) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Guest name cannot be empty"
+                    });
+                }
+            }
+        }
+
+        if (req.body.events !== undefined) {
+            if (!Array.isArray(req.body.events)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Events must be an array"
+                });
+            }
+
+            for (const entry of req.body.events) {
+                if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Events array must contain valid event objects"
+                    });
+                }
+
+                const rawEventId = entry.event && typeof entry.event === "object" && entry.event._id
+                    ? entry.event._id
+                    : entry.event;
+
+                const isValidId = rawEventId && (
+                    rawEventId instanceof mongoose.Types.ObjectId ||
+                    (typeof rawEventId === "string" && /^[0-9a-fA-F]{24}$/.test(rawEventId))
+                );
+
+                if (!isValidId) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Each event entry must contain a valid event ID"
+                    });
+                }
+
+                if (entry.guestTag !== undefined && typeof entry.guestTag !== "string") {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Invalid guest tag format in events array"
+                    });
+                }
+            }
+        }
+
+        const allowedFields = [
+            "guestName",
+            "guestEmail",
+            "guestContact",
+            "guestLinkedin",
+            "guestCompany",
+            "guestDesignation",
+            "guestImage",
+            "events"
+        ];
+
+        const updateData = {};
+        for (const field of allowedFields) {
+            if (req.body[field] !== undefined) {
+                updateData[field] = req.body[field];
+            }
+        }
+
+        if (Object.keys(updateData).length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "No valid fields provided for update"
+            });
+        }
+
+        const updatedGuest = await Guest.findByIdAndUpdate(
+            guestId,
+            { $set: updateData },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedGuest) {
+            return res.status(404).json({
+                success: false,
+                message: "Guest not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Guest updated successfully",
+            guest: updatedGuest
+        });
+    } catch (error) {
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({
+                success: false,
+                message: "Validation failed",
+                error: error.message
+            });
+        }
+
+        if (error.name === 'CastError' && error.kind === 'ObjectId') {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid guest ID format",
+                error: error.message
+            });
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: "Error updating guest",
+            error: error.message
+        });
+    }
+};
+
+/**
+ * @desc    Delete a guest speaker profile
+ * @route   DELETE /api/guest/:id or DELETE /api/guest/delete-guest/:id
+ * @access  Private (Admin / Coordinator)
+ * @param   {string} req.params.id - Guest ObjectId string
+ * @returns {Object} JSON confirmation of deletion
+ */
+export const deleteGuest = async (req, res) => {
+    try {
+        const guestId = req.params.id;
+
+        if (!guestId) {
+            return res.status(400).json({
+                success: false,
+                message: "Guest ID is required"
+            });
+        }
+
+        const deletedGuest = await Guest.findByIdAndDelete(guestId);
+
+        if (!deletedGuest) {
+            return res.status(404).json({
+                success: false,
+                message: "Guest not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Guest deleted successfully",
+            deletedGuest
+        });
+    } catch (error) {
+        if (error.name === 'CastError' && error.kind === 'ObjectId') {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid guest ID format",
+                error: error.message
+            });
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: "Error deleting guest",
             error: error.message
         });
     }

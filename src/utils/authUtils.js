@@ -146,14 +146,90 @@ export const storeAuth = ({ token, role, user } = {}) => {
 export const clearAuthStorage = () => {
   if (typeof window === "undefined") return;
   try {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("role");
-    localStorage.removeItem("activeItem");
+    const storage = window.localStorage || (typeof localStorage !== "undefined" ? localStorage : null);
+    if (storage) {
+      storage.removeItem("token");
+      storage.removeItem("user");
+      storage.removeItem("role");
+      storage.removeItem("activeItem");
+    }
     if (window.sessionStorage) {
-      sessionStorage.clear();
+      window.sessionStorage.clear();
     }
   } catch (err) {
     console.warn("[AuthUtils] Error clearing storage:", err);
+  }
+};
+
+/**
+ * Checks whether an HTTP status code or response payload indicates a missing/invalid token.
+ * 
+ * @param {number|null|undefined} status - HTTP status code
+ * @param {Object|null|undefined} data - Response payload body
+ * @returns {boolean}
+ */
+export const isTokenError = (status, data) => {
+  if (status === 401) return true;
+  const msg = (data?.error || data?.message || "").toString().toLowerCase();
+  return (
+    msg.includes("no token provided") ||
+    msg.includes("invalid token") ||
+    msg.includes("jwt expired") ||
+    msg.includes("token expired") ||
+    msg.includes("jwt must be provided") ||
+    msg.includes("jwt malformed") ||
+    msg.includes("authentication required")
+  );
+};
+
+let isRedirectingToLogin = false;
+
+/**
+ * Resets the redirect debounce state (useful for unit tests or re-mounting).
+ */
+export const resetAuthRedirectState = () => {
+  isRedirectingToLogin = false;
+};
+
+/**
+ * Handles an unauthenticated session state across the application.
+ * Purges cached tokens, resets Redux user state, and navigates cleanly to login.
+ * 
+ * @param {Object} [options]
+ * @param {string} [options.targetPath="/"]
+ */
+export const handleUnauthenticatedSession = (options = {}) => {
+  const { targetPath = "/" } = options;
+
+  // 1. Purge storage credentials immediately
+  clearAuthStorage();
+
+  // 2. Dispatch Redux logout action if store is available
+  if (typeof window !== "undefined" && window.__REDUX_STORE__) {
+    try {
+      window.__REDUX_STORE__.dispatch({ type: "user/clearUser" });
+    } catch (e) {
+      console.warn("[AuthUtils] Failed to dispatch Redux clearUser:", e);
+    }
+  }
+
+  // 3. Navigate to login if not already on an authentication route
+  if (typeof window !== "undefined" && window.location) {
+    const currentPath = window.location.pathname;
+    const isAuthRoute =
+      currentPath === "/" ||
+      currentPath === "/login" ||
+      currentPath === "/auth" ||
+      currentPath === "/auth/login" ||
+      currentPath === "/forget-password";
+
+    if (!isAuthRoute && !isRedirectingToLogin) {
+      isRedirectingToLogin = true;
+      console.warn("[AuthUtils] Unauthenticated session detected. Redirecting to login:", targetPath);
+      window.location.replace(targetPath);
+      setTimeout(() => {
+        isRedirectingToLogin = false;
+      }, 3000);
+    }
   }
 };

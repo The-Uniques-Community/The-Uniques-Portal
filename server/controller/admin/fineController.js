@@ -204,13 +204,27 @@ export const updateFineStatus = async (req, res) => {
     
     // Update proof of payment if provided
     if (req.body.proofOfPayment && typeof req.body.proofOfPayment === 'object') {
-      member.fines[fineIndex].proofOfPayment = req.body.proofOfPayment;
-    } else if (proofOfPaymentId && mongoose.Types.ObjectId.isValid(proofOfPaymentId)) {
-      if (member.fines[fineIndex].proofOfPayment && typeof member.fines[fineIndex].proofOfPayment === 'object') {
-        member.fines[fineIndex].proofOfPayment._id = proofOfPaymentId;
-      } else {
-        member.fines[fineIndex].proofOfPayment = { _id: proofOfPaymentId };
-      }
+      const p = req.body.proofOfPayment;
+      const rawUrl = typeof p.fileUrl === 'string' ? p.fileUrl : (typeof p.url === 'string' ? p.url : '');
+      const safeUrl = rawUrl.startsWith('https://') ? rawUrl : '';
+      const safeId = (p._id && mongoose.Types.ObjectId.isValid(p._id)) ? p._id : new mongoose.Types.ObjectId();
+      member.fines[fineIndex].proofOfPayment = {
+        _id: safeId,
+        fileId: String(p.fileId || ''),
+        fileUrl: safeUrl,
+        url: safeUrl,
+        fileName: String(p.fileName || p.name || '')
+      };
+    } else if (proofOfPaymentId) {
+      const pIdStr = typeof proofOfPaymentId === 'object' ? proofOfPaymentId._id || proofOfPaymentId.fileId : proofOfPaymentId;
+      const isDriveId = typeof pIdStr === 'string' && !mongoose.Types.ObjectId.isValid(pIdStr);
+      member.fines[fineIndex].proofOfPayment = {
+        _id: mongoose.Types.ObjectId.isValid(pIdStr) ? pIdStr : new mongoose.Types.ObjectId(),
+        fileId: isDriveId ? pIdStr : (typeof proofOfPaymentId === 'object' ? proofOfPaymentId.fileId || '' : ''),
+        fileUrl: isDriveId ? `https://drive.google.com/file/d/${pIdStr}/preview` : (typeof proofOfPaymentId === 'object' ? proofOfPaymentId.fileUrl || proofOfPaymentId.url || '' : ''),
+        url: isDriveId ? `https://drive.google.com/file/d/${pIdStr}/preview` : (typeof proofOfPaymentId === 'object' ? proofOfPaymentId.url || proofOfPaymentId.fileUrl || '' : ''),
+        fileName: typeof proofOfPaymentId === 'object' ? proofOfPaymentId.fileName || proofOfPaymentId.name || 'receipt.pdf' : 'receipt.pdf'
+      };
     }
 
     await member.save();

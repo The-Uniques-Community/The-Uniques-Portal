@@ -96,7 +96,7 @@ const ProjectForm = ({ onSuccess }) => {
   const handleImageFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (!validateFile(file, FILE_VALIDATION_PRESETS.IMAGE, { inputTarget: e })) {
+      if (!validateFile(file, FILE_VALIDATION_PRESETS.AVATAR, { inputTarget: e })) {
         return;
       }
       if (imagePreview && imagePreview.startsWith("blob:")) {
