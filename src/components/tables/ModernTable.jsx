@@ -170,6 +170,8 @@ const ModernTable = ({
                   sx={{
                     "&:last-child td, &:last-child th": { border: 0 },
                     transition: "background-color 0.15s ease",
+                    contentVisibility: "auto",
+                    containIntrinsicSize: "auto 52px",
                   }}
                 >
                   {renderRow(row, index)}

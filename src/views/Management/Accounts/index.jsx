@@ -27,6 +27,7 @@ import { useLocation } from 'react-router-dom';
 import { BASE_URL } from '@/config';
 import ModernHeader from '@/components/headers/ModernHeader';
 import { BaseSkeleton } from '@/components/common/skeletons';
+import LazyRender from '@/components/common/LazyRender';
 
 const API_BASE_URL = `${BASE_URL}/api/admin`;
 
@@ -239,98 +240,100 @@ const Accounts = () => {
     
       
       {/* Charts Section */}
-      <Grid container spacing={3} className="mb-6">
-        <Grid item xs={12} md={8}>
-          <Paper elevation={2} className="p-4">
-            <Typography variant="h6" fontWeight="bold" className="mb-4">
-              Fine Distribution by Batch
-            </Typography>
-            {loading ? (
-              <Box height={300} sx={{ display: "flex", alignItems: "center" }}>
-                <BaseSkeleton variant="rounded" width="100%" height={260} sx={{ borderRadius: "8px" }} />
-              </Box>
-            ) : (
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart
-                  data={chartData}
-                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip 
-                    formatter={(value) => [`₹${value}`, 'Total Fine']}
-                    labelStyle={{ color: theme.palette.text.primary }}
-                    contentStyle={{ 
-                      backgroundColor: theme.palette.background.paper, 
-                      border: `1px solid ${theme.palette.divider}`
-                    }}
-                  />
-                  <Bar dataKey="fines" fill="#ca0019" name="Total Fine" />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-          </Paper>
-        </Grid>
-        
-        <Grid item xs={12} md={4}>
-          <Paper elevation={2} className="p-4 h-full">
-            <Typography variant="h6" fontWeight="bold" className="mb-4">
-              Fine Payment Status
-            </Typography>
-            {loading ? (
-              <Box height={300} sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-                <BaseSkeleton variant="circular" width={180} height={180} />
-                <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
-                  <BaseSkeleton variant="rounded" width={90} height={18} sx={{ borderRadius: "6px" }} />
-                  <BaseSkeleton variant="rounded" width={80} height={18} sx={{ borderRadius: "6px" }} />
+      <LazyRender minHeight="340px">
+        <Grid container spacing={3} className="mb-6">
+          <Grid item xs={12} md={8}>
+            <Paper elevation={2} className="p-4">
+              <Typography variant="h6" fontWeight="bold" className="mb-4">
+                Fine Distribution by Batch
+              </Typography>
+              {loading ? (
+                <Box height={300} sx={{ display: "flex", alignItems: "center" }}>
+                  <BaseSkeleton variant="rounded" width="100%" height={260} sx={{ borderRadius: "8px" }} />
                 </Box>
-              </Box>
-            ) : (
-              <Box className="flex flex-col items-center">
-                <ResponsiveContainer width="100%" height={200}>
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                      label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    >
-                      {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(value) => [value, 'Members']} />
-                  </PieChart>
+              ) : (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart
+                    data={chartData}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip 
+                      formatter={(value) => [`₹${value}`, 'Total Fine']}
+                      labelStyle={{ color: theme.palette.text.primary }}
+                      contentStyle={{ 
+                        backgroundColor: theme.palette.background.paper, 
+                        border: `1px solid ${theme.palette.divider}`
+                      }}
+                    />
+                    <Bar dataKey="fines" fill="#ca0019" name="Total Fine" />
+                  </BarChart>
                 </ResponsiveContainer>
-                
-                <Box className="mt-4">
-                  <div className="flex justify-center gap-4">
-                    <div className="flex items-center">
-                      <div 
-                        className="w-3 h-3 rounded-full mr-2" 
-                        style={{ backgroundColor: theme.palette.primary.main }}
-                      ></div>
-                      <Typography variant="body2">Members with Fine</Typography>
-                    </div>
-                    <div className="flex items-center">
-                      <div 
-                        className="w-3 h-3 rounded-full mr-2" 
-                        style={{ backgroundColor: theme.palette.info.main }}
-                      ></div>
-                      <Typography variant="body2">Paid Members</Typography>
-                    </div>
-                  </div>
+              )}
+            </Paper>
+          </Grid>
+          
+          <Grid item xs={12} md={4}>
+            <Paper elevation={2} className="p-4 h-full">
+              <Typography variant="h6" fontWeight="bold" className="mb-4">
+                Fine Payment Status
+              </Typography>
+              {loading ? (
+                <Box height={300} sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                  <BaseSkeleton variant="circular" width={180} height={180} />
+                  <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+                    <BaseSkeleton variant="rounded" width={90} height={18} sx={{ borderRadius: "6px" }} />
+                    <BaseSkeleton variant="rounded" width={80} height={18} sx={{ borderRadius: "6px" }} />
+                  </Box>
                 </Box>
-              </Box>
-            )}
-          </Paper>
+              ) : (
+                <Box className="flex flex-col items-center">
+                  <ResponsiveContainer width="100%" height={200}>
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                        label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                      >
+                        {pieData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value) => [value, 'Members']} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  
+                  <Box className="mt-4">
+                    <div className="flex justify-center gap-4">
+                      <div className="flex items-center">
+                        <div 
+                          className="w-3 h-3 rounded-full mr-2" 
+                          style={{ backgroundColor: theme.palette.primary.main }}
+                        ></div>
+                        <Typography variant="body2">Members with Fine</Typography>
+                      </div>
+                      <div className="flex items-center">
+                        <div 
+                          className="w-3 h-3 rounded-full mr-2" 
+                          style={{ backgroundColor: theme.palette.info.main }}
+                        ></div>
+                        <Typography variant="body2">Paid Members</Typography>
+                      </div>
+                    </div>
+                  </Box>
+                </Box>
+              )}
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
+      </LazyRender>
       
       {/* Fine Management Table */}
       <FineTable />

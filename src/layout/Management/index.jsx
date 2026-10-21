@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import { useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
@@ -22,8 +22,9 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useThemeContext } from "@/theme/ThemeProvider";
-import ConfirmationModal from "@/components/modals/ConfirmationModal";
 import authService from "@/services/authService";
+
+const ConfirmationModal = lazy(() => import("@/components/modals/ConfirmationModal"));
 import logo from "@/assets/logos/theuniquesCommunity.png";
 import uniques_white from "@/assets/logos/uniqueswhite.png";
 import AccountBalance from "@mui/icons-material/AccountBalance";
@@ -124,12 +125,16 @@ export default function ManagementLayout({ role: explicitRole }) {
 
   return (
     <>
-      <ConfirmationModal
-        isOpen={isOpen}
-        onClose={onClose}
-        onConfirm={onConfirm}
-        message={"You sure you want to log out?"}
-      />
+      {isOpen && (
+        <Suspense fallback={null}>
+          <ConfirmationModal
+            isOpen={isOpen}
+            onClose={onClose}
+            onConfirm={onConfirm}
+            message={"You sure you want to log out?"}
+          />
+        </Suspense>
+      )}
 
       {/* Floating Shiny Black Sidebar */}
       <Drawer

@@ -134,6 +134,7 @@ const MemberCard = ({
       </div>
 
       {/* Modal */}
+      {open && (
       <Modal
         open={open}
         onClose={handleClose} // Properly link handleClose
@@ -261,6 +262,7 @@ const MemberCard = ({
           
         </Box>
       </Modal>
+      )}
     </div>
   );
 };

@@ -35,7 +35,6 @@ import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import Close from "@mui/icons-material/Close";
 import UploadFile from "@mui/icons-material/UploadFile";
-import * as XLSX from "xlsx";
 import { FILE_VALIDATION_PRESETS, validateFiles } from "@/utils/fileValidation";
 
 export const FinePaymentModal = ({ open, onClose, memberId, fine, onPaymentComplete }) => {
@@ -173,7 +172,8 @@ export const TransactionTable = () => {
     defaultFilters: { status: "All", batch: "All Batches" },
   });
 
-  const exportToExcel = () => {
+  const exportToExcel = async () => {
+    const XLSX = await import("xlsx");
     const worksheet = XLSX.utils.json_to_sheet(
       members.filter(Boolean).map((m) => ({
         "Member Name": m.name || m.fullName || "N/A",

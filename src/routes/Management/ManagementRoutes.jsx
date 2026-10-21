@@ -8,7 +8,8 @@ import { lazy } from "react";
 import { Navigate } from "react-router-dom";
 import Loader from "@/components/common/loaders/RouteLoader";
 import ProtectedRoute from "@/routes/ProtectedRoute";
-import ManagementLayout from "@/layout/Management";
+
+const ManagementLayout = Loader(lazy(() => import("@/layout/Management")));
 
 // Import dedicated page skeletons
 import {

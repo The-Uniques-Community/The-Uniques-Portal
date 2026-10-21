@@ -41,7 +41,8 @@ const ReportFeed = ({ reports, reportsLoading, scrollRef }) => {
             <motion.div 
               key={report._id} 
               initial={{ y: 15, opacity: 0 }} 
-              animate={{ y: 0, opacity: 1 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true, amount: 0.15 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
             >
               <Box 

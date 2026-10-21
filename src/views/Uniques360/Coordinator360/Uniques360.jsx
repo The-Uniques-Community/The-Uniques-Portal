@@ -34,11 +34,13 @@ import { useThemeContext } from "@/theme/ThemeProvider";
 import logoCommunity from "@/assets/logos/theuniquesCommunity.png";
 import logoWhite from "@/assets/logos/uniqueswhite.png";
 import TaskTable from "./components/TaskTable";
-import CreateTaskDialog from "./components/CreateTaskDialog";
-import ReportsDialog from "./components/ReportsDialog";
-import EditTaskDialog from "./components/EditTaskDialog";
-import TeamDialog from "./components/TeamDialog";
 import { Coordinator360Skeleton, TableSkeleton } from "@/components/common/skeletons";
+import { preloadComponent } from "@/utils/preload";
+
+const CreateTaskDialog = React.lazy(() => import("./components/CreateTaskDialog"));
+const ReportsDialog = React.lazy(() => import("./components/ReportsDialog"));
+const EditTaskDialog = React.lazy(() => import("./components/EditTaskDialog"));
+const TeamDialog = React.lazy(() => import("./components/TeamDialog"));
 
 const BRAND_COLOR = "#ca0019";
 const BRAND_HOVER = "#a30014";
@@ -325,6 +327,8 @@ const Uniques360Coordinator = () => {
           <ModernButton
             startIcon={<AddIcon sx={{ fontSize: "20px !important", transition: "transform 0.3s ease" }} />}
             onClick={() => setOpen(true)}
+            onMouseEnter={() => preloadComponent(() => import("./components/CreateTaskDialog"))}
+            onFocus={() => preloadComponent(() => import("./components/CreateTaskDialog"))}
           >
             Assign New Task
           </ModernButton>
@@ -530,6 +534,8 @@ const Uniques360Coordinator = () => {
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => setOpen(true)}
+            onMouseEnter={() => preloadComponent(() => import("./components/CreateTaskDialog"))}
+            onFocus={() => preloadComponent(() => import("./components/CreateTaskDialog"))}
             sx={{ textTransform: "none", fontWeight: 600, borderRadius: "10px", bgcolor: BRAND_COLOR, "&:hover": { bgcolor: BRAND_HOVER }, boxShadow: "none" }}
           >
             Assign First Task
@@ -599,83 +605,99 @@ const Uniques360Coordinator = () => {
       )}
 
       {/* MODAL SYNC SYSTEM */}
-      <CreateTaskDialog
-        open={open}
-        onClose={() => setOpen(false)}
-        onSubmit={handleCreateTask}
-        submitting={submitting}
-        newTask={newTask}
-        setNewTask={setNewTask}
-        selectedBatch={selectedBatch}
-        setSelectedBatch={setSelectedBatch}
-        batches={batches}
-        members={members}
-        newTaskRoles={newTaskRoles}
-        setNewTaskRoles={setNewTaskRoles}
-      />
+      {open && (
+        <React.Suspense fallback={null}>
+          <CreateTaskDialog
+            open={open}
+            onClose={() => setOpen(false)}
+            onSubmit={handleCreateTask}
+            submitting={submitting}
+            newTask={newTask}
+            setNewTask={setNewTask}
+            selectedBatch={selectedBatch}
+            setSelectedBatch={setSelectedBatch}
+            batches={batches}
+            members={members}
+            newTaskRoles={newTaskRoles}
+            setNewTaskRoles={setNewTaskRoles}
+          />
+        </React.Suspense>
+      )}
 
-      <ReportsDialog
-        open={reportsOpen}
-        onClose={() => setReportsOpen(false)}
-        task={selectedTask}
-        reports={reports}
-        loading={reportsLoading}
-      />
+      {reportsOpen && (
+        <React.Suspense fallback={null}>
+          <ReportsDialog
+            open={reportsOpen}
+            onClose={() => setReportsOpen(false)}
+            task={selectedTask}
+            reports={reports}
+            loading={reportsLoading}
+          />
+        </React.Suspense>
+      )}
 
-      <EditTaskDialog
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-        onSubmit={handleUpdateTask}
-        submitting={submitting}
-        task={selectedTask}
-        setTask={setSelectedTask}
-        members={members}
-      />
+      {editOpen && (
+        <React.Suspense fallback={null}>
+          <EditTaskDialog
+            open={editOpen}
+            onClose={() => setEditOpen(false)}
+            onSubmit={handleUpdateTask}
+            submitting={submitting}
+            task={selectedTask}
+            setTask={setSelectedTask}
+            members={members}
+          />
+        </React.Suspense>
+      )}
 
-      <TeamDialog
-        open={teamOpen}
-        onClose={() => setTeamOpen(false)}
-        task={selectedTask}
-        members={members}
-        selectedMemberId={teamSelectedMember}
-        onSelectedMemberChange={setTeamSelectedMember}
-        selectedBatch={teamSelectedBatch}
-        onSelectedBatchChange={setTeamSelectedBatch}
-        batches={batches}
-        onAddMember={async () => {
-          if (!selectedTask || !teamSelectedMember) return;
-          try {
-            await axios.post(
-              `${BASE_URL}/api/uniques360/tasks/${selectedTask._id}/members`,
-              {
-                newMemberId: teamSelectedMember,
-                role: teamSelectedRole || null,
-              },
-              { withCredentials: true }
-            );
-            toast.success("Teammate deployed");
-            setTeamSelectedMember("");
-            setTeamSelectedBatch("");
-            setTeamSelectedRole("");
-            fetchTasks();
-            setSelectedTask((prev) => ({
-              ...prev,
-              assignedTo: [
-                ...(prev.assignedTo || []),
-                members.find((member) => member._id === teamSelectedMember),
-              ].filter(Boolean),
-            }));
-          } catch (error) {
-            console.error(error);
-            toast.error(error.response?.data?.message || "Error adding teammate");
-          }
-        }}
-        onRemoveMember={async (memberId) => {
-          await handleRemoveMember(selectedTask._id, memberId);
-        }}
-        selectedRole={teamSelectedRole}
-        onSelectedRoleChange={setTeamSelectedRole}
-      />
+      {teamOpen && (
+        <React.Suspense fallback={null}>
+          <TeamDialog
+            open={teamOpen}
+            onClose={() => setTeamOpen(false)}
+            task={selectedTask}
+            members={members}
+            selectedMemberId={teamSelectedMember}
+            onSelectedMemberChange={setTeamSelectedMember}
+            selectedBatch={teamSelectedBatch}
+            onSelectedBatchChange={setTeamSelectedBatch}
+            batches={batches}
+            onAddMember={async () => {
+              if (!selectedTask || !teamSelectedMember) return;
+              try {
+                await axios.post(
+                  `${BASE_URL}/api/uniques360/tasks/${selectedTask._id}/members`,
+                  {
+                    newMemberId: teamSelectedMember,
+                    role: teamSelectedRole || null,
+                  },
+                  { withCredentials: true }
+                );
+                toast.success("Teammate deployed");
+                setTeamSelectedMember("");
+                setTeamSelectedBatch("");
+                setTeamSelectedRole("");
+                fetchTasks();
+                setSelectedTask((prev) => ({
+                  ...prev,
+                  assignedTo: [
+                    ...(prev.assignedTo || []),
+                    members.find((member) => member._id === teamSelectedMember),
+                  ].filter(Boolean),
+                }));
+              } catch (error) {
+                console.error(error);
+                toast.error(error.response?.data?.message || "Error adding teammate");
+              }
+            }}
+            onRemoveMember={async (memberId) => {
+              await handleRemoveMember(selectedTask._id, memberId);
+            }}
+            selectedRole={teamSelectedRole}
+            onSelectedRoleChange={setTeamSelectedRole}
+          />
+        </React.Suspense>
+      )}
     </Box>
   );
 };

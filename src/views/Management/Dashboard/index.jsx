@@ -78,6 +78,7 @@ import Preview from "@mui/icons-material/Preview";
 import Close from "@mui/icons-material/Close";
 import ModernTable from "@/components/tables/ModernTable";
 import { BaseSkeleton } from "@/components/common/skeletons";
+import LazyRender from "@/components/common/LazyRender";
 
 // Fine Payment Modal Component
 const FinePaymentModal = ({
@@ -958,21 +959,28 @@ const ManagementDashboard = () => {
                 ))}
               </div>
             ) : (
-              <div className="flex flex-wrap items-center justify-start gap-3">
-                {members.length > 0 ? (
-                  members.map((member) => (
-                    <NewMember key={member._id} user={member} />
-                  ))
-                ) : (
-                  <p className="text-gray-500">No new members found</p>
-                )}
-              </div>
+              <LazyRender minHeight="120px">
+                <div className="flex flex-wrap items-center justify-start gap-3">
+                  {members.length > 0 ? (
+                    members.map((member) => (
+                      <NewMember key={member._id} user={member} />
+                    ))
+                  ) : (
+                    <p className="text-gray-500">No new members found</p>
+                  )}
+                </div>
+              </LazyRender>
             )}
           </div>
         </div>
         <div className="xl:col-span-1 lg:col-span-1 md:col-span-1">
           <div className="mb-5">
-            <Calender />
+            <LazyRender
+              minHeight="320px"
+              placeholder={<BaseSkeleton variant="rounded" width="100%" height={320} sx={{ borderRadius: "16px" }} />}
+            >
+              <Calender />
+            </LazyRender>
           </div>
           <Box
             sx={{
@@ -1023,9 +1031,11 @@ const ManagementDashboard = () => {
                 ))}
               </Box>
             ) : (
-              events.map((event, index) => (
-                <EventOverView key={index} event={event} />
-              ))
+              <LazyRender minHeight="250px">
+                {events.map((event, index) => (
+                  <EventOverView key={index} event={event} />
+                ))}
+              </LazyRender>
             )}
             </Box>
           </Box>
@@ -1570,20 +1580,24 @@ const ManagementDashboard = () => {
       </Modal>
 
       {/* NEW: Fine Payment Modal */}
-      <FinePaymentModal
-        open={openPaymentModal}
-        onClose={() => setOpenPaymentModal(false)}
-        memberId={fineToUpdate?.memberId}
-        fine={fineToUpdate?.fine}
-        onPaymentComplete={handlePaymentComplete}
-      />
+      {openPaymentModal && (
+        <FinePaymentModal
+          open={openPaymentModal}
+          onClose={() => setOpenPaymentModal(false)}
+          memberId={fineToUpdate?.memberId}
+          fine={fineToUpdate?.fine}
+          onPaymentComplete={handlePaymentComplete}
+        />
+      )}
 
       {/* NEW: Receipt Preview Modal */}
-      <ReceiptPreviewModal
-        open={openReceiptPreview}
-        onClose={() => setOpenReceiptPreview(false)}
-        receiptUrl={receiptPreviewUrl}
-      />
+      {openReceiptPreview && (
+        <ReceiptPreviewModal
+          open={openReceiptPreview}
+          onClose={() => setOpenReceiptPreview(false)}
+          receiptUrl={receiptPreviewUrl}
+        />
+      )}
 
       {/* NEW: Success notification */}
       <Snackbar

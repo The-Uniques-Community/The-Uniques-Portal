@@ -63,14 +63,20 @@ const ClickSpark = ({
         [easing]
     );
 
+    const isAnimatingRef = useRef(false);
+    const animFrameRef = useRef(null);
+
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext("2d");
 
-        let animationId;
-
         const draw = (timestamp) => {
+            if (document.hidden) {
+                isAnimatingRef.current = false;
+                return;
+            }
+
             if (!startTimeRef.current) {
                 startTimeRef.current = timestamp;
             }
@@ -103,13 +109,43 @@ const ClickSpark = ({
                 return true;
             });
 
-            animationId = requestAnimationFrame(draw);
+            if (sparksRef.current.length > 0) {
+                animFrameRef.current = requestAnimationFrame(draw);
+            } else {
+                isAnimatingRef.current = false;
+                startTimeRef.current = null;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
         };
 
-        animationId = requestAnimationFrame(draw);
+        const startAnimation = () => {
+            if (isAnimatingRef.current) return;
+            isAnimatingRef.current = true;
+            startTimeRef.current = null;
+            animFrameRef.current = requestAnimationFrame(draw);
+        };
+
+        const handleVisibilityChange = () => {
+            if (document.hidden) {
+                if (animFrameRef.current) {
+                    cancelAnimationFrame(animFrameRef.current);
+                }
+                isAnimatingRef.current = false;
+            } else if (sparksRef.current.length > 0) {
+                startAnimation();
+            }
+        };
+
+        // Expose startAnimation to canvas container
+        canvas.__startSparkAnimation = startAnimation;
+        document.addEventListener("visibilitychange", handleVisibilityChange);
 
         return () => {
-            cancelAnimationFrame(animationId);
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
+            if (animFrameRef.current) {
+                cancelAnimationFrame(animFrameRef.current);
+            }
+            isAnimatingRef.current = false;
         };
     }, [
         sparkColor,
@@ -137,6 +173,9 @@ const ClickSpark = ({
         }));
 
         sparksRef.current.push(...newSparks);
+        if (canvas.__startSparkAnimation) {
+            canvas.__startSparkAnimation();
+        }
     };
 
     return (

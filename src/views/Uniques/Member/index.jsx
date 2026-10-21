@@ -45,6 +45,7 @@ import XIcon from "@mui/icons-material/X";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import { Link } from "react-router-dom";
 import { MemberDashboardSkeleton } from "@/components/common/skeletons";
+import LazyRender from "@/components/common/LazyRender";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
@@ -2405,35 +2406,37 @@ const Index = () => {
 
                 {/* SGPA Chart */}
                 {user.semesterSGPA && user.semesterSGPA.length > 0 ? (
-                  <Box
-                    sx={{
-                      height: 300,
-                      mb: 3,
-                      bgcolor: "background.paper",
-                      p: 2,
-                      borderRadius: 2,
-                      border: "1px solid", borderColor: "divider",
-                    }}
-                  >
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={prepareSemesterData()}
-                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                        <XAxis dataKey="name" />
-                        <YAxis domain={[0, 10]} />
-                        <RechartsTooltip
-                          formatter={(value) => [
-                            `${value} SGPA`,
-                            "Performance",
-                          ]}
-                        />
-                        <Legend />
-                        <Bar dataKey="sgpa" name="SGPA" fill="#ca0019" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </Box>
+                  <LazyRender minHeight="300px">
+                    <Box
+                      sx={{
+                        height: 300,
+                        mb: 3,
+                        bgcolor: "background.paper",
+                        p: 2,
+                        borderRadius: 2,
+                        border: "1px solid", borderColor: "divider",
+                      }}
+                    >
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                          data={prepareSemesterData()}
+                          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                          <XAxis dataKey="name" />
+                          <YAxis domain={[0, 10]} />
+                          <RechartsTooltip
+                            formatter={(value) => [
+                              `${value} SGPA`,
+                              "Performance",
+                            ]}
+                          />
+                          <Legend />
+                          <Bar dataKey="sgpa" name="SGPA" fill="#ca0019" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </Box>
+                  </LazyRender>
                 ) : (
                   <Typography
                     variant="body2"
@@ -2543,42 +2546,44 @@ const Index = () => {
                 </Box>
 
                 {user.skills && user.skills.length > 0 ? (
-                  <Box
-                    sx={{
-                      height: 250,
-                      display: "flex",
-                      justifyContent: "center",
-                      bgcolor: "background.paper",
-                      p: 2,
-                      borderRadius: 2,
-                      border: "1px solid", borderColor: "divider",
-                    }}
-                  >
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={prepareSkillsData()}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          outerRadius={80}
-                          fill="#8884d8"
-                          dataKey="value"
-                          label={({ name }) => name}
-                        >
-                          {prepareSkillsData().map((entry, index) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={COLORS[index % COLORS.length]}
-                            />
-                          ))}
-                        </Pie>
-                        <RechartsTooltip
-                          formatter={(value, name) => [`${value} skills`, name]}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </Box>
+                  <LazyRender minHeight="250px">
+                    <Box
+                      sx={{
+                        height: 250,
+                        display: "flex",
+                        justifyContent: "center",
+                        bgcolor: "background.paper",
+                        p: 2,
+                        borderRadius: 2,
+                        border: "1px solid", borderColor: "divider",
+                      }}
+                    >
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={prepareSkillsData()}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                            label={({ name }) => name}
+                          >
+                            {prepareSkillsData().map((entry, index) => (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={COLORS[index % COLORS.length]}
+                              />
+                            ))}
+                          </Pie>
+                          <RechartsTooltip
+                            formatter={(value, name) => [`${value} skills`, name]}
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </Box>
+                  </LazyRender>
                 ) : (
                   <Box
                     sx={{

@@ -41,5 +41,32 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, 'src')
     }
+  },
+  build: {
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (
+              id.includes('/react/') ||
+              id.includes('/react-dom/') ||
+              id.includes('/react-router/') ||
+              id.includes('/react-router-dom/') ||
+              id.includes('/@reduxjs/') ||
+              id.includes('/react-redux/')
+            ) {
+              return 'vendor-react';
+            }
+            if (id.includes('/@mui/') || id.includes('/@emotion/')) {
+              return 'vendor-mui';
+            }
+            if (id.includes('/framer-motion/') || id.includes('/lenis/')) {
+              return 'vendor-motion';
+            }
+          }
+        }
+      }
+    }
   }
 });

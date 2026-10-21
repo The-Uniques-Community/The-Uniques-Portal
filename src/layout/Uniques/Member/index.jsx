@@ -1,4 +1,4 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -23,11 +23,12 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useThemeContext } from "@/theme/ThemeProvider";
-import ConfirmationModal from "@/components/modals/ConfirmationModal";
 import logo from "@/assets/logos/theuniquesCommunity.png";
 import uniques_white from "@/assets/logos/uniqueswhite.png";
 import Brightness4Icon from "@mui/icons-material/Brightness4"; // Dark Mode Icon
 import Brightness7Icon from "@mui/icons-material/Brightness7"; // Light Mode Icon
+
+const ConfirmationModal = lazy(() => import("@/components/modals/ConfirmationModal"));
 
 // Navigation items with relative paths
 const STUDENT_NAVIGATION = [
@@ -89,12 +90,16 @@ function DashboardLayoutAppBar() {
 
   return (
     <>
-      <ConfirmationModal
-        isOpen={isOpen}
-        onClose={onClose}
-        onConfirm={onConfirm}
-        message={"You sure you want to log out?"}
-      />
+      {isOpen && (
+        <Suspense fallback={null}>
+          <ConfirmationModal
+            isOpen={isOpen}
+            onClose={onClose}
+            onConfirm={onConfirm}
+            message={"You sure you want to log out?"}
+          />
+        </Suspense>
+      )}
       <Drawer
         variant={isMobile ? "temporary" : "permanent"}
         open={drawerOpen}
