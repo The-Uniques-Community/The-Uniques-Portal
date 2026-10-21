@@ -6,6 +6,7 @@
  */
 import Member from "../../models/member/memberModel.js";
 import mongoose from "mongoose";
+import { parsePaginationParams, buildSearchQuery } from "../../utils/queryHelper.js";
 
 /**
  * @desc    Search members by name, email, or admission number for fine operations
@@ -461,69 +462,81 @@ export const getFineHistory = async (req, res) => {
  */
 export const getFineStatistics = async (req, res) => {
   try {
-    const members = await Member.find()
-      .select('fullName fines');
-    
-    const statistics = {
+    const pipeline = [
+      { $match: { "fines.0": { $exists: true } } },
+      {
+        $facet: {
+          metrics: [
+            { $unwind: "$fines" },
+            {
+              $group: {
+                _id: null,
+                totalFinesIssued: { $sum: 1 },
+                totalAmount: { $sum: "$fines.amount" },
+                totalPendingAmount: {
+                  $sum: { $cond: [{ $eq: ["$fines.status", "pending"] }, "$fines.amount", 0] },
+                },
+                totalPaidAmount: {
+                  $sum: { $cond: [{ $eq: ["$fines.status", "paid"] }, "$fines.amount", 0] },
+                },
+                totalWaivedAmount: {
+                  $sum: { $cond: [{ $eq: ["$fines.status", "waived"] }, "$fines.amount", 0] },
+                },
+              },
+            },
+          ],
+          pendingCount: [
+            { $match: { "fines.status": "pending" } },
+            { $count: "count" },
+          ],
+          recentFines: [
+            { $unwind: "$fines" },
+            { $sort: { "fines.dateImposed": -1 } },
+            { $limit: 5 },
+            {
+              $project: {
+                _id: "$fines._id",
+                amount: "$fines.amount",
+                reason: "$fines.reason",
+                dateImposed: "$fines.dateImposed",
+                status: "$fines.status",
+                memberName: "$fullName",
+                memberId: "$_id",
+              },
+            },
+          ],
+        },
+      },
+    ];
+
+    const [result] = await Member.aggregate(pipeline).exec();
+    const metric = result?.metrics?.[0] || {
       totalFinesIssued: 0,
       totalAmount: 0,
       totalPendingAmount: 0,
       totalPaidAmount: 0,
       totalWaivedAmount: 0,
-      membersWithPendingFines: 0,
-      recentFines: []
     };
 
-    const allFines = [];
-    
-    members.forEach(member => {
-      if (!member.fines || member.fines.length === 0) return;
-      
-      // Count total fines
-      statistics.totalFinesIssued += member.fines.length;
-      
-      // Sum amounts by status
-      member.fines.forEach(fine => {
-        statistics.totalAmount += fine.amount;
-        
-        if (fine.status === 'pending') {
-          statistics.totalPendingAmount += fine.amount;
-        } else if (fine.status === 'paid') {
-          statistics.totalPaidAmount += fine.amount;
-        } else if (fine.status === 'waived') {
-          statistics.totalWaivedAmount += fine.amount;
-        }
-        
-        // Add to all fines for sorting later
-        allFines.push({
-          ...fine.toObject(),
-          memberName: member.fullName,
-          memberId: member._id
-        });
-      });
-      
-      // Count members with pending fines
-      if (member.fines.some(fine => fine.status === 'pending')) {
-        statistics.membersWithPendingFines++;
-      }
-    });
-    
-    // Get 5 most recent fines
-    statistics.recentFines = allFines
-      .sort((a, b) => new Date(b.dateImposed) - new Date(a.dateImposed))
-      .slice(0, 5);
-    
     return res.status(200).json({
       success: true,
-      message: 'Fine statistics retrieved successfully',
-      data: statistics
+      message: "Fine statistics retrieved successfully",
+      data: {
+        totalFinesIssued: metric.totalFinesIssued,
+        totalAmount: metric.totalAmount,
+        totalPendingAmount: metric.totalPendingAmount,
+        totalPaidAmount: metric.totalPaidAmount,
+        totalWaivedAmount: metric.totalWaivedAmount,
+        membersWithPendingFines: result?.pendingCount?.[0]?.count || 0,
+        recentFines: result?.recentFines || [],
+      },
     });
   } catch (error) {
-    console.error('Error retrieving fine statistics:', error);
+    console.error("Error retrieving fine statistics:", error);
     return res.status(500).json({
       success: false,
-      message: 'Error retrieving fine statistics',
-      error: error.message
+      message: "Error retrieving fine statistics",
+      error: error.message,
     });
   }
 };
@@ -540,6 +553,7 @@ export const getFineStatistics = async (req, res) => {
 export const getAllMembersWithFines = async (req, res) => {
   try {
     const { batch, search, status } = req.query;
+    const { page, limit, skip } = parsePaginationParams(req.query, { defaultLimit: 10 });
     
     // Build query filter - starts empty to get all members with fines
     let filter = { 'fines.0': { $exists: true } }; // Only members who have at least one fine
@@ -550,20 +564,19 @@ export const getAllMembersWithFines = async (req, res) => {
     }
     
     // Filter by batch if provided
-    if (batch && batch !== 'All Batches') {
+    if (batch && batch !== 'All Batches' && batch !== 'All') {
       filter.batch = batch;
     }
     
     // Filter by search term if provided
     if (search && search.trim() !== '') {
-      filter.$or = [
-        { fullName: { $regex: search, $options: 'i' } },
-        { admno: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } }
-      ];
+      filter = {
+        ...filter,
+        ...buildSearchQuery(search, ['fullName', 'admno', 'email']),
+      };
     }
     
-    // Fetch all matching members without pagination
+    // Fetch matching members
     const members = await Member.find(filter)
       .select('fullName admno email batch fines profilePic createdAt updatedAt')
       .sort({ updatedAt: -1 });
@@ -587,7 +600,9 @@ export const getAllMembersWithFines = async (req, res) => {
       
       return {
         id: member._id,
+        _id: member._id,
         name: member.fullName,
+        fullName: member.fullName,
         admno: member.admno,
         fineId: member.fines.map(fine => fine._id),
         email: member.email,
@@ -599,6 +614,8 @@ export const getAllMembersWithFines = async (req, res) => {
         totalPendingAmount,
         totalPaidAmount,
         totalWaivedAmount,
+        totalPendingFine: totalPendingAmount,
+        totalPaidFine: totalPaidAmount,
         totalFinesCount: allFines.length,
         updatedAt: member.updatedAt,
         createdAt: member.createdAt
@@ -606,9 +623,7 @@ export const getAllMembersWithFines = async (req, res) => {
     });
     
     // Sort results based on status filter
-    if (status === 'pending') {
-      membersWithDetails.sort((a, b) => b.totalPendingAmount - a.totalPendingAmount);
-    } else if (status === 'paid') {
+    if (status === 'paid') {
       membersWithDetails.sort((a, b) => b.totalPaidAmount - a.totalPaidAmount);
     } else if (status === 'waived') {
       membersWithDetails.sort((a, b) => b.totalWaivedAmount - a.totalWaivedAmount);
@@ -617,12 +632,26 @@ export const getAllMembersWithFines = async (req, res) => {
       membersWithDetails.sort((a, b) => b.totalPendingAmount - a.totalPendingAmount);
     }
     
+    const totalCount = membersWithDetails.length;
+    const paginatedMembers = membersWithDetails.slice(skip, skip + limit);
+    const pages = Math.ceil(totalCount / limit) || 1;
+
     return res.status(200).json({
       success: true,
       message: 'Members with fines retrieved successfully',
       data: {
-        count: membersWithDetails.length,
-        members: membersWithDetails
+        count: totalCount,
+        members: paginatedMembers
+      },
+      members: paginatedMembers,
+      count: totalCount,
+      pagination: {
+        total: totalCount,
+        page,
+        limit,
+        pages,
+        hasNextPage: page < pages,
+        hasPrevPage: page > 1,
       }
     });
   } catch (error) {

@@ -6,6 +6,7 @@
  */
 import Trainer from "../../models/admin/trainerModel.js";
 import mongoose from "mongoose";
+import { paginateQuery, buildSearchQuery } from "../../utils/queryHelper.js";
 
 /**
  * @desc Add a new trainer profile
@@ -71,8 +72,29 @@ export const addTrainer = async (req, res) => {
 // Get all trainers
 export const getAllTrainers = async (req, res) => {
     try {
-        const trainers = await Trainer.find().sort({ createdAt: -1 });
-        res.status(200).json(trainers);
+        const { page, limit, search, origin, teachingBatch } = req.query;
+        const filter = { ...buildSearchQuery(search, ["fullName", "email", "teachingBatch", "course", "skills"]) };
+        if (origin) filter.origin = origin;
+        if (teachingBatch) filter.teachingBatch = teachingBatch;
+
+        if (!page && !limit && !search) {
+            const trainers = await Trainer.find(filter).sort({ createdAt: -1 });
+            return res.status(200).json(trainers);
+        }
+
+        const result = await paginateQuery(Trainer, filter, {
+            page,
+            limit,
+            sort: { createdAt: -1 },
+            lean: true,
+        });
+
+        return res.status(200).json({
+            success: true,
+            data: result.data,
+            trainers: result.data,
+            pagination: result.pagination,
+        });
     } catch (error) {
         console.error("Error fetching trainers:", error);
         res.status(500).json({ message: "Internal Server Error" });

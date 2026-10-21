@@ -81,6 +81,10 @@ const trainerSchema = new mongoose.Schema({
     },
 }, { timestamps: true });
 
+// Optimized compound indexes for trainers
+trainerSchema.index({ teachingBatch: 1, origin: 1 });
+trainerSchema.index({ createdAt: -1 });
+
 const Trainer = mongoose.models.Trainer || mongoose.model("Trainer", trainerSchema);
 
 /**

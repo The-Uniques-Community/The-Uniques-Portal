@@ -242,6 +242,12 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
+// Optimized compound indexes for pagination and filtering
+userSchema.index({ batch: 1, role: 1 });
+userSchema.index({ isSuspended: 1, isVerified: 1, status: 1 });
+userSchema.index({ "fines.status": 1 });
+userSchema.index({ role: 1, createdAt: -1 });
+
 const User = mongoose.models.User || mongoose.model("User", userSchema, "users");
 
 /**

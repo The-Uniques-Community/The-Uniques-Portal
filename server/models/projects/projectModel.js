@@ -75,6 +75,11 @@ const projectSchema = new mongoose.Schema(
   }
 );
 
+// Optimized compound indexes for projects
+projectSchema.index({ featured: -1, createdAt: -1 });
+projectSchema.index({ batch: 1, status: 1 });
+projectSchema.index({ category: 1, status: 1 });
+
 // Prevent mongoose model overwrite error during hot reload
 const Project = mongoose.models.Project || mongoose.model("Project", projectSchema);
 
