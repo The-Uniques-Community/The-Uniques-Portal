@@ -1,32 +1,39 @@
 /**
  * @file StatsSkeleton.jsx
- * @description Metric tile grid skeleton preserving numbers and card geometry on dashboards.
+ * @description Metric tile grid skeleton matching ModernStatCard layout and geometry.
  */
 
 import React from "react";
 import { Box, Paper } from "@mui/material";
 import BaseSkeleton from "./BaseSkeleton";
 
-const StatItem = () => (
+export const StatCardSkeleton = () => (
   <Paper
     elevation={0}
     sx={{
-      p: 2.5,
-      borderRadius: "14px",
+      p: 3,
+      borderRadius: "16px",
       border: "1px solid",
       borderColor: "divider",
       display: "flex",
-      alignItems: "center",
+      flexDirection: "column",
       justifyContent: "space-between",
-      height: 110,
+      minHeight: 140,
+      bgcolor: "background.paper",
+      boxSizing: "border-box",
     }}
   >
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 1, width: "70%" }}>
-      <BaseSkeleton variant="text" width="60%" height={18} />
-      <BaseSkeleton variant="text" width="85%" height={32} />
-      <BaseSkeleton variant="text" width="40%" height={16} />
+    {/* Top row: Label + circular icon badge */}
+    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", width: "100%" }}>
+      <BaseSkeleton variant="text" width="60%" height={24} />
+      <BaseSkeleton variant="circular" width={40} height={40} sx={{ flexShrink: 0 }} />
     </Box>
-    <BaseSkeleton variant="rounded" width={48} height={48} sx={{ borderRadius: "12px" }} />
+
+    {/* Metric Value */}
+    <BaseSkeleton variant="text" width="45%" height={48} sx={{ mt: 1, mb: 1 }} />
+
+    {/* Bottom Accent line */}
+    <BaseSkeleton variant="rounded" width="100%" height={4} sx={{ borderRadius: "2px", mt: "auto" }} />
   </Paper>
 );
 
@@ -43,11 +50,11 @@ const StatsSkeleton = ({ count = 4, className = "" }) => {
     <Box
       className={
         className ||
-        "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full"
+        "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 w-full"
       }
     >
       {items.map((_, idx) => (
-        <StatItem key={idx} />
+        <StatCardSkeleton key={idx} />
       ))}
     </Box>
   );

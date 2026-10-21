@@ -31,6 +31,7 @@ import {
 } from "@mui/material";
 import ModernTable from "@/components/tables/ModernTable";
 import ModernHeader from "@/components/headers/ModernHeader";
+import { BaseSkeleton } from "@/components/common/skeletons";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -201,8 +202,6 @@ const LeaveManagement = () => {
           sx={{ px: 0 }}
         />
 
-        {isLoading && <CircularProgress />}
-
         {/* Leave Statistics */}
         <Grid container spacing={2} sx={{ mb: 4 }}>
           <Grid item xs={12} sm={6} md={3}>
@@ -211,7 +210,9 @@ const LeaveManagement = () => {
                 <Typography color="textSecondary" gutterBottom>
                   Total Submitted
                 </Typography>
-                <Typography variant="h5">{leaves.length}</Typography>
+                <Typography variant="h5">
+                  {isLoading ? <BaseSkeleton variant="text" width={40} height={32} /> : leaves.length}
+                </Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -221,7 +222,13 @@ const LeaveManagement = () => {
                 <Typography color="textSecondary" gutterBottom>
                   Pending Review
                 </Typography>
-                <Typography variant="h5">{leaves.filter((l) => l.status === "Pending").length}</Typography>
+                <Typography variant="h5">
+                  {isLoading ? (
+                    <BaseSkeleton variant="text" width={40} height={32} />
+                  ) : (
+                    leaves.filter((l) => l.status === "Pending").length
+                  )}
+                </Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -231,7 +238,13 @@ const LeaveManagement = () => {
                 <Typography color="textSecondary" gutterBottom>
                   Approved
                 </Typography>
-                <Typography variant="h5">{leaves.filter((l) => l.status === "Approved").length}</Typography>
+                <Typography variant="h5">
+                  {isLoading ? (
+                    <BaseSkeleton variant="text" width={40} height={32} />
+                  ) : (
+                    leaves.filter((l) => l.status === "Approved").length
+                  )}
+                </Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -241,7 +254,13 @@ const LeaveManagement = () => {
                 <Typography color="textSecondary" gutterBottom>
                   Rejected
                 </Typography>
-                <Typography variant="h5">{leaves.filter((l) => l.status === "Rejected").length}</Typography>
+                <Typography variant="h5">
+                  {isLoading ? (
+                    <BaseSkeleton variant="text" width={40} height={32} />
+                  ) : (
+                    leaves.filter((l) => l.status === "Rejected").length
+                  )}
+                </Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -250,6 +269,7 @@ const LeaveManagement = () => {
         {/* Leave Table */}
         <ModernTable
           title="Leave Requests"
+          loading={isLoading}
           columns={[
             { id: "type", label: "Leave Type" },
             { id: "startDate", label: "Start Date" },

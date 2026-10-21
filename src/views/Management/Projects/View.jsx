@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { ProjectViewSkeleton } from "@/components/common/skeletons";
 import {
   Box,
   Typography,
@@ -271,22 +272,7 @@ const ProjectView = () => {
   const handleResetZoom = () => setZoomLevel(1);
 
   if (loading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "70vh",
-        }}
-      >
-        <CircularProgress sx={{ color: "#1976d2" }} />
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-          Loading project details...
-        </Typography>
-      </Box>
-    );
+    return <ProjectViewSkeleton />;
   }
 
   if (!project) {

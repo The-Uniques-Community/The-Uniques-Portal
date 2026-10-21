@@ -77,6 +77,7 @@ import RemoveCircle from "@mui/icons-material/RemoveCircle";
 import Preview from "@mui/icons-material/Preview";
 import Close from "@mui/icons-material/Close";
 import ModernTable from "@/components/tables/ModernTable";
+import { BaseSkeleton } from "@/components/common/skeletons";
 
 // Fine Payment Modal Component
 const FinePaymentModal = ({
@@ -932,8 +933,29 @@ const ManagementDashboard = () => {
               Newly Added Members
             </h2>
             {loading ? (
-              <div className="flex justify-center py-8">
-                <CircularProgress />
+              <div className="flex flex-wrap items-center justify-start gap-3">
+                {Array.from({ length: 6 }).map((_, idx) => (
+                  <Paper
+                    key={idx}
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      borderRadius: "14px",
+                      border: "1px solid",
+                      borderColor: "divider",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: 1,
+                      minWidth: 100,
+                      bgcolor: "background.paper",
+                    }}
+                  >
+                    <BaseSkeleton variant="circular" width={56} height={56} />
+                    <BaseSkeleton variant="text" width={70} height={18} />
+                    <BaseSkeleton variant="text" width={50} height={14} />
+                  </Paper>
+                ))}
               </div>
             ) : (
               <div className="flex flex-wrap items-center justify-start gap-3">
@@ -989,9 +1011,17 @@ const ManagementDashboard = () => {
               }}
             >
             {loading ? (
-              <div className="flex justify-center py-8">
-                <CircularProgress size={24} />
-              </div>
+              <Box sx={{ p: 2, display: "flex", flexDirection: "column", gap: 2 }}>
+                {Array.from({ length: 4 }).map((_, idx) => (
+                  <Box key={idx} sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                    <BaseSkeleton variant="rounded" width={42} height={42} sx={{ borderRadius: "8px", flexShrink: 0 }} />
+                    <Box sx={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 0.5 }}>
+                      <BaseSkeleton variant="text" width="75%" height={18} />
+                      <BaseSkeleton variant="text" width="50%" height={14} />
+                    </Box>
+                  </Box>
+                ))}
+              </Box>
             ) : (
               events.map((event, index) => (
                 <EventOverView key={index} event={event} />
@@ -1040,14 +1070,9 @@ const ManagementDashboard = () => {
 
         {tableView === 0 ? (
           // Fines Table
-          <>
-            {loading ? (
-              <div className="flex justify-center py-8">
-                <CircularProgress />
-              </div>
-            ) : (
-              <ModernTable
-                title="Members with Fines"
+          <ModernTable
+            loading={loading}
+            title="Members with Fines"
                 columns={[
                   { id: "member", label: "Member" },
                   { id: "admissionNo", label: "Admission No" },
@@ -1096,8 +1121,6 @@ const ManagementDashboard = () => {
                   </>
                 )}
               />
-            )}
-          </>
         ) : (
           // Supplementary Table
           <>
@@ -1120,13 +1143,9 @@ const ManagementDashboard = () => {
               ))}
             </div>
 
-            {loading ? (
-              <div className="flex justify-center py-8">
-                <CircularProgress />
-              </div>
-            ) : (
-              <ModernTable
-                title={`Supplementary Exams - Semester ${currentSemester}`}
+            <ModernTable
+              loading={loading}
+              title={`Supplementary Exams - Semester ${currentSemester}`}
                 columns={[
                   { id: "member", label: "Member" },
                   { id: "admissionNo", label: "Admission No" },
@@ -1196,7 +1215,6 @@ const ManagementDashboard = () => {
                   </>
                 )}
               />
-            )}
           </>
         )}
       </div>

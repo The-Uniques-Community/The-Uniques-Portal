@@ -12,6 +12,7 @@ import logoWhite from "@/assets/logos/uniqueswhite.png";
 import TaskSidebar from "./components/TaskSidebar";
 import ReportFeed from "./components/ReportFeed";
 import ReportComposer from "./components/ReportComposer";
+import { WorkspaceSkeleton } from "@/components/common/skeletons";
 
 const Uniques360Member = () => {
   const [tasks, setTasks] = useState([]);
@@ -139,11 +140,7 @@ const Uniques360Member = () => {
   };
 
   if (loading) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", backgroundColor: "background.default" }}>
-        <CircularProgress size={40} sx={{ color: "primary.main" }} />
-      </Box>
-    );
+    return <WorkspaceSkeleton />;
   }
 
   // Define reactive styling conditions based on current selected status configurations

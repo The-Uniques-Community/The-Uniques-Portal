@@ -1,5 +1,6 @@
 import { BASE_URL } from "@/config";
 import React, { useState, useEffect, useRef } from "react";
+import { EventBudgetSkeleton } from "@/components/common/skeletons";
 import {
   Box,
   Typography,
@@ -868,18 +869,7 @@ const EventBudget = () => {
   };
 
   if (loading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "80vh",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <EventBudgetSkeleton />;
   }
 
   if (!event) {

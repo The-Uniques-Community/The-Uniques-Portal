@@ -2,6 +2,7 @@ import { BASE_URL } from "@/config";
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify"; // Make sure this is installed
+import { EventViewSkeleton, BaseSkeleton } from "@/components/common/skeletons";
 import {
   FILE_VALIDATION_PRESETS,
   validateFile,
@@ -1468,18 +1469,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
   };
 
   if (loading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "80vh",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <EventViewSkeleton />;
   }
 
   if (!event) {
@@ -3324,16 +3314,11 @@ VALID_TEAM_TYPES.map((type) => {
               {formFields.length > 0 ? (
                 formFields.map((field) => renderFormField(field))
               ) : (
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    py: 4,
-                  }}
-                >
-                  <CircularProgress sx={{ mb: 2 }} />
-                  <Typography>Loading form fields...</Typography>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2, py: 1 }}>
+                  <BaseSkeleton variant="rounded" width="100%" height={56} sx={{ borderRadius: 1 }} />
+                  <BaseSkeleton variant="rounded" width="100%" height={56} sx={{ borderRadius: 1 }} />
+                  <BaseSkeleton variant="rounded" width="100%" height={56} sx={{ borderRadius: 1 }} />
+                  <BaseSkeleton variant="rounded" width="100%" height={80} sx={{ borderRadius: 1 }} />
                 </Box>
               )}
             </>

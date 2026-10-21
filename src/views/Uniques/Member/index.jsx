@@ -44,6 +44,7 @@ import GitHubIcon from "@mui/icons-material/GitHub";
 import XIcon from "@mui/icons-material/X";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import { Link } from "react-router-dom";
+import { MemberDashboardSkeleton } from "@/components/common/skeletons";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
@@ -1649,26 +1650,9 @@ const Index = () => {
     "#eeeeee",
   ];
 
-  // If page is loading, show loading indicator
+  // If page is loading, show loading skeleton
   if (pageLoading) {
-    return (
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "80vh",
-            flexDirection: "column",
-          }}
-        >
-          <CircularProgress size={60} sx={{ mb: 3, color: "#ca0019" }} />
-          <Typography variant="h6" color="textSecondary">
-            Loading profile...
-          </Typography>
-        </Box>
-      </Container>
-    );
+    return <MemberDashboardSkeleton />;
   }
 
   // If there's an error loading the profile, show error message

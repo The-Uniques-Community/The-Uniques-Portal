@@ -10,7 +10,7 @@ import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import { MemberCardDashboard } from "@/components/cards/MemberCardDashboard";
-import { CardSkeleton } from "@/components/common/skeletons";
+import { MemberCardSkeleton } from "@/components/common/skeletons";
 import DataTablePagination from "@/components/common/pagination/DataTablePagination";
 import SearchFilterBar from "@/components/common/filters/SearchFilterBar";
 import memberService from "@/services/memberService";
@@ -158,7 +158,7 @@ const MembersIndex = () => {
           <Grid container spacing={3}>
             {Array.from(new Array(limit)).map((_, idx) => (
               <Grid item xs={12} sm={6} md={4} lg={3} key={idx}>
-                <CardSkeleton height={280} />
+                <MemberCardSkeleton />
               </Grid>
             ))}
           </Grid>

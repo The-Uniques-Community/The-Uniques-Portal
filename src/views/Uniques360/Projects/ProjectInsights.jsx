@@ -24,6 +24,7 @@ import {
 import { alpha } from "@mui/material/styles"; // Import alpha for secure hex opacities
 import ModernTable from "@/components/tables/ModernTable";
 import ModernHeader from "@/components/headers/ModernHeader";
+import { ProjectInsightsSkeleton } from "@/components/common/skeletons";
 import ProjectIcon from '@mui/icons-material/Assignment';
 import OngoingIcon from '@mui/icons-material/TrendingUp';
 import CompletedIcon from '@mui/icons-material/CheckCircle';
@@ -103,11 +104,7 @@ const ProjectInsights = () => {
   };
 
   if (loading) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh" }}>
-        <CircularProgress sx={{ color: themeColors.red }} />
-      </Box>
-    );
+    return <ProjectInsightsSkeleton />;
   }
 
   return (
@@ -162,6 +159,7 @@ const ProjectInsights = () => {
         {/* Project List Table */}
         <Grid item xs={12} lg={8}>
           <ModernTable
+            loading={loading}
             title="Active Project Tasks"
             columns={[
               { id: "title", label: "Project Title" },

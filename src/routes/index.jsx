@@ -9,6 +9,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import Loader from "@/components/common/loaders/RouteLoader";
 import ErrorBoundary from "@/components/common/ErrorBoundary";
 import RootLayout from "@/layout/RootLayout";
+import { AuthPageSkeleton } from "@/components/common/skeletons";
 
 // Route modules
 import { AdminRoutes, CoordinatorRoutes } from "@/routes/Management/ManagementRoutes";
@@ -18,8 +19,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { isTokenExpired } from "@/utils/authUtils";
 
 // Lazy-loaded auth, status & error views
-const Login = Loader(lazy(() => import("@/views/Authentication/login")));
-const ForgetPassword = Loader(lazy(() => import("@/views/Authentication/login/ForgetPassword")));
+const Login = Loader(lazy(() => import("@/views/Authentication/login")), true, AuthPageSkeleton);
+const ForgetPassword = Loader(lazy(() => import("@/views/Authentication/login/ForgetPassword")), true, AuthPageSkeleton);
 const Unauthorized = Loader(lazy(() => import("@/views/Authentication/Unauthorized")));
 const NotFound = Loader(lazy(() => import("@/views/NotFound")));
 
