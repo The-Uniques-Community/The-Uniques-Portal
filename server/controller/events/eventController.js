@@ -10,8 +10,107 @@ import FormResponse from "../../models/member/formResponse.js";
 import Guest from "../../models/member/guestModel.js";
 import Member from "../../models/member/memberModel.js";
 import User from "../../models/user/userModel.js";
+import File from "../../models/member/fileModel.js";
 
 import mongoose from "mongoose";
+
+/**
+ * Normalizes any file input (subdocument object, string ID, URL, or null/empty)
+ * into a valid fileAttachmentSchema subdocument or null.
+ *
+ * @param {any} fileRef - Raw file reference
+ * @returns {Promise<Object|null>} Standardized subdocument or null
+ */
+async function normalizeFileAttachment(fileRef) {
+  if (!fileRef) return null;
+
+  // Case 1: Subdocument object
+  if (typeof fileRef === "object" && !(fileRef instanceof mongoose.Types.ObjectId)) {
+    const fileId = fileRef.fileId || "";
+    const fileUrl = fileRef.fileUrl || fileRef.url || "";
+    const url = fileRef.url || fileRef.fileUrl || "";
+    const fileName = fileRef.fileName || "";
+    return {
+      _id: fileRef._id && mongoose.Types.ObjectId.isValid(fileRef._id)
+        ? new mongoose.Types.ObjectId(fileRef._id)
+        : new mongoose.Types.ObjectId(),
+      fileId,
+      fileUrl,
+      url,
+      fileName,
+    };
+  }
+
+  // Case 2: String representation (ObjectId, Google Drive fileId, URL, or empty)
+  if (typeof fileRef === "string" || fileRef instanceof mongoose.Types.ObjectId) {
+    const str = fileRef.toString().trim();
+    if (!str) return null;
+
+    if (mongoose.Types.ObjectId.isValid(str)) {
+      try {
+        const fileDoc = await File.findById(str).lean();
+        if (fileDoc) {
+          return {
+            _id: fileDoc._id,
+            fileId: fileDoc.fileId || "",
+            fileUrl: fileDoc.fileUrl || "",
+            url: fileDoc.fileUrl || "",
+            fileName: fileDoc.fileName || "",
+          };
+        }
+      } catch (err) {
+        // Fall back to creating subdoc below
+      }
+      return {
+        _id: new mongoose.Types.ObjectId(str),
+        fileId: str,
+        fileUrl: "",
+        url: "",
+        fileName: "",
+      };
+    }
+
+    // URL or string fileId
+    const isUrl = str.startsWith("http://") || str.startsWith("https://") || str.startsWith("data:");
+    return {
+      _id: new mongoose.Types.ObjectId(),
+      fileId: isUrl ? "" : str,
+      fileUrl: isUrl ? str : "",
+      url: isUrl ? str : "",
+      fileName: "",
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Normalizes and sanitizes guest list by removing null, empty, or invalid guest entries.
+ *
+ * @param {Array} guests - Raw guest array
+ * @returns {Array<{guestId: mongoose.Types.ObjectId, guestTag: string}>}
+ */
+function sanitizeGuests(guests) {
+  if (!Array.isArray(guests)) return [];
+  const valid = [];
+  for (const g of guests) {
+    if (!g) continue;
+    let gid = g.guestId;
+    if (gid && typeof gid === "object" && gid._id) {
+      gid = gid._id;
+    }
+    if (gid && typeof gid === "string") {
+      gid = gid.trim();
+    }
+    if (gid && mongoose.Types.ObjectId.isValid(gid)) {
+      valid.push({
+        guestId: new mongoose.Types.ObjectId(gid),
+        guestTag: g.guestTag || "others",
+      });
+    }
+  }
+  return valid;
+}
 
 /**
  * Create a new event with form integration
@@ -43,6 +142,31 @@ export const createEvent = async (req, res) => {
       });
     }
 
+    // Normalize banner, guests, gallery, and sponsors
+    const normalizedBanner = await normalizeFileAttachment(eventBanner);
+    const normalizedGuests = sanitizeGuests(eventGuests);
+
+    let normalizedGallery = [];
+    if (Array.isArray(eventGallery)) {
+      for (const item of eventGallery) {
+        const norm = await normalizeFileAttachment(item);
+        if (norm) normalizedGallery.push(norm);
+      }
+    }
+
+    let normalizedSponsors = [];
+    if (Array.isArray(sponsors)) {
+      for (const s of sponsors) {
+        if (!s || !s.name || s.amount === undefined || s.amount === null) continue;
+        const normReceipt = await normalizeFileAttachment(s.receiptId);
+        normalizedSponsors.push({
+          ...s,
+          amount: Number(s.amount) || 0,
+          receiptId: normReceipt,
+        });
+      }
+    }
+
     // Handle registration form if provided
     let formId = null;
     if (eventForm && eventForm.formFeilds && eventForm.formFeilds.length > 0) {
@@ -71,26 +195,26 @@ export const createEvent = async (req, res) => {
     const newEvent = new Event({
       eventName,
       eventDescription,
-      eventBanner,
+      eventBanner: normalizedBanner,
       eventDate,
       eventTime,
       eventVenue,
       eventOrganizerBatch,
-      eventGuests: eventGuests || [],
+      eventGuests: normalizedGuests,
       eventType,
       eventStatus: eventStatus || "upcoming",
       eventForm: {
         formId,
         formFeilds: eventForm?.formFeilds || [],
       },
-      eventGallery: eventGallery || [],
-      sponsors: sponsors || [], // Add sponsors to the event
+      eventGallery: normalizedGallery,
+      sponsors: normalizedSponsors, // Add sponsors to the event
     });
 
     // Initialize budget fields if sponsors are provided
-    if (sponsors && sponsors.length > 0) {
+    if (normalizedSponsors && normalizedSponsors.length > 0) {
       // Calculate total amount from sponsors
-      const totalSponsorship = sponsors.reduce(
+      const totalSponsorship = normalizedSponsors.reduce(
         (total, sponsor) => total + (sponsor.amount || 0),
         0
       );
@@ -128,8 +252,8 @@ export const createEvent = async (req, res) => {
     await newEvent.save();
 
     // Link guests to the event if any are provided
-    if (eventGuests && eventGuests.length > 0) {
-      for (const guest of eventGuests) {
+    if (normalizedGuests && normalizedGuests.length > 0) {
+      for (const guest of normalizedGuests) {
         // Update the guest's events array
         await Guest.findByIdAndUpdate(guest.guestId, {
           $push: {
@@ -567,6 +691,36 @@ export const updateEvent = async (req, res) => {
       });
     }
 
+    // Normalize eventBanner if provided
+    if ("eventBanner" in updateData) {
+      updateData.eventBanner = await normalizeFileAttachment(updateData.eventBanner);
+    }
+
+    // Normalize eventGallery if provided
+    if ("eventGallery" in updateData && Array.isArray(updateData.eventGallery)) {
+      const normalizedGallery = [];
+      for (const item of updateData.eventGallery) {
+        const norm = await normalizeFileAttachment(item);
+        if (norm) normalizedGallery.push(norm);
+      }
+      updateData.eventGallery = normalizedGallery;
+    }
+
+    // Normalize sponsors if provided
+    if ("sponsors" in updateData && Array.isArray(updateData.sponsors)) {
+      const normSponsors = [];
+      for (const s of updateData.sponsors) {
+        if (!s) continue;
+        const normReceipt = await normalizeFileAttachment(s.receiptId);
+        normSponsors.push({
+          ...s,
+          amount: Number(s.amount) || 0,
+          receiptId: normReceipt,
+        });
+      }
+      updateData.sponsors = normSponsors;
+    }
+
     // Handle form updates if provided
     if (updateData.eventForm) {
       if (event.eventForm && event.eventForm.formId) {
@@ -620,10 +774,18 @@ export const updateEvent = async (req, res) => {
 
     // Handle guest updates if provided
     if (updateData.eventGuests) {
-      // Get current guest IDs for comparison
-      const currentGuestIds = event.eventGuests.map((g) =>
-        g.guestId.toString()
-      );
+      updateData.eventGuests = sanitizeGuests(updateData.eventGuests);
+
+      // Get current guest IDs for comparison safely
+      const currentGuestIds = (event.eventGuests || [])
+        .map((g) => {
+          if (!g || !g.guestId) return null;
+          return typeof g.guestId === "object" && g.guestId._id
+            ? g.guestId._id.toString()
+            : g.guestId.toString();
+        })
+        .filter(Boolean);
+
       const newGuestIds = updateData.eventGuests.map((g) =>
         g.guestId.toString()
       );
@@ -1425,7 +1587,7 @@ export const addEventSponsor = async (req, res) => {
       contactEmail,
       contactPhone,
       notes,
-      receiptId,
+      receiptId: await normalizeFileAttachment(receiptId),
       logoUrl,
       status: status, // Add status field
       dateReceived: new Date(),
@@ -1499,15 +1661,17 @@ export const updateReceiptId = async (req, res) => {
       });
     }
 
+    const normalizedReceipt = await normalizeFileAttachment(receiptId);
+
     // Update based on item type
     let updateQuery = {};
     if (itemType === "sponsor") {
       updateQuery = {
-        $set: { "sponsors.$[elem].receiptId": receiptId },
+        $set: { "sponsors.$[elem].receiptId": normalizedReceipt },
       };
     } else {
       updateQuery = {
-        $set: { "expenses.$[elem].receiptId": receiptId },
+        $set: { "expenses.$[elem].receiptId": normalizedReceipt },
       };
     }
 
@@ -1584,7 +1748,7 @@ export const addEventExpense = async (req, res) => {
       vendor,
       paymentMethod: paymentMethod || "cash",
       paymentStatus: paymentStatus || "pending",
-      receiptId,
+      receiptId: await normalizeFileAttachment(receiptId),
       paidBy,
       paidOn: paidOn
         ? new Date(paidOn)
@@ -2115,27 +2279,33 @@ export const updateEventGallery = async (req, res) => {
       });
     }
 
-    // Validate image IDs
-    const validImagesToAdd = imagesToAdd.filter((img) =>
-      mongoose.Types.ObjectId.isValid(img)
-    );
+    // Validate image IDs to remove
+    const validImagesToRemove = (Array.isArray(imagesToRemove) ? imagesToRemove : [])
+      .map((img) => (typeof img === "object" && img?._id ? img._id : img))
+      .filter((img) => img && mongoose.Types.ObjectId.isValid(img))
+      .map((img) => new mongoose.Types.ObjectId(img));
 
-    const validImagesToRemove = imagesToRemove.filter((img) =>
-      mongoose.Types.ObjectId.isValid(img)
-    );
+    // Normalize images to add
+    const normalizedToAdd = [];
+    if (Array.isArray(imagesToAdd)) {
+      for (const img of imagesToAdd) {
+        const norm = await normalizeFileAttachment(img);
+        if (norm) normalizedToAdd.push(norm);
+      }
+    }
 
     // Process updates
     let updateOperations = {};
 
-    if (validImagesToAdd.length > 0) {
-      updateOperations.$addToSet = {
-        eventGallery: { $each: validImagesToAdd },
+    if (normalizedToAdd.length > 0) {
+      updateOperations.$push = {
+        eventGallery: { $each: normalizedToAdd },
       };
     }
 
     if (validImagesToRemove.length > 0) {
       updateOperations.$pull = {
-        eventGallery: { $in: validImagesToRemove },
+        eventGallery: { _id: { $in: validImagesToRemove } },
       };
     }
 

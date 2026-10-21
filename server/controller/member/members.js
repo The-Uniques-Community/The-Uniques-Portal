@@ -53,7 +53,6 @@ export const getMemberData = async () => {
         isPlaced: true,
         isVerified: true,
         isSuspended: false,
-        profileStatus: "active",
         fineStatus: "0",
         // New fine model data
         fines: [],
@@ -115,7 +114,6 @@ export const getMemberData = async () => {
         isPlaced: false,
         isVerified: true,
         isSuspended: false,
-        profileStatus: "active",
         fineStatus: "0",
         // New fine model data
         fines: [
@@ -200,7 +198,6 @@ export const getMemberData = async () => {
         isPlaced: false,
         isVerified: true,
         isSuspended: false,
-        profileStatus: "active",
         fineStatus: "0",
         // New fine model data
         fines: [
@@ -250,7 +247,6 @@ export const getMemberData = async () => {
         isPlaced: false,
         isVerified: true,
         isSuspended: true, // Suspended account
-        profileStatus: "blocked",
         fineStatus: "500", // Has outstanding fine
         // New fine model data
         fines: [

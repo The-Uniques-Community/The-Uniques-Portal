@@ -30,8 +30,7 @@ export const approveProfile = async (req, res) => {
         await Member.updateOne(
             { email },
             {
-                isVerified: true,
-                profileStatus: "approved"
+                isVerified: true
             }
         );
         res.status(200).json({ message: "User profile approved successfully" });
@@ -59,8 +58,7 @@ export const blockMember = async (req, res) => {
         await Member.updateOne(
             { email },
             {
-                isSuspended: true,
-                profileStatus:"blocked"
+                isSuspended: true
             }
         );
         res.status(200).json({ message: "User blocked successfully" });
@@ -88,8 +86,7 @@ export const unblockMember = async (req, res) => {
         await Member.updateOne(
             { email },
             {
-                isSuspended: false,
-                profileStatus:"active"
+                isSuspended: false
             }
         );
         res.status(200).json({ message: "User unblocked successfully" });
@@ -265,7 +262,6 @@ export const addMember = async (req, res) => {
         admno,
         course: course || 'B.Tech CSE', // Default value if not provided
         password: hashedPassword, // Store hashed password
-        profileStatus: 'inactive',
         role: 'member'
       });
       

@@ -275,11 +275,11 @@ export const NewMember = ({ user, refreshData }) => {
             </div>
             <span
               className={`${getStatusColor(
-                user?.profileStatus || "active"
+                user?.status || user?.profileStatus || "active"
               )} text-white text-sm px-3 py-1 rounded-full`}
             >
-              {(user?.profileStatus || "active").charAt(0).toUpperCase() +
-                (user?.profileStatus || "active").slice(1)}
+              {(user?.status || user?.profileStatus || "active").charAt(0).toUpperCase() +
+                (user?.status || user?.profileStatus || "active").slice(1)}
             </span>
           </div>
 
@@ -400,8 +400,8 @@ export const NewMember = ({ user, refreshData }) => {
             <div className="flex flex-wrap gap-2">
               <Chip
                 icon={<BadgeIcon />}
-                label={(user?.profileStatus || "active").toUpperCase()}
-                className={`${getStatusColor(user?.profileStatus || "active")} text-white`}
+                label={(user?.status || user?.profileStatus || "active").toUpperCase()}
+                className={`${getStatusColor(user?.status || user?.profileStatus || "active")} text-white`}
               />
               {user.isSuspended && (
                 <Chip
@@ -928,17 +928,17 @@ export const NewMember = ({ user, refreshData }) => {
               {/* Block/Unblock Button */}
               <Button
                 variant="contained"
-                color={user.profileStatus === "blocked" ? "success" : "error"}
+                color={user.isSuspended ? "success" : "error"}
                 startIcon={
                   !blockLoading &&
-                  (user.profileStatus === "blocked" ? (
+                  (user.isSuspended ? (
                     <DoneIcon />
                   ) : (
                     <BlockIcon />
                   ))
                 }
                 className={
-                  user.profileStatus === "blocked"
+                  user.isSuspended
                     ? "bg-green-600"
                     : "bg-red-600"
                 }
@@ -947,7 +947,7 @@ export const NewMember = ({ user, refreshData }) => {
               >
                 {blockLoading ? (
                   <CircularProgress size={24} color="inherit" />
-                ) : user.profileStatus === "blocked" ? (
+                ) : user.isSuspended ? (
                   "Unblock User"
                 ) : (
                   "Block User"

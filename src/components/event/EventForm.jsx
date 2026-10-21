@@ -160,7 +160,7 @@ const EventForm = ({ event, onSuccess }) => {
   );
   const [bannerFile, setBannerFile] = useState(null);
   const [bannerPreview, setBannerPreview] = useState(
-    event?.eventBanner?.fileUrl || ""
+    event?.eventBanner?.fileUrl || event?.eventBanner?.url || ""
   );
   // Add gallery states
   const [galleryFiles, setGalleryFiles] = useState([]);
@@ -173,6 +173,8 @@ const EventForm = ({ event, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showError, setShowError] = useState(false);
 
   const isEdit = Boolean(event);
 
@@ -272,7 +274,7 @@ const EventForm = ({ event, onSuccess }) => {
     initialValues: {
       eventName: event?.eventName || "",
       eventDescription: event?.eventDescription || "",
-      eventBanner: event?.eventBanner || "",
+      eventBanner: event?.eventBanner || null,
       eventDate: formatDateForInput(event?.eventDate) || "",
       eventTime: event?.eventTime || "",
       eventVenue: event?.eventVenue || "",
@@ -287,7 +289,10 @@ const EventForm = ({ event, onSuccess }) => {
         setLoading(true);
 
         let eventId = isEdit ? event._id : null;
-        let bannerId = values.eventBanner;
+        let bannerAttachment = values.eventBanner || null;
+        if (typeof bannerAttachment === "string" && !bannerAttachment.trim()) {
+          bannerAttachment = null;
+        }
 
         // Step 1: Handle banner upload if a new file was selected
         if (bannerFile) {
@@ -311,7 +316,14 @@ const EventForm = ({ event, onSuccess }) => {
               uploadResponse.data.files &&
               uploadResponse.data.files.length > 0
             ) {
-              bannerId = uploadResponse.data.files[0]._id;
+              const uploadedFile = uploadResponse.data.files[0];
+              bannerAttachment = {
+                _id: uploadedFile._id,
+                fileId: uploadedFile.fileId || "",
+                fileUrl: uploadedFile.fileUrl || uploadedFile.url || "",
+                url: uploadedFile.url || uploadedFile.fileUrl || "",
+                fileName: uploadedFile.fileName || "",
+              };
               console.log("Banner uploaded successfully:", uploadResponse.data);
             }
           } catch (uploadError) {
@@ -320,7 +332,10 @@ const EventForm = ({ event, onSuccess }) => {
           }
         }
 
-        const galleryIds = [];
+        const galleryAttachments = [];
+        if (isEdit && !replaceExistingGallery && existingGallery.length > 0) {
+          galleryAttachments.push(...existingGallery);
+        }
 
         // Step 2: Handle gallery uploads if any
         if (galleryFiles && galleryFiles.length > 0) {
@@ -354,13 +369,16 @@ const EventForm = ({ event, onSuccess }) => {
               galleryResponse.data.files &&
               galleryResponse.data.files.length > 0
             ) {
-              galleryIds.push(
-                ...galleryResponse.data.files.map((file) => file._id)
-              );
+              const newGalleryItems = galleryResponse.data.files.map((file) => ({
+                _id: file._id,
+                fileId: file.fileId || "",
+                fileUrl: file.fileUrl || file.url || "",
+                url: file.url || file.fileUrl || "",
+                fileName: file.fileName || "",
+              }));
+              galleryAttachments.push(...newGalleryItems);
             }
             console.log("Gallery uploads processed:", galleryResponse.data);
-
-            // No need to update the form values as the backend handles the connections
           } catch (galleryError) {
             console.error("Error uploading gallery images:", galleryError);
             // Continue with form submission even if gallery upload fails
@@ -369,6 +387,7 @@ const EventForm = ({ event, onSuccess }) => {
 
         // Inside formik.onSubmit, before creating eventData
         // Process receipt uploads if any
+        let updatedSponsors = [...sponsors];
         if (currentReceipt) {
           const receiptFormData = new FormData();
           receiptFormData.append("files", currentReceipt.file);
@@ -382,16 +401,54 @@ const EventForm = ({ event, onSuccess }) => {
             );
 
             if (receiptResponse.data.files && receiptResponse.data.files.length > 0) {
-              // Update the receipt ID in the sponsor
-              const newSponsors = [...sponsors];
-              newSponsors[currentReceipt.index].receiptId = receiptResponse.data.files[0]._id;
-              delete newSponsors[currentReceipt.index].hasNewReceipt; // Remove temp flag
-              setSponsors(newSponsors);
+              const uploadedReceipt = receiptResponse.data.files[0];
+              const receiptAttachment = {
+                _id: uploadedReceipt._id,
+                fileId: uploadedReceipt.fileId || "",
+                fileUrl: uploadedReceipt.fileUrl || uploadedReceipt.url || "",
+                url: uploadedReceipt.url || uploadedReceipt.fileUrl || "",
+                fileName: uploadedReceipt.fileName || "",
+              };
+              updatedSponsors[currentReceipt.index].receiptId = receiptAttachment;
+              delete updatedSponsors[currentReceipt.index].hasNewReceipt; // Remove temp flag
+              setSponsors(updatedSponsors);
             }
           } catch (receiptError) {
             console.error("Error uploading receipt:", receiptError);
           }
         }
+
+        const sanitizedSponsors = (updatedSponsors || []).map((s) => ({
+          ...s,
+          amount: Number(s.amount) || 0,
+          receiptId:
+            s.receiptId && typeof s.receiptId === "object"
+              ? {
+                  _id: s.receiptId._id,
+                  fileId: s.receiptId.fileId || "",
+                  fileUrl: s.receiptId.fileUrl || s.receiptId.url || "",
+                  url: s.receiptId.url || s.receiptId.fileUrl || "",
+                  fileName: s.receiptId.fileName || "",
+                }
+              : null,
+        }));
+
+        // Filter and sanitize guests (remove unselected / empty guest rows)
+        const sanitizedGuests = (values.eventGuests || [])
+          .filter((g) => {
+            if (!g) return false;
+            const gid =
+              typeof g.guestId === "object" ? g.guestId?._id : g.guestId;
+            return gid && typeof gid === "string" && gid.trim() !== "";
+          })
+          .map((g) => {
+            const gid =
+              typeof g.guestId === "object" ? g.guestId?._id : g.guestId;
+            return {
+              guestId: gid.trim(),
+              guestTag: g.guestTag || "others",
+            };
+          });
 
         // Step 3: Format event data for submission
         const formattedValues = { ...values };
@@ -401,18 +458,17 @@ const EventForm = ({ event, onSuccess }) => {
           ).toISOString();
         }
 
-        console.log("eventGallery", galleryIds);
-
         // Update the eventData object to include sponsors
         const eventData = {
           ...formattedValues,
-          eventBanner: bannerId,
-          eventGallery: galleryIds,
+          eventBanner: bannerAttachment,
+          eventGallery: galleryAttachments,
+          eventGuests: sanitizedGuests,
           eventForm: {
-            formFeilds: formFields
+            formFeilds: formFields,
           },
           // Include sponsors data if hasSponsors is true
-          sponsors: hasSponsors ? sponsors : []
+          sponsors: hasSponsors ? sanitizedSponsors : [],
         };
 
         // Step 4: Create or update the event
@@ -429,10 +485,10 @@ const EventForm = ({ event, onSuccess }) => {
             eventData,
             { withCredentials: true }
           );
-          eventId = response.data.event._id; // Get new event ID for guest linking
+          eventId = response.data.event?._id; // Get new event ID for guest linking
         }
 
-        //toast and redirect
+        // toast and redirect
         if (response.data.success || response.data.event) {
           // Set success message based on whether creating or editing
           const message = isEdit
@@ -441,16 +497,27 @@ const EventForm = ({ event, onSuccess }) => {
 
           setSuccessMessage(message);
           setShowSuccess(true);
+          setShowError(false);
           formik.resetForm();
           if (onSuccess) {
             onSuccess(response.data.event);
+          } else {
+            setTimeout(() => {
+              navigate(-1);
+            }, 1200);
           }
         }
       } catch (error) {
         console.error("Error saving event:", error);
         setSuccessMessage("");
         setShowSuccess(false);
-        // Show error to user (you could set state here to display an error message)
+        const errText =
+          error.response?.data?.error ||
+          error.response?.data?.message ||
+          error.message ||
+          "Error saving event";
+        setErrorMessage(errText);
+        setShowError(true);
       } finally {
         setLoading(false);
       }
@@ -626,6 +693,21 @@ const EventForm = ({ event, onSuccess }) => {
           {successMessage}
         </Alert>
       </Snackbar>
+      <Snackbar
+        open={showError}
+        autoHideDuration={6000}
+        onClose={() => setShowError(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setShowError(false)}
+          severity="error"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {errorMessage}
+        </Alert>
+      </Snackbar>
       <Button
         startIcon={<ArrowBack />}
         onClick={() => navigate(-1)}
@@ -684,7 +766,7 @@ const EventForm = ({ event, onSuccess }) => {
                     onClick={() => {
                       setBannerFile(null);
                       setBannerPreview("");
-                      formik.setFieldValue("eventBanner", "");
+                      formik.setFieldValue("eventBanner", null);
                     }}
                   >
                     <DeleteIcon />

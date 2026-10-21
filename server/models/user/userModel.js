@@ -7,6 +7,11 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import fileAttachmentSchema from "../common/fileAttachmentSchema.js";
+import {
+  calculateMemberStatus,
+  getMemberAdmissionYear,
+  getMemberGraduationYear,
+} from "../../utils/memberStatus.js";
 
 const projectSchema = new mongoose.Schema({
   title: { type: String, trim: true },
@@ -72,11 +77,6 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
-    profileStatus: {
-      type: String,
-      enum: ["inactive", "active", "pending", "blocked", "approved"],
-      default: "active",
-    },
     isVerified: { type: Boolean, default: false },
     isSuspended: { type: Boolean, default: false },
     tokenVersion: { type: Number, default: 0 }, // Session invalidation counter
@@ -99,6 +99,8 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["B.Tech CSE", "CSD", "BCA", "BTech AI/ML", "B.Tech AI/ML"],
     },
+    admissionYear: { type: Number, min: 2000, max: 2100 },
+    graduationYear: { type: Number, min: 2000, max: 2100 },
     isPlaced: { type: Boolean, default: false },
 
     // Contact & Profile
@@ -165,17 +167,35 @@ userSchema.index(
   }
 );
 userSchema.index({ role: 1 });
-userSchema.index({ profileStatus: 1 });
 userSchema.index({ batch: 1 });
+userSchema.index({ graduationYear: 1 });
 
-// Pre-save hook: Hash passwords safely
+// Pre-save hook: Hash passwords safely and calculate academic years
 userSchema.pre("save", async function (next) {
+  if (!this.admissionYear) {
+    const calculatedAdmYear = getMemberAdmissionYear(this);
+    if (calculatedAdmYear) this.admissionYear = calculatedAdmYear;
+  }
+  if (!this.graduationYear) {
+    const calculatedGradYear = getMemberGraduationYear(this);
+    if (calculatedGradYear) this.graduationYear = calculatedGradYear;
+  }
   if (this.role) this.role = this.role.toLowerCase();
   if (!this.isModified("password") || !this.password) return next();
   if (/^\$2[ab]\$\d+\$/.test(this.password)) return next(); // Skip if already hashed
   const salt = await bcrypt.genSalt(12);
   this.password = await bcrypt.hash(this.password, salt);
   next();
+});
+
+// Status Virtuals: calculate active/inactive dynamically based on graduation year and July cutoff
+userSchema.virtual("status").get(function () {
+  return calculateMemberStatus(this);
+});
+
+// Backward-compatible virtual for any client or component referencing profileStatus
+userSchema.virtual("profileStatus").get(function () {
+  return calculateMemberStatus(this);
 });
 
 // Academic Virtuals
