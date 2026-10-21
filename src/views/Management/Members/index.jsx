@@ -75,7 +75,7 @@ const MembersIndex = () => {
     setFilter,
     refetch,
   } = usePaginatedQuery({
-    query: (params) => memberService.getAdminMembers(params),
+    query: memberService.getAdminMembers,
     defaultLimit: 12,
     syncUrlParams: true,
   });

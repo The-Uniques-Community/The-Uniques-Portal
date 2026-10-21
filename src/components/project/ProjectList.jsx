@@ -56,7 +56,7 @@ export const ProjectList = ({ createRoutePrefix = "/coordinator/projects-overvie
     setSearch,
     refetch,
   } = usePaginatedQuery({
-    query: (params) => projectService.getProjects(params),
+    query: projectService.getProjects,
     defaultLimit: 10,
     syncUrlParams: true,
   });
