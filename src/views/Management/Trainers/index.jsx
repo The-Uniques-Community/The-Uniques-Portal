@@ -350,10 +350,11 @@ const Trainers = () => {
                     ) : (
                         <div className="grid xl:grid-cols-4 md:grid-cols-3 grid-cols-1 sm:grid-cols-1 gap-4">
                             {filteredTrainers.length > 0 ? (
-                                filteredTrainers.map((trainer) => (
+                                filteredTrainers.filter(Boolean).map((trainer) => (
                                     <TrainerCardDashboard
                                         key={trainer._id}
                                         user={trainer}
+                                        trainer={trainer}
                                     />
                                 ))
                             ) : (

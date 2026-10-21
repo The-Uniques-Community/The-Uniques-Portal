@@ -246,6 +246,8 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
     }
   };
 
+  if (!user) return null;
+
   return (
     <>
       <Modal open={open} onClose={handleClose}>
@@ -368,7 +370,7 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
               <div className="flex items-center justify-start gap-x-3 mb-3">
                 <img src={tu} className="h-7 w-7 object-contain" alt="" />
                 <p style={{ color: theme.palette.text.secondary }}>
-                  <span className="font-medium">Batch:</span> {user.batch}
+                  <span className="font-medium">Batch:</span> {user?.batch || "N/A"}
                 </p>
               </div>
               <div className="flex items-center gap-x-3 mb-4">
@@ -1213,7 +1215,7 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                     {user.fullName}
                   </Typography>
                   <Typography variant="body2" style={{ color: theme.palette.text.secondary }}>
-                    {user.admno} • {user.batch}
+                    {user?.admno} • {user?.batch || "N/A"}
                   </Typography>
                 </div>
               </div>

@@ -307,7 +307,15 @@ const sampleUserData = {
   ],
 };
 
-export const MemberCardDashboard = ({ user, onEdit, onDelete, refreshData }) => {
+export const MemberCardDashboard = ({
+  user,
+  member,
+  onEdit,
+  onDelete,
+  refreshData,
+  onMemberUpdate,
+}) => {
+  const currentUser = user || member;
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const [open, setOpen] = useState(false);
@@ -317,6 +325,9 @@ export const MemberCardDashboard = ({ user, onEdit, onDelete, refreshData }) => 
     if (!fileId) return "/placeholder.svg"; // Fallback image
     return `${BASE_URL}/api/image-proxy/${fileId}`;
   };
+
+  if (!currentUser) return null;
+
   return (
     <>
       {/* User Card */}
@@ -336,10 +347,10 @@ export const MemberCardDashboard = ({ user, onEdit, onDelete, refreshData }) => 
                 alt="The Uniques"
                 className="w-5 inline h-5 object-contain object-center"
               />{" "}
-              {user.batch}
+              {currentUser.batch || "The Uniques"}
             </div>
-            <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${getMemberStatusBadgeProps(getMemberStatus(user)).className}`}>
-              {getMemberStatusBadgeProps(getMemberStatus(user)).label}
+            <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${getMemberStatusBadgeProps(getMemberStatus(currentUser)).className}`}>
+              {getMemberStatusBadgeProps(getMemberStatus(currentUser)).label}
             </span>
           </div>
 
@@ -351,7 +362,7 @@ export const MemberCardDashboard = ({ user, onEdit, onDelete, refreshData }) => 
                   size="small"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onEdit(user);
+                    onEdit(currentUser);
                   }}
                   className="text-blue-600 hover:bg-blue-50"
                   style={{ color: isDark ? "#90caf9" : "#1976d2" }}
@@ -365,7 +376,7 @@ export const MemberCardDashboard = ({ user, onEdit, onDelete, refreshData }) => 
                   size="small"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onDelete(user._id);
+                    onDelete(currentUser._id);
                   }}
                   className="text-red-600 hover:bg-red-50"
                   style={{ color: isDark ? "#f48fb1" : "#d32f2f" }}
@@ -383,11 +394,11 @@ export const MemberCardDashboard = ({ user, onEdit, onDelete, refreshData }) => 
             <div className="flex items-center gap-3">
               <Avatar
                 src={
-                  user?.profilePic?.fileId
-                    ? getProxyImageUrl(user.profilePic.fileId)
+                  currentUser?.profilePic?.fileId
+                    ? getProxyImageUrl(currentUser.profilePic.fileId)
                     : userIcon
                 }
-                alt={user.fullName}
+                alt={currentUser.fullName || "Member"}
                 sx={{ 
                   width: 64, 
                   height: 64, 
@@ -401,17 +412,17 @@ export const MemberCardDashboard = ({ user, onEdit, onDelete, refreshData }) => 
                 }}
               />
               <div>
-                <h2 style={{ color: theme.palette.text.primary }} className="text-lg font-semibold">{user.fullName}</h2>
+                <h2 style={{ color: theme.palette.text.primary }} className="text-lg font-semibold">{currentUser.fullName || "Unnamed Member"}</h2>
                 <p style={{ color: theme.palette.text.secondary }} className="text-sm">
-                  {user.bio ? user.bio.slice(0, 36) + "..." : "No bio available"}
+                  {currentUser.bio ? currentUser.bio.slice(0, 36) + "..." : "No bio available"}
                 </p>
               </div>
             </div>
 
             {/* Social Media Links */}
             <div className="flex justify-start gap-x-4 mt-3">
-              {user.githubProfile && (
-                <Link to={user.githubProfile}>
+              {currentUser.githubProfile && (
+                <Link to={currentUser.githubProfile}>
                   <div 
                     style={{ backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "#000000" }} 
                     className="w-10 h-10 p-1 rounded-full"
@@ -422,8 +433,8 @@ export const MemberCardDashboard = ({ user, onEdit, onDelete, refreshData }) => 
                   </div>
                 </Link>
               )}
-              {user.linkedinProfile && (
-                <Link to={user.linkedinProfile}>
+              {currentUser.linkedinProfile && (
+                <Link to={currentUser.linkedinProfile}>
                   <div 
                     style={{ backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "#000000" }} 
                     className="w-10 h-10 p-1 rounded-full"
@@ -434,8 +445,8 @@ export const MemberCardDashboard = ({ user, onEdit, onDelete, refreshData }) => 
                   </div>
                 </Link>
               )}
-              {user.twitterProfile && (
-                <Link to={user.twitterProfile}>
+              {currentUser.twitterProfile && (
+                <Link to={currentUser.twitterProfile}>
                   <div 
                     style={{ backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "#000000" }} 
                     className="w-10 h-10 p-1 rounded-full"
@@ -446,8 +457,8 @@ export const MemberCardDashboard = ({ user, onEdit, onDelete, refreshData }) => 
                   </div>
                 </Link>
               )}
-              {user.whatsappContact && (
-                <Link to={`https://wa.me/${user.whatsappContact}`}>
+              {currentUser.whatsappContact && (
+                <Link to={`https://wa.me/${currentUser.whatsappContact}`}>
                   <div 
                     style={{ backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "#000000" }} 
                     className="w-10 h-10 p-1 rounded-full"
@@ -491,11 +502,14 @@ export const MemberCardDashboard = ({ user, onEdit, onDelete, refreshData }) => 
       </Card>
 
       {/* Fullscreen Modal */}
-      <ProfileModal
-        handleClose={() => setOpen(false)}
-        open={open}
-        user={user}
-      />
+      {currentUser && (
+        <ProfileModal
+          handleClose={() => setOpen(false)}
+          open={open}
+          user={currentUser}
+          refreshData={refreshData || onMemberUpdate}
+        />
+      )}
     </>
   );
 };

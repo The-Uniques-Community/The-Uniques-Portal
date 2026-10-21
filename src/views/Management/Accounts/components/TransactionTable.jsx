@@ -175,10 +175,10 @@ export const TransactionTable = () => {
 
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(
-      members.map((m) => ({
-        "Member Name": m.name || m.fullName,
-        "Admission No": m.admno,
-        "Batch": m.batch,
+      members.filter(Boolean).map((m) => ({
+        "Member Name": m.name || m.fullName || "N/A",
+        "Admission No": m.admno || "N/A",
+        "Batch": m.batch || "N/A",
         "Total Pending": m.totalPendingAmount || m.totalPendingFine || 0,
         "Pending Count": m.pendingFinesCount || 0,
       }))

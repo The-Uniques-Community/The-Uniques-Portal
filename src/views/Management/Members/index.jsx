@@ -170,9 +170,14 @@ const MembersIndex = () => {
           </Box>
         ) : (
           <Grid container spacing={3}>
-            {members.map((member) => (
+            {members.filter(Boolean).map((member) => (
               <Grid item xs={12} sm={6} md={4} lg={3} key={member._id}>
-                <MemberCardDashboard member={member} onMemberUpdate={refetch} />
+                <MemberCardDashboard
+                  member={member}
+                  user={member}
+                  onMemberUpdate={refetch}
+                  refreshData={refetch}
+                />
               </Grid>
             ))}
           </Grid>
