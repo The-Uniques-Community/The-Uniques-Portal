@@ -58,8 +58,6 @@ import ArrowBack from '@mui/icons-material/ArrowBack';
 import CloudUpload from '@mui/icons-material/CloudUpload';
 import Visibility from '@mui/icons-material/Visibility';
 import { useParams, useNavigate } from "react-router-dom";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
 import { toast } from "react-toastify";
 
 // Budget chart component using simple box charts
@@ -730,6 +728,11 @@ const EventBudget = () => {
     setGeneratingReport(true);
 
     try {
+      const [{ jsPDF }, { default: autoTable }] = await Promise.all([
+        import("jspdf"),
+        import("jspdf-autotable"),
+      ]);
+
       // Create new PDF document
       const doc = new jsPDF();
       const eventName = event?.eventName || "Event";

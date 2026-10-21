@@ -43,7 +43,8 @@ const TaskSidebar = ({ tasks, selectedTask, onSelectTask }) => {
       <motion.div
         key={task._id}
         initial={{ x: -10, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
+        whileInView={{ x: 0, opacity: 1 }}
+        viewport={{ once: true }}
         transition={{ delay: index * 0.03, duration: 0.2, ease: "easeOut" }}
       >
         <ListItemButton

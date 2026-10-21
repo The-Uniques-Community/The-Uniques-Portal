@@ -198,6 +198,7 @@ const MembersIndex = () => {
       </TabContext>
 
       {/* Add Member Dialog */}
+      {addMemberOpen && (
       <Dialog open={addMemberOpen} onClose={() => setAddMemberOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Add New Member</DialogTitle>
         <DialogContent sx={{ pt: 2 }}>
@@ -263,6 +264,7 @@ const MembersIndex = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      )}
 
       <Snackbar
         open={alert.open}

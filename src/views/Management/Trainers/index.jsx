@@ -55,8 +55,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import SchoolIcon from "@mui/icons-material/School";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from "react-toastify";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { CardSkeleton } from "@/components/common/skeletons";
 import tu from "@/assets/logos/tu.png";
@@ -271,7 +270,6 @@ const Trainers = () => {
 
     return (
         <Box sx={{ width: "100%", typography: "body1", p: 3 }}>
-            <ToastContainer position="top-right" autoClose={3000} />
             <ModernHeader
                 title="Trainers"
                 highlight="Overview"
@@ -437,6 +435,7 @@ const Trainers = () => {
             </TabContext>
 
             {/* Add/Edit Dialog */}
+            {openDialog && (
             <Dialog 
                 open={openDialog} 
                 onClose={handleCloseDialog} 
@@ -637,8 +636,10 @@ const Trainers = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+            )}
 
             {/* Delete Confirmation Dialog */}
+            {deleteDialogOpen && (
             <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
                 <DialogTitle>Confirm Delete</DialogTitle>
                 <DialogContent>
@@ -654,6 +655,7 @@ const Trainers = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+            )}
 
         </Box>
     );

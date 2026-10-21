@@ -49,7 +49,7 @@ const TrainerProfileDialog = ({ open, handleClose, user }) => {
         });
     };
 
-    if (!user) return null;
+    if (!user || !open) return null;
 
     return (
         <Dialog

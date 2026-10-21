@@ -1,7 +1,9 @@
 import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useInView } from "@/hooks/useInView";
 
 const Orbit = () => {
+  const [containerRef, inView] = useInView({ once: false, rootMargin: "100px 0px" });
   const orbitImages = {
     orbit1: [
       "https://kmz0l2g36g.ufs.sh/f/szSqTLNNPY1r5DgQ6rMC9pHMzvDGXT0OePm1Af7nSFktqrKE",
@@ -60,6 +62,7 @@ const Orbit = () => {
 
   return (
     <Box 
+      ref={containerRef}
       className="relative flex items-center justify-center w-full mx-auto overflow-hidden" 
       style={{ 
         height: `${containerSize}px`,
@@ -83,7 +86,8 @@ const Orbit = () => {
         className="absolute rounded-full border-2 border-dashed border-gray-300 animate-orbit-slow"
         style={{ 
           width: `${orbit1Size}px`, 
-          height: `${orbit1Size}px` 
+          height: `${orbit1Size}px`,
+          animationPlayState: inView ? "running" : "paused",
         }}
       >
         {orbitImages.orbit1.map((src, i) => (
@@ -108,7 +112,8 @@ const Orbit = () => {
         className="absolute rounded-full border-2 border-dashed border-gray-300 animate-orbit-medium"
         style={{ 
           width: `${orbit2Size}px`, 
-          height: `${orbit2Size}px` 
+          height: `${orbit2Size}px`,
+          animationPlayState: inView ? "running" : "paused",
         }}
       >
         {orbitImages.orbit2.map((src, i) => (
@@ -133,7 +138,8 @@ const Orbit = () => {
         className="absolute rounded-full border-2 border-dashed border-gray-300 animate-orbit-fast"
         style={{ 
           width: `${orbit3Size}px`, 
-          height: `${orbit3Size}px` 
+          height: `${orbit3Size}px`,
+          animationPlayState: inView ? "running" : "paused",
         }}
       >
         {orbitImages.orbit3.map((src, i) => (

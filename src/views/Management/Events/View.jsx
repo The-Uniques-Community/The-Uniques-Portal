@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify"; // Make sure this is installed
 import { EventViewSkeleton, BaseSkeleton } from "@/components/common/skeletons";
+import LazyRender from "@/components/common/LazyRender";
 import {
   FILE_VALIDATION_PRESETS,
   validateFile,
@@ -133,13 +134,16 @@ const Gallery = ({ images, onAddImage, onRemoveImage, readOnly }) => {
                   },
                 }}
               >
-                <iframe
-                  class="drive-iframe"
-                  src={`https://drive.google.com/file/d/${image.fileId}/preview`}
-                  height={200}
-                  width={"100%"}
-                  allowFullScreen
-                ></iframe>
+                <LazyRender minHeight="200px" placeholder={<BaseSkeleton variant="rounded" width="100%" height={200} />}>
+                  <iframe
+                    className="drive-iframe"
+                    src={`https://drive.google.com/file/d/${image.fileId}/preview`}
+                    height={200}
+                    width={"100%"}
+                    loading="lazy"
+                    allowFullScreen
+                  ></iframe>
+                </LazyRender>
                 {!readOnly && (
                   <IconButton
                     sx={{
@@ -2911,6 +2915,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
       </Grid>
 
       {/* Manage Guests Dialog */}
+      {guestDialogOpen && (
       <Dialog
         open={guestDialogOpen}
         onClose={handleCloseGuestDialog}
@@ -3043,9 +3048,11 @@ const handleRemoveMember = async (memberId, memberTeam) => {
           <Button onClick={handleCloseGuestDialog}>Close</Button>
         </DialogActions>
       </Dialog>
+      )}
       {/* Add this just after the Manage Guests Dialog */}
       {/* Manage Members Dialog */}
       {/* Team-based Member Management Dialog */}
+      {memberDialogOpen && (
 <Dialog
   open={memberDialogOpen}
   onClose={handleCloseMemberDialog}
@@ -3272,8 +3279,10 @@ VALID_TEAM_TYPES.map((type) => {
     <Button onClick={handleCloseMemberDialog}>Close</Button>
   </DialogActions>
 </Dialog>
+)}
 
       {/* Registration Form Modal */}
+      {registrationModalOpen && (
       <Dialog
         open={registrationModalOpen}
         onClose={() => !registrationLoading && setRegistrationModalOpen(false)}
@@ -3347,7 +3356,9 @@ VALID_TEAM_TYPES.map((type) => {
           )}
         </DialogActions>
       </Dialog>
+      )}
       {/* New Guest Dialog */}
+      {newGuestDialogOpen && (
       <Dialog
         open={newGuestDialogOpen}
         onClose={() => setNewGuestDialogOpen(false)}
@@ -3423,6 +3434,7 @@ VALID_TEAM_TYPES.map((type) => {
           </Button>
         </DialogActions>
       </Dialog>
+      )}
     </Box>
   );
 };

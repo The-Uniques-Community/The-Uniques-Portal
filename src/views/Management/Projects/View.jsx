@@ -1166,6 +1166,7 @@ const ProjectView = () => {
       </Grid>
 
       {/* Edit Project Dialog (Full Functional Edit with API persistence) */}
+      {editOpen && (
       <Dialog
         open={editOpen}
         onClose={handleCloseEdit}
@@ -1513,6 +1514,7 @@ const ProjectView = () => {
           </DialogActions>
         </Box>
       </Dialog>
+      )}
     </Box>
   );
 };
