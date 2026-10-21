@@ -60,7 +60,7 @@ const LeaveManagement = () => {
     setFilter,
     refetch,
   } = usePaginatedQuery({
-    query: (params) => leaveService.getAllLeaves(params),
+    query: leaveService.getAllLeaves,
     defaultLimit: 10,
     defaultFilters: { status: "Pending" },
     syncUrlParams: true,

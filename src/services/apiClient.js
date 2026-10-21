@@ -64,7 +64,15 @@ apiClient.interceptors.request.use(
         .replace(/^https?:\/\/localhost:500[01]/, '');
     }
 
-    // 2. Attach JWT tokens
+    // 2. Safely extract signal from params if passed incorrectly
+    if (config.params && config.params.signal) {
+      if (!config.signal) {
+        config.signal = config.params.signal;
+      }
+      delete config.params.signal;
+    }
+
+    // 3. Attach JWT tokens
     const token = localStorage.getItem('token');
     if (token) {
       config.headers = config.headers || {};

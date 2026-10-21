@@ -1,14 +1,72 @@
 /**
  * @file usePaginatedQuery.js
- * @description Centralized pagination, search, filter, and sort hook.
- * Handles AbortController race condition cancellation, debounced search (350ms),
- * auto-reset page to 1 on filter/search change, URL search params synchronization,
- * and normalized response parsing across varied backend endpoints.
+ * @description Centralized, race-condition-safe pagination, search, filter, and sort hook.
+ * Uses queryRef and stabilized dependencies to eliminate infinite re-rendering loops.
+ * Synchronizes with URLSearchParams safely without triggering circular updates.
  */
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import apiClient from '@/services/apiClient';
+
+/**
+ * Normalizes backend response variations into a standard shape.
+ */
+const normalizeResponse = (response, limit = 10, page = 1, customTransformer = null) => {
+  if (customTransformer) {
+    return customTransformer(response);
+  }
+
+  let items = [];
+  let total = 0;
+
+  if (Array.isArray(response)) {
+    items = response;
+    total = response.length;
+  } else if (response && typeof response === 'object') {
+    if (Array.isArray(response.data)) {
+      items = response.data;
+      total = response.pagination?.total ?? response.count ?? response.total ?? items.length;
+    } else if (response.data && Array.isArray(response.data.members)) {
+      items = response.data.members;
+      total = response.data.count ?? response.data.total ?? items.length;
+    } else if (response.data && Array.isArray(response.data.data)) {
+      items = response.data.data;
+      total = response.data.count ?? response.data.total ?? items.length;
+    } else if (Array.isArray(response.leaves)) {
+      items = response.leaves;
+      total = response.count ?? response.total ?? items.length;
+    } else if (Array.isArray(response.projects)) {
+      items = response.projects;
+      total = response.count ?? response.total ?? items.length;
+    } else if (Array.isArray(response.trainers)) {
+      items = response.trainers;
+      total = response.count ?? response.total ?? items.length;
+    } else if (Array.isArray(response.tasks)) {
+      items = response.tasks;
+      total = response.count ?? response.total ?? items.length;
+    } else {
+      const arrayField = Object.values(response).find((val) => Array.isArray(val));
+      items = arrayField || [];
+      total = response.count || response.total || items.length;
+    }
+  }
+
+  const safeLimit = Math.max(1, limit || 10);
+  const totalPages = Math.max(1, Math.ceil(total / safeLimit));
+
+  return {
+    items,
+    pagination: {
+      total,
+      page,
+      limit: safeLimit,
+      pages: totalPages,
+      hasNextPage: page < totalPages,
+      hasPrevPage: page > 1,
+    },
+  };
+};
 
 export const usePaginatedQuery = ({
   query,
@@ -24,71 +82,91 @@ export const usePaginatedQuery = ({
 }) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const initialPage = useMemo(() => {
+  // Keep query and transformer in refs so inline function definitions do NOT trigger re-fetches
+  const queryRef = useRef(query);
+  queryRef.current = query;
+
+  const transformResponseRef = useRef(transformResponse);
+  transformResponseRef.current = transformResponse;
+
+  const defaultFiltersRef = useRef(defaultFilters);
+
+  // Initialize state once from URL params (if sync enabled) or defaults
+  const [page, setPageState] = useState(() => {
     if (syncUrlParams) {
       const p = parseInt(searchParams.get('page'), 10);
       return !isNaN(p) && p > 0 ? p : defaultPage;
     }
     return defaultPage;
-  }, [syncUrlParams, searchParams, defaultPage]);
+  });
 
-  const initialLimit = useMemo(() => {
+  const [limit, setLimitState] = useState(() => {
     if (syncUrlParams) {
       const l = parseInt(searchParams.get('limit'), 10);
       return !isNaN(l) && l > 0 ? l : defaultLimit;
     }
     return defaultLimit;
-  }, [syncUrlParams, searchParams, defaultLimit]);
+  });
 
-  const initialSearch = useMemo(() => {
+  const [search, setSearchState] = useState(() => {
     if (syncUrlParams) {
       return searchParams.get('search') || '';
     }
     return '';
-  }, [syncUrlParams, searchParams]);
+  });
+
+  const [debouncedSearch, setDebouncedSearch] = useState(() => {
+    if (syncUrlParams) {
+      return searchParams.get('search') || '';
+    }
+    return '';
+  });
+
+  const [filters, setFiltersState] = useState(defaultFilters);
+  const [sortBy, setSortByState] = useState(defaultSortBy);
+  const [sortOrder, setSortOrderState] = useState(defaultSortOrder);
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [page, setPageState] = useState(initialPage);
-  const [limit, setLimitState] = useState(initialLimit);
-  const [search, setSearchState] = useState(initialSearch);
-  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
-  const [filters, setFiltersState] = useState(defaultFilters);
-  const [sortBy, setSortByState] = useState(defaultSortBy);
-  const [sortOrder, setSortOrderState] = useState(defaultSortOrder);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
   const [pagination, setPagination] = useState({
     total: 0,
-    page: initialPage,
-    limit: initialLimit,
+    page,
+    limit,
     pages: 1,
     hasNextPage: false,
     hasPrevPage: false,
   });
 
+  const isMountedRef = useRef(true);
   const abortControllerRef = useRef(null);
-  const isFirstRender = useRef(true);
+  const hasMountedRef = useRef(false);
 
-  // Debounce search input
+  // Debounce search input changes
   useEffect(() => {
-    const handler = setTimeout(() => {
+    const timer = setTimeout(() => {
       setDebouncedSearch(search);
     }, debounceMs);
 
-    return () => clearTimeout(handler);
+    return () => clearTimeout(timer);
   }, [search, debounceMs]);
 
-  // Auto-reset page to 1 when debounced search changes
+  // Reset to page 1 whenever debouncedSearch changes after initial mount
   useEffect(() => {
-    if (isFirstRender.current) return;
+    if (!hasMountedRef.current) return;
     setPageState(1);
   }, [debouncedSearch]);
 
-  // URL search params sync
+  const filterKey = useMemo(() => JSON.stringify(filters), [filters]);
+
+  // Synchronize state to URL query parameters safely without infinite loop
   useEffect(() => {
     if (!syncUrlParams) return;
 
-    const newParams = new URLSearchParams(searchParams);
+    const currentUrlParams = new URLSearchParams(window.location.search);
+    const newParams = new URLSearchParams(window.location.search);
 
     if (page > 1) newParams.set('page', String(page));
     else newParams.delete('page');
@@ -100,7 +178,14 @@ export const usePaginatedQuery = ({
     else newParams.delete('search');
 
     Object.entries(filters).forEach(([key, val]) => {
-      if (val !== undefined && val !== null && val !== '' && val !== 'all' && val !== 'All' && val !== 'All Batches') {
+      if (
+        val !== undefined &&
+        val !== null &&
+        val !== '' &&
+        val !== 'all' &&
+        val !== 'All' &&
+        val !== 'All Batches'
+      ) {
         newParams.set(key, String(val));
       } else {
         newParams.delete(key);
@@ -113,70 +198,27 @@ export const usePaginatedQuery = ({
     if (sortOrder !== defaultSortOrder) newParams.set('sortOrder', sortOrder);
     else newParams.delete('sortOrder');
 
-    setSearchParams(newParams, { replace: true });
-  }, [page, limit, debouncedSearch, filters, sortBy, sortOrder, syncUrlParams]);
+    // Only update if serialized query string actually changed
+    if (currentUrlParams.toString() !== newParams.toString()) {
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [
+    page,
+    limit,
+    debouncedSearch,
+    filterKey,
+    sortBy,
+    sortOrder,
+    syncUrlParams,
+    defaultLimit,
+    defaultSortBy,
+    defaultSortOrder,
+    setSearchParams,
+  ]);
 
-  // Normalize API responses
-  const normalizeResponse = useCallback(
-    (response) => {
-      if (transformResponse) {
-        return transformResponse(response);
-      }
-
-      let items = [];
-      let total = 0;
-
-      if (Array.isArray(response)) {
-        items = response;
-        total = response.length;
-      } else if (response && typeof response === 'object') {
-        if (Array.isArray(response.data)) {
-          items = response.data;
-          total = response.pagination?.total ?? response.count ?? response.total ?? items.length;
-        } else if (response.data && Array.isArray(response.data.members)) {
-          items = response.data.members;
-          total = response.data.count ?? response.data.total ?? items.length;
-        } else if (response.data && Array.isArray(response.data.data)) {
-          items = response.data.data;
-          total = response.data.count ?? response.data.total ?? items.length;
-        } else if (Array.isArray(response.leaves)) {
-          items = response.leaves;
-          total = response.count ?? response.total ?? items.length;
-        } else if (Array.isArray(response.projects)) {
-          items = response.projects;
-          total = response.count ?? response.total ?? items.length;
-        } else if (Array.isArray(response.trainers)) {
-          items = response.trainers;
-          total = response.count ?? response.total ?? items.length;
-        } else if (Array.isArray(response.tasks)) {
-          items = response.tasks;
-          total = response.count ?? response.total ?? items.length;
-        } else {
-          const arrayField = Object.values(response).find((val) => Array.isArray(val));
-          items = arrayField || [];
-          total = response.count || response.total || items.length;
-        }
-      }
-
-      const totalPages = Math.max(1, Math.ceil(total / (limit || 10)));
-
-      return {
-        items,
-        pagination: {
-          total,
-          page,
-          limit,
-          pages: totalPages,
-          hasNextPage: page < totalPages,
-          hasPrevPage: page > 1,
-        },
-      };
-    },
-    [transformResponse, limit, page]
-  );
-
-  // Core execution with AbortController
-  const executeQuery = useCallback(async () => {
+  // Primary Data Fetching Effect: depends ONLY on stable primitives
+  useEffect(() => {
+    // Abort previous in-flight request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
@@ -195,68 +237,103 @@ export const usePaginatedQuery = ({
       ...filters,
     };
 
+    // Clean up empty params
     Object.keys(queryParams).forEach((key) => {
+      const val = queryParams[key];
       if (
-        queryParams[key] === undefined ||
-        queryParams[key] === null ||
-        queryParams[key] === '' ||
-        queryParams[key] === 'all' ||
-        queryParams[key] === 'All' ||
-        queryParams[key] === 'All Batches'
+        val === undefined ||
+        val === null ||
+        val === '' ||
+        val === 'all' ||
+        val === 'All' ||
+        val === 'All Batches'
       ) {
         delete queryParams[key];
       }
     });
 
-    try {
-      let rawResult;
-      if (typeof query === 'function') {
-        rawResult = await query({
-          ...queryParams,
-          signal: abortController.signal,
-        });
-      } else if (typeof query === 'string') {
-        const res = await apiClient.get(query, {
-          params: queryParams,
-          signal: abortController.signal,
-        });
-        rawResult = res.data;
-      } else {
-        throw new Error('usePaginatedQuery: query must be a function or endpoint string');
-      }
+    const executeFetch = async () => {
+      try {
+        let rawResult;
+        const activeQuery = queryRef.current;
 
-      const { items, pagination: normPagination } = normalizeResponse(rawResult);
-      setData(items);
-      setPagination(normPagination);
-      setError(null);
-    } catch (err) {
-      if (err.name === 'CanceledError' || err.name === 'AbortError' || err.code === 'ERR_CANCELED') {
-        return;
-      }
-      console.error('[usePaginatedQuery] Failed:', err);
-      setError(err?.message || 'Failed to fetch paginated data');
-      setData([]);
-    } finally {
-      if (!abortController.signal.aborted) {
-        setLoading(false);
-      }
-    }
-  }, [query, page, limit, debouncedSearch, filters, sortBy, sortOrder, normalizeResponse]);
+        if (typeof activeQuery === 'function') {
+          rawResult = await activeQuery({
+            ...queryParams,
+            signal: abortController.signal,
+          });
+        } else if (typeof activeQuery === 'string') {
+          const res = await apiClient.get(activeQuery, {
+            params: queryParams,
+            signal: abortController.signal,
+          });
+          rawResult = res.data;
+        } else {
+          throw new Error('usePaginatedQuery: query must be a function or endpoint string');
+        }
 
-  useEffect(() => {
-    executeQuery();
+        if (!isMountedRef.current || abortController.signal.aborted) {
+          return;
+        }
+
+        const { items, pagination: normPagination } = normalizeResponse(
+          rawResult,
+          limit,
+          page,
+          transformResponseRef.current
+        );
+
+        setData(items);
+        setPagination(normPagination);
+        setError(null);
+      } catch (err) {
+        if (
+          !isMountedRef.current ||
+          err?.name === 'CanceledError' ||
+          err?.name === 'AbortError' ||
+          err?.code === 'ERR_CANCELED'
+        ) {
+          return;
+        }
+        console.error('[usePaginatedQuery] Request failed:', err);
+        setError(err?.message || 'Failed to fetch paginated data');
+        setData([]);
+      } finally {
+        if (isMountedRef.current && !abortController.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    executeFetch();
 
     return () => {
+      abortController.abort();
+    };
+  }, [
+    page,
+    limit,
+    debouncedSearch,
+    filterKey,
+    sortBy,
+    sortOrder,
+    refreshTrigger,
+    ...dependencies,
+  ]);
+
+  useEffect(() => {
+    hasMountedRef.current = true;
+    isMountedRef.current = true;
+
+    return () => {
+      isMountedRef.current = false;
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
     };
-  }, [executeQuery, ...dependencies]);
-
-  useEffect(() => {
-    isFirstRender.current = false;
   }, []);
 
+  // Stabilized Action Callbacks
   const handlePageChange = useCallback((newPage) => {
     setPageState(newPage);
   }, []);
@@ -289,9 +366,13 @@ export const usePaginatedQuery = ({
   const resetFilters = useCallback(() => {
     setSearchState('');
     setDebouncedSearch('');
-    setFiltersState(defaultFilters);
+    setFiltersState(defaultFiltersRef.current || {});
     setPageState(1);
-  }, [defaultFilters]);
+  }, []);
+
+  const refetch = useCallback(() => {
+    setRefreshTrigger((prev) => prev + 1);
+  }, []);
 
   return {
     data,
@@ -312,7 +393,7 @@ export const usePaginatedQuery = ({
     setFilter: handleFilterChange,
     setSorting: handleSortingChange,
     resetFilters,
-    refetch: executeQuery,
+    refetch,
   };
 };
 

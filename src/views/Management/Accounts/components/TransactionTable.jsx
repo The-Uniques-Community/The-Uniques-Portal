@@ -168,7 +168,7 @@ export const TransactionTable = () => {
     setFilter,
     refetch,
   } = usePaginatedQuery({
-    query: (params) => fineService.getFineMembers(params),
+    query: fineService.getFineMembers,
     defaultLimit: 10,
     defaultFilters: { status: "All", batch: "All Batches" },
     syncUrlParams: true,
