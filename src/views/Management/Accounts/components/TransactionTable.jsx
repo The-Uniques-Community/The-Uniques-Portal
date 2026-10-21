@@ -171,7 +171,6 @@ export const TransactionTable = () => {
     query: fineService.getFineMembers,
     defaultLimit: 10,
     defaultFilters: { status: "All", batch: "All Batches" },
-    syncUrlParams: true,
   });
 
   const exportToExcel = () => {

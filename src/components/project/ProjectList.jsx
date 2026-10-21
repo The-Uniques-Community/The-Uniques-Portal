@@ -58,7 +58,6 @@ export const ProjectList = ({ createRoutePrefix = "/coordinator/projects-overvie
   } = usePaginatedQuery({
     query: projectService.getProjects,
     defaultLimit: 10,
-    syncUrlParams: true,
   });
 
   const handleCreateProject = () => {
