@@ -18,6 +18,11 @@ import verifyRole from "../../middlewares/verifyRole.js";
 
 const router = express.Router();
 
+// REST standard routes
+router.get("/", getAllBatches);
+router.post("/", verifyToken, verifyRole(["admin", "coordinator"]), addBatch);
+
+// Named action aliases
 router.get("/all", getAllBatches);
 router.post("/add", verifyToken, verifyRole(["admin", "coordinator"]), addBatch);
 router.get("/profiles", getBatchProfiles);

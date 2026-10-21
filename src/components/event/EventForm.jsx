@@ -48,6 +48,12 @@ import SaveIcon from "@mui/icons-material/Save";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import ImageIcon from "@mui/icons-material/Image";
+import {
+  FILE_VALIDATION_PRESETS,
+  validateFile,
+  validateFiles,
+  resetFileInput,
+} from "@/utils/fileValidation";
 import { useFormik } from "formik";
 
 /**
@@ -225,8 +231,12 @@ const EventForm = ({ event, onSuccess }) => {
 
   // Handle banner file selection
   const handleBannerChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (!file) return;
+
+    if (!validateFile(file, FILE_VALIDATION_PRESETS.IMAGE, { inputTarget: e })) {
+      return;
+    }
 
     setBannerFile(file);
 
@@ -240,13 +250,13 @@ const EventForm = ({ event, onSuccess }) => {
 
   // Handle gallery files selection
   const handleGalleryChange = (e) => {
-    const files = Array.from(e.target.files);
-    if (!files.length) return;
+    const { validFiles } = validateFiles(e.target.files, FILE_VALIDATION_PRESETS.IMAGE, { inputTarget: e });
+    if (!validFiles.length) return;
 
-    setGalleryFiles((prev) => [...prev, ...files]);
+    setGalleryFiles((prev) => [...prev, ...validFiles]);
 
     // Create preview URLs for all selected files
-    files.forEach((file) => {
+    validFiles.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setGalleryPreviews((prev) => [...prev, reader.result]);
@@ -662,8 +672,12 @@ const EventForm = ({ event, onSuccess }) => {
 
   // Handle receipt file upload
   const handleReceiptUpload = (index, e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (!file) return;
+
+    if (!validateFile(file, FILE_VALIDATION_PRESETS.RECEIPT, { inputTarget: e })) {
+      return;
+    }
     
     setCurrentReceipt({
       index,
@@ -739,7 +753,7 @@ const EventForm = ({ event, onSuccess }) => {
             >
               <input
                 type="file"
-                accept="image/*"
+                accept={FILE_VALIDATION_PRESETS.IMAGE.accept}
                 id="banner-upload"
                 style={{ display: "none" }}
                 onChange={handleBannerChange}
@@ -818,7 +832,7 @@ const EventForm = ({ event, onSuccess }) => {
 
                 <input
                   type="file"
-                  accept="image/*"
+                  accept={FILE_VALIDATION_PRESETS.IMAGE.accept}
                   id="gallery-upload"
                   multiple
                   style={{ display: "none" }}
@@ -1655,7 +1669,7 @@ const EventForm = ({ event, onSuccess }) => {
                         </Typography>
                         <input
                           type="file"
-                          accept="image/*,application/pdf"
+                          accept={FILE_VALIDATION_PRESETS.RECEIPT.accept}
                           id={`receipt-upload-${index}`}
                           style={{ display: "none" }}
                           onChange={(e) => handleReceiptUpload(index, e)}

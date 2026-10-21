@@ -59,17 +59,26 @@ export const createCommunityAdmin = async (req, res) => {
  */
 export const applyForCampusAmbassador = async (req, res) => {
   try {
-    const {
-      fullName,
-      email,
-      phone,
-      college,
-      course,
-      graduationYear,
-      linkedinProfile,
-      whyJoin,
-      heardFrom
-    } = req.body;
+    const fullName = req.body.fullName || req.body.name;
+    const email = req.body.email;
+    const phone = req.body.phone || req.body.phoneNumber || req.body.contact;
+    const college = req.body.college || req.body.collegeName || req.body.institution;
+    const course = req.body.course || req.body.degree || req.body.branch;
+    const graduationYear = req.body.graduationYear || req.body.gradYear || req.body.yearOfStudy || '2026';
+    const linkedinProfile = req.body.linkedinProfile || req.body.linkedin || '';
+    const whyJoin = req.body.whyJoin || req.body.statement || '';
+    const rawHeardFrom = req.body.heardFrom || req.body.source || 'other';
+    const validHeardFrom = ['social_media', 'friend', 'college', 'event', 'search', 'other'];
+    const normalizedHeard = String(rawHeardFrom).toLowerCase().replace(/[\s-]+/g, '_');
+    const heardFrom = validHeardFrom.includes(normalizedHeard) ? normalizedHeard : 'other';
+
+    // Validate email presence
+    if (!email || typeof email !== 'string' || !email.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required"
+      });
+    }
 
     // Check if application with this email already exists
     const existingApplication = await CampusAmbassador.findOne({ email });

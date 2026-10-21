@@ -2,6 +2,12 @@ import { BASE_URL } from "@/config";
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify"; // Make sure this is installed
+import {
+  FILE_VALIDATION_PRESETS,
+  validateFile,
+  validateFiles,
+  resetFileInput,
+} from "@/utils/fileValidation";
 import dayjs from "dayjs"; // Make sure this is installed
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -99,7 +105,7 @@ const Gallery = ({ images, onAddImage, onRemoveImage, readOnly }) => {
             <input
               type="file"
               hidden
-              accept="image/*"
+              accept={FILE_VALIDATION_PRESETS.IMAGE.accept}
               multiple
               onChange={onAddImage}
             />
@@ -618,8 +624,10 @@ const handleRemoveMember = async (memberId, memberTeam) => {
 
   const handleAddImage = async (e) => {
     try {
-      const files = Array.from(e.target.files);
-      if (files.length === 0) return;
+      const { validFiles } = validateFiles(e.target.files, FILE_VALIDATION_PRESETS.IMAGE, { inputTarget: e });
+      if (validFiles.length === 0) return;
+
+      const files = validFiles;
 
       // Get authentication token
 
@@ -1035,8 +1043,12 @@ const handleRemoveMember = async (memberId, memberTeam) => {
   // Handle banner upload
   const handleUploadBanner = async (e) => {
     try {
-      const file = e.target.files[0];
+      const file = e.target.files?.[0];
       if (!file) return;
+
+      if (!validateFile(file, FILE_VALIDATION_PRESETS.IMAGE, { inputTarget: e })) {
+        return;
+      }
 
       setLoading(true);
 
@@ -1659,7 +1671,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
                   <input
                     type="file"
                     hidden
-                    accept="image/*"
+                    accept={FILE_VALIDATION_PRESETS.IMAGE.accept}
                     onChange={handleUploadBanner}
                   />
                 </Button>

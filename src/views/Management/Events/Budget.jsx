@@ -36,6 +36,11 @@ import {
   Input,
 } from "@mui/material";
 import ModernTable from "@/components/tables/ModernTable";
+import {
+  FILE_VALIDATION_PRESETS,
+  validateFile,
+  resetFileInput,
+} from "@/utils/fileValidation";
 import Add from '@mui/icons-material/Add';
 import AttachMoney from '@mui/icons-material/AttachMoney';
 import Business from '@mui/icons-material/Business';
@@ -302,6 +307,14 @@ const EventBudget = () => {
     console.log("Uploading receipt for", itemId, itemType);
   };
 
+  // Handle receipt file change on selection
+  const handleReceiptFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      validateFile(file, FILE_VALIDATION_PRESETS.RECEIPT, { inputTarget: e });
+    }
+  };
+
   // Submit the receipt file
   const handleSubmitReceipt = async (e) => {
     e.preventDefault();
@@ -316,6 +329,10 @@ const EventBudget = () => {
 
     if (!file) {
       toast.error("Please select a file to upload");
+      return;
+    }
+
+    if (!validateFile(file, FILE_VALIDATION_PRESETS.RECEIPT, { inputTarget: fileInput })) {
       return;
     }
 
@@ -1805,12 +1822,13 @@ const EventBudget = () => {
             </Typography>
             <input
               type="file"
-              accept="image/*,application/pdf"
+              accept={FILE_VALIDATION_PRESETS.RECEIPT.accept}
               ref={
                 currentItemForReceipt?.type === "expense"
                   ? fileInputRef
                   : sponsorFileInputRef
               }
+              onChange={handleReceiptFileChange}
               style={{ display: "block", marginTop: "10px" }}
             />
           </Box>

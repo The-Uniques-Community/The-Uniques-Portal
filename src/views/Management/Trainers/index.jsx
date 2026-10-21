@@ -7,6 +7,11 @@ import TabPanel from "@mui/lab/TabPanel";
 import axios from "axios";
 import { BASE_URL } from "@/config";
 import ModernHeader from "@/components/headers/ModernHeader";
+import {
+  FILE_VALIDATION_PRESETS,
+  validateFile,
+  resetFileInput,
+} from "@/utils/fileValidation";
 
 import { TrainerCardDashboard } from "@/components/cards/TrainerCardDashboard";
 import {
@@ -71,8 +76,13 @@ const Trainers = () => {
     const [selectedImage, setSelectedImage] = useState(null);
 
     const handleFileChange = (e) => {
-        if (e.target.files && e.target.files[0]) {
-            setSelectedImage(e.target.files[0]);
+        const file = e.target.files?.[0];
+        if (file) {
+            if (!validateFile(file, FILE_VALIDATION_PRESETS.AVATAR, { inputTarget: e })) {
+                setSelectedImage(null);
+                return;
+            }
+            setSelectedImage(file);
         }
     };
 
@@ -607,7 +617,7 @@ const Trainers = () => {
                             <Box sx={{ gridColumn: 'span 12' }}>
                                 <Typography variant="subtitle2" gutterBottom>Profile Image</Typography>
                                 <input
-                                    accept="image/*"
+                                    accept={FILE_VALIDATION_PRESETS.IMAGE.accept}
                                     type="file"
                                     onChange={handleFileChange}
                                     style={{ display: 'block', width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}

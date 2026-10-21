@@ -1,0 +1,555 @@
+{
+  "/authService": [
+    "src/App.jsx:7",
+    "src/hooks/useAuth.js:9",
+    "src/layout/Admin/index.jsx:25",
+    "src/layout/Management/index.jsx:26",
+    "src/layout/Uniques/Coordinator/index.jsx:30",
+    "src/layout/Uniques/Member/index.jsx:41",
+    "src/services/index.js:6",
+    "src/views/Authentication/login/index.jsx:31"
+  ],
+  "/authUtils": [
+    "src/App.jsx:8",
+    "src/hooks/useAuth.js:10",
+    "src/routes/ProtectedRoute.jsx:11",
+    "src/routes/index.jsx:18",
+    "src/services/apiClient.js:8",
+    "src/services/authService.js:10",
+    "src/views/Authentication/login/index.jsx:32"
+  ],
+  "/uploads/2022/10/What_Web3_Going_2023": [
+    "src/assets/dummyData/eventsData.js:35"
+  ],
+  "/uploads/2024/12/hackton": [
+    "src/assets/dummyData/eventsData.js:72"
+  ],
+  "/api/portraits/men/1": [
+    "src/assets/dummyData/memberData.js:43"
+  ],
+  "/api/portraits/women/2": [
+    "src/assets/dummyData/memberData.js:139"
+  ],
+  "/api/image-proxy/${fileId}": [
+    "src/components/cards/MemberCardDashboard.jsx:50",
+    "src/components/cards/MemberCardDashboard.jsx:318",
+    "src/components/cards/TrainerCardDashboard.jsx:39",
+    "src/components/cards/TrainerCardDashboard.jsx:245",
+    "src/components/modals/ProfileModal.jsx:182",
+    "src/views/Management/Dashboard/index.jsx:880",
+    "src/views/Management/Members/index.jsx:159",
+    "src/views/Management/Trainers/index.jsx:97",
+    "src/views/Management/dashboardComponents/NewMember.jsx:87",
+    "src/views/Uniques/Member/index.jsx:136"
+  ],
+  "/upload/event_file_upload": [
+    "src/components/event/EventForm.jsx:5",
+    "src/components/event/EventForm.jsx:151",
+    "src/components/event/EventForm.jsx:311",
+    "src/components/event/EventForm.jsx:364",
+    "src/components/event/EventForm.jsx:399",
+    "src/services/eventService.js:49",
+    "src/views/Management/Events/View.jsx:652",
+    "src/views/Management/Events/View.jsx:1051"
+  ],
+  "/api/guest/get-all-guests": [
+    "src/components/event/EventForm.jsx:151",
+    "src/components/event/EventForm.jsx:203",
+    "src/views/Management/Events/View.jsx:475"
+  ],
+  "/api/events": [
+    "src/components/event/EventForm.jsx:151",
+    "src/components/event/EventForm.jsx:484",
+    "src/services/eventService.js:9",
+    "src/services/eventService.js:19",
+    "src/views/Management/Dashboard/index.jsx:673",
+    "src/views/Management/Events/index.jsx:80"
+  ],
+  "/api/events/:id": [
+    "src/components/event/EventForm.jsx:151"
+  ],
+  "/api/events/${eventId}": [
+    "src/components/event/EventForm.jsx:215",
+    "src/components/event/EventForm.jsx:478"
+  ],
+  "/api/guest/add-guest": [
+    "src/components/event/EventForm.jsx:542",
+    "src/views/Management/Events/View.jsx:851",
+    "src/views/Management/Events/View.jsx:904"
+  ],
+  "/api/admin/member/${user": [
+    "src/components/modals/ProfileModal.jsx:113",
+    "src/components/modals/ProfileModal.jsx:217",
+    "src/views/Uniques/Member/index.jsx:377"
+  ],
+  "/api/image-proxy/${uploadResult": [
+    "src/components/project/ProjectForm.jsx:143"
+  ],
+  "/apiClient": [
+    "src/config.js:7",
+    "src/redux/store.js:3",
+    "src/services/authService.js:7",
+    "src/services/communityService.js:5",
+    "src/services/coordinatorService.js:5",
+    "src/services/enquiryService.js:5",
+    "src/services/eventService.js:5",
+    "src/services/fineService.js:5",
+    "src/services/index.js:5",
+    "src/services/leaveService.js:5",
+    "src/services/memberService.js:5",
+    "src/services/projectService.js:5",
+    "src/services/trainerService.js:5",
+    "src/services/uniques360Service.js:5",
+    "src/utils/batch/batchProfilesData.js:1",
+    "src/utils/batch/batchesData.js:1",
+    "src/utils/stats/statsData.js:1",
+    "src/views/Management/Accounts/components/TransactionTable.jsx:73",
+    "src/views/Uniques/Member/index.jsx:100"
+  ],
+  "/api/member/getProfile": [
+    "src/redux/slices/userSlice.js:98",
+    "src/services/coordinatorService.js:10",
+    "src/services/coordinatorService.js:14",
+    "src/services/memberService.js:64",
+    "src/views/Uniques/Member/index.jsx:249",
+    "src/views/Uniques/Member/index.jsx:277"
+  ],
+  "/api/admin/member/:id": [
+    "src/redux/slices/userSlice.js:116",
+    "src/services/coordinatorService.js:20"
+  ],
+  "/api/uniques360/tasks/coordinator/current": [
+    "src/redux/slices/userSlice.js:134",
+    "src/redux/slices/userSlice.js:152",
+    "src/services/coordinatorService.js:32",
+    "src/services/coordinatorService.js:36",
+    "src/services/coordinatorService.js:42",
+    "src/services/coordinatorService.js:49",
+    "src/views/Uniques360/Coordinator360/Uniques360.jsx:96",
+    "src/views/Uniques360/Events/EventInsights.jsx:57",
+    "src/views/Uniques360/Projects/ProjectInsights.jsx:51"
+  ],
+  "/api/admin/member/counts": [
+    "src/redux/slices/userSlice.js:152",
+    "src/services/coordinatorService.js:42",
+    "src/services/coordinatorService.js:47",
+    "src/services/memberService.js:24"
+  ],
+  "/api/events/counts": [
+    "src/redux/slices/userSlice.js:152",
+    "src/services/coordinatorService.js:42",
+    "src/services/coordinatorService.js:48"
+  ],
+  "/auth/login": [
+    "src/routes/index.jsx:53"
+  ],
+  "/auth": [
+    "src/routes/index.jsx:57",
+    "src/services/apiClient.js:107"
+  ],
+  "/auth/forget-password": [
+    "src/routes/index.jsx:67"
+  ],
+  "/auth/password-reset": [
+    "src/routes/index.jsx:71"
+  ],
+  "/auth/emaillogin": [
+    "src/services/authService.js:19"
+  ],
+  "/auth/verify_user": [
+    "src/services/authService.js:48"
+  ],
+  "/auth/verify_role": [
+    "src/services/authService.js:72"
+  ],
+  "/auth/logout": [
+    "src/services/authService.js:86"
+  ],
+  "/auth/password-reset/send-otp": [
+    "src/services/authService.js:107",
+    "src/views/Authentication/login/ForgetPassword.jsx:60"
+  ],
+  "/auth/password-reset/verify-otp": [
+    "src/services/authService.js:112",
+    "src/views/Authentication/login/ForgetPassword.jsx:89"
+  ],
+  "/auth/password-reset/reset-password": [
+    "src/services/authService.js:117",
+    "src/views/Authentication/login/ForgetPassword.jsx:118"
+  ],
+  "/api/blogs": [
+    "src/services/communityService.js:9",
+    "src/services/communityService.js:14"
+  ],
+  "/api/stats": [
+    "src/services/communityService.js:19",
+    "src/services/communityService.js:24",
+    "src/utils/stats/statsData.js:35"
+  ],
+  "/api/batches": [
+    "src/services/communityService.js:29",
+    "src/services/communityService.js:34"
+  ],
+  "/api/community-benefits": [
+    "src/services/communityService.js:39",
+    "src/services/communityService.js:44"
+  ],
+  "/api/apply-campus-ambassador": [
+    "src/services/communityService.js:49"
+  ],
+  "/api/admin/member/${id}": [
+    "src/services/coordinatorService.js:26",
+    "src/services/memberService.js:34",
+    "src/services/memberService.js:39"
+  ],
+  "/api/contact": [
+    "src/services/enquiryService.js:9"
+  ],
+  "/api/admin/enquiry": [
+    "src/services/enquiryService.js:14",
+    "src/views/Management/Enquiry/index.jsx:104"
+  ],
+  "/api/admin/enquiry/${id}": [
+    "src/services/enquiryService.js:19",
+    "src/services/enquiryService.js:34",
+    "src/views/Management/Enquiry/index.jsx:160"
+  ],
+  "/api/admin/enquiry/${id}/reply": [
+    "src/services/enquiryService.js:24"
+  ],
+  "/api/admin/enquiry/${id}/status": [
+    "src/services/enquiryService.js:29"
+  ],
+  "/api/events/${id}": [
+    "src/services/eventService.js:14",
+    "src/services/eventService.js:24",
+    "src/services/eventService.js:29",
+    "src/views/Management/Events/Budget.jsx:453",
+    "src/views/Management/Events/View.jsx:443",
+    "src/views/Management/Events/View.jsx:580",
+    "src/views/Management/Events/View.jsx:954",
+    "src/views/Management/Events/View.jsx:1001",
+    "src/views/Management/Events/View.jsx:1071"
+  ],
+  "/api/events/${eventId}/members": [
+    "src/services/eventService.js:34",
+    "src/services/eventService.js:39"
+  ],
+  "/api/events/${eventId}/members/${memberId}": [
+    "src/services/eventService.js:44"
+  ],
+  "/api/guest": [
+    "src/services/eventService.js:56",
+    "src/services/eventService.js:61"
+  ],
+  "/api/guest/${id}": [
+    "src/services/eventService.js:66",
+    "src/services/eventService.js:71"
+  ],
+  "/api/admin/fine/fines/statistics": [
+    "src/services/fineService.js:9",
+    "src/views/Management/Dashboard/index.jsx:655"
+  ],
+  "/api/admin/fine/fines/members": [
+    "src/services/fineService.js:14",
+    "src/views/Management/Dashboard/index.jsx:633"
+  ],
+  "/api/admin/fine/fines/pending/members": [
+    "src/services/fineService.js:19"
+  ],
+  "/api/admin/fine/members/${memberId}/fines": [
+    "src/services/fineService.js:24",
+    "src/services/fineService.js:29"
+  ],
+  "/api/admin/fine/members/${memberId}/fines/${fineId}": [
+    "src/services/fineService.js:34",
+    "src/services/fineService.js:39"
+  ],
+  "/upload/fine_file_upload": [
+    "src/services/fineService.js:44",
+    "src/views/Management/Accounts/components/TransactionTable.jsx:83",
+    "src/views/Management/Dashboard/index.jsx:137"
+  ],
+  "/api/fine": [
+    "src/services/fineService.js:51"
+  ],
+  "/api/leave/submit": [
+    "src/services/leaveService.js:9",
+    "src/views/Uniques/Member/LeaveManagement/index.jsx:145"
+  ],
+  "/api/leave/my-leaves": [
+    "src/services/leaveService.js:14",
+    "src/views/Uniques/Member/LeaveManagement/index.jsx:64"
+  ],
+  "/api/leave/all": [
+    "src/services/leaveService.js:19",
+    "src/views/Management/LeaveManagement/index.jsx:62"
+  ],
+  "/api/leave/pending": [
+    "src/services/leaveService.js:24"
+  ],
+  "/api/leave/${id}/approve": [
+    "src/services/leaveService.js:29"
+  ],
+  "/api/leave/${id}/reject": [
+    "src/services/leaveService.js:34"
+  ],
+  "/api/leave/${id}": [
+    "src/services/leaveService.js:39",
+    "src/services/leaveService.js:44",
+    "src/services/leaveService.js:49",
+    "src/views/Uniques/Member/LeaveManagement/index.jsx:173"
+  ],
+  "/api/public/members": [
+    "src/services/memberService.js:9"
+  ],
+  "/api/public/members/counts": [
+    "src/services/memberService.js:14"
+  ],
+  "/api/admin/member": [
+    "src/services/memberService.js:19",
+    "src/views/Management/Dashboard/index.jsx:619",
+    "src/views/Management/Events/View.jsx:246",
+    "src/views/Management/Members/index.jsx:121",
+    "src/views/Uniques360/Coordinator360/Uniques360.jsx:113",
+    "src/views/Uniques360/Member360/uniques360.jsx:33"
+  ],
+  "/api/admin/member/add": [
+    "src/services/memberService.js:29",
+    "src/views/Management/Members/index.jsx:249"
+  ],
+  "/api/admin/member/${id}/block": [
+    "src/services/memberService.js:44"
+  ],
+  "/api/admin/member/${id}/suspend": [
+    "src/services/memberService.js:49"
+  ],
+  "/api/admin/member/supplementary/semester/${semester}": [
+    "src/services/memberService.js:54",
+    "src/views/Management/Dashboard/index.jsx:746"
+  ],
+  "/api/admin/member/fines/all": [
+    "src/services/memberService.js:59",
+    "src/views/Management/Dashboard/index.jsx:794"
+  ],
+  "/api/admin/member/${targetId}": [
+    "src/services/memberService.js:75"
+  ],
+  "/api/projects": [
+    "src/services/projectService.js:9",
+    "src/services/projectService.js:19",
+    "src/utils/project/projectsData.js:434"
+  ],
+  "/api/projects/${id}": [
+    "src/services/projectService.js:14",
+    "src/services/projectService.js:24",
+    "src/services/projectService.js:29"
+  ],
+  "/upload/project_file_upload": [
+    "src/services/projectService.js:34"
+  ],
+  "/api/admin/trainers/all-trainers": [
+    "src/services/trainerService.js:9",
+    "src/views/Management/Trainers/index.jsx:84"
+  ],
+  "/api/admin/trainers/add-trainer": [
+    "src/services/trainerService.js:14",
+    "src/views/Management/Trainers/index.jsx:159"
+  ],
+  "/api/admin/trainers/update-trainer/${id}": [
+    "src/services/trainerService.js:19"
+  ],
+  "/api/admin/trainers/delete-trainer/${id}": [
+    "src/services/trainerService.js:24"
+  ],
+  "/upload/trainer_file_upload": [
+    "src/services/trainerService.js:29",
+    "src/views/Management/Trainers/index.jsx:171"
+  ],
+  "/api/uniques360/tasks": [
+    "src/services/uniques360Service.js:9",
+    "src/views/Uniques360/Coordinator360/Uniques360.jsx:158"
+  ],
+  "/api/uniques360/tasks/member/${memberId}": [
+    "src/services/uniques360Service.js:14"
+  ],
+  "/api/uniques360/tasks/coordinator/${coordinatorId}": [
+    "src/services/uniques360Service.js:19"
+  ],
+  "/api/uniques360/tasks/${taskId}": [
+    "src/services/uniques360Service.js:24",
+    "src/services/uniques360Service.js:29",
+    "src/services/uniques360Service.js:34",
+    "src/views/Uniques360/Coordinator360/Uniques360.jsx:188",
+    "src/views/Uniques360/Coordinator360/Uniques360.jsx:204",
+    "src/views/Uniques360/Events/EventInsights.jsx:78",
+    "src/views/Uniques360/Projects/ProjectInsights.jsx:73"
+  ],
+  "/api/uniques360/tasks/${taskId}/members": [
+    "src/services/uniques360Service.js:39"
+  ],
+  "/api/uniques360/tasks/${taskId}/members/remove": [
+    "src/services/uniques360Service.js:44",
+    "src/views/Uniques360/Coordinator360/Uniques360.jsx:254"
+  ],
+  "/api/uniques360/reports": [
+    "src/services/uniques360Service.js:49",
+    "src/views/Uniques360/Member360/uniques360.jsx:107"
+  ],
+  "/api/uniques360/reports/task/${taskId}": [
+    "src/services/uniques360Service.js:54",
+    "src/views/Uniques360/Coordinator360/Uniques360.jsx:238",
+    "src/views/Uniques360/Member360/uniques360.jsx:64"
+  ],
+  "/api/batches/profiles": [
+    "src/utils/batch/batchProfilesData.js:110"
+  ],
+  "/api/batches/profiles/update": [
+    "src/utils/batch/batchProfilesData.js:149"
+  ],
+  "/api/batches/all": [
+    "src/utils/batch/batchesData.js:42"
+  ],
+  "/api/batches/add": [
+    "src/utils/batch/batchesData.js:86"
+  ],
+  "/api/stats/update": [
+    "src/utils/stats/statsData.js:65"
+  ],
+  "/auth/password-reset/resend-otp": [
+    "src/views/Authentication/login/ForgetPassword.jsx:150"
+  ],
+  "/auth/google": [
+    "src/views/Authentication/login/index.jsx:66"
+  ],
+  "/api/admin/fine": [
+    "src/views/Management/Accounts/components/TransactionTable.jsx:82"
+  ],
+  "/api/admin": [
+    "src/views/Management/Accounts/index.jsx:30",
+    "src/views/Management/Dashboard/index.jsx:610"
+  ],
+  "/api/admin/fine/members/${memberId}/fines/${fine": [
+    "src/views/Management/Dashboard/index.jsx:157"
+  ],
+  "/api/admin/member/supplementary/semester/${currentSemester}": [
+    "src/views/Management/Dashboard/index.jsx:725"
+  ],
+  "/api/admin/enquiry/${enquiryId}/reply": [
+    "src/views/Management/Enquiry/index.jsx:210"
+  ],
+  "/api/admin/enquiry/${selectedEnquiry": [
+    "src/views/Management/Enquiry/index.jsx:250"
+  ],
+  "/api/admin/enquiry/${deleteId}": [
+    "src/views/Management/Enquiry/index.jsx:285"
+  ],
+  "/upload/budget_file_upload": [
+    "src/views/Management/Events/Budget.jsx:332"
+  ],
+  "/api/events/${id}/expenses/${expenseId}": [
+    "src/views/Management/Events/Budget.jsx:366",
+    "src/views/Management/Events/Budget.jsx:683"
+  ],
+  "/api/events/${id}/budget-allocations/${allocationId}": [
+    "src/views/Management/Events/Budget.jsx:392"
+  ],
+  "/api/events/${id}/budget-allocations": [
+    "src/views/Management/Events/Budget.jsx:417"
+  ],
+  "/api/events/${id}/budget": [
+    "src/views/Management/Events/Budget.jsx:475",
+    "src/views/Management/Events/Budget.jsx:529"
+  ],
+  "/api/events/${id}/sponsors": [
+    "src/views/Management/Events/Budget.jsx:566"
+  ],
+  "/api/events/${id}/sponsors/${sponsorId}": [
+    "src/views/Management/Events/Budget.jsx:605"
+  ],
+  "/api/events/${id}/expenses": [
+    "src/views/Management/Events/Budget.jsx:640"
+  ],
+  "/api/events/${id}/members": [
+    "src/views/Management/Events/View.jsx:277"
+  ],
+  "/api/events/${id}/members/team/${teamType}/add": [
+    "src/views/Management/Events/View.jsx:359"
+  ],
+  "/api/events/${id}/members/team/${memberTeam}/members": [
+    "src/views/Management/Events/View.jsx:404"
+  ],
+  "/api/events/${eventId}/form-responses": [
+    "src/views/Management/Events/View.jsx:491"
+  ],
+  "/api/events/${id}/gallery": [
+    "src/views/Management/Events/View.jsx:673",
+    "src/views/Management/Events/View.jsx:708"
+  ],
+  "/api/events/${id}/register": [
+    "src/views/Management/Events/View.jsx:766"
+  ],
+  "/api/events/link-guest": [
+    "src/views/Management/Events/View.jsx:929"
+  ],
+  "/api/events/${id}/form-response": [
+    "src/views/Management/Events/View.jsx:1244"
+  ],
+  "/api/events/${id}/status": [
+    "src/views/Management/Events/View.jsx:2455"
+  ],
+  "/api/events/${eventToDelete}": [
+    "src/views/Management/Events/index.jsx:209"
+  ],
+  "/api/leave/${selectedLeave": [
+    "src/views/Management/LeaveManagement/index.jsx:156",
+    "src/views/Management/LeaveManagement/index.jsx:182"
+  ],
+  "/api/admin/member/${editingMember": [
+    "src/views/Management/Members/index.jsx:346"
+  ],
+  "/api/admin/member/${memberToDelete": [
+    "src/views/Management/Members/index.jsx:386"
+  ],
+  "/api/image-proxy/${profile": [
+    "src/views/Management/Profile/index.jsx:97"
+  ],
+  "/api/admin/trainers/update-trainer/${selectedTrainer": [
+    "src/views/Management/Trainers/index.jsx:154"
+  ],
+  "/api/admin/trainers/delete-trainer/${selectedTrainer": [
+    "src/views/Management/Trainers/index.jsx:235"
+  ],
+  "/api/leave/${editingId}": [
+    "src/views/Uniques/Member/LeaveManagement/index.jsx:135"
+  ],
+  "/api/member/members/${user": [
+    "src/views/Uniques/Member/index.jsx:464",
+    "src/views/Uniques/Member/index.jsx:577",
+    "src/views/Uniques/Member/index.jsx:655",
+    "src/views/Uniques/Member/index.jsx:697",
+    "src/views/Uniques/Member/index.jsx:829",
+    "src/views/Uniques/Member/index.jsx:871",
+    "src/views/Uniques/Member/index.jsx:1003",
+    "src/views/Uniques/Member/index.jsx:1038",
+    "src/views/Uniques/Member/index.jsx:1152",
+    "src/views/Uniques/Member/index.jsx:1194",
+    "src/views/Uniques/Member/index.jsx:1302",
+    "src/views/Uniques/Member/index.jsx:1343",
+    "src/views/Uniques/Member/index.jsx:1437",
+    "src/views/Uniques/Member/index.jsx:1479"
+  ],
+  "/upload/file_upload": [
+    "src/views/Uniques/Member/index.jsx:546",
+    "src/views/Uniques/Member/index.jsx:790",
+    "src/views/Uniques/Member/index.jsx:979"
+  ],
+  "/api/uniques360/tasks/${selectedTask": [
+    "src/views/Uniques360/Coordinator360/Uniques360.jsx:219",
+    "src/views/Uniques360/Coordinator360/Uniques360.jsx:681",
+    "src/views/Uniques360/Member360/uniques360.jsx:127"
+  ],
+  "/api/uniques360/tasks/member/me": [
+    "src/views/Uniques360/Member360/uniques360.jsx:46"
+  ]
+}

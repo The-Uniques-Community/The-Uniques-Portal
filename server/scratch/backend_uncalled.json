@@ -1,0 +1,602 @@
+[
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "*"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/approveProfile"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/blockMember"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/create"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/createAdmin"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/enquiry/"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/enquiry/"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/fine/members/:memberId/fines/pending"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/fine/members/search"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/imposeFine"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/listNewEvent"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/member/"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/member/:memberId/fine"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/member/:memberId/fines"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/member/batch/:batch"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/member/get-all-fine-history"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/member/status/:status"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/member/supplementary/pending"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/migration/migrate-event-relationships"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/migration/rollback-migration"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/migration/verify-migration"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/unblockMember"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/batches/name/:name"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/blogs/"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/blogs/"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/blogs/:blogId"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/blogs/:blogId"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/blogs/member/:memberId"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/blogs/my-blogs"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/campus-ambassador"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/campus-ambassador/:id"
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "path": "/api/campus-ambassador/:id/status"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/campus-ambassador/apply"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/campus-ambassador/stats"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/community-benefits/"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/community-benefits/"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/community-benefits/"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/community-benefits/update"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/community-benefits/update"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/community/createCommunityAdmin"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/community/projects/"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/community/projects/"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/community/projects/:id"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/community/projects/:id"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/community/projects/:id"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/contact/"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/custom-members/"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/custom-members/:id"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/custom-members/:id"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/custom-members/add"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/events/"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/events/"
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "path": "/api/events/:id/members/remove"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/events/:id/members/team"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/events/:id/migrate/event-members"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/events/available-members"
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "path": "/api/events/form-responses/:responseId/status"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/events/status/:status"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/fine/profile/fines"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/fine/profile/fines/pending"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/guest/bulkUpload"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/guest/get-guest/:id"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/health"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/member/bulk-upload"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/member/login"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/member/logout"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/member/members/:id/academics"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/member/members/:id/achievements"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/member/members/:id/certifications"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/member/members/:id/editProfile"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/member/members/:id/events"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/member/members/:id/internships"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/member/members/:id/profilePic"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/member/members/:id/projects"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/member/register"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/member/update-fine-data"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/projects/"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/projects/"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/public/members/"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/stats/"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/stats/"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/stats/"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/stats/all"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/stats/counts"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/upload/add_subfolder"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/upload/budget_file_upload"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/upload/create_main_folder"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/upload/create_student_folder"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/upload/event_file_upload"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/upload/file_upload"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/upload/fine_file_upload"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/upload/project_file_upload"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/upload/trainer_file_upload"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/auth/get_user"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/auth/google/callback"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/health"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/upload/add_subfolder"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/upload/create_main_folder"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/upload/create_student_folder"
+  }
+]

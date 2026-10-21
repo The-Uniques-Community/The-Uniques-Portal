@@ -33,7 +33,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { toast } from "react-toastify";
-import { BASE_URL } from "@/config";
+import leaveService from "@/services/leaveService";
 import ModernHeader from "@/components/headers/ModernHeader";
 
 const LeaveManagement = () => {
@@ -59,22 +59,15 @@ const LeaveManagement = () => {
   const fetchLeaves = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${BASE_URL}/api/leave/all`, {
-        method: "GET",
-        credentials: "include",
-      });
-      if (!response.ok) {
-        if (response.status === 401) {
-          toast.error("Please login to view leave requests");
-          return;
-        }
-        throw new Error("Failed to fetch leaves");
-      }
-      const data = await response.json();
+      const data = await leaveService.getAllLeaves();
       setLeaves(data.leaves || []);
     } catch (error) {
       console.error("Error fetching leaves:", error);
-      toast.error("Failed to load leave requests");
+      if (error?.status === 401 || error?.response?.status === 401) {
+        toast.error("Please login to view leave requests");
+        return;
+      }
+      toast.error(error?.message || "Failed to load leave requests");
     } finally {
       setIsLoading(false);
     }
@@ -153,19 +146,13 @@ const LeaveManagement = () => {
     if (!selectedLeave) return;
     try {
       setIsLoading(true);
-      const response = await fetch(`${BASE_URL}/api/leave/${selectedLeave._id}/approve`, {
-        method: "PUT",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ approvedBy: "Admin" }),
-      });
-      if (!response.ok) throw new Error("Failed to approve leave");
+      await leaveService.approveLeave(selectedLeave._id, { approvedBy: "Admin", remarks: "Approved by Admin" });
       toast.success(`Leave approved for ${selectedLeave.memberName}`);
       handleCloseDialog();
       fetchLeaves();
     } catch (error) {
       console.error("Error approving leave:", error);
-      toast.error("Failed to approve leave request");
+      toast.error(error?.message || "Failed to approve leave request");
     } finally {
       setIsLoading(false);
     }
@@ -179,19 +166,13 @@ const LeaveManagement = () => {
     }
     try {
       setIsLoading(true);
-      const response = await fetch(`${BASE_URL}/api/leave/${selectedLeave._id}/reject`, {
-        method: "PUT",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rejectionReason: rejectReason, rejectedBy: "Admin" }),
-      });
-      if (!response.ok) throw new Error("Failed to reject leave");
+      await leaveService.rejectLeave(selectedLeave._id, { rejectionReason: rejectReason, rejectedBy: "Admin", remarks: rejectReason });
       toast.success(`Leave rejected for ${selectedLeave.memberName}`);
       handleCloseDialog();
       fetchLeaves();
     } catch (error) {
       console.error("Error rejecting leave:", error);
-      toast.error("Failed to reject leave request");
+      toast.error(error?.message || "Failed to reject leave request");
     } finally {
       setIsLoading(false);
     }

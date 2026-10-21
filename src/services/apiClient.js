@@ -5,7 +5,7 @@
  * @architecture Replaces all raw axios/fetch calls and global monkey-patching in config.js.
  */
 import axios from 'axios';
-import { clearAuthStorage } from '@/utils/authUtils';
+import { isTokenError, handleUnauthenticatedSession } from '@/utils/authUtils';
 
 let _storeInstance = null;
 
@@ -15,6 +15,9 @@ let _storeInstance = null;
  */
 export const setStoreInstance = (store) => {
   _storeInstance = store;
+  if (typeof window !== 'undefined') {
+    window.__REDUX_STORE__ = store;
+  }
 };
 
 /**
@@ -79,6 +82,16 @@ apiClient.interceptors.request.use(
  */
 apiClient.interceptors.response.use(
   (response) => {
+    // Catch cases where backend returns 200 with token error payload
+    if (response?.data && isTokenError(response.status, response.data)) {
+      const isAuthCall =
+        response.config?.url?.includes('/auth/emaillogin') ||
+        response.config?.url?.includes('/auth/login');
+      if (!isAuthCall) {
+        handleUnauthenticatedSession({ targetPath: '/' });
+        return new Promise(() => {});
+      }
+    }
     return response;
   },
   (error) => {
@@ -90,23 +103,22 @@ apiClient.interceptors.response.use(
       error.message ||
       'An unexpected network error occurred';
 
-    // Global 401 Unauthorized handling (token expired or invalidated)
-    if (status === 401) {
-      console.warn('[ApiClient] 401 Unauthorized received - resetting session');
-      clearAuthStorage();
+    // Global unauthenticated handling (token missing, invalid, or expired)
+    if (isTokenError(status, errorData)) {
+      const isAuthCall =
+        error.config?.url?.includes('/auth/emaillogin') ||
+        error.config?.url?.includes('/auth/login');
 
-      if (_storeInstance) {
-        try {
-          _storeInstance.dispatch({ type: 'user/clearUser' });
-        } catch (e) {
-          console.error('Failed to dispatch Redux logout action:', e);
-        }
+      // For explicit login attempts, allow rejection so the login form displays invalid credential notices
+      if (isAuthCall) {
+        return Promise.reject(new ApiError(errorMessage, status, errorData));
       }
 
-      // Avoid infinite redirects if already on auth routes
-      if (typeof window !== 'undefined' && window.location.pathname !== '/' && !window.location.pathname.startsWith('/auth') && window.location.pathname !== '/forget-password') {
-        window.location.replace('/');
-      }
+      console.warn('[ApiClient] Unauthenticated token error encountered. Navigating to login:', errorMessage);
+      handleUnauthenticatedSession({ targetPath: '/' });
+
+      // Return a pending promise so calling components do not pop "No token provided" error toasts while navigating
+      return new Promise(() => {});
     }
 
     return Promise.reject(new ApiError(errorMessage, status, errorData));

@@ -77,6 +77,11 @@ import tu from '@/assets/logos/tu.png';
 import * as XLSX from 'xlsx';
 
 import { BASE_URL } from '@/config';
+import {
+  FILE_VALIDATION_PRESETS,
+  validateFiles,
+  resetFileInput,
+} from '@/utils/fileValidation';
 
 // Base API URL
 const API_BASE_URL = `${BASE_URL}/api/admin/fine`;
@@ -94,15 +99,17 @@ const FinePaymentModal = ({ open, onClose, memberId, fine, onPaymentComplete }) 
 
   // Handle file selection
   const handleFileChange = (e) => {
-    const selectedFiles = Array.from(e.target.files);
-    if (selectedFiles.length > 0) {
-      setFiles(selectedFiles);
-      
-      // Create preview for image files
-      if (selectedFiles[0].type.startsWith('image/')) {
-        const url = URL.createObjectURL(selectedFiles[0]);
-        setPreviewUrl(url);
-      }
+    const { validFiles, allValid } = validateFiles(e.target.files, FILE_VALIDATION_PRESETS.RECEIPT, { inputTarget: e });
+    if (!allValid || validFiles.length === 0) {
+      return;
+    }
+
+    setFiles(validFiles);
+    
+    // Create preview for image files
+    if (validFiles[0].type.startsWith('image/')) {
+      const url = URL.createObjectURL(validFiles[0]);
+      setPreviewUrl(url);
     }
   };
   
@@ -153,14 +160,21 @@ const FinePaymentModal = ({ open, onClose, memberId, fine, onPaymentComplete }) 
 
       // 2. Now update the fine with the file reference
       if (uploadResponse.data.files && uploadResponse.data.files.length > 0) {
-        const fileId = uploadResponse.data.files[0]._id;
+        const uploadedFile = uploadResponse.data.files[0];
         
         // Update the fine status and attach the proof
         const updateResponse = await apiClient.patch(
           `${API_BASE_URL}/members/${memberId}/fines/${fine._id}`,
           {
             status: 'paid',
-            proofOfPaymentId: fileId,
+            proofOfPayment: {
+              _id: uploadedFile._id,
+              fileId: uploadedFile.fileId,
+              fileUrl: uploadedFile.fileUrl || uploadedFile.url,
+              url: uploadedFile.url || uploadedFile.fileUrl,
+              fileName: uploadedFile.fileName || uploadedFile.name || 'receipt.pdf'
+            },
+            proofOfPaymentId: uploadedFile._id,
             paymentMethod: paymentMethod,
             paymentReference: reference
           }
@@ -327,12 +341,12 @@ const FinePaymentModal = ({ open, onClose, memberId, fine, onPaymentComplete }) 
                     <input
                       type="file"
                       hidden
-                      accept="image/*,.pdf"
+                      accept={FILE_VALIDATION_PRESETS.RECEIPT.accept}
                       onChange={handleFileChange}
                     />
                   </Button>
                   <Typography variant="caption" display="block" mt={1} color="textSecondary">
-                    Supported formats: JPG, PNG, PDF
+                    Supported formats: JPG, PNG, WEBP, PDF
                   </Typography>
                 </Box>
               )}
@@ -435,13 +449,25 @@ const FineTable = () => {
   
   // NEW: Receipt preview handler
   const handleOpenReceipt = (fileUrl) => {
-    // If we have a file object reference
-    if (fileUrl && fileUrl.fileUrl) {
-      setReceiptPreviewUrl(fileUrl.fileId);
+    if (!fileUrl) {
+      setAlert({
+        open: true,
+        message: "Cannot open receipt: File not found",
+        severity: "error"
+      });
+      return;
+    }
+
+    const targetId = typeof fileUrl === 'string'
+      ? fileUrl
+      : (fileUrl.url || fileUrl.fileUrl || fileUrl.webViewLink || fileUrl.fileId);
+
+    if (targetId) {
+      setReceiptPreviewUrl(targetId);
       setOpenReceiptPreview(true);
       return;
     }
-    
+
     // Show error
     setAlert({
       open: true,
@@ -768,6 +794,60 @@ const FineTable = () => {
         return <Chip label={status} size="small" />;
     }
   };
+
+  // Validate and construct safe URLs for receipt preview iframe and window.open
+  const getReceiptUrls = (val) => {
+    if (!val || typeof val !== 'string') return null;
+    const trimmed = val.trim();
+    if (!trimmed) return null;
+
+    const isHttpUrl = /^https?:\/\//i.test(trimmed) || trimmed.startsWith('/');
+    if (isHttpUrl) {
+      try {
+        const parsed = new URL(trimmed, typeof window !== 'undefined' ? window.location.origin : 'http://localhost');
+        const isDrive = parsed.protocol === 'https:' && (parsed.hostname === 'drive.google.com' || parsed.host === 'drive.google.com');
+
+        const trustedHosts = new Set();
+        if (typeof window !== 'undefined' && window.location?.host) {
+          trustedHosts.add(window.location.host.toLowerCase());
+          trustedHosts.add(window.location.hostname.toLowerCase());
+        }
+        if (BASE_URL) {
+          try {
+            const base = new URL(BASE_URL, typeof window !== 'undefined' ? window.location.origin : 'http://localhost');
+            trustedHosts.add(base.host.toLowerCase());
+            trustedHosts.add(base.hostname.toLowerCase());
+          } catch {}
+        }
+        const isTrustedHost = trustedHosts.has(parsed.host.toLowerCase()) || trustedHosts.has(parsed.hostname.toLowerCase());
+
+        if (!isDrive && !isTrustedHost) {
+          return null;
+        }
+
+        const iframeSrc = isDrive && !trimmed.includes('/preview')
+          ? trimmed.replace(/\/view(\?.*)?$/, '/preview')
+          : trimmed;
+        const openUrl = trimmed;
+
+        return { iframeSrc, openUrl };
+      } catch {
+        return null;
+      }
+    }
+
+    // Preserve Drive ID handling only for non-URL values
+    if (/^[a-zA-Z0-9_-]+$/.test(trimmed)) {
+      return {
+        iframeSrc: `https://drive.google.com/file/d/${trimmed}/preview`,
+        openUrl: `https://drive.google.com/file/d/${trimmed}/view`,
+      };
+    }
+
+    return null;
+  };
+
+  const receiptUrls = getReceiptUrls(receiptPreviewUrl);
 
   return (
     <Box
@@ -1655,28 +1735,41 @@ const FineTable = () => {
         </DialogTitle>
         <DialogContent>
           {receiptPreviewUrl && (
-            <Box textAlign="center" py={2}>
-              
+            receiptUrls ? (
+              <Box textAlign="center" py={2}>
                 <Box>
                   <iframe 
-                    src={`https://drive.google.com/file/d/${receiptPreviewUrl}/preview`} 
+                    src={receiptUrls.iframeSrc} 
                     width="100%" 
                     height="500px" 
                     title="PDF Receipt"
                     style={{ border: '1px solid #ddd' }}
                   />
                 </Box>
-            
-              
-              <Button
-                variant="contained"
-                startIcon={<Preview />}
-                sx={{ mt: 2 }}
-                onClick={() => window.open(receiptPreviewUrl, '_blank')}
-              >
-                Open in New Tab
-              </Button>
-            </Box>
+                <Button
+                  variant="contained"
+                  startIcon={<Preview />}
+                  sx={{ mt: 2 }}
+                  onClick={() => {
+                    if (receiptUrls.openUrl) {
+                      window.open(receiptUrls.openUrl, '_blank');
+                    } else {
+                      setAlert({
+                        open: true,
+                        message: "Cannot open receipt: File not found",
+                        severity: "error"
+                      });
+                    }
+                  }}
+                >
+                  Open in New Tab
+                </Button>
+              </Box>
+            ) : (
+              <Box py={2}>
+                <Alert severity="error">Cannot open receipt: File not found</Alert>
+              </Box>
+            )
           )}
         </DialogContent>
       </Dialog>

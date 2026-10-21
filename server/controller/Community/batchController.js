@@ -108,9 +108,9 @@ export const getAllBatches = async (req, res) => {
 // Add new batch name
 export const addBatch = async (req, res) => {
   try {
-    let { name } = req.body;
-    if (!name || !name.trim()) {
-      return res.status(400).json({ success: false, message: "Batch name is required" });
+    let name = req.body.name || req.body.batchName;
+    if (typeof name !== "string" || !name.trim()) {
+      return res.status(400).json({ success: false, message: "Batch name is required and must be a non-empty string" });
     }
     name = name.trim();
     if (!name.toLowerCase().startsWith("the uniques") && !name.toLowerCase().startsWith("uniques")) {

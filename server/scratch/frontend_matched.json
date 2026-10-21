@@ -1,0 +1,2545 @@
+[
+  {
+    "call": {
+      "endpoint": "/api/image-proxy/${fileId}",
+      "file": "src/components/cards/MemberCardDashboard.jsx",
+      "line": 50,
+      "rawLine": "return `${BASE_URL}/api/image-proxy/${fileId}`;"
+    },
+    "normalized": "/api/image-proxy/:param",
+    "matchedRoutes": [
+      "GET /api/image-proxy/:fileId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/image-proxy/${fileId}",
+      "file": "src/components/cards/MemberCardDashboard.jsx",
+      "line": 318,
+      "rawLine": "return `${BASE_URL}/api/image-proxy/${fileId}`;"
+    },
+    "normalized": "/api/image-proxy/:param",
+    "matchedRoutes": [
+      "GET /api/image-proxy/:fileId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/image-proxy/${fileId}",
+      "file": "src/components/cards/TrainerCardDashboard.jsx",
+      "line": 39,
+      "rawLine": "return `${BASE_URL}/api/image-proxy/${fileId}`;"
+    },
+    "normalized": "/api/image-proxy/:param",
+    "matchedRoutes": [
+      "GET /api/image-proxy/:fileId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/image-proxy/${fileId}",
+      "file": "src/components/cards/TrainerCardDashboard.jsx",
+      "line": 245,
+      "rawLine": "return `${BASE_URL}/api/image-proxy/${fileId}`;"
+    },
+    "normalized": "/api/image-proxy/:param",
+    "matchedRoutes": [
+      "GET /api/image-proxy/:fileId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/upload/event_file_upload",
+      "file": "src/components/event/EventForm.jsx",
+      "line": 5,
+      "rawLine": "* @agent_note Handles multipart uploads to /upload/event_file_upload for banner, gallery, and sponsor receipts."
+    },
+    "normalized": "/upload/event_file_upload",
+    "matchedRoutes": [
+      "POST /upload/event_file_upload"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/guest/get-all-guests",
+      "file": "src/components/event/EventForm.jsx",
+      "line": 151,
+      "rawLine": "* @api GET /api/guest/get-all-guests, POST /upload/event_file_upload, POST /api/events, PUT /api/events/:id."
+    },
+    "normalized": "/api/guest/get-all-guests",
+    "matchedRoutes": [
+      "GET /api/guest/get-all-guests"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/upload/event_file_upload",
+      "file": "src/components/event/EventForm.jsx",
+      "line": 151,
+      "rawLine": "* @api GET /api/guest/get-all-guests, POST /upload/event_file_upload, POST /api/events, PUT /api/events/:id."
+    },
+    "normalized": "/upload/event_file_upload",
+    "matchedRoutes": [
+      "POST /upload/event_file_upload"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/:id",
+      "file": "src/components/event/EventForm.jsx",
+      "line": 151,
+      "rawLine": "* @api GET /api/guest/get-all-guests, POST /upload/event_file_upload, POST /api/events, PUT /api/events/:id."
+    },
+    "normalized": "/api/events/:id",
+    "matchedRoutes": [
+      "GET /api/events/:id",
+      "PUT /api/events/:id",
+      "DELETE /api/events/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/guest/get-all-guests",
+      "file": "src/components/event/EventForm.jsx",
+      "line": 203,
+      "rawLine": "`${BASE_URL}/api/guest/get-all-guests`"
+    },
+    "normalized": "/api/guest/get-all-guests",
+    "matchedRoutes": [
+      "GET /api/guest/get-all-guests"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${eventId}",
+      "file": "src/components/event/EventForm.jsx",
+      "line": 215,
+      "rawLine": "`${BASE_URL}/api/events/${eventId}?populate=gallery`,"
+    },
+    "normalized": "/api/events/:param",
+    "matchedRoutes": [
+      "GET /api/events/:id",
+      "PUT /api/events/:id",
+      "DELETE /api/events/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/upload/event_file_upload",
+      "file": "src/components/event/EventForm.jsx",
+      "line": 311,
+      "rawLine": "`${BASE_URL}/upload/event_file_upload`,"
+    },
+    "normalized": "/upload/event_file_upload",
+    "matchedRoutes": [
+      "POST /upload/event_file_upload"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/upload/event_file_upload",
+      "file": "src/components/event/EventForm.jsx",
+      "line": 364,
+      "rawLine": "`${BASE_URL}/upload/event_file_upload`,"
+    },
+    "normalized": "/upload/event_file_upload",
+    "matchedRoutes": [
+      "POST /upload/event_file_upload"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/upload/event_file_upload",
+      "file": "src/components/event/EventForm.jsx",
+      "line": 399,
+      "rawLine": "`${BASE_URL}/upload/event_file_upload`,"
+    },
+    "normalized": "/upload/event_file_upload",
+    "matchedRoutes": [
+      "POST /upload/event_file_upload"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${eventId}",
+      "file": "src/components/event/EventForm.jsx",
+      "line": 478,
+      "rawLine": "`${BASE_URL}/api/events/${eventId}`,"
+    },
+    "normalized": "/api/events/:param",
+    "matchedRoutes": [
+      "GET /api/events/:id",
+      "PUT /api/events/:id",
+      "DELETE /api/events/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/guest/add-guest",
+      "file": "src/components/event/EventForm.jsx",
+      "line": 542,
+      "rawLine": "`${BASE_URL}/api/guest/add-guest`,"
+    },
+    "normalized": "/api/guest/add-guest",
+    "matchedRoutes": [
+      "POST /api/guest/add-guest"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/${user",
+      "file": "src/components/modals/ProfileModal.jsx",
+      "line": 113,
+      "rawLine": "`${BASE_URL}/api/admin/member/${user._id}/block`"
+    },
+    "normalized": "/api/admin/member/${user",
+    "matchedRoutes": [
+      "GET /api/admin/member/:id",
+      "PUT /api/admin/member/:id",
+      "DELETE /api/admin/member/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/image-proxy/${fileId}",
+      "file": "src/components/modals/ProfileModal.jsx",
+      "line": 182,
+      "rawLine": "return `${BASE_URL}/api/image-proxy/${fileId}`;"
+    },
+    "normalized": "/api/image-proxy/:param",
+    "matchedRoutes": [
+      "GET /api/image-proxy/:fileId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/${user",
+      "file": "src/components/modals/ProfileModal.jsx",
+      "line": 217,
+      "rawLine": "`${BASE_URL}/api/admin/member/${user._id}/fine`,"
+    },
+    "normalized": "/api/admin/member/${user",
+    "matchedRoutes": [
+      "GET /api/admin/member/:id",
+      "PUT /api/admin/member/:id",
+      "DELETE /api/admin/member/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/image-proxy/${uploadResult",
+      "file": "src/components/project/ProjectForm.jsx",
+      "line": 143,
+      "rawLine": "finalImageUrl = `${BASE_URL}/api/image-proxy/${uploadResult.fileId}`;"
+    },
+    "normalized": "/api/image-proxy/${uploadResult",
+    "matchedRoutes": [
+      "GET /api/image-proxy/:fileId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/member/getProfile",
+      "file": "src/redux/slices/userSlice.js",
+      "line": 98,
+      "rawLine": "* Backend endpoint: GET /api/member/getProfile"
+    },
+    "normalized": "/api/member/getProfile",
+    "matchedRoutes": [
+      "GET /api/member/getProfile"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/:id",
+      "file": "src/redux/slices/userSlice.js",
+      "line": 116,
+      "rawLine": "* Backend endpoint: PUT /api/admin/member/:id"
+    },
+    "normalized": "/api/admin/member/:id",
+    "matchedRoutes": [
+      "GET /api/admin/member/:id",
+      "PUT /api/admin/member/:id",
+      "DELETE /api/admin/member/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/coordinator/current",
+      "file": "src/redux/slices/userSlice.js",
+      "line": 134,
+      "rawLine": "* Backend endpoint: GET /api/uniques360/tasks/coordinator/current"
+    },
+    "normalized": "/api/uniques360/tasks/coordinator/current",
+    "matchedRoutes": [
+      "GET /api/uniques360/tasks/coordinator/:coordinatorId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/counts",
+      "file": "src/redux/slices/userSlice.js",
+      "line": 152,
+      "rawLine": "* Aggregated backend endpoints: /api/admin/member/counts, /api/events/counts, /api/uniques360/tasks/coordinator/current"
+    },
+    "normalized": "/api/admin/member/counts",
+    "matchedRoutes": [
+      "GET /api/admin/member/:id",
+      "PUT /api/admin/member/:id",
+      "DELETE /api/admin/member/:id",
+      "GET /api/admin/member/counts"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/counts",
+      "file": "src/redux/slices/userSlice.js",
+      "line": 152,
+      "rawLine": "* Aggregated backend endpoints: /api/admin/member/counts, /api/events/counts, /api/uniques360/tasks/coordinator/current"
+    },
+    "normalized": "/api/events/counts",
+    "matchedRoutes": [
+      "GET /api/events/:id",
+      "PUT /api/events/:id",
+      "DELETE /api/events/:id",
+      "GET /api/events/counts"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/coordinator/current",
+      "file": "src/redux/slices/userSlice.js",
+      "line": 152,
+      "rawLine": "* Aggregated backend endpoints: /api/admin/member/counts, /api/events/counts, /api/uniques360/tasks/coordinator/current"
+    },
+    "normalized": "/api/uniques360/tasks/coordinator/current",
+    "matchedRoutes": [
+      "GET /api/uniques360/tasks/coordinator/:coordinatorId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/auth/emaillogin",
+      "file": "src/services/authService.js",
+      "line": 19,
+      "rawLine": "const response = await apiClient.post(\"/auth/emaillogin\", credentials);"
+    },
+    "normalized": "/auth/emaillogin",
+    "matchedRoutes": [
+      "POST /auth/emaillogin"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/auth/verify_user",
+      "file": "src/services/authService.js",
+      "line": 48,
+      "rawLine": "const response = await apiClient.get(\"/auth/verify_user\");"
+    },
+    "normalized": "/auth/verify_user",
+    "matchedRoutes": [
+      "GET /auth/verify_user"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/auth/verify_role",
+      "file": "src/services/authService.js",
+      "line": 72,
+      "rawLine": "const response = await apiClient.get(\"/auth/verify_role\", { params: { role } });"
+    },
+    "normalized": "/auth/verify_role",
+    "matchedRoutes": [
+      "GET /auth/verify_role"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/auth/logout",
+      "file": "src/services/authService.js",
+      "line": 86,
+      "rawLine": "await apiClient.post(\"/auth/logout\");"
+    },
+    "normalized": "/auth/logout",
+    "matchedRoutes": [
+      "POST /auth/logout"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/auth/password-reset/send-otp",
+      "file": "src/services/authService.js",
+      "line": 107,
+      "rawLine": "const response = await apiClient.post(\"/auth/password-reset/send-otp\", { email });"
+    },
+    "normalized": "/auth/password-reset/send-otp",
+    "matchedRoutes": [
+      "POST /auth/password-reset/send-otp"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/auth/password-reset/verify-otp",
+      "file": "src/services/authService.js",
+      "line": 112,
+      "rawLine": "const response = await apiClient.post(\"/auth/password-reset/verify-otp\", { email, otp });"
+    },
+    "normalized": "/auth/password-reset/verify-otp",
+    "matchedRoutes": [
+      "POST /auth/password-reset/verify-otp"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/auth/password-reset/reset-password",
+      "file": "src/services/authService.js",
+      "line": 117,
+      "rawLine": "const response = await apiClient.post(\"/auth/password-reset/reset-password\", payload);"
+    },
+    "normalized": "/auth/password-reset/reset-password",
+    "matchedRoutes": [
+      "POST /auth/password-reset/reset-password"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/member/getProfile",
+      "file": "src/services/coordinatorService.js",
+      "line": 10,
+      "rawLine": "* Backend route: GET /api/member/getProfile"
+    },
+    "normalized": "/api/member/getProfile",
+    "matchedRoutes": [
+      "GET /api/member/getProfile"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/member/getProfile",
+      "file": "src/services/coordinatorService.js",
+      "line": 14,
+      "rawLine": "const response = await apiClient.get('/api/member/getProfile');"
+    },
+    "normalized": "/api/member/getProfile",
+    "matchedRoutes": [
+      "GET /api/member/getProfile"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/:id",
+      "file": "src/services/coordinatorService.js",
+      "line": 20,
+      "rawLine": "* Backend route: PUT /api/admin/member/:id"
+    },
+    "normalized": "/api/admin/member/:id",
+    "matchedRoutes": [
+      "GET /api/admin/member/:id",
+      "PUT /api/admin/member/:id",
+      "DELETE /api/admin/member/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/${id}",
+      "file": "src/services/coordinatorService.js",
+      "line": 26,
+      "rawLine": "const response = await apiClient.put(`/api/admin/member/${id}`, updateData);"
+    },
+    "normalized": "/api/admin/member/:param",
+    "matchedRoutes": [
+      "GET /api/admin/member/:id",
+      "PUT /api/admin/member/:id",
+      "DELETE /api/admin/member/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/coordinator/current",
+      "file": "src/services/coordinatorService.js",
+      "line": 32,
+      "rawLine": "* Backend route: GET /api/uniques360/tasks/coordinator/current"
+    },
+    "normalized": "/api/uniques360/tasks/coordinator/current",
+    "matchedRoutes": [
+      "GET /api/uniques360/tasks/coordinator/:coordinatorId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/coordinator/current",
+      "file": "src/services/coordinatorService.js",
+      "line": 36,
+      "rawLine": "const response = await apiClient.get('/api/uniques360/tasks/coordinator/current');"
+    },
+    "normalized": "/api/uniques360/tasks/coordinator/current",
+    "matchedRoutes": [
+      "GET /api/uniques360/tasks/coordinator/:coordinatorId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/counts",
+      "file": "src/services/coordinatorService.js",
+      "line": 42,
+      "rawLine": "* Fetches member counts (/api/admin/member/counts), event counts (/api/events/counts), and coordinator tasks (/api/uniques360/tasks/coordinator/current)"
+    },
+    "normalized": "/api/admin/member/counts",
+    "matchedRoutes": [
+      "GET /api/admin/member/:id",
+      "PUT /api/admin/member/:id",
+      "DELETE /api/admin/member/:id",
+      "GET /api/admin/member/counts"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/counts",
+      "file": "src/services/coordinatorService.js",
+      "line": 42,
+      "rawLine": "* Fetches member counts (/api/admin/member/counts), event counts (/api/events/counts), and coordinator tasks (/api/uniques360/tasks/coordinator/current)"
+    },
+    "normalized": "/api/events/counts",
+    "matchedRoutes": [
+      "GET /api/events/:id",
+      "PUT /api/events/:id",
+      "DELETE /api/events/:id",
+      "GET /api/events/counts"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/coordinator/current",
+      "file": "src/services/coordinatorService.js",
+      "line": 42,
+      "rawLine": "* Fetches member counts (/api/admin/member/counts), event counts (/api/events/counts), and coordinator tasks (/api/uniques360/tasks/coordinator/current)"
+    },
+    "normalized": "/api/uniques360/tasks/coordinator/current",
+    "matchedRoutes": [
+      "GET /api/uniques360/tasks/coordinator/:coordinatorId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/counts",
+      "file": "src/services/coordinatorService.js",
+      "line": 47,
+      "rawLine": "apiClient.get('/api/admin/member/counts'),"
+    },
+    "normalized": "/api/admin/member/counts",
+    "matchedRoutes": [
+      "GET /api/admin/member/:id",
+      "PUT /api/admin/member/:id",
+      "DELETE /api/admin/member/:id",
+      "GET /api/admin/member/counts"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/counts",
+      "file": "src/services/coordinatorService.js",
+      "line": 48,
+      "rawLine": "apiClient.get('/api/events/counts'),"
+    },
+    "normalized": "/api/events/counts",
+    "matchedRoutes": [
+      "GET /api/events/:id",
+      "PUT /api/events/:id",
+      "DELETE /api/events/:id",
+      "GET /api/events/counts"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/coordinator/current",
+      "file": "src/services/coordinatorService.js",
+      "line": 49,
+      "rawLine": "apiClient.get('/api/uniques360/tasks/coordinator/current'),"
+    },
+    "normalized": "/api/uniques360/tasks/coordinator/current",
+    "matchedRoutes": [
+      "GET /api/uniques360/tasks/coordinator/:coordinatorId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/enquiry/${id}",
+      "file": "src/services/enquiryService.js",
+      "line": 19,
+      "rawLine": "const response = await apiClient.get(`/api/admin/enquiry/${id}`);"
+    },
+    "normalized": "/api/admin/enquiry/:param",
+    "matchedRoutes": [
+      "GET /api/admin/enquiry/:id",
+      "DELETE /api/admin/enquiry/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/enquiry/${id}/reply",
+      "file": "src/services/enquiryService.js",
+      "line": 24,
+      "rawLine": "const response = await apiClient.post(`/api/admin/enquiry/${id}/reply`, replyData);"
+    },
+    "normalized": "/api/admin/enquiry/:param/reply",
+    "matchedRoutes": [
+      "POST /api/admin/enquiry/:id/reply"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/enquiry/${id}/status",
+      "file": "src/services/enquiryService.js",
+      "line": 29,
+      "rawLine": "const response = await apiClient.patch(`/api/admin/enquiry/${id}/status`, { status });"
+    },
+    "normalized": "/api/admin/enquiry/:param/status",
+    "matchedRoutes": [
+      "PATCH /api/admin/enquiry/:id/status"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/enquiry/${id}",
+      "file": "src/services/enquiryService.js",
+      "line": 34,
+      "rawLine": "const response = await apiClient.delete(`/api/admin/enquiry/${id}`);"
+    },
+    "normalized": "/api/admin/enquiry/:param",
+    "matchedRoutes": [
+      "GET /api/admin/enquiry/:id",
+      "DELETE /api/admin/enquiry/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}",
+      "file": "src/services/eventService.js",
+      "line": 14,
+      "rawLine": "const response = await apiClient.get(`/api/events/${id}`);"
+    },
+    "normalized": "/api/events/:param",
+    "matchedRoutes": [
+      "GET /api/events/:id",
+      "PUT /api/events/:id",
+      "DELETE /api/events/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}",
+      "file": "src/services/eventService.js",
+      "line": 24,
+      "rawLine": "const response = await apiClient.put(`/api/events/${id}`, eventData);"
+    },
+    "normalized": "/api/events/:param",
+    "matchedRoutes": [
+      "GET /api/events/:id",
+      "PUT /api/events/:id",
+      "DELETE /api/events/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}",
+      "file": "src/services/eventService.js",
+      "line": 29,
+      "rawLine": "const response = await apiClient.delete(`/api/events/${id}`);"
+    },
+    "normalized": "/api/events/:param",
+    "matchedRoutes": [
+      "GET /api/events/:id",
+      "PUT /api/events/:id",
+      "DELETE /api/events/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${eventId}/members",
+      "file": "src/services/eventService.js",
+      "line": 34,
+      "rawLine": "const response = await apiClient.get(`/api/events/${eventId}/members`);"
+    },
+    "normalized": "/api/events/:param/members",
+    "matchedRoutes": [
+      "GET /api/events/:id/members",
+      "PUT /api/events/:id/members",
+      "PATCH /api/events/:id/members"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${eventId}/members",
+      "file": "src/services/eventService.js",
+      "line": 39,
+      "rawLine": "const response = await apiClient.post(`/api/events/${eventId}/members`, { members });"
+    },
+    "normalized": "/api/events/:param/members",
+    "matchedRoutes": [
+      "GET /api/events/:id/members",
+      "PUT /api/events/:id/members",
+      "PATCH /api/events/:id/members"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/upload/event_file_upload",
+      "file": "src/services/eventService.js",
+      "line": 49,
+      "rawLine": "const response = await apiClient.post('/upload/event_file_upload', formData, {"
+    },
+    "normalized": "/upload/event_file_upload",
+    "matchedRoutes": [
+      "POST /upload/event_file_upload"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/fine/fines/statistics",
+      "file": "src/services/fineService.js",
+      "line": 9,
+      "rawLine": "const response = await apiClient.get('/api/admin/fine/fines/statistics');"
+    },
+    "normalized": "/api/admin/fine/fines/statistics",
+    "matchedRoutes": [
+      "GET /api/admin/fine/fines/statistics"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/fine/fines/members",
+      "file": "src/services/fineService.js",
+      "line": 14,
+      "rawLine": "const response = await apiClient.get('/api/admin/fine/fines/members', { params });"
+    },
+    "normalized": "/api/admin/fine/fines/members",
+    "matchedRoutes": [
+      "GET /api/admin/fine/fines/members"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/fine/fines/pending/members",
+      "file": "src/services/fineService.js",
+      "line": 19,
+      "rawLine": "const response = await apiClient.get('/api/admin/fine/fines/pending/members', { params });"
+    },
+    "normalized": "/api/admin/fine/fines/pending/members",
+    "matchedRoutes": [
+      "GET /api/admin/fine/fines/pending/members"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/fine/members/${memberId}/fines",
+      "file": "src/services/fineService.js",
+      "line": 24,
+      "rawLine": "const response = await apiClient.get(`/api/admin/fine/members/${memberId}/fines`);"
+    },
+    "normalized": "/api/admin/fine/members/:param/fines",
+    "matchedRoutes": [
+      "POST /api/admin/fine/members/:memberId/fines",
+      "GET /api/admin/fine/members/:memberId/fines"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/fine/members/${memberId}/fines",
+      "file": "src/services/fineService.js",
+      "line": 29,
+      "rawLine": "const response = await apiClient.post(`/api/admin/fine/members/${memberId}/fines`, fineData);"
+    },
+    "normalized": "/api/admin/fine/members/:param/fines",
+    "matchedRoutes": [
+      "POST /api/admin/fine/members/:memberId/fines",
+      "GET /api/admin/fine/members/:memberId/fines"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/fine/members/${memberId}/fines/${fineId}",
+      "file": "src/services/fineService.js",
+      "line": 34,
+      "rawLine": "const response = await apiClient.patch(`/api/admin/fine/members/${memberId}/fines/${fineId}`, payload);"
+    },
+    "normalized": "/api/admin/fine/members/:param/fines/:param",
+    "matchedRoutes": [
+      "PATCH /api/admin/fine/members/:memberId/fines/:fineId",
+      "DELETE /api/admin/fine/members/:memberId/fines/:fineId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/fine/members/${memberId}/fines/${fineId}",
+      "file": "src/services/fineService.js",
+      "line": 39,
+      "rawLine": "const response = await apiClient.delete(`/api/admin/fine/members/${memberId}/fines/${fineId}`);"
+    },
+    "normalized": "/api/admin/fine/members/:param/fines/:param",
+    "matchedRoutes": [
+      "PATCH /api/admin/fine/members/:memberId/fines/:fineId",
+      "DELETE /api/admin/fine/members/:memberId/fines/:fineId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/upload/fine_file_upload",
+      "file": "src/services/fineService.js",
+      "line": 44,
+      "rawLine": "const response = await apiClient.post('/upload/fine_file_upload', formData, {"
+    },
+    "normalized": "/upload/fine_file_upload",
+    "matchedRoutes": [
+      "POST /upload/fine_file_upload"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/leave/submit",
+      "file": "src/services/leaveService.js",
+      "line": 9,
+      "rawLine": "const response = await apiClient.post('/api/leave/submit', payload);"
+    },
+    "normalized": "/api/leave/submit",
+    "matchedRoutes": [
+      "GET /api/leave/:id",
+      "PUT /api/leave/:id",
+      "DELETE /api/leave/:id",
+      "POST /api/leave/submit"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/leave/my-leaves",
+      "file": "src/services/leaveService.js",
+      "line": 14,
+      "rawLine": "const response = await apiClient.get('/api/leave/my-leaves');"
+    },
+    "normalized": "/api/leave/my-leaves",
+    "matchedRoutes": [
+      "GET /api/leave/:id",
+      "PUT /api/leave/:id",
+      "DELETE /api/leave/:id",
+      "GET /api/leave/my-leaves"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/leave/all",
+      "file": "src/services/leaveService.js",
+      "line": 19,
+      "rawLine": "const response = await apiClient.get('/api/leave/all', { params });"
+    },
+    "normalized": "/api/leave/all",
+    "matchedRoutes": [
+      "GET /api/leave/:id",
+      "PUT /api/leave/:id",
+      "DELETE /api/leave/:id",
+      "GET /api/leave/all"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/leave/pending",
+      "file": "src/services/leaveService.js",
+      "line": 24,
+      "rawLine": "const response = await apiClient.get('/api/leave/pending', { params });"
+    },
+    "normalized": "/api/leave/pending",
+    "matchedRoutes": [
+      "GET /api/leave/:id",
+      "PUT /api/leave/:id",
+      "DELETE /api/leave/:id",
+      "GET /api/leave/pending"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/leave/${id}/approve",
+      "file": "src/services/leaveService.js",
+      "line": 29,
+      "rawLine": "const response = await apiClient.put(`/api/leave/${id}/approve`, { remarks });"
+    },
+    "normalized": "/api/leave/:param/approve",
+    "matchedRoutes": [
+      "PUT /api/leave/:id/approve"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/leave/${id}/reject",
+      "file": "src/services/leaveService.js",
+      "line": 34,
+      "rawLine": "const response = await apiClient.put(`/api/leave/${id}/reject`, { remarks });"
+    },
+    "normalized": "/api/leave/:param/reject",
+    "matchedRoutes": [
+      "PUT /api/leave/:id/reject"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/leave/${id}",
+      "file": "src/services/leaveService.js",
+      "line": 39,
+      "rawLine": "const response = await apiClient.get(`/api/leave/${id}`);"
+    },
+    "normalized": "/api/leave/:param",
+    "matchedRoutes": [
+      "GET /api/leave/:id",
+      "PUT /api/leave/:id",
+      "DELETE /api/leave/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/leave/${id}",
+      "file": "src/services/leaveService.js",
+      "line": 44,
+      "rawLine": "const response = await apiClient.put(`/api/leave/${id}`, payload);"
+    },
+    "normalized": "/api/leave/:param",
+    "matchedRoutes": [
+      "GET /api/leave/:id",
+      "PUT /api/leave/:id",
+      "DELETE /api/leave/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/leave/${id}",
+      "file": "src/services/leaveService.js",
+      "line": 49,
+      "rawLine": "const response = await apiClient.delete(`/api/leave/${id}`);"
+    },
+    "normalized": "/api/leave/:param",
+    "matchedRoutes": [
+      "GET /api/leave/:id",
+      "PUT /api/leave/:id",
+      "DELETE /api/leave/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/public/members/counts",
+      "file": "src/services/memberService.js",
+      "line": 14,
+      "rawLine": "const response = await apiClient.get('/api/public/members/counts');"
+    },
+    "normalized": "/api/public/members/counts",
+    "matchedRoutes": [
+      "GET /api/public/members/:id",
+      "GET /api/public/members/counts"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/counts",
+      "file": "src/services/memberService.js",
+      "line": 24,
+      "rawLine": "const response = await apiClient.get('/api/admin/member/counts');"
+    },
+    "normalized": "/api/admin/member/counts",
+    "matchedRoutes": [
+      "GET /api/admin/member/:id",
+      "PUT /api/admin/member/:id",
+      "DELETE /api/admin/member/:id",
+      "GET /api/admin/member/counts"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/add",
+      "file": "src/services/memberService.js",
+      "line": 29,
+      "rawLine": "const response = await apiClient.post('/api/admin/member/add', memberData);"
+    },
+    "normalized": "/api/admin/member/add",
+    "matchedRoutes": [
+      "GET /api/admin/member/:id",
+      "PUT /api/admin/member/:id",
+      "DELETE /api/admin/member/:id",
+      "POST /api/admin/member/add"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/${id}",
+      "file": "src/services/memberService.js",
+      "line": 34,
+      "rawLine": "const response = await apiClient.put(`/api/admin/member/${id}`, memberData);"
+    },
+    "normalized": "/api/admin/member/:param",
+    "matchedRoutes": [
+      "GET /api/admin/member/:id",
+      "PUT /api/admin/member/:id",
+      "DELETE /api/admin/member/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/${id}",
+      "file": "src/services/memberService.js",
+      "line": 39,
+      "rawLine": "const response = await apiClient.delete(`/api/admin/member/${id}`);"
+    },
+    "normalized": "/api/admin/member/:param",
+    "matchedRoutes": [
+      "GET /api/admin/member/:id",
+      "PUT /api/admin/member/:id",
+      "DELETE /api/admin/member/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/${id}/block",
+      "file": "src/services/memberService.js",
+      "line": 44,
+      "rawLine": "const response = await apiClient.patch(`/api/admin/member/${id}/block`);"
+    },
+    "normalized": "/api/admin/member/:param/block",
+    "matchedRoutes": [
+      "PATCH /api/admin/member/:id/block"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/${id}/suspend",
+      "file": "src/services/memberService.js",
+      "line": 49,
+      "rawLine": "const response = await apiClient.patch(`/api/admin/member/${id}/suspend`, { suspendUntil });"
+    },
+    "normalized": "/api/admin/member/:param/suspend",
+    "matchedRoutes": [
+      "PATCH /api/admin/member/:id/suspend"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/supplementary/semester/${semester}",
+      "file": "src/services/memberService.js",
+      "line": 54,
+      "rawLine": "const response = await apiClient.get(`/api/admin/member/supplementary/semester/${semester}`);"
+    },
+    "normalized": "/api/admin/member/supplementary/semester/:param",
+    "matchedRoutes": [
+      "GET /api/admin/member/supplementary/semester/:semester"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/fines/all",
+      "file": "src/services/memberService.js",
+      "line": 59,
+      "rawLine": "const response = await apiClient.get('/api/admin/member/fines/all');"
+    },
+    "normalized": "/api/admin/member/fines/all",
+    "matchedRoutes": [
+      "GET /api/admin/member/fines/all"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/member/getProfile",
+      "file": "src/services/memberService.js",
+      "line": 64,
+      "rawLine": "const response = await apiClient.get('/api/member/getProfile');"
+    },
+    "normalized": "/api/member/getProfile",
+    "matchedRoutes": [
+      "GET /api/member/getProfile"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/${targetId}",
+      "file": "src/services/memberService.js",
+      "line": 75,
+      "rawLine": "const response = await apiClient.put(`/api/admin/member/${targetId}`, payload);"
+    },
+    "normalized": "/api/admin/member/:param",
+    "matchedRoutes": [
+      "GET /api/admin/member/:id",
+      "PUT /api/admin/member/:id",
+      "DELETE /api/admin/member/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/projects/${id}",
+      "file": "src/services/projectService.js",
+      "line": 14,
+      "rawLine": "const response = await apiClient.get(`/api/projects/${id}`);"
+    },
+    "normalized": "/api/projects/:param",
+    "matchedRoutes": [
+      "GET /api/projects/:id",
+      "PUT /api/projects/:id",
+      "DELETE /api/projects/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/projects/${id}",
+      "file": "src/services/projectService.js",
+      "line": 24,
+      "rawLine": "const response = await apiClient.put(`/api/projects/${id}`, projectData);"
+    },
+    "normalized": "/api/projects/:param",
+    "matchedRoutes": [
+      "GET /api/projects/:id",
+      "PUT /api/projects/:id",
+      "DELETE /api/projects/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/projects/${id}",
+      "file": "src/services/projectService.js",
+      "line": 29,
+      "rawLine": "const response = await apiClient.delete(`/api/projects/${id}`);"
+    },
+    "normalized": "/api/projects/:param",
+    "matchedRoutes": [
+      "GET /api/projects/:id",
+      "PUT /api/projects/:id",
+      "DELETE /api/projects/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/upload/project_file_upload",
+      "file": "src/services/projectService.js",
+      "line": 34,
+      "rawLine": "const response = await apiClient.post('/upload/project_file_upload', formData, {"
+    },
+    "normalized": "/upload/project_file_upload",
+    "matchedRoutes": [
+      "POST /upload/project_file_upload"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/trainers/all-trainers",
+      "file": "src/services/trainerService.js",
+      "line": 9,
+      "rawLine": "const response = await apiClient.get('/api/admin/trainers/all-trainers');"
+    },
+    "normalized": "/api/admin/trainers/all-trainers",
+    "matchedRoutes": [
+      "GET /api/admin/trainers/all-trainers"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/trainers/add-trainer",
+      "file": "src/services/trainerService.js",
+      "line": 14,
+      "rawLine": "const response = await apiClient.post('/api/admin/trainers/add-trainer', trainerData);"
+    },
+    "normalized": "/api/admin/trainers/add-trainer",
+    "matchedRoutes": [
+      "POST /api/admin/trainers/add-trainer"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/trainers/update-trainer/${id}",
+      "file": "src/services/trainerService.js",
+      "line": 19,
+      "rawLine": "const response = await apiClient.put(`/api/admin/trainers/update-trainer/${id}`, trainerData);"
+    },
+    "normalized": "/api/admin/trainers/update-trainer/:param",
+    "matchedRoutes": [
+      "PUT /api/admin/trainers/update-trainer/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/trainers/delete-trainer/${id}",
+      "file": "src/services/trainerService.js",
+      "line": 24,
+      "rawLine": "const response = await apiClient.delete(`/api/admin/trainers/delete-trainer/${id}`);"
+    },
+    "normalized": "/api/admin/trainers/delete-trainer/:param",
+    "matchedRoutes": [
+      "DELETE /api/admin/trainers/delete-trainer/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/upload/trainer_file_upload",
+      "file": "src/services/trainerService.js",
+      "line": 29,
+      "rawLine": "const response = await apiClient.post('/upload/trainer_file_upload', formData, {"
+    },
+    "normalized": "/upload/trainer_file_upload",
+    "matchedRoutes": [
+      "POST /upload/trainer_file_upload"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks",
+      "file": "src/services/uniques360Service.js",
+      "line": 9,
+      "rawLine": "const response = await apiClient.post('/api/uniques360/tasks', taskData);"
+    },
+    "normalized": "/api/uniques360/tasks",
+    "matchedRoutes": [
+      "POST /api/uniques360/tasks"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/member/${memberId}",
+      "file": "src/services/uniques360Service.js",
+      "line": 14,
+      "rawLine": "const response = await apiClient.get(`/api/uniques360/tasks/member/${memberId}`);"
+    },
+    "normalized": "/api/uniques360/tasks/member/:param",
+    "matchedRoutes": [
+      "GET /api/uniques360/tasks/member/:memberId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/coordinator/${coordinatorId}",
+      "file": "src/services/uniques360Service.js",
+      "line": 19,
+      "rawLine": "const response = await apiClient.get(`/api/uniques360/tasks/coordinator/${coordinatorId}`);"
+    },
+    "normalized": "/api/uniques360/tasks/coordinator/:param",
+    "matchedRoutes": [
+      "GET /api/uniques360/tasks/coordinator/:coordinatorId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/${taskId}",
+      "file": "src/services/uniques360Service.js",
+      "line": 24,
+      "rawLine": "const response = await apiClient.patch(`/api/uniques360/tasks/${taskId}`, { status });"
+    },
+    "normalized": "/api/uniques360/tasks/:param",
+    "matchedRoutes": [
+      "PATCH /api/uniques360/tasks/:taskId",
+      "PUT /api/uniques360/tasks/:taskId",
+      "DELETE /api/uniques360/tasks/:taskId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/${taskId}",
+      "file": "src/services/uniques360Service.js",
+      "line": 29,
+      "rawLine": "const response = await apiClient.put(`/api/uniques360/tasks/${taskId}`, taskData);"
+    },
+    "normalized": "/api/uniques360/tasks/:param",
+    "matchedRoutes": [
+      "PATCH /api/uniques360/tasks/:taskId",
+      "PUT /api/uniques360/tasks/:taskId",
+      "DELETE /api/uniques360/tasks/:taskId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/${taskId}",
+      "file": "src/services/uniques360Service.js",
+      "line": 34,
+      "rawLine": "const response = await apiClient.delete(`/api/uniques360/tasks/${taskId}`);"
+    },
+    "normalized": "/api/uniques360/tasks/:param",
+    "matchedRoutes": [
+      "PATCH /api/uniques360/tasks/:taskId",
+      "PUT /api/uniques360/tasks/:taskId",
+      "DELETE /api/uniques360/tasks/:taskId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/${taskId}/members",
+      "file": "src/services/uniques360Service.js",
+      "line": 39,
+      "rawLine": "const response = await apiClient.post(`/api/uniques360/tasks/${taskId}/members`, { memberId });"
+    },
+    "normalized": "/api/uniques360/tasks/:param/members",
+    "matchedRoutes": [
+      "POST /api/uniques360/tasks/:taskId/members"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/${taskId}/members/remove",
+      "file": "src/services/uniques360Service.js",
+      "line": 44,
+      "rawLine": "const response = await apiClient.post(`/api/uniques360/tasks/${taskId}/members/remove`, { memberId });"
+    },
+    "normalized": "/api/uniques360/tasks/:param/members/remove",
+    "matchedRoutes": [
+      "POST /api/uniques360/tasks/:taskId/members/remove"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/reports",
+      "file": "src/services/uniques360Service.js",
+      "line": 49,
+      "rawLine": "const response = await apiClient.post('/api/uniques360/reports', reportData);"
+    },
+    "normalized": "/api/uniques360/reports",
+    "matchedRoutes": [
+      "POST /api/uniques360/reports"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/reports/task/${taskId}",
+      "file": "src/services/uniques360Service.js",
+      "line": 54,
+      "rawLine": "const response = await apiClient.get(`/api/uniques360/reports/task/${taskId}`);"
+    },
+    "normalized": "/api/uniques360/reports/task/:param",
+    "matchedRoutes": [
+      "GET /api/uniques360/reports/task/:taskId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/batches/profiles",
+      "file": "src/utils/batch/batchProfilesData.js",
+      "line": 110,
+      "rawLine": "const response = await apiClient.get(`${BASE_URL}/api/batches/profiles`);"
+    },
+    "normalized": "/api/batches/profiles",
+    "matchedRoutes": [
+      "DELETE /api/batches/:id",
+      "GET /api/batches/profiles"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/batches/profiles/update",
+      "file": "src/utils/batch/batchProfilesData.js",
+      "line": 149,
+      "rawLine": "await apiClient.post(`${BASE_URL}/api/batches/profiles/update`, { profiles: toSave });"
+    },
+    "normalized": "/api/batches/profiles/update",
+    "matchedRoutes": [
+      "POST /api/batches/profiles/update",
+      "PUT /api/batches/profiles/update"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/batches/all",
+      "file": "src/utils/batch/batchesData.js",
+      "line": 42,
+      "rawLine": "const response = await apiClient.get(`${BASE_URL}/api/batches/all`);"
+    },
+    "normalized": "/api/batches/all",
+    "matchedRoutes": [
+      "DELETE /api/batches/:id",
+      "GET /api/batches/all"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/batches/add",
+      "file": "src/utils/batch/batchesData.js",
+      "line": 86,
+      "rawLine": "await apiClient.post(`${BASE_URL}/api/batches/add`, { name: formatted });"
+    },
+    "normalized": "/api/batches/add",
+    "matchedRoutes": [
+      "DELETE /api/batches/:id",
+      "POST /api/batches/add"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/stats/update",
+      "file": "src/utils/stats/statsData.js",
+      "line": 65,
+      "rawLine": "const response = await apiClient.post(`${BASE_URL}/api/stats/update`, payload);"
+    },
+    "normalized": "/api/stats/update",
+    "matchedRoutes": [
+      "POST /api/stats/update",
+      "PUT /api/stats/update"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/auth/password-reset/send-otp",
+      "file": "src/views/Authentication/login/ForgetPassword.jsx",
+      "line": 60,
+      "rawLine": "const response = await axios.post(`${BASE_URL}/auth/password-reset/send-otp`, {"
+    },
+    "normalized": "/auth/password-reset/send-otp",
+    "matchedRoutes": [
+      "POST /auth/password-reset/send-otp"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/auth/password-reset/verify-otp",
+      "file": "src/views/Authentication/login/ForgetPassword.jsx",
+      "line": 89,
+      "rawLine": "const response = await axios.post(`${BASE_URL}/auth/password-reset/verify-otp`, {"
+    },
+    "normalized": "/auth/password-reset/verify-otp",
+    "matchedRoutes": [
+      "POST /auth/password-reset/verify-otp"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/auth/password-reset/reset-password",
+      "file": "src/views/Authentication/login/ForgetPassword.jsx",
+      "line": 118,
+      "rawLine": "const response = await axios.post(`${BASE_URL}/auth/password-reset/reset-password`, {"
+    },
+    "normalized": "/auth/password-reset/reset-password",
+    "matchedRoutes": [
+      "POST /auth/password-reset/reset-password"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/auth/password-reset/resend-otp",
+      "file": "src/views/Authentication/login/ForgetPassword.jsx",
+      "line": 150,
+      "rawLine": "const response = await axios.post(`${BASE_URL}/auth/password-reset/resend-otp`, {"
+    },
+    "normalized": "/auth/password-reset/resend-otp",
+    "matchedRoutes": [
+      "POST /auth/password-reset/resend-otp"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/auth/google",
+      "file": "src/views/Authentication/login/index.jsx",
+      "line": 66,
+      "rawLine": "const googleLoginUrl = `${BASE_URL}/auth/google`;"
+    },
+    "normalized": "/auth/google",
+    "matchedRoutes": [
+      "GET /auth/google"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/upload/fine_file_upload",
+      "file": "src/views/Management/Accounts/components/TransactionTable.jsx",
+      "line": 83,
+      "rawLine": "const UPLOAD_API_URL = `${BASE_URL}/upload/fine_file_upload`;"
+    },
+    "normalized": "/upload/fine_file_upload",
+    "matchedRoutes": [
+      "POST /upload/fine_file_upload"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/upload/fine_file_upload",
+      "file": "src/views/Management/Dashboard/index.jsx",
+      "line": 137,
+      "rawLine": "`${BASE_URL}/upload/fine_file_upload`,"
+    },
+    "normalized": "/upload/fine_file_upload",
+    "matchedRoutes": [
+      "POST /upload/fine_file_upload"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/fine/members/${memberId}/fines/${fine",
+      "file": "src/views/Management/Dashboard/index.jsx",
+      "line": 157,
+      "rawLine": "const updateEndpoint = `${BASE_URL}/api/admin/fine/members/${memberId}/fines/${fine._id}`;"
+    },
+    "normalized": "/api/admin/fine/members/:param/fines/${fine",
+    "matchedRoutes": [
+      "PATCH /api/admin/fine/members/:memberId/fines/:fineId",
+      "DELETE /api/admin/fine/members/:memberId/fines/:fineId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/fine/fines/members",
+      "file": "src/views/Management/Dashboard/index.jsx",
+      "line": 633,
+      "rawLine": "`${BASE_URL}/api/admin/fine/fines/members`"
+    },
+    "normalized": "/api/admin/fine/fines/members",
+    "matchedRoutes": [
+      "GET /api/admin/fine/fines/members"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/fine/fines/statistics",
+      "file": "src/views/Management/Dashboard/index.jsx",
+      "line": 655,
+      "rawLine": "`${BASE_URL}/api/admin/fine/fines/statistics`"
+    },
+    "normalized": "/api/admin/fine/fines/statistics",
+    "matchedRoutes": [
+      "GET /api/admin/fine/fines/statistics"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/supplementary/semester/${currentSemester}",
+      "file": "src/views/Management/Dashboard/index.jsx",
+      "line": 725,
+      "rawLine": "`${BASE_URL}/api/admin/member/supplementary/semester/${currentSemester}`"
+    },
+    "normalized": "/api/admin/member/supplementary/semester/:param",
+    "matchedRoutes": [
+      "GET /api/admin/member/supplementary/semester/:semester"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/supplementary/semester/${semester}",
+      "file": "src/views/Management/Dashboard/index.jsx",
+      "line": 746,
+      "rawLine": "`${BASE_URL}/api/admin/member/supplementary/semester/${semester}`"
+    },
+    "normalized": "/api/admin/member/supplementary/semester/:param",
+    "matchedRoutes": [
+      "GET /api/admin/member/supplementary/semester/:semester"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/fines/all",
+      "file": "src/views/Management/Dashboard/index.jsx",
+      "line": 794,
+      "rawLine": "`${BASE_URL}/api/admin/member/fines/all`"
+    },
+    "normalized": "/api/admin/member/fines/all",
+    "matchedRoutes": [
+      "GET /api/admin/member/fines/all"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/image-proxy/${fileId}",
+      "file": "src/views/Management/Dashboard/index.jsx",
+      "line": 880,
+      "rawLine": "return `${BASE_URL}/api/image-proxy/${fileId}`;"
+    },
+    "normalized": "/api/image-proxy/:param",
+    "matchedRoutes": [
+      "GET /api/image-proxy/:fileId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/enquiry/${id}",
+      "file": "src/views/Management/Enquiry/index.jsx",
+      "line": 160,
+      "rawLine": "`${BASE_URL}/api/admin/enquiry/${id}`,"
+    },
+    "normalized": "/api/admin/enquiry/:param",
+    "matchedRoutes": [
+      "GET /api/admin/enquiry/:id",
+      "DELETE /api/admin/enquiry/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/enquiry/${enquiryId}/reply",
+      "file": "src/views/Management/Enquiry/index.jsx",
+      "line": 210,
+      "rawLine": "`${BASE_URL}/api/admin/enquiry/${enquiryId}/reply`,"
+    },
+    "normalized": "/api/admin/enquiry/:param/reply",
+    "matchedRoutes": [
+      "POST /api/admin/enquiry/:id/reply"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/enquiry/${selectedEnquiry",
+      "file": "src/views/Management/Enquiry/index.jsx",
+      "line": 250,
+      "rawLine": "`${BASE_URL}/api/admin/enquiry/${selectedEnquiry._id}/status`,"
+    },
+    "normalized": "/api/admin/enquiry/${selectedEnquiry",
+    "matchedRoutes": [
+      "GET /api/admin/enquiry/:id",
+      "DELETE /api/admin/enquiry/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/enquiry/${deleteId}",
+      "file": "src/views/Management/Enquiry/index.jsx",
+      "line": 285,
+      "rawLine": "`${BASE_URL}/api/admin/enquiry/${deleteId}`,"
+    },
+    "normalized": "/api/admin/enquiry/:param",
+    "matchedRoutes": [
+      "GET /api/admin/enquiry/:id",
+      "DELETE /api/admin/enquiry/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/upload/budget_file_upload",
+      "file": "src/views/Management/Events/Budget.jsx",
+      "line": 332,
+      "rawLine": "`${BASE_URL}/upload/budget_file_upload`,"
+    },
+    "normalized": "/upload/budget_file_upload",
+    "matchedRoutes": [
+      "POST /upload/budget_file_upload"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}/expenses/${expenseId}",
+      "file": "src/views/Management/Events/Budget.jsx",
+      "line": 366,
+      "rawLine": "`${BASE_URL}/api/events/${id}/expenses/${expenseId}`,"
+    },
+    "normalized": "/api/events/:param/expenses/:param",
+    "matchedRoutes": [
+      "PATCH /api/events/:id/expenses/:expenseId",
+      "DELETE /api/events/:id/expenses/:expenseId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}/budget-allocations/${allocationId}",
+      "file": "src/views/Management/Events/Budget.jsx",
+      "line": 392,
+      "rawLine": "`${BASE_URL}/api/events/${id}/budget-allocations/${allocationId}`,"
+    },
+    "normalized": "/api/events/:param/budget-allocations/:param",
+    "matchedRoutes": [
+      "DELETE /api/events/:id/budget-allocations/:allocationId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}/budget-allocations",
+      "file": "src/views/Management/Events/Budget.jsx",
+      "line": 417,
+      "rawLine": "`${BASE_URL}/api/events/${id}/budget-allocations`,"
+    },
+    "normalized": "/api/events/:param/budget-allocations",
+    "matchedRoutes": [
+      "POST /api/events/:id/budget-allocations"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}",
+      "file": "src/views/Management/Events/Budget.jsx",
+      "line": 453,
+      "rawLine": "const response = await fetch(`${BASE_URL}/api/events/${id}`, {"
+    },
+    "normalized": "/api/events/:param",
+    "matchedRoutes": [
+      "GET /api/events/:id",
+      "PUT /api/events/:id",
+      "DELETE /api/events/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}/budget",
+      "file": "src/views/Management/Events/Budget.jsx",
+      "line": 475,
+      "rawLine": "`${BASE_URL}/api/events/${id}/budget`,"
+    },
+    "normalized": "/api/events/:param/budget",
+    "matchedRoutes": [
+      "PUT /api/events/:id/budget",
+      "GET /api/events/:id/budget"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}/budget",
+      "file": "src/views/Management/Events/Budget.jsx",
+      "line": 529,
+      "rawLine": "`${BASE_URL}/api/events/${id}/budget`,"
+    },
+    "normalized": "/api/events/:param/budget",
+    "matchedRoutes": [
+      "PUT /api/events/:id/budget",
+      "GET /api/events/:id/budget"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}/sponsors",
+      "file": "src/views/Management/Events/Budget.jsx",
+      "line": 566,
+      "rawLine": "`${BASE_URL}/api/events/${id}/sponsors`,"
+    },
+    "normalized": "/api/events/:param/sponsors",
+    "matchedRoutes": [
+      "POST /api/events/:id/sponsors"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}/sponsors/${sponsorId}",
+      "file": "src/views/Management/Events/Budget.jsx",
+      "line": 605,
+      "rawLine": "`${BASE_URL}/api/events/${id}/sponsors/${sponsorId}`,"
+    },
+    "normalized": "/api/events/:param/sponsors/:param",
+    "matchedRoutes": [
+      "DELETE /api/events/:id/sponsors/:sponsorId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}/expenses",
+      "file": "src/views/Management/Events/Budget.jsx",
+      "line": 640,
+      "rawLine": "`${BASE_URL}/api/events/${id}/expenses`,"
+    },
+    "normalized": "/api/events/:param/expenses",
+    "matchedRoutes": [
+      "POST /api/events/:id/expenses"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}/expenses/${expenseId}",
+      "file": "src/views/Management/Events/Budget.jsx",
+      "line": 683,
+      "rawLine": "`${BASE_URL}/api/events/${id}/expenses/${expenseId}`,"
+    },
+    "normalized": "/api/events/:param/expenses/:param",
+    "matchedRoutes": [
+      "PATCH /api/events/:id/expenses/:expenseId",
+      "DELETE /api/events/:id/expenses/:expenseId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}/members",
+      "file": "src/views/Management/Events/View.jsx",
+      "line": 277,
+      "rawLine": "`${BASE_URL}/api/events/${id}/members`,"
+    },
+    "normalized": "/api/events/:param/members",
+    "matchedRoutes": [
+      "GET /api/events/:id/members",
+      "PUT /api/events/:id/members",
+      "PATCH /api/events/:id/members"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}/members/team/${teamType}/add",
+      "file": "src/views/Management/Events/View.jsx",
+      "line": 359,
+      "rawLine": "const endpoint = `${BASE_URL}/api/events/${id}/members/team/${teamType}/add`;"
+    },
+    "normalized": "/api/events/:param/members/team/:param/add",
+    "matchedRoutes": [
+      "POST /api/events/:id/members/team/:teamType/add"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}/members/team/${memberTeam}/members",
+      "file": "src/views/Management/Events/View.jsx",
+      "line": 404,
+      "rawLine": "const endpoint = `${BASE_URL}/api/events/${id}/members/team/${memberTeam}/members`;"
+    },
+    "normalized": "/api/events/:param/members/team/:param/members",
+    "matchedRoutes": [
+      "DELETE /api/events/:id/members/team/:teamType/members"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}",
+      "file": "src/views/Management/Events/View.jsx",
+      "line": 443,
+      "rawLine": "`${BASE_URL}/api/events/${id}`"
+    },
+    "normalized": "/api/events/:param",
+    "matchedRoutes": [
+      "GET /api/events/:id",
+      "PUT /api/events/:id",
+      "DELETE /api/events/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/guest/get-all-guests",
+      "file": "src/views/Management/Events/View.jsx",
+      "line": 475,
+      "rawLine": "`${BASE_URL}/api/guest/get-all-guests`"
+    },
+    "normalized": "/api/guest/get-all-guests",
+    "matchedRoutes": [
+      "GET /api/guest/get-all-guests"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${eventId}/form-responses",
+      "file": "src/views/Management/Events/View.jsx",
+      "line": 491,
+      "rawLine": "`${BASE_URL}/api/events/${eventId}/form-responses`,"
+    },
+    "normalized": "/api/events/:param/form-responses",
+    "matchedRoutes": [
+      "GET /api/events/:eventId/form-responses"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}",
+      "file": "src/views/Management/Events/View.jsx",
+      "line": 580,
+      "rawLine": "`${BASE_URL}/api/events/${id}`,"
+    },
+    "normalized": "/api/events/:param",
+    "matchedRoutes": [
+      "GET /api/events/:id",
+      "PUT /api/events/:id",
+      "DELETE /api/events/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/upload/event_file_upload",
+      "file": "src/views/Management/Events/View.jsx",
+      "line": 652,
+      "rawLine": "`${BASE_URL}/upload/event_file_upload`,"
+    },
+    "normalized": "/upload/event_file_upload",
+    "matchedRoutes": [
+      "POST /upload/event_file_upload"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}/gallery",
+      "file": "src/views/Management/Events/View.jsx",
+      "line": 673,
+      "rawLine": "`${BASE_URL}/api/events/${id}/gallery`"
+    },
+    "normalized": "/api/events/:param/gallery",
+    "matchedRoutes": [
+      "PATCH /api/events/:id/gallery",
+      "GET /api/events/:id/gallery"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}/gallery",
+      "file": "src/views/Management/Events/View.jsx",
+      "line": 708,
+      "rawLine": "`${BASE_URL}/api/events/${id}/gallery`,"
+    },
+    "normalized": "/api/events/:param/gallery",
+    "matchedRoutes": [
+      "PATCH /api/events/:id/gallery",
+      "GET /api/events/:id/gallery"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}/register",
+      "file": "src/views/Management/Events/View.jsx",
+      "line": 766,
+      "rawLine": "`${BASE_URL}/api/events/${id}/register`,"
+    },
+    "normalized": "/api/events/:param/register",
+    "matchedRoutes": [
+      "POST /api/events/:id/register"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/guest/add-guest",
+      "file": "src/views/Management/Events/View.jsx",
+      "line": 851,
+      "rawLine": "`${BASE_URL}/api/guest/add-guest`,"
+    },
+    "normalized": "/api/guest/add-guest",
+    "matchedRoutes": [
+      "POST /api/guest/add-guest"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/guest/add-guest",
+      "file": "src/views/Management/Events/View.jsx",
+      "line": 904,
+      "rawLine": "`${BASE_URL}/api/guest/add-guest`,"
+    },
+    "normalized": "/api/guest/add-guest",
+    "matchedRoutes": [
+      "POST /api/guest/add-guest"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/link-guest",
+      "file": "src/views/Management/Events/View.jsx",
+      "line": 929,
+      "rawLine": "`${BASE_URL}/api/events/link-guest`,"
+    },
+    "normalized": "/api/events/link-guest",
+    "matchedRoutes": [
+      "GET /api/events/:id",
+      "PUT /api/events/:id",
+      "DELETE /api/events/:id",
+      "POST /api/events/link-guest"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}",
+      "file": "src/views/Management/Events/View.jsx",
+      "line": 954,
+      "rawLine": "`${BASE_URL}/api/events/${id}`"
+    },
+    "normalized": "/api/events/:param",
+    "matchedRoutes": [
+      "GET /api/events/:id",
+      "PUT /api/events/:id",
+      "DELETE /api/events/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}",
+      "file": "src/views/Management/Events/View.jsx",
+      "line": 1001,
+      "rawLine": "`${BASE_URL}/api/events/${id}`,"
+    },
+    "normalized": "/api/events/:param",
+    "matchedRoutes": [
+      "GET /api/events/:id",
+      "PUT /api/events/:id",
+      "DELETE /api/events/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/upload/event_file_upload",
+      "file": "src/views/Management/Events/View.jsx",
+      "line": 1051,
+      "rawLine": "`${BASE_URL}/upload/event_file_upload`,"
+    },
+    "normalized": "/upload/event_file_upload",
+    "matchedRoutes": [
+      "POST /upload/event_file_upload"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}",
+      "file": "src/views/Management/Events/View.jsx",
+      "line": 1071,
+      "rawLine": "`${BASE_URL}/api/events/${id}`"
+    },
+    "normalized": "/api/events/:param",
+    "matchedRoutes": [
+      "GET /api/events/:id",
+      "PUT /api/events/:id",
+      "DELETE /api/events/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}/form-response",
+      "file": "src/views/Management/Events/View.jsx",
+      "line": 1244,
+      "rawLine": "`${BASE_URL}/api/events/${id}/form-response`,"
+    },
+    "normalized": "/api/events/:param/form-response",
+    "matchedRoutes": [
+      "POST /api/events/:eventId/form-response"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${id}/status",
+      "file": "src/views/Management/Events/View.jsx",
+      "line": 2455,
+      "rawLine": "`${BASE_URL}/api/events/${id}/status`,"
+    },
+    "normalized": "/api/events/:param/status",
+    "matchedRoutes": [
+      "PATCH /api/events/:id/status"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${eventToDelete}",
+      "file": "src/views/Management/Events/index.jsx",
+      "line": 209,
+      "rawLine": "`${BASE_URL}/api/events/${eventToDelete}`,"
+    },
+    "normalized": "/api/events/:param",
+    "matchedRoutes": [
+      "GET /api/events/:id",
+      "PUT /api/events/:id",
+      "DELETE /api/events/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/leave/all",
+      "file": "src/views/Management/LeaveManagement/index.jsx",
+      "line": 62,
+      "rawLine": "const response = await fetch(`${BASE_URL}/api/leave/all`, {"
+    },
+    "normalized": "/api/leave/all",
+    "matchedRoutes": [
+      "GET /api/leave/:id",
+      "PUT /api/leave/:id",
+      "DELETE /api/leave/:id",
+      "GET /api/leave/all"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/leave/${selectedLeave",
+      "file": "src/views/Management/LeaveManagement/index.jsx",
+      "line": 156,
+      "rawLine": "const response = await fetch(`${BASE_URL}/api/leave/${selectedLeave._id}/approve`, {"
+    },
+    "normalized": "/api/leave/${selectedLeave",
+    "matchedRoutes": [
+      "GET /api/leave/:id",
+      "PUT /api/leave/:id",
+      "DELETE /api/leave/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/leave/${selectedLeave",
+      "file": "src/views/Management/LeaveManagement/index.jsx",
+      "line": 182,
+      "rawLine": "const response = await fetch(`${BASE_URL}/api/leave/${selectedLeave._id}/reject`, {"
+    },
+    "normalized": "/api/leave/${selectedLeave",
+    "matchedRoutes": [
+      "GET /api/leave/:id",
+      "PUT /api/leave/:id",
+      "DELETE /api/leave/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/image-proxy/${fileId}",
+      "file": "src/views/Management/Members/index.jsx",
+      "line": 159,
+      "rawLine": "return `${BASE_URL}/api/image-proxy/${fileId}`;"
+    },
+    "normalized": "/api/image-proxy/:param",
+    "matchedRoutes": [
+      "GET /api/image-proxy/:fileId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/add",
+      "file": "src/views/Management/Members/index.jsx",
+      "line": 249,
+      "rawLine": "const response = await axios.post(`${BASE_URL}/api/admin/member/add`, newMember);"
+    },
+    "normalized": "/api/admin/member/add",
+    "matchedRoutes": [
+      "GET /api/admin/member/:id",
+      "PUT /api/admin/member/:id",
+      "DELETE /api/admin/member/:id",
+      "POST /api/admin/member/add"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/${editingMember",
+      "file": "src/views/Management/Members/index.jsx",
+      "line": 346,
+      "rawLine": "const response = await axios.put(`${BASE_URL}/api/admin/member/${editingMember._id}`, editingMember);"
+    },
+    "normalized": "/api/admin/member/${editingMember",
+    "matchedRoutes": [
+      "GET /api/admin/member/:id",
+      "PUT /api/admin/member/:id",
+      "DELETE /api/admin/member/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/${memberToDelete",
+      "file": "src/views/Management/Members/index.jsx",
+      "line": 386,
+      "rawLine": "const response = await axios.delete(`${BASE_URL}/api/admin/member/${memberToDelete._id}`);"
+    },
+    "normalized": "/api/admin/member/${memberToDelete",
+    "matchedRoutes": [
+      "GET /api/admin/member/:id",
+      "PUT /api/admin/member/:id",
+      "DELETE /api/admin/member/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/image-proxy/${profile",
+      "file": "src/views/Management/Profile/index.jsx",
+      "line": 97,
+      "rawLine": "return `${BASE_URL}/api/image-proxy/${profile.profilePic.fileId}`;"
+    },
+    "normalized": "/api/image-proxy/${profile",
+    "matchedRoutes": [
+      "GET /api/image-proxy/:fileId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/trainers/all-trainers",
+      "file": "src/views/Management/Trainers/index.jsx",
+      "line": 84,
+      "rawLine": "const response = await axios.get(`${burl}/api/admin/trainers/all-trainers`);"
+    },
+    "normalized": "/api/admin/trainers/all-trainers",
+    "matchedRoutes": [
+      "GET /api/admin/trainers/all-trainers"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/image-proxy/${fileId}",
+      "file": "src/views/Management/Trainers/index.jsx",
+      "line": 97,
+      "rawLine": "if (fileId) return `${burl}/api/image-proxy/${fileId}`;"
+    },
+    "normalized": "/api/image-proxy/:param",
+    "matchedRoutes": [
+      "GET /api/image-proxy/:fileId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/trainers/update-trainer/${selectedTrainer",
+      "file": "src/views/Management/Trainers/index.jsx",
+      "line": 154,
+      "rawLine": "const response = await axios.put(`${burl}/api/admin/trainers/update-trainer/${selectedTrainer._id}`, payload);"
+    },
+    "normalized": "/api/admin/trainers/update-trainer/${selectedTrainer",
+    "matchedRoutes": [
+      "PUT /api/admin/trainers/update-trainer/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/trainers/add-trainer",
+      "file": "src/views/Management/Trainers/index.jsx",
+      "line": 159,
+      "rawLine": "const response = await axios.post(`${burl}/api/admin/trainers/add-trainer`, payload);"
+    },
+    "normalized": "/api/admin/trainers/add-trainer",
+    "matchedRoutes": [
+      "POST /api/admin/trainers/add-trainer"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/upload/trainer_file_upload",
+      "file": "src/views/Management/Trainers/index.jsx",
+      "line": 171,
+      "rawLine": "await axios.post(`${burl}/upload/trainer_file_upload`, formData, {"
+    },
+    "normalized": "/upload/trainer_file_upload",
+    "matchedRoutes": [
+      "POST /upload/trainer_file_upload"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/trainers/delete-trainer/${selectedTrainer",
+      "file": "src/views/Management/Trainers/index.jsx",
+      "line": 235,
+      "rawLine": "await axios.delete(`${burl}/api/admin/trainers/delete-trainer/${selectedTrainer._id}`);"
+    },
+    "normalized": "/api/admin/trainers/delete-trainer/${selectedTrainer",
+    "matchedRoutes": [
+      "DELETE /api/admin/trainers/delete-trainer/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/image-proxy/${fileId}",
+      "file": "src/views/Management/dashboardComponents/NewMember.jsx",
+      "line": 87,
+      "rawLine": "return `${BASE_URL}/api/image-proxy/${fileId}`;"
+    },
+    "normalized": "/api/image-proxy/:param",
+    "matchedRoutes": [
+      "GET /api/image-proxy/:fileId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/leave/my-leaves",
+      "file": "src/views/Uniques/Member/LeaveManagement/index.jsx",
+      "line": 64,
+      "rawLine": "const response = await fetch(`${BASE_URL}/api/leave/my-leaves`, {"
+    },
+    "normalized": "/api/leave/my-leaves",
+    "matchedRoutes": [
+      "GET /api/leave/:id",
+      "PUT /api/leave/:id",
+      "DELETE /api/leave/:id",
+      "GET /api/leave/my-leaves"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/leave/${editingId}",
+      "file": "src/views/Uniques/Member/LeaveManagement/index.jsx",
+      "line": 135,
+      "rawLine": "const response = await fetch(`${BASE_URL}/api/leave/${editingId}`, {"
+    },
+    "normalized": "/api/leave/:param",
+    "matchedRoutes": [
+      "GET /api/leave/:id",
+      "PUT /api/leave/:id",
+      "DELETE /api/leave/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/leave/submit",
+      "file": "src/views/Uniques/Member/LeaveManagement/index.jsx",
+      "line": 145,
+      "rawLine": "const response = await fetch(`${BASE_URL}/api/leave/submit`, {"
+    },
+    "normalized": "/api/leave/submit",
+    "matchedRoutes": [
+      "GET /api/leave/:id",
+      "PUT /api/leave/:id",
+      "DELETE /api/leave/:id",
+      "POST /api/leave/submit"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/leave/${id}",
+      "file": "src/views/Uniques/Member/LeaveManagement/index.jsx",
+      "line": 173,
+      "rawLine": "const response = await fetch(`${BASE_URL}/api/leave/${id}`, {"
+    },
+    "normalized": "/api/leave/:param",
+    "matchedRoutes": [
+      "GET /api/leave/:id",
+      "PUT /api/leave/:id",
+      "DELETE /api/leave/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/image-proxy/${fileId}",
+      "file": "src/views/Uniques/Member/index.jsx",
+      "line": 136,
+      "rawLine": "return `${API_BASE_URL}/api/image-proxy/${fileId}`;"
+    },
+    "normalized": "/api/image-proxy/:param",
+    "matchedRoutes": [
+      "GET /api/image-proxy/:fileId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/member/getProfile",
+      "file": "src/views/Uniques/Member/index.jsx",
+      "line": 249,
+      "rawLine": "`${API_BASE_URL}/api/member/getProfile`,"
+    },
+    "normalized": "/api/member/getProfile",
+    "matchedRoutes": [
+      "GET /api/member/getProfile"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/member/getProfile",
+      "file": "src/views/Uniques/Member/index.jsx",
+      "line": 277,
+      "rawLine": "`${API_BASE_URL}/api/member/getProfile`,"
+    },
+    "normalized": "/api/member/getProfile",
+    "matchedRoutes": [
+      "GET /api/member/getProfile"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member/${user",
+      "file": "src/views/Uniques/Member/index.jsx",
+      "line": 377,
+      "rawLine": "`${API_BASE_URL}/api/admin/member/${user._id}/fine`,"
+    },
+    "normalized": "/api/admin/member/${user",
+    "matchedRoutes": [
+      "GET /api/admin/member/:id",
+      "PUT /api/admin/member/:id",
+      "DELETE /api/admin/member/:id"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/upload/file_upload",
+      "file": "src/views/Uniques/Member/index.jsx",
+      "line": 546,
+      "rawLine": "`${API_BASE_URL}/upload/file_upload`,"
+    },
+    "normalized": "/upload/file_upload",
+    "matchedRoutes": [
+      "POST /upload/file_upload"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/upload/file_upload",
+      "file": "src/views/Uniques/Member/index.jsx",
+      "line": 790,
+      "rawLine": "`${API_BASE_URL}/upload/file_upload`,"
+    },
+    "normalized": "/upload/file_upload",
+    "matchedRoutes": [
+      "POST /upload/file_upload"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/upload/file_upload",
+      "file": "src/views/Uniques/Member/index.jsx",
+      "line": 979,
+      "rawLine": "`${API_BASE_URL}/upload/file_upload`,"
+    },
+    "normalized": "/upload/file_upload",
+    "matchedRoutes": [
+      "POST /upload/file_upload"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/coordinator/current",
+      "file": "src/views/Uniques360/Coordinator360/Uniques360.jsx",
+      "line": 96,
+      "rawLine": "`${BASE_URL}/api/uniques360/tasks/coordinator/current`,"
+    },
+    "normalized": "/api/uniques360/tasks/coordinator/current",
+    "matchedRoutes": [
+      "GET /api/uniques360/tasks/coordinator/:coordinatorId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks",
+      "file": "src/views/Uniques360/Coordinator360/Uniques360.jsx",
+      "line": 158,
+      "rawLine": "`${BASE_URL}/api/uniques360/tasks`,"
+    },
+    "normalized": "/api/uniques360/tasks",
+    "matchedRoutes": [
+      "POST /api/uniques360/tasks"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/${taskId}",
+      "file": "src/views/Uniques360/Coordinator360/Uniques360.jsx",
+      "line": 188,
+      "rawLine": "`${BASE_URL}/api/uniques360/tasks/${taskId}`,"
+    },
+    "normalized": "/api/uniques360/tasks/:param",
+    "matchedRoutes": [
+      "PATCH /api/uniques360/tasks/:taskId",
+      "PUT /api/uniques360/tasks/:taskId",
+      "DELETE /api/uniques360/tasks/:taskId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/${taskId}",
+      "file": "src/views/Uniques360/Coordinator360/Uniques360.jsx",
+      "line": 204,
+      "rawLine": "await axios.delete(`${BASE_URL}/api/uniques360/tasks/${taskId}`, {"
+    },
+    "normalized": "/api/uniques360/tasks/:param",
+    "matchedRoutes": [
+      "PATCH /api/uniques360/tasks/:taskId",
+      "PUT /api/uniques360/tasks/:taskId",
+      "DELETE /api/uniques360/tasks/:taskId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/${selectedTask",
+      "file": "src/views/Uniques360/Coordinator360/Uniques360.jsx",
+      "line": 219,
+      "rawLine": "await axios.put(`${BASE_URL}/api/uniques360/tasks/${selectedTask._id}`, selectedTask, {"
+    },
+    "normalized": "/api/uniques360/tasks/${selectedTask",
+    "matchedRoutes": [
+      "PATCH /api/uniques360/tasks/:taskId",
+      "PUT /api/uniques360/tasks/:taskId",
+      "DELETE /api/uniques360/tasks/:taskId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/reports/task/${taskId}",
+      "file": "src/views/Uniques360/Coordinator360/Uniques360.jsx",
+      "line": 238,
+      "rawLine": "`${BASE_URL}/api/uniques360/reports/task/${taskId}`,"
+    },
+    "normalized": "/api/uniques360/reports/task/:param",
+    "matchedRoutes": [
+      "GET /api/uniques360/reports/task/:taskId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/${taskId}/members/remove",
+      "file": "src/views/Uniques360/Coordinator360/Uniques360.jsx",
+      "line": 254,
+      "rawLine": "`${BASE_URL}/api/uniques360/tasks/${taskId}/members/remove`,"
+    },
+    "normalized": "/api/uniques360/tasks/:param/members/remove",
+    "matchedRoutes": [
+      "POST /api/uniques360/tasks/:taskId/members/remove"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/${selectedTask",
+      "file": "src/views/Uniques360/Coordinator360/Uniques360.jsx",
+      "line": 681,
+      "rawLine": "`${BASE_URL}/api/uniques360/tasks/${selectedTask._id}/members`,"
+    },
+    "normalized": "/api/uniques360/tasks/${selectedTask",
+    "matchedRoutes": [
+      "PATCH /api/uniques360/tasks/:taskId",
+      "PUT /api/uniques360/tasks/:taskId",
+      "DELETE /api/uniques360/tasks/:taskId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/coordinator/current",
+      "file": "src/views/Uniques360/Events/EventInsights.jsx",
+      "line": 57,
+      "rawLine": "const response = await axios.get(`${BASE_URL}/api/uniques360/tasks/coordinator/current`, {"
+    },
+    "normalized": "/api/uniques360/tasks/coordinator/current",
+    "matchedRoutes": [
+      "GET /api/uniques360/tasks/coordinator/:coordinatorId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/${taskId}",
+      "file": "src/views/Uniques360/Events/EventInsights.jsx",
+      "line": 78,
+      "rawLine": "await axios.patch(`${BASE_URL}/api/uniques360/tasks/${taskId}`, { status: \"completed\" }, { withCredentials: true });"
+    },
+    "normalized": "/api/uniques360/tasks/:param",
+    "matchedRoutes": [
+      "PATCH /api/uniques360/tasks/:taskId",
+      "PUT /api/uniques360/tasks/:taskId",
+      "DELETE /api/uniques360/tasks/:taskId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/member/me",
+      "file": "src/views/Uniques360/Member360/uniques360.jsx",
+      "line": 46,
+      "rawLine": "const response = await axios.get(`${BASE_URL}/api/uniques360/tasks/member/me`, { withCredentials: true });"
+    },
+    "normalized": "/api/uniques360/tasks/member/me",
+    "matchedRoutes": [
+      "GET /api/uniques360/tasks/member/:memberId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/reports/task/${taskId}",
+      "file": "src/views/Uniques360/Member360/uniques360.jsx",
+      "line": 64,
+      "rawLine": "const response = await axios.get(`${BASE_URL}/api/uniques360/reports/task/${taskId}`, { withCredentials: true });"
+    },
+    "normalized": "/api/uniques360/reports/task/:param",
+    "matchedRoutes": [
+      "GET /api/uniques360/reports/task/:taskId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/reports",
+      "file": "src/views/Uniques360/Member360/uniques360.jsx",
+      "line": 107,
+      "rawLine": "`${BASE_URL}/api/uniques360/reports`,"
+    },
+    "normalized": "/api/uniques360/reports",
+    "matchedRoutes": [
+      "POST /api/uniques360/reports"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/${selectedTask",
+      "file": "src/views/Uniques360/Member360/uniques360.jsx",
+      "line": 127,
+      "rawLine": "`${BASE_URL}/api/uniques360/tasks/${selectedTask._id}`,"
+    },
+    "normalized": "/api/uniques360/tasks/${selectedTask",
+    "matchedRoutes": [
+      "PATCH /api/uniques360/tasks/:taskId",
+      "PUT /api/uniques360/tasks/:taskId",
+      "DELETE /api/uniques360/tasks/:taskId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/coordinator/current",
+      "file": "src/views/Uniques360/Projects/ProjectInsights.jsx",
+      "line": 51,
+      "rawLine": "const response = await axios.get(`${BASE_URL}/api/uniques360/tasks/coordinator/current`, {"
+    },
+    "normalized": "/api/uniques360/tasks/coordinator/current",
+    "matchedRoutes": [
+      "GET /api/uniques360/tasks/coordinator/:coordinatorId"
+    ]
+  },
+  {
+    "call": {
+      "endpoint": "/api/uniques360/tasks/${taskId}",
+      "file": "src/views/Uniques360/Projects/ProjectInsights.jsx",
+      "line": 73,
+      "rawLine": "await axios.patch(`${BASE_URL}/api/uniques360/tasks/${taskId}`, { status: \"completed\" }, { withCredentials: true });"
+    },
+    "normalized": "/api/uniques360/tasks/:param",
+    "matchedRoutes": [
+      "PATCH /api/uniques360/tasks/:taskId",
+      "PUT /api/uniques360/tasks/:taskId",
+      "DELETE /api/uniques360/tasks/:taskId"
+    ]
+  }
+]

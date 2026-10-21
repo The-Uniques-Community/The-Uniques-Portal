@@ -82,6 +82,7 @@ export const submitLeaveRequest = async (req, res) => {
     await sendLeaveSubmissionNotification(newLeave);
 
     res.status(201).json({
+      success: true,
       message: "Leave request submitted successfully",
       leave: newLeave,
     });
