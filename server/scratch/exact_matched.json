@@ -1,0 +1,964 @@
+[
+  {
+    "pattern": "/api/image-proxy/:param",
+    "count": 10,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/upload/event_file_upload",
+    "count": 8,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/guest/get-all-guests",
+    "count": 3,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/events",
+    "count": 6,
+    "methods": [
+      null
+    ]
+  },
+  {
+    "pattern": "/api/events/:id",
+    "count": 1,
+    "methods": [
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/events/:param",
+    "count": 12,
+    "methods": [
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/guest/add-guest",
+    "count": 3,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/member/${user",
+    "count": 3,
+    "methods": [
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/image-proxy/${uploadResult",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/member/getProfile",
+    "count": 6,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/member/:id",
+    "count": 2,
+    "methods": [
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/uniques360/tasks/coordinator/current",
+    "count": 9,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/member/counts",
+    "count": 4,
+    "methods": [
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/events/counts",
+    "count": 3,
+    "methods": [
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/auth/login",
+    "count": 1,
+    "methods": [
+      null
+    ]
+  },
+  {
+    "pattern": "/auth",
+    "count": 2,
+    "methods": [
+      null
+    ]
+  },
+  {
+    "pattern": "/auth/forget-password",
+    "count": 1,
+    "methods": [
+      null
+    ]
+  },
+  {
+    "pattern": "/auth/password-reset",
+    "count": 1,
+    "methods": [
+      null
+    ]
+  },
+  {
+    "pattern": "/auth/emaillogin",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/auth/verify_user",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/auth/verify_role",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/auth/logout",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/auth/password-reset/send-otp",
+    "count": 2,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/auth/password-reset/verify-otp",
+    "count": 2,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/auth/password-reset/reset-password",
+    "count": 2,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/blogs",
+    "count": 2,
+    "methods": [
+      null
+    ]
+  },
+  {
+    "pattern": "/api/stats",
+    "count": 3,
+    "methods": [
+      null
+    ]
+  },
+  {
+    "pattern": "/api/batches",
+    "count": 2,
+    "methods": [
+      null
+    ]
+  },
+  {
+    "pattern": "/api/community-benefits",
+    "count": 2,
+    "methods": [
+      null
+    ]
+  },
+  {
+    "pattern": "/api/apply-campus-ambassador",
+    "count": 1,
+    "methods": [
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/member/:param",
+    "count": 4,
+    "methods": [
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/contact",
+    "count": 1,
+    "methods": [
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/enquiry",
+    "count": 2,
+    "methods": [
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/enquiry/:param",
+    "count": 4,
+    "methods": [
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/enquiry/:param/reply",
+    "count": 2,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/enquiry/:param/status",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/members",
+    "count": 3,
+    "methods": [
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/members/:param",
+    "count": 1,
+    "methods": [
+      null
+    ]
+  },
+  {
+    "pattern": "/api/guest",
+    "count": 2,
+    "methods": [
+      null
+    ]
+  },
+  {
+    "pattern": "/api/guest/:param",
+    "count": 2,
+    "methods": [
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/fine/fines/statistics",
+    "count": 2,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/fine/fines/members",
+    "count": 2,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/fine/fines/pending/members",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/fine/members/:param/fines",
+    "count": 2,
+    "methods": [
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/fine/members/:param/fines/:param",
+    "count": 2,
+    "methods": [
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/upload/fine_file_upload",
+    "count": 3,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/fine",
+    "count": 1,
+    "methods": [
+      null
+    ]
+  },
+  {
+    "pattern": "/api/leave/submit",
+    "count": 2,
+    "methods": [
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/leave/my-leaves",
+    "count": 2,
+    "methods": [
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/leave/all",
+    "count": 2,
+    "methods": [
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/leave/pending",
+    "count": 1,
+    "methods": [
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/leave/:param/approve",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/leave/:param/reject",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/leave/:param",
+    "count": 5,
+    "methods": [
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/public/members",
+    "count": 1,
+    "methods": [
+      null
+    ]
+  },
+  {
+    "pattern": "/api/public/members/counts",
+    "count": 1,
+    "methods": [
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/member",
+    "count": 6,
+    "methods": [
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/member/add",
+    "count": 2,
+    "methods": [
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/member/:param/block",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/member/:param/suspend",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/member/supplementary/semester/:param",
+    "count": 3,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/member/fines/all",
+    "count": 2,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/projects",
+    "count": 3,
+    "methods": [
+      null
+    ]
+  },
+  {
+    "pattern": "/api/projects/:param",
+    "count": 3,
+    "methods": [
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/upload/project_file_upload",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/trainers/all-trainers",
+    "count": 2,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/trainers/add-trainer",
+    "count": 2,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/trainers/update-trainer/:param",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/trainers/delete-trainer/:param",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/upload/trainer_file_upload",
+    "count": 2,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/uniques360/tasks",
+    "count": 2,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/uniques360/tasks/member/:param",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/uniques360/tasks/coordinator/:param",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/uniques360/tasks/:param",
+    "count": 7,
+    "methods": [
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/uniques360/tasks/:param/members",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/uniques360/tasks/:param/members/remove",
+    "count": 2,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/uniques360/reports",
+    "count": 2,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/uniques360/reports/task/:param",
+    "count": 3,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/batches/profiles",
+    "count": 1,
+    "methods": [
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/batches/profiles/update",
+    "count": 1,
+    "methods": [
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/batches/all",
+    "count": 1,
+    "methods": [
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/batches/add",
+    "count": 1,
+    "methods": [
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/stats/update",
+    "count": 1,
+    "methods": [
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/auth/password-reset/resend-otp",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/auth/google",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/fine",
+    "count": 1,
+    "methods": [
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin",
+    "count": 2,
+    "methods": [
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/fine/members/:param/fines/${fine",
+    "count": 1,
+    "methods": [
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/enquiry/${selectedEnquiry",
+    "count": 1,
+    "methods": [
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/upload/budget_file_upload",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/expenses/:param",
+    "count": 2,
+    "methods": [
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/budget-allocations/:param",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/budget-allocations",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/budget",
+    "count": 2,
+    "methods": [
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/sponsors",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/sponsors/:param",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/expenses",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/members/team/:param/add",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/members/team/:param/members",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/form-responses",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/gallery",
+    "count": 2,
+    "methods": [
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/register",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/events/link-guest",
+    "count": 1,
+    "methods": [
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/form-response",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/status",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/leave/${selectedLeave",
+    "count": 2,
+    "methods": [
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/member/${editingMember",
+    "count": 1,
+    "methods": [
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/member/${memberToDelete",
+    "count": 1,
+    "methods": [
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/image-proxy/${profile",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/trainers/update-trainer/${selectedTrainer",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/admin/trainers/delete-trainer/${selectedTrainer",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/member/members/${user",
+    "count": 14,
+    "methods": [
+      null
+    ]
+  },
+  {
+    "pattern": "/upload/file_upload",
+    "count": 3,
+    "methods": [
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/uniques360/tasks/${selectedTask",
+    "count": 3,
+    "methods": [
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "pattern": "/api/uniques360/tasks/member/me",
+    "count": 1,
+    "methods": [
+      null,
+      null
+    ]
+  }
+]

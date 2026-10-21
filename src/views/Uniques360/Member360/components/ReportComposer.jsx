@@ -2,6 +2,11 @@ import React, { useRef } from "react";
 import { Box, CircularProgress, IconButton, Paper, TextField, InputAdornment, Typography } from "@mui/material";
 import SendIcon from '@mui/icons-material/Send';
 import ProgressIcon from '@mui/icons-material/QueryStats';
+import {
+  FILE_VALIDATION_PRESETS,
+  validateFile,
+  resetFileInput,
+} from "@/utils/fileValidation";
 
 const ReportComposer = ({ selectedTask, newReport, setNewReport, progressPercent, setProgressPercent, sending, onSubmit }) => {
   const fileInputRef = useRef(null);
@@ -11,8 +16,11 @@ const ReportComposer = ({ selectedTask, newReport, setNewReport, progressPercent
   };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (file) {
+      if (!validateFile(file, FILE_VALIDATION_PRESETS.DOCUMENT_OR_IMAGE, { inputTarget: e })) {
+        return;
+      }
       console.log("Selected file:", file);
     }
   };
@@ -91,7 +99,13 @@ const ReportComposer = ({ selectedTask, newReport, setNewReport, progressPercent
           {/* Left Side: Controls & Metric Inline inputs */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             {/* Attachment Button */}
-            <input type="file" ref={fileInputRef} style={{ display: "none" }} onChange={handleFileChange} />
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept={FILE_VALIDATION_PRESETS.DOCUMENT_OR_IMAGE.accept}
+              style={{ display: "none" }}
+              onChange={handleFileChange}
+            />
             {/* <IconButton 
               onClick={handleAttachClick}
               size="small"

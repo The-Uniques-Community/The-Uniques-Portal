@@ -48,6 +48,11 @@ import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import { ArrowUpRight, Award, Briefcase, Home, Upload } from "lucide-react";
+import {
+  FILE_VALIDATION_PRESETS,
+  validateFile,
+  resetFileInput,
+} from "@/utils/fileValidation";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import BusinessIcon from "@mui/icons-material/Business";
@@ -521,8 +526,13 @@ const Index = () => {
   };
 
   const handleProfilePictureChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setProfilePicture(e.target.files[0]);
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!validateFile(file, FILE_VALIDATION_PRESETS.IMAGE, { inputTarget: e })) {
+        setProfilePicture(null);
+        return;
+      }
+      setProfilePicture(file);
     }
   };
 
@@ -751,11 +761,16 @@ const Index = () => {
   };
 
   const handleCertificationFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setCertificationFile(e.target.files[0]);
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!validateFile(file, FILE_VALIDATION_PRESETS.CERTIFICATE, { inputTarget: e })) {
+        setCertificationFile(null);
+        return;
+      }
+      setCertificationFile(file);
       setCurrentCertification({
         ...currentCertification,
-        fileName: e.target.files[0].name,
+        fileName: file.name,
       });
     }
   };
@@ -928,8 +943,13 @@ const Index = () => {
   };
 
   const handleProjectImageChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setProjectImage(e.target.files[0]);
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!validateFile(file, FILE_VALIDATION_PRESETS.IMAGE, { inputTarget: e })) {
+        setProjectImage(null);
+        return;
+      }
+      setProjectImage(file);
     }
   };
 
@@ -3989,7 +4009,7 @@ const Index = () => {
               <input
                 type="file"
                 id="profile-picture"
-                accept="image/*"
+                accept={FILE_VALIDATION_PRESETS.IMAGE.accept}
                 onChange={handleProfilePictureChange}
                 style={{ display: "none" }}
                 ref={profilePictureInputRef}
@@ -4153,7 +4173,7 @@ const Index = () => {
               <input
                 type="file"
                 id="certification-file"
-                accept=".pdf,.jpg,.jpeg,.png"
+                accept={FILE_VALIDATION_PRESETS.CERTIFICATE.accept}
                 onChange={handleCertificationFileChange}
                 style={{ display: "none" }}
               />
@@ -4265,7 +4285,7 @@ const Index = () => {
               <input
                 type="file"
                 id="project-image"
-                accept="image/*"
+                accept={FILE_VALIDATION_PRESETS.IMAGE.accept}
                 onChange={handleProjectImageChange}
                 style={{ display: "none" }}
               />

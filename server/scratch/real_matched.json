@@ -1,0 +1,717 @@
+[
+  {
+    "pattern": "/api/image-proxy/:param",
+    "count": 10,
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/upload/event_file_upload",
+    "count": 8,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/guest/get-all-guests",
+    "count": 3,
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/events/:id",
+    "count": 1,
+    "methods": [
+      "GET",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "pattern": "/api/events/:param",
+    "count": 12,
+    "methods": [
+      "GET",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "pattern": "/api/guest/add-guest",
+    "count": 3,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/admin/member/${user",
+    "count": 3,
+    "methods": [
+      "GET",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "pattern": "/api/image-proxy/${uploadResult",
+    "count": 1,
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/member/getProfile",
+    "count": 6,
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/admin/member/:id",
+    "count": 2,
+    "methods": [
+      "GET",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "pattern": "/api/uniques360/tasks/coordinator/current",
+    "count": 9,
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/admin/member/counts",
+    "count": 4,
+    "methods": [
+      "GET",
+      "PUT",
+      "DELETE",
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/events/counts",
+    "count": 3,
+    "methods": [
+      "GET",
+      "PUT",
+      "DELETE",
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/auth/emaillogin",
+    "count": 1,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/auth/verify_user",
+    "count": 1,
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/auth/verify_role",
+    "count": 1,
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/auth/logout",
+    "count": 1,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/auth/password-reset/send-otp",
+    "count": 2,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/auth/password-reset/verify-otp",
+    "count": 2,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/auth/password-reset/reset-password",
+    "count": 2,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/admin/member/:param",
+    "count": 4,
+    "methods": [
+      "GET",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "pattern": "/api/admin/enquiry/:param",
+    "count": 4,
+    "methods": [
+      "GET",
+      "DELETE"
+    ]
+  },
+  {
+    "pattern": "/api/admin/enquiry/:param/reply",
+    "count": 2,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/admin/enquiry/:param/status",
+    "count": 1,
+    "methods": [
+      "PATCH"
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/members",
+    "count": 3,
+    "methods": [
+      "GET",
+      "PUT",
+      "PATCH"
+    ]
+  },
+  {
+    "pattern": "/api/admin/fine/fines/statistics",
+    "count": 2,
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/admin/fine/fines/members",
+    "count": 2,
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/admin/fine/fines/pending/members",
+    "count": 1,
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/admin/fine/members/:param/fines",
+    "count": 2,
+    "methods": [
+      "POST",
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/admin/fine/members/:param/fines/:param",
+    "count": 2,
+    "methods": [
+      "PATCH",
+      "DELETE"
+    ]
+  },
+  {
+    "pattern": "/upload/fine_file_upload",
+    "count": 3,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/leave/submit",
+    "count": 2,
+    "methods": [
+      "GET",
+      "PUT",
+      "DELETE",
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/leave/my-leaves",
+    "count": 2,
+    "methods": [
+      "GET",
+      "PUT",
+      "DELETE",
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/leave/all",
+    "count": 2,
+    "methods": [
+      "GET",
+      "PUT",
+      "DELETE",
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/leave/pending",
+    "count": 1,
+    "methods": [
+      "GET",
+      "PUT",
+      "DELETE",
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/leave/:param/approve",
+    "count": 1,
+    "methods": [
+      "PUT"
+    ]
+  },
+  {
+    "pattern": "/api/leave/:param/reject",
+    "count": 1,
+    "methods": [
+      "PUT"
+    ]
+  },
+  {
+    "pattern": "/api/leave/:param",
+    "count": 5,
+    "methods": [
+      "GET",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "pattern": "/api/public/members/counts",
+    "count": 1,
+    "methods": [
+      "GET",
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/admin/member/add",
+    "count": 2,
+    "methods": [
+      "GET",
+      "PUT",
+      "DELETE",
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/admin/member/:param/block",
+    "count": 1,
+    "methods": [
+      "PATCH"
+    ]
+  },
+  {
+    "pattern": "/api/admin/member/:param/suspend",
+    "count": 1,
+    "methods": [
+      "PATCH"
+    ]
+  },
+  {
+    "pattern": "/api/admin/member/supplementary/semester/:param",
+    "count": 3,
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/admin/member/fines/all",
+    "count": 2,
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/projects/:param",
+    "count": 3,
+    "methods": [
+      "GET",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "pattern": "/upload/project_file_upload",
+    "count": 1,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/admin/trainers/all-trainers",
+    "count": 2,
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/admin/trainers/add-trainer",
+    "count": 2,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/admin/trainers/update-trainer/:param",
+    "count": 1,
+    "methods": [
+      "PUT"
+    ]
+  },
+  {
+    "pattern": "/api/admin/trainers/delete-trainer/:param",
+    "count": 1,
+    "methods": [
+      "DELETE"
+    ]
+  },
+  {
+    "pattern": "/upload/trainer_file_upload",
+    "count": 2,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/uniques360/tasks",
+    "count": 2,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/uniques360/tasks/member/:param",
+    "count": 1,
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/uniques360/tasks/coordinator/:param",
+    "count": 1,
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/uniques360/tasks/:param",
+    "count": 7,
+    "methods": [
+      "PATCH",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "pattern": "/api/uniques360/tasks/:param/members",
+    "count": 1,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/uniques360/tasks/:param/members/remove",
+    "count": 2,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/uniques360/reports",
+    "count": 2,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/uniques360/reports/task/:param",
+    "count": 3,
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/batches/profiles",
+    "count": 1,
+    "methods": [
+      "DELETE",
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/batches/profiles/update",
+    "count": 1,
+    "methods": [
+      "POST",
+      "PUT"
+    ]
+  },
+  {
+    "pattern": "/api/batches/all",
+    "count": 1,
+    "methods": [
+      "DELETE",
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/batches/add",
+    "count": 1,
+    "methods": [
+      "DELETE",
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/stats/update",
+    "count": 1,
+    "methods": [
+      "POST",
+      "PUT"
+    ]
+  },
+  {
+    "pattern": "/auth/password-reset/resend-otp",
+    "count": 1,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/auth/google",
+    "count": 1,
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/admin/fine/members/:param/fines/${fine",
+    "count": 1,
+    "methods": [
+      "PATCH",
+      "DELETE"
+    ]
+  },
+  {
+    "pattern": "/api/admin/enquiry/${selectedEnquiry",
+    "count": 1,
+    "methods": [
+      "GET",
+      "DELETE"
+    ]
+  },
+  {
+    "pattern": "/upload/budget_file_upload",
+    "count": 1,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/expenses/:param",
+    "count": 2,
+    "methods": [
+      "PATCH",
+      "DELETE"
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/budget-allocations/:param",
+    "count": 1,
+    "methods": [
+      "DELETE"
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/budget-allocations",
+    "count": 1,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/budget",
+    "count": 2,
+    "methods": [
+      "PUT",
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/sponsors",
+    "count": 1,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/sponsors/:param",
+    "count": 1,
+    "methods": [
+      "DELETE"
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/expenses",
+    "count": 1,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/members/team/:param/add",
+    "count": 1,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/members/team/:param/members",
+    "count": 1,
+    "methods": [
+      "DELETE"
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/form-responses",
+    "count": 1,
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/gallery",
+    "count": 2,
+    "methods": [
+      "PATCH",
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/register",
+    "count": 1,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/events/link-guest",
+    "count": 1,
+    "methods": [
+      "GET",
+      "PUT",
+      "DELETE",
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/form-response",
+    "count": 1,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/events/:param/status",
+    "count": 1,
+    "methods": [
+      "PATCH"
+    ]
+  },
+  {
+    "pattern": "/api/leave/${selectedLeave",
+    "count": 2,
+    "methods": [
+      "GET",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "pattern": "/api/admin/member/${editingMember",
+    "count": 1,
+    "methods": [
+      "GET",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "pattern": "/api/admin/member/${memberToDelete",
+    "count": 1,
+    "methods": [
+      "GET",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "pattern": "/api/image-proxy/${profile",
+    "count": 1,
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "pattern": "/api/admin/trainers/update-trainer/${selectedTrainer",
+    "count": 1,
+    "methods": [
+      "PUT"
+    ]
+  },
+  {
+    "pattern": "/api/admin/trainers/delete-trainer/${selectedTrainer",
+    "count": 1,
+    "methods": [
+      "DELETE"
+    ]
+  },
+  {
+    "pattern": "/upload/file_upload",
+    "count": 3,
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "pattern": "/api/uniques360/tasks/${selectedTask",
+    "count": 3,
+    "methods": [
+      "PATCH",
+      "PUT",
+      "DELETE"
+    ]
+  },
+  {
+    "pattern": "/api/uniques360/tasks/member/me",
+    "count": 1,
+    "methods": [
+      "GET"
+    ]
+  }
+]

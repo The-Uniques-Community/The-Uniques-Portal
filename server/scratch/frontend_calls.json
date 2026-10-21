@@ -1,0 +1,1760 @@
+[
+  {
+    "endpoint": "/authService",
+    "file": "src/App.jsx",
+    "line": 7,
+    "rawLine": "import authService from \"@/services/authService\";"
+  },
+  {
+    "endpoint": "/authUtils",
+    "file": "src/App.jsx",
+    "line": 8,
+    "rawLine": "import { getStoredAuth, isTokenExpired, clearAuthStorage } from \"@/utils/authUtils\";"
+  },
+  {
+    "endpoint": "/uploads/2022/10/What_Web3_Going_2023",
+    "file": "src/assets/dummyData/eventsData.js",
+    "line": 35,
+    "rawLine": "eventBanner: \"https://www.xrtoday.com/wp-content/uploads/2022/10/What_Web3_Going_2023.jpg\","
+  },
+  {
+    "endpoint": "/uploads/2024/12/hackton",
+    "file": "src/assets/dummyData/eventsData.js",
+    "line": 72,
+    "rawLine": "eventBanner: \"https://i0.wp.com/allaboutbelgaum.com/content/uploads/2024/12/hackton.jpeg?resize=910%2C455&ssl=1\","
+  },
+  {
+    "endpoint": "/api/portraits/men/1",
+    "file": "src/assets/dummyData/memberData.js",
+    "line": 43,
+    "rawLine": "profilePic: \"https://randomuser.me/api/portraits/men/1.jpg\","
+  },
+  {
+    "endpoint": "/api/portraits/women/2",
+    "file": "src/assets/dummyData/memberData.js",
+    "line": 139,
+    "rawLine": "profilePic: \"https://randomuser.me/api/portraits/women/2.jpg\","
+  },
+  {
+    "endpoint": "/api/image-proxy/${fileId}",
+    "file": "src/components/cards/MemberCardDashboard.jsx",
+    "line": 50,
+    "rawLine": "return `${BASE_URL}/api/image-proxy/${fileId}`;"
+  },
+  {
+    "endpoint": "/api/image-proxy/${fileId}",
+    "file": "src/components/cards/MemberCardDashboard.jsx",
+    "line": 318,
+    "rawLine": "return `${BASE_URL}/api/image-proxy/${fileId}`;"
+  },
+  {
+    "endpoint": "/api/image-proxy/${fileId}",
+    "file": "src/components/cards/TrainerCardDashboard.jsx",
+    "line": 39,
+    "rawLine": "return `${BASE_URL}/api/image-proxy/${fileId}`;"
+  },
+  {
+    "endpoint": "/api/image-proxy/${fileId}",
+    "file": "src/components/cards/TrainerCardDashboard.jsx",
+    "line": 245,
+    "rawLine": "return `${BASE_URL}/api/image-proxy/${fileId}`;"
+  },
+  {
+    "endpoint": "/upload/event_file_upload",
+    "file": "src/components/event/EventForm.jsx",
+    "line": 5,
+    "rawLine": "* @agent_note Handles multipart uploads to /upload/event_file_upload for banner, gallery, and sponsor receipts."
+  },
+  {
+    "endpoint": "/api/guest/get-all-guests",
+    "file": "src/components/event/EventForm.jsx",
+    "line": 151,
+    "rawLine": "* @api GET /api/guest/get-all-guests, POST /upload/event_file_upload, POST /api/events, PUT /api/events/:id."
+  },
+  {
+    "endpoint": "/upload/event_file_upload",
+    "file": "src/components/event/EventForm.jsx",
+    "line": 151,
+    "rawLine": "* @api GET /api/guest/get-all-guests, POST /upload/event_file_upload, POST /api/events, PUT /api/events/:id."
+  },
+  {
+    "endpoint": "/api/events",
+    "file": "src/components/event/EventForm.jsx",
+    "line": 151,
+    "rawLine": "* @api GET /api/guest/get-all-guests, POST /upload/event_file_upload, POST /api/events, PUT /api/events/:id."
+  },
+  {
+    "endpoint": "/api/events/:id",
+    "file": "src/components/event/EventForm.jsx",
+    "line": 151,
+    "rawLine": "* @api GET /api/guest/get-all-guests, POST /upload/event_file_upload, POST /api/events, PUT /api/events/:id."
+  },
+  {
+    "endpoint": "/api/guest/get-all-guests",
+    "file": "src/components/event/EventForm.jsx",
+    "line": 203,
+    "rawLine": "`${BASE_URL}/api/guest/get-all-guests`"
+  },
+  {
+    "endpoint": "/api/events/${eventId}",
+    "file": "src/components/event/EventForm.jsx",
+    "line": 215,
+    "rawLine": "`${BASE_URL}/api/events/${eventId}?populate=gallery`,"
+  },
+  {
+    "endpoint": "/upload/event_file_upload",
+    "file": "src/components/event/EventForm.jsx",
+    "line": 311,
+    "rawLine": "`${BASE_URL}/upload/event_file_upload`,"
+  },
+  {
+    "endpoint": "/upload/event_file_upload",
+    "file": "src/components/event/EventForm.jsx",
+    "line": 364,
+    "rawLine": "`${BASE_URL}/upload/event_file_upload`,"
+  },
+  {
+    "endpoint": "/upload/event_file_upload",
+    "file": "src/components/event/EventForm.jsx",
+    "line": 399,
+    "rawLine": "`${BASE_URL}/upload/event_file_upload`,"
+  },
+  {
+    "endpoint": "/api/events/${eventId}",
+    "file": "src/components/event/EventForm.jsx",
+    "line": 478,
+    "rawLine": "`${BASE_URL}/api/events/${eventId}`,"
+  },
+  {
+    "endpoint": "/api/events",
+    "file": "src/components/event/EventForm.jsx",
+    "line": 484,
+    "rawLine": "`${BASE_URL}/api/events`,"
+  },
+  {
+    "endpoint": "/api/guest/add-guest",
+    "file": "src/components/event/EventForm.jsx",
+    "line": 542,
+    "rawLine": "`${BASE_URL}/api/guest/add-guest`,"
+  },
+  {
+    "endpoint": "/api/admin/member/${user",
+    "file": "src/components/modals/ProfileModal.jsx",
+    "line": 113,
+    "rawLine": "`${BASE_URL}/api/admin/member/${user._id}/block`"
+  },
+  {
+    "endpoint": "/api/image-proxy/${fileId}",
+    "file": "src/components/modals/ProfileModal.jsx",
+    "line": 182,
+    "rawLine": "return `${BASE_URL}/api/image-proxy/${fileId}`;"
+  },
+  {
+    "endpoint": "/api/admin/member/${user",
+    "file": "src/components/modals/ProfileModal.jsx",
+    "line": 217,
+    "rawLine": "`${BASE_URL}/api/admin/member/${user._id}/fine`,"
+  },
+  {
+    "endpoint": "/api/image-proxy/${uploadResult",
+    "file": "src/components/project/ProjectForm.jsx",
+    "line": 143,
+    "rawLine": "finalImageUrl = `${BASE_URL}/api/image-proxy/${uploadResult.fileId}`;"
+  },
+  {
+    "endpoint": "/apiClient",
+    "file": "src/config.js",
+    "line": 7,
+    "rawLine": "import apiClient, { API_BASE_URL } from \"@/services/apiClient\";"
+  },
+  {
+    "endpoint": "/authService",
+    "file": "src/hooks/useAuth.js",
+    "line": 9,
+    "rawLine": "import authService from \"@/services/authService\";"
+  },
+  {
+    "endpoint": "/authUtils",
+    "file": "src/hooks/useAuth.js",
+    "line": 10,
+    "rawLine": "import { getStoredAuth, isTokenExpired } from \"@/utils/authUtils\";"
+  },
+  {
+    "endpoint": "/authService",
+    "file": "src/layout/Admin/index.jsx",
+    "line": 25,
+    "rawLine": "import authService from \"@/services/authService\";"
+  },
+  {
+    "endpoint": "/authService",
+    "file": "src/layout/Management/index.jsx",
+    "line": 26,
+    "rawLine": "import authService from \"@/services/authService\";"
+  },
+  {
+    "endpoint": "/authService",
+    "file": "src/layout/Uniques/Coordinator/index.jsx",
+    "line": 30,
+    "rawLine": "import authService from \"@/services/authService\";"
+  },
+  {
+    "endpoint": "/authService",
+    "file": "src/layout/Uniques/Member/index.jsx",
+    "line": 41,
+    "rawLine": "import authService from \"@/services/authService\";"
+  },
+  {
+    "endpoint": "/api/member/getProfile",
+    "file": "src/redux/slices/userSlice.js",
+    "line": 98,
+    "rawLine": "* Backend endpoint: GET /api/member/getProfile"
+  },
+  {
+    "endpoint": "/api/admin/member/:id",
+    "file": "src/redux/slices/userSlice.js",
+    "line": 116,
+    "rawLine": "* Backend endpoint: PUT /api/admin/member/:id"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/coordinator/current",
+    "file": "src/redux/slices/userSlice.js",
+    "line": 134,
+    "rawLine": "* Backend endpoint: GET /api/uniques360/tasks/coordinator/current"
+  },
+  {
+    "endpoint": "/api/admin/member/counts",
+    "file": "src/redux/slices/userSlice.js",
+    "line": 152,
+    "rawLine": "* Aggregated backend endpoints: /api/admin/member/counts, /api/events/counts, /api/uniques360/tasks/coordinator/current"
+  },
+  {
+    "endpoint": "/api/events/counts",
+    "file": "src/redux/slices/userSlice.js",
+    "line": 152,
+    "rawLine": "* Aggregated backend endpoints: /api/admin/member/counts, /api/events/counts, /api/uniques360/tasks/coordinator/current"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/coordinator/current",
+    "file": "src/redux/slices/userSlice.js",
+    "line": 152,
+    "rawLine": "* Aggregated backend endpoints: /api/admin/member/counts, /api/events/counts, /api/uniques360/tasks/coordinator/current"
+  },
+  {
+    "endpoint": "/apiClient",
+    "file": "src/redux/store.js",
+    "line": 3,
+    "rawLine": "import { setStoreInstance } from '@/services/apiClient';"
+  },
+  {
+    "endpoint": "/authUtils",
+    "file": "src/routes/ProtectedRoute.jsx",
+    "line": 11,
+    "rawLine": "import { isRoleAuthorized, isTokenExpired } from \"@/utils/authUtils\";"
+  },
+  {
+    "endpoint": "/authUtils",
+    "file": "src/routes/index.jsx",
+    "line": 18,
+    "rawLine": "import { isTokenExpired } from \"@/utils/authUtils\";"
+  },
+  {
+    "endpoint": "/auth/login",
+    "file": "src/routes/index.jsx",
+    "line": 53,
+    "rawLine": "path: \"/auth/login\","
+  },
+  {
+    "endpoint": "/auth",
+    "file": "src/routes/index.jsx",
+    "line": 57,
+    "rawLine": "path: \"/auth\","
+  },
+  {
+    "endpoint": "/auth/forget-password",
+    "file": "src/routes/index.jsx",
+    "line": 67,
+    "rawLine": "path: \"/auth/forget-password\","
+  },
+  {
+    "endpoint": "/auth/password-reset",
+    "file": "src/routes/index.jsx",
+    "line": 71,
+    "rawLine": "path: \"/auth/password-reset\","
+  },
+  {
+    "endpoint": "/authUtils",
+    "file": "src/services/apiClient.js",
+    "line": 8,
+    "rawLine": "import { clearAuthStorage } from '@/utils/authUtils';"
+  },
+  {
+    "endpoint": "/auth",
+    "file": "src/services/apiClient.js",
+    "line": 107,
+    "rawLine": "if (typeof window !== 'undefined' && window.location.pathname !== '/' && !window.location.pathname.startsWith('/auth') && window.location.pathname !== '/forget-password') {"
+  },
+  {
+    "endpoint": "/apiClient",
+    "file": "src/services/authService.js",
+    "line": 7,
+    "rawLine": "import apiClient from \"./apiClient\";"
+  },
+  {
+    "endpoint": "/authUtils",
+    "file": "src/services/authService.js",
+    "line": 10,
+    "rawLine": "import { storeAuth, clearAuthStorage } from \"@/utils/authUtils\";"
+  },
+  {
+    "endpoint": "/auth/emaillogin",
+    "file": "src/services/authService.js",
+    "line": 19,
+    "rawLine": "const response = await apiClient.post(\"/auth/emaillogin\", credentials);"
+  },
+  {
+    "endpoint": "/auth/verify_user",
+    "file": "src/services/authService.js",
+    "line": 48,
+    "rawLine": "const response = await apiClient.get(\"/auth/verify_user\");"
+  },
+  {
+    "endpoint": "/auth/verify_role",
+    "file": "src/services/authService.js",
+    "line": 72,
+    "rawLine": "const response = await apiClient.get(\"/auth/verify_role\", { params: { role } });"
+  },
+  {
+    "endpoint": "/auth/logout",
+    "file": "src/services/authService.js",
+    "line": 86,
+    "rawLine": "await apiClient.post(\"/auth/logout\");"
+  },
+  {
+    "endpoint": "/auth/password-reset/send-otp",
+    "file": "src/services/authService.js",
+    "line": 107,
+    "rawLine": "const response = await apiClient.post(\"/auth/password-reset/send-otp\", { email });"
+  },
+  {
+    "endpoint": "/auth/password-reset/verify-otp",
+    "file": "src/services/authService.js",
+    "line": 112,
+    "rawLine": "const response = await apiClient.post(\"/auth/password-reset/verify-otp\", { email, otp });"
+  },
+  {
+    "endpoint": "/auth/password-reset/reset-password",
+    "file": "src/services/authService.js",
+    "line": 117,
+    "rawLine": "const response = await apiClient.post(\"/auth/password-reset/reset-password\", payload);"
+  },
+  {
+    "endpoint": "/apiClient",
+    "file": "src/services/communityService.js",
+    "line": 5,
+    "rawLine": "import apiClient from './apiClient';"
+  },
+  {
+    "endpoint": "/api/blogs",
+    "file": "src/services/communityService.js",
+    "line": 9,
+    "rawLine": "const response = await apiClient.get('/api/blogs', { params });"
+  },
+  {
+    "endpoint": "/api/blogs",
+    "file": "src/services/communityService.js",
+    "line": 14,
+    "rawLine": "const response = await apiClient.post('/api/blogs', blogData);"
+  },
+  {
+    "endpoint": "/api/stats",
+    "file": "src/services/communityService.js",
+    "line": 19,
+    "rawLine": "const response = await apiClient.get('/api/stats');"
+  },
+  {
+    "endpoint": "/api/stats",
+    "file": "src/services/communityService.js",
+    "line": 24,
+    "rawLine": "const response = await apiClient.post('/api/stats', statsData);"
+  },
+  {
+    "endpoint": "/api/batches",
+    "file": "src/services/communityService.js",
+    "line": 29,
+    "rawLine": "const response = await apiClient.get('/api/batches');"
+  },
+  {
+    "endpoint": "/api/batches",
+    "file": "src/services/communityService.js",
+    "line": 34,
+    "rawLine": "const response = await apiClient.post('/api/batches', batchesData);"
+  },
+  {
+    "endpoint": "/api/community-benefits",
+    "file": "src/services/communityService.js",
+    "line": 39,
+    "rawLine": "const response = await apiClient.get('/api/community-benefits');"
+  },
+  {
+    "endpoint": "/api/community-benefits",
+    "file": "src/services/communityService.js",
+    "line": 44,
+    "rawLine": "const response = await apiClient.post('/api/community-benefits', benefitsData);"
+  },
+  {
+    "endpoint": "/api/apply-campus-ambassador",
+    "file": "src/services/communityService.js",
+    "line": 49,
+    "rawLine": "const response = await apiClient.post('/api/apply-campus-ambassador', formData);"
+  },
+  {
+    "endpoint": "/apiClient",
+    "file": "src/services/coordinatorService.js",
+    "line": 5,
+    "rawLine": "import apiClient from './apiClient.js';"
+  },
+  {
+    "endpoint": "/api/member/getProfile",
+    "file": "src/services/coordinatorService.js",
+    "line": 10,
+    "rawLine": "* Backend route: GET /api/member/getProfile"
+  },
+  {
+    "endpoint": "/api/member/getProfile",
+    "file": "src/services/coordinatorService.js",
+    "line": 14,
+    "rawLine": "const response = await apiClient.get('/api/member/getProfile');"
+  },
+  {
+    "endpoint": "/api/admin/member/:id",
+    "file": "src/services/coordinatorService.js",
+    "line": 20,
+    "rawLine": "* Backend route: PUT /api/admin/member/:id"
+  },
+  {
+    "endpoint": "/api/admin/member/${id}",
+    "file": "src/services/coordinatorService.js",
+    "line": 26,
+    "rawLine": "const response = await apiClient.put(`/api/admin/member/${id}`, updateData);"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/coordinator/current",
+    "file": "src/services/coordinatorService.js",
+    "line": 32,
+    "rawLine": "* Backend route: GET /api/uniques360/tasks/coordinator/current"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/coordinator/current",
+    "file": "src/services/coordinatorService.js",
+    "line": 36,
+    "rawLine": "const response = await apiClient.get('/api/uniques360/tasks/coordinator/current');"
+  },
+  {
+    "endpoint": "/api/admin/member/counts",
+    "file": "src/services/coordinatorService.js",
+    "line": 42,
+    "rawLine": "* Fetches member counts (/api/admin/member/counts), event counts (/api/events/counts), and coordinator tasks (/api/uniques360/tasks/coordinator/current)"
+  },
+  {
+    "endpoint": "/api/events/counts",
+    "file": "src/services/coordinatorService.js",
+    "line": 42,
+    "rawLine": "* Fetches member counts (/api/admin/member/counts), event counts (/api/events/counts), and coordinator tasks (/api/uniques360/tasks/coordinator/current)"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/coordinator/current",
+    "file": "src/services/coordinatorService.js",
+    "line": 42,
+    "rawLine": "* Fetches member counts (/api/admin/member/counts), event counts (/api/events/counts), and coordinator tasks (/api/uniques360/tasks/coordinator/current)"
+  },
+  {
+    "endpoint": "/api/admin/member/counts",
+    "file": "src/services/coordinatorService.js",
+    "line": 47,
+    "rawLine": "apiClient.get('/api/admin/member/counts'),"
+  },
+  {
+    "endpoint": "/api/events/counts",
+    "file": "src/services/coordinatorService.js",
+    "line": 48,
+    "rawLine": "apiClient.get('/api/events/counts'),"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/coordinator/current",
+    "file": "src/services/coordinatorService.js",
+    "line": 49,
+    "rawLine": "apiClient.get('/api/uniques360/tasks/coordinator/current'),"
+  },
+  {
+    "endpoint": "/apiClient",
+    "file": "src/services/enquiryService.js",
+    "line": 5,
+    "rawLine": "import apiClient from './apiClient';"
+  },
+  {
+    "endpoint": "/api/contact",
+    "file": "src/services/enquiryService.js",
+    "line": 9,
+    "rawLine": "const response = await apiClient.post('/api/contact', data);"
+  },
+  {
+    "endpoint": "/api/admin/enquiry",
+    "file": "src/services/enquiryService.js",
+    "line": 14,
+    "rawLine": "const response = await apiClient.get('/api/admin/enquiry', { params });"
+  },
+  {
+    "endpoint": "/api/admin/enquiry/${id}",
+    "file": "src/services/enquiryService.js",
+    "line": 19,
+    "rawLine": "const response = await apiClient.get(`/api/admin/enquiry/${id}`);"
+  },
+  {
+    "endpoint": "/api/admin/enquiry/${id}/reply",
+    "file": "src/services/enquiryService.js",
+    "line": 24,
+    "rawLine": "const response = await apiClient.post(`/api/admin/enquiry/${id}/reply`, replyData);"
+  },
+  {
+    "endpoint": "/api/admin/enquiry/${id}/status",
+    "file": "src/services/enquiryService.js",
+    "line": 29,
+    "rawLine": "const response = await apiClient.patch(`/api/admin/enquiry/${id}/status`, { status });"
+  },
+  {
+    "endpoint": "/api/admin/enquiry/${id}",
+    "file": "src/services/enquiryService.js",
+    "line": 34,
+    "rawLine": "const response = await apiClient.delete(`/api/admin/enquiry/${id}`);"
+  },
+  {
+    "endpoint": "/apiClient",
+    "file": "src/services/eventService.js",
+    "line": 5,
+    "rawLine": "import apiClient from './apiClient';"
+  },
+  {
+    "endpoint": "/api/events",
+    "file": "src/services/eventService.js",
+    "line": 9,
+    "rawLine": "const response = await apiClient.get('/api/events', { params });"
+  },
+  {
+    "endpoint": "/api/events/${id}",
+    "file": "src/services/eventService.js",
+    "line": 14,
+    "rawLine": "const response = await apiClient.get(`/api/events/${id}`);"
+  },
+  {
+    "endpoint": "/api/events",
+    "file": "src/services/eventService.js",
+    "line": 19,
+    "rawLine": "const response = await apiClient.post('/api/events', eventData);"
+  },
+  {
+    "endpoint": "/api/events/${id}",
+    "file": "src/services/eventService.js",
+    "line": 24,
+    "rawLine": "const response = await apiClient.put(`/api/events/${id}`, eventData);"
+  },
+  {
+    "endpoint": "/api/events/${id}",
+    "file": "src/services/eventService.js",
+    "line": 29,
+    "rawLine": "const response = await apiClient.delete(`/api/events/${id}`);"
+  },
+  {
+    "endpoint": "/api/events/${eventId}/members",
+    "file": "src/services/eventService.js",
+    "line": 34,
+    "rawLine": "const response = await apiClient.get(`/api/events/${eventId}/members`);"
+  },
+  {
+    "endpoint": "/api/events/${eventId}/members",
+    "file": "src/services/eventService.js",
+    "line": 39,
+    "rawLine": "const response = await apiClient.post(`/api/events/${eventId}/members`, { members });"
+  },
+  {
+    "endpoint": "/api/events/${eventId}/members/${memberId}",
+    "file": "src/services/eventService.js",
+    "line": 44,
+    "rawLine": "const response = await apiClient.delete(`/api/events/${eventId}/members/${memberId}`);"
+  },
+  {
+    "endpoint": "/upload/event_file_upload",
+    "file": "src/services/eventService.js",
+    "line": 49,
+    "rawLine": "const response = await apiClient.post('/upload/event_file_upload', formData, {"
+  },
+  {
+    "endpoint": "/api/guest",
+    "file": "src/services/eventService.js",
+    "line": 56,
+    "rawLine": "const response = await apiClient.get('/api/guest', { params });"
+  },
+  {
+    "endpoint": "/api/guest",
+    "file": "src/services/eventService.js",
+    "line": 61,
+    "rawLine": "const response = await apiClient.post('/api/guest', guestData);"
+  },
+  {
+    "endpoint": "/api/guest/${id}",
+    "file": "src/services/eventService.js",
+    "line": 66,
+    "rawLine": "const response = await apiClient.put(`/api/guest/${id}`, guestData);"
+  },
+  {
+    "endpoint": "/api/guest/${id}",
+    "file": "src/services/eventService.js",
+    "line": 71,
+    "rawLine": "const response = await apiClient.delete(`/api/guest/${id}`);"
+  },
+  {
+    "endpoint": "/apiClient",
+    "file": "src/services/fineService.js",
+    "line": 5,
+    "rawLine": "import apiClient from './apiClient';"
+  },
+  {
+    "endpoint": "/api/admin/fine/fines/statistics",
+    "file": "src/services/fineService.js",
+    "line": 9,
+    "rawLine": "const response = await apiClient.get('/api/admin/fine/fines/statistics');"
+  },
+  {
+    "endpoint": "/api/admin/fine/fines/members",
+    "file": "src/services/fineService.js",
+    "line": 14,
+    "rawLine": "const response = await apiClient.get('/api/admin/fine/fines/members', { params });"
+  },
+  {
+    "endpoint": "/api/admin/fine/fines/pending/members",
+    "file": "src/services/fineService.js",
+    "line": 19,
+    "rawLine": "const response = await apiClient.get('/api/admin/fine/fines/pending/members', { params });"
+  },
+  {
+    "endpoint": "/api/admin/fine/members/${memberId}/fines",
+    "file": "src/services/fineService.js",
+    "line": 24,
+    "rawLine": "const response = await apiClient.get(`/api/admin/fine/members/${memberId}/fines`);"
+  },
+  {
+    "endpoint": "/api/admin/fine/members/${memberId}/fines",
+    "file": "src/services/fineService.js",
+    "line": 29,
+    "rawLine": "const response = await apiClient.post(`/api/admin/fine/members/${memberId}/fines`, fineData);"
+  },
+  {
+    "endpoint": "/api/admin/fine/members/${memberId}/fines/${fineId}",
+    "file": "src/services/fineService.js",
+    "line": 34,
+    "rawLine": "const response = await apiClient.patch(`/api/admin/fine/members/${memberId}/fines/${fineId}`, payload);"
+  },
+  {
+    "endpoint": "/api/admin/fine/members/${memberId}/fines/${fineId}",
+    "file": "src/services/fineService.js",
+    "line": 39,
+    "rawLine": "const response = await apiClient.delete(`/api/admin/fine/members/${memberId}/fines/${fineId}`);"
+  },
+  {
+    "endpoint": "/upload/fine_file_upload",
+    "file": "src/services/fineService.js",
+    "line": 44,
+    "rawLine": "const response = await apiClient.post('/upload/fine_file_upload', formData, {"
+  },
+  {
+    "endpoint": "/api/fine",
+    "file": "src/services/fineService.js",
+    "line": 51,
+    "rawLine": "const response = await apiClient.get('/api/fine');"
+  },
+  {
+    "endpoint": "/apiClient",
+    "file": "src/services/index.js",
+    "line": 5,
+    "rawLine": "export { default as apiClient, API_BASE_URL, ApiError } from './apiClient';"
+  },
+  {
+    "endpoint": "/authService",
+    "file": "src/services/index.js",
+    "line": 6,
+    "rawLine": "export { default as authService } from './authService';"
+  },
+  {
+    "endpoint": "/apiClient",
+    "file": "src/services/leaveService.js",
+    "line": 5,
+    "rawLine": "import apiClient from './apiClient';"
+  },
+  {
+    "endpoint": "/api/leave/submit",
+    "file": "src/services/leaveService.js",
+    "line": 9,
+    "rawLine": "const response = await apiClient.post('/api/leave/submit', payload);"
+  },
+  {
+    "endpoint": "/api/leave/my-leaves",
+    "file": "src/services/leaveService.js",
+    "line": 14,
+    "rawLine": "const response = await apiClient.get('/api/leave/my-leaves');"
+  },
+  {
+    "endpoint": "/api/leave/all",
+    "file": "src/services/leaveService.js",
+    "line": 19,
+    "rawLine": "const response = await apiClient.get('/api/leave/all', { params });"
+  },
+  {
+    "endpoint": "/api/leave/pending",
+    "file": "src/services/leaveService.js",
+    "line": 24,
+    "rawLine": "const response = await apiClient.get('/api/leave/pending', { params });"
+  },
+  {
+    "endpoint": "/api/leave/${id}/approve",
+    "file": "src/services/leaveService.js",
+    "line": 29,
+    "rawLine": "const response = await apiClient.put(`/api/leave/${id}/approve`, { remarks });"
+  },
+  {
+    "endpoint": "/api/leave/${id}/reject",
+    "file": "src/services/leaveService.js",
+    "line": 34,
+    "rawLine": "const response = await apiClient.put(`/api/leave/${id}/reject`, { remarks });"
+  },
+  {
+    "endpoint": "/api/leave/${id}",
+    "file": "src/services/leaveService.js",
+    "line": 39,
+    "rawLine": "const response = await apiClient.get(`/api/leave/${id}`);"
+  },
+  {
+    "endpoint": "/api/leave/${id}",
+    "file": "src/services/leaveService.js",
+    "line": 44,
+    "rawLine": "const response = await apiClient.put(`/api/leave/${id}`, payload);"
+  },
+  {
+    "endpoint": "/api/leave/${id}",
+    "file": "src/services/leaveService.js",
+    "line": 49,
+    "rawLine": "const response = await apiClient.delete(`/api/leave/${id}`);"
+  },
+  {
+    "endpoint": "/apiClient",
+    "file": "src/services/memberService.js",
+    "line": 5,
+    "rawLine": "import apiClient from './apiClient';"
+  },
+  {
+    "endpoint": "/api/public/members",
+    "file": "src/services/memberService.js",
+    "line": 9,
+    "rawLine": "const response = await apiClient.get('/api/public/members', { params });"
+  },
+  {
+    "endpoint": "/api/public/members/counts",
+    "file": "src/services/memberService.js",
+    "line": 14,
+    "rawLine": "const response = await apiClient.get('/api/public/members/counts');"
+  },
+  {
+    "endpoint": "/api/admin/member",
+    "file": "src/services/memberService.js",
+    "line": 19,
+    "rawLine": "const response = await apiClient.get('/api/admin/member', { params });"
+  },
+  {
+    "endpoint": "/api/admin/member/counts",
+    "file": "src/services/memberService.js",
+    "line": 24,
+    "rawLine": "const response = await apiClient.get('/api/admin/member/counts');"
+  },
+  {
+    "endpoint": "/api/admin/member/add",
+    "file": "src/services/memberService.js",
+    "line": 29,
+    "rawLine": "const response = await apiClient.post('/api/admin/member/add', memberData);"
+  },
+  {
+    "endpoint": "/api/admin/member/${id}",
+    "file": "src/services/memberService.js",
+    "line": 34,
+    "rawLine": "const response = await apiClient.put(`/api/admin/member/${id}`, memberData);"
+  },
+  {
+    "endpoint": "/api/admin/member/${id}",
+    "file": "src/services/memberService.js",
+    "line": 39,
+    "rawLine": "const response = await apiClient.delete(`/api/admin/member/${id}`);"
+  },
+  {
+    "endpoint": "/api/admin/member/${id}/block",
+    "file": "src/services/memberService.js",
+    "line": 44,
+    "rawLine": "const response = await apiClient.patch(`/api/admin/member/${id}/block`);"
+  },
+  {
+    "endpoint": "/api/admin/member/${id}/suspend",
+    "file": "src/services/memberService.js",
+    "line": 49,
+    "rawLine": "const response = await apiClient.patch(`/api/admin/member/${id}/suspend`, { suspendUntil });"
+  },
+  {
+    "endpoint": "/api/admin/member/supplementary/semester/${semester}",
+    "file": "src/services/memberService.js",
+    "line": 54,
+    "rawLine": "const response = await apiClient.get(`/api/admin/member/supplementary/semester/${semester}`);"
+  },
+  {
+    "endpoint": "/api/admin/member/fines/all",
+    "file": "src/services/memberService.js",
+    "line": 59,
+    "rawLine": "const response = await apiClient.get('/api/admin/member/fines/all');"
+  },
+  {
+    "endpoint": "/api/member/getProfile",
+    "file": "src/services/memberService.js",
+    "line": 64,
+    "rawLine": "const response = await apiClient.get('/api/member/getProfile');"
+  },
+  {
+    "endpoint": "/api/admin/member/${targetId}",
+    "file": "src/services/memberService.js",
+    "line": 75,
+    "rawLine": "const response = await apiClient.put(`/api/admin/member/${targetId}`, payload);"
+  },
+  {
+    "endpoint": "/apiClient",
+    "file": "src/services/projectService.js",
+    "line": 5,
+    "rawLine": "import apiClient from './apiClient';"
+  },
+  {
+    "endpoint": "/api/projects",
+    "file": "src/services/projectService.js",
+    "line": 9,
+    "rawLine": "const response = await apiClient.get('/api/projects', { params });"
+  },
+  {
+    "endpoint": "/api/projects/${id}",
+    "file": "src/services/projectService.js",
+    "line": 14,
+    "rawLine": "const response = await apiClient.get(`/api/projects/${id}`);"
+  },
+  {
+    "endpoint": "/api/projects",
+    "file": "src/services/projectService.js",
+    "line": 19,
+    "rawLine": "const response = await apiClient.post('/api/projects', projectData);"
+  },
+  {
+    "endpoint": "/api/projects/${id}",
+    "file": "src/services/projectService.js",
+    "line": 24,
+    "rawLine": "const response = await apiClient.put(`/api/projects/${id}`, projectData);"
+  },
+  {
+    "endpoint": "/api/projects/${id}",
+    "file": "src/services/projectService.js",
+    "line": 29,
+    "rawLine": "const response = await apiClient.delete(`/api/projects/${id}`);"
+  },
+  {
+    "endpoint": "/upload/project_file_upload",
+    "file": "src/services/projectService.js",
+    "line": 34,
+    "rawLine": "const response = await apiClient.post('/upload/project_file_upload', formData, {"
+  },
+  {
+    "endpoint": "/apiClient",
+    "file": "src/services/trainerService.js",
+    "line": 5,
+    "rawLine": "import apiClient from './apiClient';"
+  },
+  {
+    "endpoint": "/api/admin/trainers/all-trainers",
+    "file": "src/services/trainerService.js",
+    "line": 9,
+    "rawLine": "const response = await apiClient.get('/api/admin/trainers/all-trainers');"
+  },
+  {
+    "endpoint": "/api/admin/trainers/add-trainer",
+    "file": "src/services/trainerService.js",
+    "line": 14,
+    "rawLine": "const response = await apiClient.post('/api/admin/trainers/add-trainer', trainerData);"
+  },
+  {
+    "endpoint": "/api/admin/trainers/update-trainer/${id}",
+    "file": "src/services/trainerService.js",
+    "line": 19,
+    "rawLine": "const response = await apiClient.put(`/api/admin/trainers/update-trainer/${id}`, trainerData);"
+  },
+  {
+    "endpoint": "/api/admin/trainers/delete-trainer/${id}",
+    "file": "src/services/trainerService.js",
+    "line": 24,
+    "rawLine": "const response = await apiClient.delete(`/api/admin/trainers/delete-trainer/${id}`);"
+  },
+  {
+    "endpoint": "/upload/trainer_file_upload",
+    "file": "src/services/trainerService.js",
+    "line": 29,
+    "rawLine": "const response = await apiClient.post('/upload/trainer_file_upload', formData, {"
+  },
+  {
+    "endpoint": "/apiClient",
+    "file": "src/services/uniques360Service.js",
+    "line": 5,
+    "rawLine": "import apiClient from './apiClient';"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks",
+    "file": "src/services/uniques360Service.js",
+    "line": 9,
+    "rawLine": "const response = await apiClient.post('/api/uniques360/tasks', taskData);"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/member/${memberId}",
+    "file": "src/services/uniques360Service.js",
+    "line": 14,
+    "rawLine": "const response = await apiClient.get(`/api/uniques360/tasks/member/${memberId}`);"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/coordinator/${coordinatorId}",
+    "file": "src/services/uniques360Service.js",
+    "line": 19,
+    "rawLine": "const response = await apiClient.get(`/api/uniques360/tasks/coordinator/${coordinatorId}`);"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/${taskId}",
+    "file": "src/services/uniques360Service.js",
+    "line": 24,
+    "rawLine": "const response = await apiClient.patch(`/api/uniques360/tasks/${taskId}`, { status });"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/${taskId}",
+    "file": "src/services/uniques360Service.js",
+    "line": 29,
+    "rawLine": "const response = await apiClient.put(`/api/uniques360/tasks/${taskId}`, taskData);"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/${taskId}",
+    "file": "src/services/uniques360Service.js",
+    "line": 34,
+    "rawLine": "const response = await apiClient.delete(`/api/uniques360/tasks/${taskId}`);"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/${taskId}/members",
+    "file": "src/services/uniques360Service.js",
+    "line": 39,
+    "rawLine": "const response = await apiClient.post(`/api/uniques360/tasks/${taskId}/members`, { memberId });"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/${taskId}/members/remove",
+    "file": "src/services/uniques360Service.js",
+    "line": 44,
+    "rawLine": "const response = await apiClient.post(`/api/uniques360/tasks/${taskId}/members/remove`, { memberId });"
+  },
+  {
+    "endpoint": "/api/uniques360/reports",
+    "file": "src/services/uniques360Service.js",
+    "line": 49,
+    "rawLine": "const response = await apiClient.post('/api/uniques360/reports', reportData);"
+  },
+  {
+    "endpoint": "/api/uniques360/reports/task/${taskId}",
+    "file": "src/services/uniques360Service.js",
+    "line": 54,
+    "rawLine": "const response = await apiClient.get(`/api/uniques360/reports/task/${taskId}`);"
+  },
+  {
+    "endpoint": "/apiClient",
+    "file": "src/utils/batch/batchProfilesData.js",
+    "line": 1,
+    "rawLine": "import apiClient from \"@/services/apiClient\";"
+  },
+  {
+    "endpoint": "/api/batches/profiles",
+    "file": "src/utils/batch/batchProfilesData.js",
+    "line": 110,
+    "rawLine": "const response = await apiClient.get(`${BASE_URL}/api/batches/profiles`);"
+  },
+  {
+    "endpoint": "/api/batches/profiles/update",
+    "file": "src/utils/batch/batchProfilesData.js",
+    "line": 149,
+    "rawLine": "await apiClient.post(`${BASE_URL}/api/batches/profiles/update`, { profiles: toSave });"
+  },
+  {
+    "endpoint": "/apiClient",
+    "file": "src/utils/batch/batchesData.js",
+    "line": 1,
+    "rawLine": "import apiClient from \"@/services/apiClient\";"
+  },
+  {
+    "endpoint": "/api/batches/all",
+    "file": "src/utils/batch/batchesData.js",
+    "line": 42,
+    "rawLine": "const response = await apiClient.get(`${BASE_URL}/api/batches/all`);"
+  },
+  {
+    "endpoint": "/api/batches/add",
+    "file": "src/utils/batch/batchesData.js",
+    "line": 86,
+    "rawLine": "await apiClient.post(`${BASE_URL}/api/batches/add`, { name: formatted });"
+  },
+  {
+    "endpoint": "/api/projects",
+    "file": "src/utils/project/projectsData.js",
+    "line": 434,
+    "rawLine": "console.warn(\"Backend /api/projects request failed, using cached projects:\", err?.message || err);"
+  },
+  {
+    "endpoint": "/apiClient",
+    "file": "src/utils/stats/statsData.js",
+    "line": 1,
+    "rawLine": "import apiClient from \"@/services/apiClient\";"
+  },
+  {
+    "endpoint": "/api/stats",
+    "file": "src/utils/stats/statsData.js",
+    "line": 35,
+    "rawLine": "const response = await apiClient.get(`${BASE_URL}/api/stats`);"
+  },
+  {
+    "endpoint": "/api/stats/update",
+    "file": "src/utils/stats/statsData.js",
+    "line": 65,
+    "rawLine": "const response = await apiClient.post(`${BASE_URL}/api/stats/update`, payload);"
+  },
+  {
+    "endpoint": "/auth/password-reset/send-otp",
+    "file": "src/views/Authentication/login/ForgetPassword.jsx",
+    "line": 60,
+    "rawLine": "const response = await axios.post(`${BASE_URL}/auth/password-reset/send-otp`, {"
+  },
+  {
+    "endpoint": "/auth/password-reset/verify-otp",
+    "file": "src/views/Authentication/login/ForgetPassword.jsx",
+    "line": 89,
+    "rawLine": "const response = await axios.post(`${BASE_URL}/auth/password-reset/verify-otp`, {"
+  },
+  {
+    "endpoint": "/auth/password-reset/reset-password",
+    "file": "src/views/Authentication/login/ForgetPassword.jsx",
+    "line": 118,
+    "rawLine": "const response = await axios.post(`${BASE_URL}/auth/password-reset/reset-password`, {"
+  },
+  {
+    "endpoint": "/auth/password-reset/resend-otp",
+    "file": "src/views/Authentication/login/ForgetPassword.jsx",
+    "line": 150,
+    "rawLine": "const response = await axios.post(`${BASE_URL}/auth/password-reset/resend-otp`, {"
+  },
+  {
+    "endpoint": "/authService",
+    "file": "src/views/Authentication/login/index.jsx",
+    "line": 31,
+    "rawLine": "import authService from \"@/services/authService\";"
+  },
+  {
+    "endpoint": "/authUtils",
+    "file": "src/views/Authentication/login/index.jsx",
+    "line": 32,
+    "rawLine": "import { storeAuth } from \"@/utils/authUtils\";"
+  },
+  {
+    "endpoint": "/auth/google",
+    "file": "src/views/Authentication/login/index.jsx",
+    "line": 66,
+    "rawLine": "const googleLoginUrl = `${BASE_URL}/auth/google`;"
+  },
+  {
+    "endpoint": "/apiClient",
+    "file": "src/views/Management/Accounts/components/TransactionTable.jsx",
+    "line": 73,
+    "rawLine": "import apiClient from \"@/services/apiClient\";"
+  },
+  {
+    "endpoint": "/api/admin/fine",
+    "file": "src/views/Management/Accounts/components/TransactionTable.jsx",
+    "line": 82,
+    "rawLine": "const API_BASE_URL = `${BASE_URL}/api/admin/fine`;"
+  },
+  {
+    "endpoint": "/upload/fine_file_upload",
+    "file": "src/views/Management/Accounts/components/TransactionTable.jsx",
+    "line": 83,
+    "rawLine": "const UPLOAD_API_URL = `${BASE_URL}/upload/fine_file_upload`;"
+  },
+  {
+    "endpoint": "/api/admin",
+    "file": "src/views/Management/Accounts/index.jsx",
+    "line": 30,
+    "rawLine": "const API_BASE_URL = `${BASE_URL}/api/admin`;"
+  },
+  {
+    "endpoint": "/upload/fine_file_upload",
+    "file": "src/views/Management/Dashboard/index.jsx",
+    "line": 137,
+    "rawLine": "`${BASE_URL}/upload/fine_file_upload`,"
+  },
+  {
+    "endpoint": "/api/admin/fine/members/${memberId}/fines/${fine",
+    "file": "src/views/Management/Dashboard/index.jsx",
+    "line": 157,
+    "rawLine": "const updateEndpoint = `${BASE_URL}/api/admin/fine/members/${memberId}/fines/${fine._id}`;"
+  },
+  {
+    "endpoint": "/api/admin",
+    "file": "src/views/Management/Dashboard/index.jsx",
+    "line": 610,
+    "rawLine": "const API_BASE_URL = `${BASE_URL}/api/admin`;"
+  },
+  {
+    "endpoint": "/api/admin/member",
+    "file": "src/views/Management/Dashboard/index.jsx",
+    "line": 619,
+    "rawLine": "`${BASE_URL}/api/admin/member?page=1&limit=10`"
+  },
+  {
+    "endpoint": "/api/admin/fine/fines/members",
+    "file": "src/views/Management/Dashboard/index.jsx",
+    "line": 633,
+    "rawLine": "`${BASE_URL}/api/admin/fine/fines/members`"
+  },
+  {
+    "endpoint": "/api/admin/fine/fines/statistics",
+    "file": "src/views/Management/Dashboard/index.jsx",
+    "line": 655,
+    "rawLine": "`${BASE_URL}/api/admin/fine/fines/statistics`"
+  },
+  {
+    "endpoint": "/api/events",
+    "file": "src/views/Management/Dashboard/index.jsx",
+    "line": 673,
+    "rawLine": "const eventsRes = await axios.get(`${BASE_URL}/api/events`);"
+  },
+  {
+    "endpoint": "/api/admin/member/supplementary/semester/${currentSemester}",
+    "file": "src/views/Management/Dashboard/index.jsx",
+    "line": 725,
+    "rawLine": "`${BASE_URL}/api/admin/member/supplementary/semester/${currentSemester}`"
+  },
+  {
+    "endpoint": "/api/admin/member/supplementary/semester/${semester}",
+    "file": "src/views/Management/Dashboard/index.jsx",
+    "line": 746,
+    "rawLine": "`${BASE_URL}/api/admin/member/supplementary/semester/${semester}`"
+  },
+  {
+    "endpoint": "/api/admin/member/fines/all",
+    "file": "src/views/Management/Dashboard/index.jsx",
+    "line": 794,
+    "rawLine": "`${BASE_URL}/api/admin/member/fines/all`"
+  },
+  {
+    "endpoint": "/api/image-proxy/${fileId}",
+    "file": "src/views/Management/Dashboard/index.jsx",
+    "line": 880,
+    "rawLine": "return `${BASE_URL}/api/image-proxy/${fileId}`;"
+  },
+  {
+    "endpoint": "/api/admin/enquiry",
+    "file": "src/views/Management/Enquiry/index.jsx",
+    "line": 104,
+    "rawLine": "let url = `${BASE_URL}/api/admin/enquiry?page=${currentPage}&limit=${limit}`;"
+  },
+  {
+    "endpoint": "/api/admin/enquiry/${id}",
+    "file": "src/views/Management/Enquiry/index.jsx",
+    "line": 160,
+    "rawLine": "`${BASE_URL}/api/admin/enquiry/${id}`,"
+  },
+  {
+    "endpoint": "/api/admin/enquiry/${enquiryId}/reply",
+    "file": "src/views/Management/Enquiry/index.jsx",
+    "line": 210,
+    "rawLine": "`${BASE_URL}/api/admin/enquiry/${enquiryId}/reply`,"
+  },
+  {
+    "endpoint": "/api/admin/enquiry/${selectedEnquiry",
+    "file": "src/views/Management/Enquiry/index.jsx",
+    "line": 250,
+    "rawLine": "`${BASE_URL}/api/admin/enquiry/${selectedEnquiry._id}/status`,"
+  },
+  {
+    "endpoint": "/api/admin/enquiry/${deleteId}",
+    "file": "src/views/Management/Enquiry/index.jsx",
+    "line": 285,
+    "rawLine": "`${BASE_URL}/api/admin/enquiry/${deleteId}`,"
+  },
+  {
+    "endpoint": "/upload/budget_file_upload",
+    "file": "src/views/Management/Events/Budget.jsx",
+    "line": 332,
+    "rawLine": "`${BASE_URL}/upload/budget_file_upload`,"
+  },
+  {
+    "endpoint": "/api/events/${id}/expenses/${expenseId}",
+    "file": "src/views/Management/Events/Budget.jsx",
+    "line": 366,
+    "rawLine": "`${BASE_URL}/api/events/${id}/expenses/${expenseId}`,"
+  },
+  {
+    "endpoint": "/api/events/${id}/budget-allocations/${allocationId}",
+    "file": "src/views/Management/Events/Budget.jsx",
+    "line": 392,
+    "rawLine": "`${BASE_URL}/api/events/${id}/budget-allocations/${allocationId}`,"
+  },
+  {
+    "endpoint": "/api/events/${id}/budget-allocations",
+    "file": "src/views/Management/Events/Budget.jsx",
+    "line": 417,
+    "rawLine": "`${BASE_URL}/api/events/${id}/budget-allocations`,"
+  },
+  {
+    "endpoint": "/api/events/${id}",
+    "file": "src/views/Management/Events/Budget.jsx",
+    "line": 453,
+    "rawLine": "const response = await fetch(`${BASE_URL}/api/events/${id}`, {"
+  },
+  {
+    "endpoint": "/api/events/${id}/budget",
+    "file": "src/views/Management/Events/Budget.jsx",
+    "line": 475,
+    "rawLine": "`${BASE_URL}/api/events/${id}/budget`,"
+  },
+  {
+    "endpoint": "/api/events/${id}/budget",
+    "file": "src/views/Management/Events/Budget.jsx",
+    "line": 529,
+    "rawLine": "`${BASE_URL}/api/events/${id}/budget`,"
+  },
+  {
+    "endpoint": "/api/events/${id}/sponsors",
+    "file": "src/views/Management/Events/Budget.jsx",
+    "line": 566,
+    "rawLine": "`${BASE_URL}/api/events/${id}/sponsors`,"
+  },
+  {
+    "endpoint": "/api/events/${id}/sponsors/${sponsorId}",
+    "file": "src/views/Management/Events/Budget.jsx",
+    "line": 605,
+    "rawLine": "`${BASE_URL}/api/events/${id}/sponsors/${sponsorId}`,"
+  },
+  {
+    "endpoint": "/api/events/${id}/expenses",
+    "file": "src/views/Management/Events/Budget.jsx",
+    "line": 640,
+    "rawLine": "`${BASE_URL}/api/events/${id}/expenses`,"
+  },
+  {
+    "endpoint": "/api/events/${id}/expenses/${expenseId}",
+    "file": "src/views/Management/Events/Budget.jsx",
+    "line": 683,
+    "rawLine": "`${BASE_URL}/api/events/${id}/expenses/${expenseId}`,"
+  },
+  {
+    "endpoint": "/api/admin/member",
+    "file": "src/views/Management/Events/View.jsx",
+    "line": 246,
+    "rawLine": "`${BASE_URL}/api/admin/member`,"
+  },
+  {
+    "endpoint": "/api/events/${id}/members",
+    "file": "src/views/Management/Events/View.jsx",
+    "line": 277,
+    "rawLine": "`${BASE_URL}/api/events/${id}/members`,"
+  },
+  {
+    "endpoint": "/api/events/${id}/members/team/${teamType}/add",
+    "file": "src/views/Management/Events/View.jsx",
+    "line": 359,
+    "rawLine": "const endpoint = `${BASE_URL}/api/events/${id}/members/team/${teamType}/add`;"
+  },
+  {
+    "endpoint": "/api/events/${id}/members/team/${memberTeam}/members",
+    "file": "src/views/Management/Events/View.jsx",
+    "line": 404,
+    "rawLine": "const endpoint = `${BASE_URL}/api/events/${id}/members/team/${memberTeam}/members`;"
+  },
+  {
+    "endpoint": "/api/events/${id}",
+    "file": "src/views/Management/Events/View.jsx",
+    "line": 443,
+    "rawLine": "`${BASE_URL}/api/events/${id}`"
+  },
+  {
+    "endpoint": "/api/guest/get-all-guests",
+    "file": "src/views/Management/Events/View.jsx",
+    "line": 475,
+    "rawLine": "`${BASE_URL}/api/guest/get-all-guests`"
+  },
+  {
+    "endpoint": "/api/events/${eventId}/form-responses",
+    "file": "src/views/Management/Events/View.jsx",
+    "line": 491,
+    "rawLine": "`${BASE_URL}/api/events/${eventId}/form-responses`,"
+  },
+  {
+    "endpoint": "/api/events/${id}",
+    "file": "src/views/Management/Events/View.jsx",
+    "line": 580,
+    "rawLine": "`${BASE_URL}/api/events/${id}`,"
+  },
+  {
+    "endpoint": "/upload/event_file_upload",
+    "file": "src/views/Management/Events/View.jsx",
+    "line": 652,
+    "rawLine": "`${BASE_URL}/upload/event_file_upload`,"
+  },
+  {
+    "endpoint": "/api/events/${id}/gallery",
+    "file": "src/views/Management/Events/View.jsx",
+    "line": 673,
+    "rawLine": "`${BASE_URL}/api/events/${id}/gallery`"
+  },
+  {
+    "endpoint": "/api/events/${id}/gallery",
+    "file": "src/views/Management/Events/View.jsx",
+    "line": 708,
+    "rawLine": "`${BASE_URL}/api/events/${id}/gallery`,"
+  },
+  {
+    "endpoint": "/api/events/${id}/register",
+    "file": "src/views/Management/Events/View.jsx",
+    "line": 766,
+    "rawLine": "`${BASE_URL}/api/events/${id}/register`,"
+  },
+  {
+    "endpoint": "/api/guest/add-guest",
+    "file": "src/views/Management/Events/View.jsx",
+    "line": 851,
+    "rawLine": "`${BASE_URL}/api/guest/add-guest`,"
+  },
+  {
+    "endpoint": "/api/guest/add-guest",
+    "file": "src/views/Management/Events/View.jsx",
+    "line": 904,
+    "rawLine": "`${BASE_URL}/api/guest/add-guest`,"
+  },
+  {
+    "endpoint": "/api/events/link-guest",
+    "file": "src/views/Management/Events/View.jsx",
+    "line": 929,
+    "rawLine": "`${BASE_URL}/api/events/link-guest`,"
+  },
+  {
+    "endpoint": "/api/events/${id}",
+    "file": "src/views/Management/Events/View.jsx",
+    "line": 954,
+    "rawLine": "`${BASE_URL}/api/events/${id}`"
+  },
+  {
+    "endpoint": "/api/events/${id}",
+    "file": "src/views/Management/Events/View.jsx",
+    "line": 1001,
+    "rawLine": "`${BASE_URL}/api/events/${id}`,"
+  },
+  {
+    "endpoint": "/upload/event_file_upload",
+    "file": "src/views/Management/Events/View.jsx",
+    "line": 1051,
+    "rawLine": "`${BASE_URL}/upload/event_file_upload`,"
+  },
+  {
+    "endpoint": "/api/events/${id}",
+    "file": "src/views/Management/Events/View.jsx",
+    "line": 1071,
+    "rawLine": "`${BASE_URL}/api/events/${id}`"
+  },
+  {
+    "endpoint": "/api/events/${id}/form-response",
+    "file": "src/views/Management/Events/View.jsx",
+    "line": 1244,
+    "rawLine": "`${BASE_URL}/api/events/${id}/form-response`,"
+  },
+  {
+    "endpoint": "/api/events/${id}/status",
+    "file": "src/views/Management/Events/View.jsx",
+    "line": 2455,
+    "rawLine": "`${BASE_URL}/api/events/${id}/status`,"
+  },
+  {
+    "endpoint": "/api/events",
+    "file": "src/views/Management/Events/index.jsx",
+    "line": 80,
+    "rawLine": "`${BASE_URL}/api/events?page=${page}`,"
+  },
+  {
+    "endpoint": "/api/events/${eventToDelete}",
+    "file": "src/views/Management/Events/index.jsx",
+    "line": 209,
+    "rawLine": "`${BASE_URL}/api/events/${eventToDelete}`,"
+  },
+  {
+    "endpoint": "/api/leave/all",
+    "file": "src/views/Management/LeaveManagement/index.jsx",
+    "line": 62,
+    "rawLine": "const response = await fetch(`${BASE_URL}/api/leave/all`, {"
+  },
+  {
+    "endpoint": "/api/leave/${selectedLeave",
+    "file": "src/views/Management/LeaveManagement/index.jsx",
+    "line": 156,
+    "rawLine": "const response = await fetch(`${BASE_URL}/api/leave/${selectedLeave._id}/approve`, {"
+  },
+  {
+    "endpoint": "/api/leave/${selectedLeave",
+    "file": "src/views/Management/LeaveManagement/index.jsx",
+    "line": 182,
+    "rawLine": "const response = await fetch(`${BASE_URL}/api/leave/${selectedLeave._id}/reject`, {"
+  },
+  {
+    "endpoint": "/api/admin/member",
+    "file": "src/views/Management/Members/index.jsx",
+    "line": 121,
+    "rawLine": "const response = await axios.get(`${BASE_URL}/api/admin/member`, { params });"
+  },
+  {
+    "endpoint": "/api/image-proxy/${fileId}",
+    "file": "src/views/Management/Members/index.jsx",
+    "line": 159,
+    "rawLine": "return `${BASE_URL}/api/image-proxy/${fileId}`;"
+  },
+  {
+    "endpoint": "/api/admin/member/add",
+    "file": "src/views/Management/Members/index.jsx",
+    "line": 249,
+    "rawLine": "const response = await axios.post(`${BASE_URL}/api/admin/member/add`, newMember);"
+  },
+  {
+    "endpoint": "/api/admin/member/${editingMember",
+    "file": "src/views/Management/Members/index.jsx",
+    "line": 346,
+    "rawLine": "const response = await axios.put(`${BASE_URL}/api/admin/member/${editingMember._id}`, editingMember);"
+  },
+  {
+    "endpoint": "/api/admin/member/${memberToDelete",
+    "file": "src/views/Management/Members/index.jsx",
+    "line": 386,
+    "rawLine": "const response = await axios.delete(`${BASE_URL}/api/admin/member/${memberToDelete._id}`);"
+  },
+  {
+    "endpoint": "/api/image-proxy/${profile",
+    "file": "src/views/Management/Profile/index.jsx",
+    "line": 97,
+    "rawLine": "return `${BASE_URL}/api/image-proxy/${profile.profilePic.fileId}`;"
+  },
+  {
+    "endpoint": "/api/admin/trainers/all-trainers",
+    "file": "src/views/Management/Trainers/index.jsx",
+    "line": 84,
+    "rawLine": "const response = await axios.get(`${burl}/api/admin/trainers/all-trainers`);"
+  },
+  {
+    "endpoint": "/api/image-proxy/${fileId}",
+    "file": "src/views/Management/Trainers/index.jsx",
+    "line": 97,
+    "rawLine": "if (fileId) return `${burl}/api/image-proxy/${fileId}`;"
+  },
+  {
+    "endpoint": "/api/admin/trainers/update-trainer/${selectedTrainer",
+    "file": "src/views/Management/Trainers/index.jsx",
+    "line": 154,
+    "rawLine": "const response = await axios.put(`${burl}/api/admin/trainers/update-trainer/${selectedTrainer._id}`, payload);"
+  },
+  {
+    "endpoint": "/api/admin/trainers/add-trainer",
+    "file": "src/views/Management/Trainers/index.jsx",
+    "line": 159,
+    "rawLine": "const response = await axios.post(`${burl}/api/admin/trainers/add-trainer`, payload);"
+  },
+  {
+    "endpoint": "/upload/trainer_file_upload",
+    "file": "src/views/Management/Trainers/index.jsx",
+    "line": 171,
+    "rawLine": "await axios.post(`${burl}/upload/trainer_file_upload`, formData, {"
+  },
+  {
+    "endpoint": "/api/admin/trainers/delete-trainer/${selectedTrainer",
+    "file": "src/views/Management/Trainers/index.jsx",
+    "line": 235,
+    "rawLine": "await axios.delete(`${burl}/api/admin/trainers/delete-trainer/${selectedTrainer._id}`);"
+  },
+  {
+    "endpoint": "/api/image-proxy/${fileId}",
+    "file": "src/views/Management/dashboardComponents/NewMember.jsx",
+    "line": 87,
+    "rawLine": "return `${BASE_URL}/api/image-proxy/${fileId}`;"
+  },
+  {
+    "endpoint": "/api/leave/my-leaves",
+    "file": "src/views/Uniques/Member/LeaveManagement/index.jsx",
+    "line": 64,
+    "rawLine": "const response = await fetch(`${BASE_URL}/api/leave/my-leaves`, {"
+  },
+  {
+    "endpoint": "/api/leave/${editingId}",
+    "file": "src/views/Uniques/Member/LeaveManagement/index.jsx",
+    "line": 135,
+    "rawLine": "const response = await fetch(`${BASE_URL}/api/leave/${editingId}`, {"
+  },
+  {
+    "endpoint": "/api/leave/submit",
+    "file": "src/views/Uniques/Member/LeaveManagement/index.jsx",
+    "line": 145,
+    "rawLine": "const response = await fetch(`${BASE_URL}/api/leave/submit`, {"
+  },
+  {
+    "endpoint": "/api/leave/${id}",
+    "file": "src/views/Uniques/Member/LeaveManagement/index.jsx",
+    "line": 173,
+    "rawLine": "const response = await fetch(`${BASE_URL}/api/leave/${id}`, {"
+  },
+  {
+    "endpoint": "/apiClient",
+    "file": "src/views/Uniques/Member/index.jsx",
+    "line": 100,
+    "rawLine": "import apiClient from \"@/services/apiClient\";"
+  },
+  {
+    "endpoint": "/api/image-proxy/${fileId}",
+    "file": "src/views/Uniques/Member/index.jsx",
+    "line": 136,
+    "rawLine": "return `${API_BASE_URL}/api/image-proxy/${fileId}`;"
+  },
+  {
+    "endpoint": "/api/member/getProfile",
+    "file": "src/views/Uniques/Member/index.jsx",
+    "line": 249,
+    "rawLine": "`${API_BASE_URL}/api/member/getProfile`,"
+  },
+  {
+    "endpoint": "/api/member/getProfile",
+    "file": "src/views/Uniques/Member/index.jsx",
+    "line": 277,
+    "rawLine": "`${API_BASE_URL}/api/member/getProfile`,"
+  },
+  {
+    "endpoint": "/api/admin/member/${user",
+    "file": "src/views/Uniques/Member/index.jsx",
+    "line": 377,
+    "rawLine": "`${API_BASE_URL}/api/admin/member/${user._id}/fine`,"
+  },
+  {
+    "endpoint": "/api/member/members/${user",
+    "file": "src/views/Uniques/Member/index.jsx",
+    "line": 464,
+    "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/editProfile`,"
+  },
+  {
+    "endpoint": "/upload/file_upload",
+    "file": "src/views/Uniques/Member/index.jsx",
+    "line": 546,
+    "rawLine": "`${API_BASE_URL}/upload/file_upload`,"
+  },
+  {
+    "endpoint": "/api/member/members/${user",
+    "file": "src/views/Uniques/Member/index.jsx",
+    "line": 577,
+    "rawLine": "`/api/member/members/${user._id}/profilePic`"
+  },
+  {
+    "endpoint": "/api/member/members/${user",
+    "file": "src/views/Uniques/Member/index.jsx",
+    "line": 655,
+    "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/achievements`,"
+  },
+  {
+    "endpoint": "/api/member/members/${user",
+    "file": "src/views/Uniques/Member/index.jsx",
+    "line": 697,
+    "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/achievements`,"
+  },
+  {
+    "endpoint": "/upload/file_upload",
+    "file": "src/views/Uniques/Member/index.jsx",
+    "line": 790,
+    "rawLine": "`${API_BASE_URL}/upload/file_upload`,"
+  },
+  {
+    "endpoint": "/api/member/members/${user",
+    "file": "src/views/Uniques/Member/index.jsx",
+    "line": 829,
+    "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/certifications`,"
+  },
+  {
+    "endpoint": "/api/member/members/${user",
+    "file": "src/views/Uniques/Member/index.jsx",
+    "line": 871,
+    "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/certifications`,"
+  },
+  {
+    "endpoint": "/upload/file_upload",
+    "file": "src/views/Uniques/Member/index.jsx",
+    "line": 979,
+    "rawLine": "`${API_BASE_URL}/upload/file_upload`,"
+  },
+  {
+    "endpoint": "/api/member/members/${user",
+    "file": "src/views/Uniques/Member/index.jsx",
+    "line": 1003,
+    "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/projects`,"
+  },
+  {
+    "endpoint": "/api/member/members/${user",
+    "file": "src/views/Uniques/Member/index.jsx",
+    "line": 1038,
+    "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/projects`,"
+  },
+  {
+    "endpoint": "/api/member/members/${user",
+    "file": "src/views/Uniques/Member/index.jsx",
+    "line": 1152,
+    "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/internships`,"
+  },
+  {
+    "endpoint": "/api/member/members/${user",
+    "file": "src/views/Uniques/Member/index.jsx",
+    "line": 1194,
+    "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/internships`,"
+  },
+  {
+    "endpoint": "/api/member/members/${user",
+    "file": "src/views/Uniques/Member/index.jsx",
+    "line": 1302,
+    "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/events`,"
+  },
+  {
+    "endpoint": "/api/member/members/${user",
+    "file": "src/views/Uniques/Member/index.jsx",
+    "line": 1343,
+    "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/events`,"
+  },
+  {
+    "endpoint": "/api/member/members/${user",
+    "file": "src/views/Uniques/Member/index.jsx",
+    "line": 1437,
+    "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/academics`,"
+  },
+  {
+    "endpoint": "/api/member/members/${user",
+    "file": "src/views/Uniques/Member/index.jsx",
+    "line": 1479,
+    "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/academics`,"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/coordinator/current",
+    "file": "src/views/Uniques360/Coordinator360/Uniques360.jsx",
+    "line": 96,
+    "rawLine": "`${BASE_URL}/api/uniques360/tasks/coordinator/current`,"
+  },
+  {
+    "endpoint": "/api/admin/member",
+    "file": "src/views/Uniques360/Coordinator360/Uniques360.jsx",
+    "line": 113,
+    "rawLine": "const response = await axios.get(`${BASE_URL}/api/admin/member`, {"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks",
+    "file": "src/views/Uniques360/Coordinator360/Uniques360.jsx",
+    "line": 158,
+    "rawLine": "`${BASE_URL}/api/uniques360/tasks`,"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/${taskId}",
+    "file": "src/views/Uniques360/Coordinator360/Uniques360.jsx",
+    "line": 188,
+    "rawLine": "`${BASE_URL}/api/uniques360/tasks/${taskId}`,"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/${taskId}",
+    "file": "src/views/Uniques360/Coordinator360/Uniques360.jsx",
+    "line": 204,
+    "rawLine": "await axios.delete(`${BASE_URL}/api/uniques360/tasks/${taskId}`, {"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/${selectedTask",
+    "file": "src/views/Uniques360/Coordinator360/Uniques360.jsx",
+    "line": 219,
+    "rawLine": "await axios.put(`${BASE_URL}/api/uniques360/tasks/${selectedTask._id}`, selectedTask, {"
+  },
+  {
+    "endpoint": "/api/uniques360/reports/task/${taskId}",
+    "file": "src/views/Uniques360/Coordinator360/Uniques360.jsx",
+    "line": 238,
+    "rawLine": "`${BASE_URL}/api/uniques360/reports/task/${taskId}`,"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/${taskId}/members/remove",
+    "file": "src/views/Uniques360/Coordinator360/Uniques360.jsx",
+    "line": 254,
+    "rawLine": "`${BASE_URL}/api/uniques360/tasks/${taskId}/members/remove`,"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/${selectedTask",
+    "file": "src/views/Uniques360/Coordinator360/Uniques360.jsx",
+    "line": 681,
+    "rawLine": "`${BASE_URL}/api/uniques360/tasks/${selectedTask._id}/members`,"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/coordinator/current",
+    "file": "src/views/Uniques360/Events/EventInsights.jsx",
+    "line": 57,
+    "rawLine": "const response = await axios.get(`${BASE_URL}/api/uniques360/tasks/coordinator/current`, {"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/${taskId}",
+    "file": "src/views/Uniques360/Events/EventInsights.jsx",
+    "line": 78,
+    "rawLine": "await axios.patch(`${BASE_URL}/api/uniques360/tasks/${taskId}`, { status: \"completed\" }, { withCredentials: true });"
+  },
+  {
+    "endpoint": "/api/admin/member",
+    "file": "src/views/Uniques360/Member360/uniques360.jsx",
+    "line": 33,
+    "rawLine": "const response = await axios.get(`${BASE_URL}/api/admin/member`, { withCredentials: true });"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/member/me",
+    "file": "src/views/Uniques360/Member360/uniques360.jsx",
+    "line": 46,
+    "rawLine": "const response = await axios.get(`${BASE_URL}/api/uniques360/tasks/member/me`, { withCredentials: true });"
+  },
+  {
+    "endpoint": "/api/uniques360/reports/task/${taskId}",
+    "file": "src/views/Uniques360/Member360/uniques360.jsx",
+    "line": 64,
+    "rawLine": "const response = await axios.get(`${BASE_URL}/api/uniques360/reports/task/${taskId}`, { withCredentials: true });"
+  },
+  {
+    "endpoint": "/api/uniques360/reports",
+    "file": "src/views/Uniques360/Member360/uniques360.jsx",
+    "line": 107,
+    "rawLine": "`${BASE_URL}/api/uniques360/reports`,"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/${selectedTask",
+    "file": "src/views/Uniques360/Member360/uniques360.jsx",
+    "line": 127,
+    "rawLine": "`${BASE_URL}/api/uniques360/tasks/${selectedTask._id}`,"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/coordinator/current",
+    "file": "src/views/Uniques360/Projects/ProjectInsights.jsx",
+    "line": 51,
+    "rawLine": "const response = await axios.get(`${BASE_URL}/api/uniques360/tasks/coordinator/current`, {"
+  },
+  {
+    "endpoint": "/api/uniques360/tasks/${taskId}",
+    "file": "src/views/Uniques360/Projects/ProjectInsights.jsx",
+    "line": 73,
+    "rawLine": "await axios.patch(`${BASE_URL}/api/uniques360/tasks/${taskId}`, { status: \"completed\" }, { withCredentials: true });"
+  }
+]

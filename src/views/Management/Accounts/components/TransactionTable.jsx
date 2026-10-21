@@ -77,6 +77,11 @@ import tu from '@/assets/logos/tu.png';
 import * as XLSX from 'xlsx';
 
 import { BASE_URL } from '@/config';
+import {
+  FILE_VALIDATION_PRESETS,
+  validateFiles,
+  resetFileInput,
+} from '@/utils/fileValidation';
 
 // Base API URL
 const API_BASE_URL = `${BASE_URL}/api/admin/fine`;
@@ -94,15 +99,17 @@ const FinePaymentModal = ({ open, onClose, memberId, fine, onPaymentComplete }) 
 
   // Handle file selection
   const handleFileChange = (e) => {
-    const selectedFiles = Array.from(e.target.files);
-    if (selectedFiles.length > 0) {
-      setFiles(selectedFiles);
-      
-      // Create preview for image files
-      if (selectedFiles[0].type.startsWith('image/')) {
-        const url = URL.createObjectURL(selectedFiles[0]);
-        setPreviewUrl(url);
-      }
+    const { validFiles, allValid } = validateFiles(e.target.files, FILE_VALIDATION_PRESETS.RECEIPT, { inputTarget: e });
+    if (!allValid || validFiles.length === 0) {
+      return;
+    }
+
+    setFiles(validFiles);
+    
+    // Create preview for image files
+    if (validFiles[0].type.startsWith('image/')) {
+      const url = URL.createObjectURL(validFiles[0]);
+      setPreviewUrl(url);
     }
   };
   
@@ -327,12 +334,12 @@ const FinePaymentModal = ({ open, onClose, memberId, fine, onPaymentComplete }) 
                     <input
                       type="file"
                       hidden
-                      accept="image/*,.pdf"
+                      accept={FILE_VALIDATION_PRESETS.RECEIPT.accept}
                       onChange={handleFileChange}
                     />
                   </Button>
                   <Typography variant="caption" display="block" mt={1} color="textSecondary">
-                    Supported formats: JPG, PNG, PDF
+                    Supported formats: JPG, PNG, WEBP, PDF
                   </Typography>
                 </Box>
               )}

@@ -1,0 +1,857 @@
+[
+  {
+    "call": {
+      "endpoint": "/authService",
+      "file": "src/App.jsx",
+      "line": 7,
+      "rawLine": "import authService from \"@/services/authService\";"
+    },
+    "normalized": "/authService"
+  },
+  {
+    "call": {
+      "endpoint": "/authUtils",
+      "file": "src/App.jsx",
+      "line": 8,
+      "rawLine": "import { getStoredAuth, isTokenExpired, clearAuthStorage } from \"@/utils/authUtils\";"
+    },
+    "normalized": "/authUtils"
+  },
+  {
+    "call": {
+      "endpoint": "/uploads/2022/10/What_Web3_Going_2023",
+      "file": "src/assets/dummyData/eventsData.js",
+      "line": 35,
+      "rawLine": "eventBanner: \"https://www.xrtoday.com/wp-content/uploads/2022/10/What_Web3_Going_2023.jpg\","
+    },
+    "normalized": "/uploads/2022/10/What_Web3_Going_2023"
+  },
+  {
+    "call": {
+      "endpoint": "/uploads/2024/12/hackton",
+      "file": "src/assets/dummyData/eventsData.js",
+      "line": 72,
+      "rawLine": "eventBanner: \"https://i0.wp.com/allaboutbelgaum.com/content/uploads/2024/12/hackton.jpeg?resize=910%2C455&ssl=1\","
+    },
+    "normalized": "/uploads/2024/12/hackton"
+  },
+  {
+    "call": {
+      "endpoint": "/api/portraits/men/1",
+      "file": "src/assets/dummyData/memberData.js",
+      "line": 43,
+      "rawLine": "profilePic: \"https://randomuser.me/api/portraits/men/1.jpg\","
+    },
+    "normalized": "/api/portraits/men/1"
+  },
+  {
+    "call": {
+      "endpoint": "/api/portraits/women/2",
+      "file": "src/assets/dummyData/memberData.js",
+      "line": 139,
+      "rawLine": "profilePic: \"https://randomuser.me/api/portraits/women/2.jpg\","
+    },
+    "normalized": "/api/portraits/women/2"
+  },
+  {
+    "call": {
+      "endpoint": "/api/events",
+      "file": "src/components/event/EventForm.jsx",
+      "line": 151,
+      "rawLine": "* @api GET /api/guest/get-all-guests, POST /upload/event_file_upload, POST /api/events, PUT /api/events/:id."
+    },
+    "normalized": "/api/events"
+  },
+  {
+    "call": {
+      "endpoint": "/api/events",
+      "file": "src/components/event/EventForm.jsx",
+      "line": 484,
+      "rawLine": "`${BASE_URL}/api/events`,"
+    },
+    "normalized": "/api/events"
+  },
+  {
+    "call": {
+      "endpoint": "/apiClient",
+      "file": "src/config.js",
+      "line": 7,
+      "rawLine": "import apiClient, { API_BASE_URL } from \"@/services/apiClient\";"
+    },
+    "normalized": "/apiClient"
+  },
+  {
+    "call": {
+      "endpoint": "/authService",
+      "file": "src/hooks/useAuth.js",
+      "line": 9,
+      "rawLine": "import authService from \"@/services/authService\";"
+    },
+    "normalized": "/authService"
+  },
+  {
+    "call": {
+      "endpoint": "/authUtils",
+      "file": "src/hooks/useAuth.js",
+      "line": 10,
+      "rawLine": "import { getStoredAuth, isTokenExpired } from \"@/utils/authUtils\";"
+    },
+    "normalized": "/authUtils"
+  },
+  {
+    "call": {
+      "endpoint": "/authService",
+      "file": "src/layout/Admin/index.jsx",
+      "line": 25,
+      "rawLine": "import authService from \"@/services/authService\";"
+    },
+    "normalized": "/authService"
+  },
+  {
+    "call": {
+      "endpoint": "/authService",
+      "file": "src/layout/Management/index.jsx",
+      "line": 26,
+      "rawLine": "import authService from \"@/services/authService\";"
+    },
+    "normalized": "/authService"
+  },
+  {
+    "call": {
+      "endpoint": "/authService",
+      "file": "src/layout/Uniques/Coordinator/index.jsx",
+      "line": 30,
+      "rawLine": "import authService from \"@/services/authService\";"
+    },
+    "normalized": "/authService"
+  },
+  {
+    "call": {
+      "endpoint": "/authService",
+      "file": "src/layout/Uniques/Member/index.jsx",
+      "line": 41,
+      "rawLine": "import authService from \"@/services/authService\";"
+    },
+    "normalized": "/authService"
+  },
+  {
+    "call": {
+      "endpoint": "/apiClient",
+      "file": "src/redux/store.js",
+      "line": 3,
+      "rawLine": "import { setStoreInstance } from '@/services/apiClient';"
+    },
+    "normalized": "/apiClient"
+  },
+  {
+    "call": {
+      "endpoint": "/authUtils",
+      "file": "src/routes/ProtectedRoute.jsx",
+      "line": 11,
+      "rawLine": "import { isRoleAuthorized, isTokenExpired } from \"@/utils/authUtils\";"
+    },
+    "normalized": "/authUtils"
+  },
+  {
+    "call": {
+      "endpoint": "/authUtils",
+      "file": "src/routes/index.jsx",
+      "line": 18,
+      "rawLine": "import { isTokenExpired } from \"@/utils/authUtils\";"
+    },
+    "normalized": "/authUtils"
+  },
+  {
+    "call": {
+      "endpoint": "/auth/login",
+      "file": "src/routes/index.jsx",
+      "line": 53,
+      "rawLine": "path: \"/auth/login\","
+    },
+    "normalized": "/auth/login"
+  },
+  {
+    "call": {
+      "endpoint": "/auth",
+      "file": "src/routes/index.jsx",
+      "line": 57,
+      "rawLine": "path: \"/auth\","
+    },
+    "normalized": "/auth"
+  },
+  {
+    "call": {
+      "endpoint": "/auth/forget-password",
+      "file": "src/routes/index.jsx",
+      "line": 67,
+      "rawLine": "path: \"/auth/forget-password\","
+    },
+    "normalized": "/auth/forget-password"
+  },
+  {
+    "call": {
+      "endpoint": "/auth/password-reset",
+      "file": "src/routes/index.jsx",
+      "line": 71,
+      "rawLine": "path: \"/auth/password-reset\","
+    },
+    "normalized": "/auth/password-reset"
+  },
+  {
+    "call": {
+      "endpoint": "/authUtils",
+      "file": "src/services/apiClient.js",
+      "line": 8,
+      "rawLine": "import { clearAuthStorage } from '@/utils/authUtils';"
+    },
+    "normalized": "/authUtils"
+  },
+  {
+    "call": {
+      "endpoint": "/auth",
+      "file": "src/services/apiClient.js",
+      "line": 107,
+      "rawLine": "if (typeof window !== 'undefined' && window.location.pathname !== '/' && !window.location.pathname.startsWith('/auth') && window.location.pathname !== '/forget-password') {"
+    },
+    "normalized": "/auth"
+  },
+  {
+    "call": {
+      "endpoint": "/apiClient",
+      "file": "src/services/authService.js",
+      "line": 7,
+      "rawLine": "import apiClient from \"./apiClient\";"
+    },
+    "normalized": "/apiClient"
+  },
+  {
+    "call": {
+      "endpoint": "/authUtils",
+      "file": "src/services/authService.js",
+      "line": 10,
+      "rawLine": "import { storeAuth, clearAuthStorage } from \"@/utils/authUtils\";"
+    },
+    "normalized": "/authUtils"
+  },
+  {
+    "call": {
+      "endpoint": "/apiClient",
+      "file": "src/services/communityService.js",
+      "line": 5,
+      "rawLine": "import apiClient from './apiClient';"
+    },
+    "normalized": "/apiClient"
+  },
+  {
+    "call": {
+      "endpoint": "/api/blogs",
+      "file": "src/services/communityService.js",
+      "line": 9,
+      "rawLine": "const response = await apiClient.get('/api/blogs', { params });"
+    },
+    "normalized": "/api/blogs"
+  },
+  {
+    "call": {
+      "endpoint": "/api/blogs",
+      "file": "src/services/communityService.js",
+      "line": 14,
+      "rawLine": "const response = await apiClient.post('/api/blogs', blogData);"
+    },
+    "normalized": "/api/blogs"
+  },
+  {
+    "call": {
+      "endpoint": "/api/stats",
+      "file": "src/services/communityService.js",
+      "line": 19,
+      "rawLine": "const response = await apiClient.get('/api/stats');"
+    },
+    "normalized": "/api/stats"
+  },
+  {
+    "call": {
+      "endpoint": "/api/stats",
+      "file": "src/services/communityService.js",
+      "line": 24,
+      "rawLine": "const response = await apiClient.post('/api/stats', statsData);"
+    },
+    "normalized": "/api/stats"
+  },
+  {
+    "call": {
+      "endpoint": "/api/batches",
+      "file": "src/services/communityService.js",
+      "line": 29,
+      "rawLine": "const response = await apiClient.get('/api/batches');"
+    },
+    "normalized": "/api/batches"
+  },
+  {
+    "call": {
+      "endpoint": "/api/batches",
+      "file": "src/services/communityService.js",
+      "line": 34,
+      "rawLine": "const response = await apiClient.post('/api/batches', batchesData);"
+    },
+    "normalized": "/api/batches"
+  },
+  {
+    "call": {
+      "endpoint": "/api/community-benefits",
+      "file": "src/services/communityService.js",
+      "line": 39,
+      "rawLine": "const response = await apiClient.get('/api/community-benefits');"
+    },
+    "normalized": "/api/community-benefits"
+  },
+  {
+    "call": {
+      "endpoint": "/api/community-benefits",
+      "file": "src/services/communityService.js",
+      "line": 44,
+      "rawLine": "const response = await apiClient.post('/api/community-benefits', benefitsData);"
+    },
+    "normalized": "/api/community-benefits"
+  },
+  {
+    "call": {
+      "endpoint": "/api/apply-campus-ambassador",
+      "file": "src/services/communityService.js",
+      "line": 49,
+      "rawLine": "const response = await apiClient.post('/api/apply-campus-ambassador', formData);"
+    },
+    "normalized": "/api/apply-campus-ambassador"
+  },
+  {
+    "call": {
+      "endpoint": "/apiClient",
+      "file": "src/services/coordinatorService.js",
+      "line": 5,
+      "rawLine": "import apiClient from './apiClient.js';"
+    },
+    "normalized": "/apiClient"
+  },
+  {
+    "call": {
+      "endpoint": "/apiClient",
+      "file": "src/services/enquiryService.js",
+      "line": 5,
+      "rawLine": "import apiClient from './apiClient';"
+    },
+    "normalized": "/apiClient"
+  },
+  {
+    "call": {
+      "endpoint": "/api/contact",
+      "file": "src/services/enquiryService.js",
+      "line": 9,
+      "rawLine": "const response = await apiClient.post('/api/contact', data);"
+    },
+    "normalized": "/api/contact"
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/enquiry",
+      "file": "src/services/enquiryService.js",
+      "line": 14,
+      "rawLine": "const response = await apiClient.get('/api/admin/enquiry', { params });"
+    },
+    "normalized": "/api/admin/enquiry"
+  },
+  {
+    "call": {
+      "endpoint": "/apiClient",
+      "file": "src/services/eventService.js",
+      "line": 5,
+      "rawLine": "import apiClient from './apiClient';"
+    },
+    "normalized": "/apiClient"
+  },
+  {
+    "call": {
+      "endpoint": "/api/events",
+      "file": "src/services/eventService.js",
+      "line": 9,
+      "rawLine": "const response = await apiClient.get('/api/events', { params });"
+    },
+    "normalized": "/api/events"
+  },
+  {
+    "call": {
+      "endpoint": "/api/events",
+      "file": "src/services/eventService.js",
+      "line": 19,
+      "rawLine": "const response = await apiClient.post('/api/events', eventData);"
+    },
+    "normalized": "/api/events"
+  },
+  {
+    "call": {
+      "endpoint": "/api/events/${eventId}/members/${memberId}",
+      "file": "src/services/eventService.js",
+      "line": 44,
+      "rawLine": "const response = await apiClient.delete(`/api/events/${eventId}/members/${memberId}`);"
+    },
+    "normalized": "/api/events/:param/members/:param"
+  },
+  {
+    "call": {
+      "endpoint": "/api/guest",
+      "file": "src/services/eventService.js",
+      "line": 56,
+      "rawLine": "const response = await apiClient.get('/api/guest', { params });"
+    },
+    "normalized": "/api/guest"
+  },
+  {
+    "call": {
+      "endpoint": "/api/guest",
+      "file": "src/services/eventService.js",
+      "line": 61,
+      "rawLine": "const response = await apiClient.post('/api/guest', guestData);"
+    },
+    "normalized": "/api/guest"
+  },
+  {
+    "call": {
+      "endpoint": "/api/guest/${id}",
+      "file": "src/services/eventService.js",
+      "line": 66,
+      "rawLine": "const response = await apiClient.put(`/api/guest/${id}`, guestData);"
+    },
+    "normalized": "/api/guest/:param"
+  },
+  {
+    "call": {
+      "endpoint": "/api/guest/${id}",
+      "file": "src/services/eventService.js",
+      "line": 71,
+      "rawLine": "const response = await apiClient.delete(`/api/guest/${id}`);"
+    },
+    "normalized": "/api/guest/:param"
+  },
+  {
+    "call": {
+      "endpoint": "/apiClient",
+      "file": "src/services/fineService.js",
+      "line": 5,
+      "rawLine": "import apiClient from './apiClient';"
+    },
+    "normalized": "/apiClient"
+  },
+  {
+    "call": {
+      "endpoint": "/api/fine",
+      "file": "src/services/fineService.js",
+      "line": 51,
+      "rawLine": "const response = await apiClient.get('/api/fine');"
+    },
+    "normalized": "/api/fine"
+  },
+  {
+    "call": {
+      "endpoint": "/apiClient",
+      "file": "src/services/index.js",
+      "line": 5,
+      "rawLine": "export { default as apiClient, API_BASE_URL, ApiError } from './apiClient';"
+    },
+    "normalized": "/apiClient"
+  },
+  {
+    "call": {
+      "endpoint": "/authService",
+      "file": "src/services/index.js",
+      "line": 6,
+      "rawLine": "export { default as authService } from './authService';"
+    },
+    "normalized": "/authService"
+  },
+  {
+    "call": {
+      "endpoint": "/apiClient",
+      "file": "src/services/leaveService.js",
+      "line": 5,
+      "rawLine": "import apiClient from './apiClient';"
+    },
+    "normalized": "/apiClient"
+  },
+  {
+    "call": {
+      "endpoint": "/apiClient",
+      "file": "src/services/memberService.js",
+      "line": 5,
+      "rawLine": "import apiClient from './apiClient';"
+    },
+    "normalized": "/apiClient"
+  },
+  {
+    "call": {
+      "endpoint": "/api/public/members",
+      "file": "src/services/memberService.js",
+      "line": 9,
+      "rawLine": "const response = await apiClient.get('/api/public/members', { params });"
+    },
+    "normalized": "/api/public/members"
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member",
+      "file": "src/services/memberService.js",
+      "line": 19,
+      "rawLine": "const response = await apiClient.get('/api/admin/member', { params });"
+    },
+    "normalized": "/api/admin/member"
+  },
+  {
+    "call": {
+      "endpoint": "/apiClient",
+      "file": "src/services/projectService.js",
+      "line": 5,
+      "rawLine": "import apiClient from './apiClient';"
+    },
+    "normalized": "/apiClient"
+  },
+  {
+    "call": {
+      "endpoint": "/api/projects",
+      "file": "src/services/projectService.js",
+      "line": 9,
+      "rawLine": "const response = await apiClient.get('/api/projects', { params });"
+    },
+    "normalized": "/api/projects"
+  },
+  {
+    "call": {
+      "endpoint": "/api/projects",
+      "file": "src/services/projectService.js",
+      "line": 19,
+      "rawLine": "const response = await apiClient.post('/api/projects', projectData);"
+    },
+    "normalized": "/api/projects"
+  },
+  {
+    "call": {
+      "endpoint": "/apiClient",
+      "file": "src/services/trainerService.js",
+      "line": 5,
+      "rawLine": "import apiClient from './apiClient';"
+    },
+    "normalized": "/apiClient"
+  },
+  {
+    "call": {
+      "endpoint": "/apiClient",
+      "file": "src/services/uniques360Service.js",
+      "line": 5,
+      "rawLine": "import apiClient from './apiClient';"
+    },
+    "normalized": "/apiClient"
+  },
+  {
+    "call": {
+      "endpoint": "/apiClient",
+      "file": "src/utils/batch/batchProfilesData.js",
+      "line": 1,
+      "rawLine": "import apiClient from \"@/services/apiClient\";"
+    },
+    "normalized": "/apiClient"
+  },
+  {
+    "call": {
+      "endpoint": "/apiClient",
+      "file": "src/utils/batch/batchesData.js",
+      "line": 1,
+      "rawLine": "import apiClient from \"@/services/apiClient\";"
+    },
+    "normalized": "/apiClient"
+  },
+  {
+    "call": {
+      "endpoint": "/api/projects",
+      "file": "src/utils/project/projectsData.js",
+      "line": 434,
+      "rawLine": "console.warn(\"Backend /api/projects request failed, using cached projects:\", err?.message || err);"
+    },
+    "normalized": "/api/projects"
+  },
+  {
+    "call": {
+      "endpoint": "/apiClient",
+      "file": "src/utils/stats/statsData.js",
+      "line": 1,
+      "rawLine": "import apiClient from \"@/services/apiClient\";"
+    },
+    "normalized": "/apiClient"
+  },
+  {
+    "call": {
+      "endpoint": "/api/stats",
+      "file": "src/utils/stats/statsData.js",
+      "line": 35,
+      "rawLine": "const response = await apiClient.get(`${BASE_URL}/api/stats`);"
+    },
+    "normalized": "/api/stats"
+  },
+  {
+    "call": {
+      "endpoint": "/authService",
+      "file": "src/views/Authentication/login/index.jsx",
+      "line": 31,
+      "rawLine": "import authService from \"@/services/authService\";"
+    },
+    "normalized": "/authService"
+  },
+  {
+    "call": {
+      "endpoint": "/authUtils",
+      "file": "src/views/Authentication/login/index.jsx",
+      "line": 32,
+      "rawLine": "import { storeAuth } from \"@/utils/authUtils\";"
+    },
+    "normalized": "/authUtils"
+  },
+  {
+    "call": {
+      "endpoint": "/apiClient",
+      "file": "src/views/Management/Accounts/components/TransactionTable.jsx",
+      "line": 73,
+      "rawLine": "import apiClient from \"@/services/apiClient\";"
+    },
+    "normalized": "/apiClient"
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/fine",
+      "file": "src/views/Management/Accounts/components/TransactionTable.jsx",
+      "line": 82,
+      "rawLine": "const API_BASE_URL = `${BASE_URL}/api/admin/fine`;"
+    },
+    "normalized": "/api/admin/fine"
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin",
+      "file": "src/views/Management/Accounts/index.jsx",
+      "line": 30,
+      "rawLine": "const API_BASE_URL = `${BASE_URL}/api/admin`;"
+    },
+    "normalized": "/api/admin"
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin",
+      "file": "src/views/Management/Dashboard/index.jsx",
+      "line": 610,
+      "rawLine": "const API_BASE_URL = `${BASE_URL}/api/admin`;"
+    },
+    "normalized": "/api/admin"
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member",
+      "file": "src/views/Management/Dashboard/index.jsx",
+      "line": 619,
+      "rawLine": "`${BASE_URL}/api/admin/member?page=1&limit=10`"
+    },
+    "normalized": "/api/admin/member"
+  },
+  {
+    "call": {
+      "endpoint": "/api/events",
+      "file": "src/views/Management/Dashboard/index.jsx",
+      "line": 673,
+      "rawLine": "const eventsRes = await axios.get(`${BASE_URL}/api/events`);"
+    },
+    "normalized": "/api/events"
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/enquiry",
+      "file": "src/views/Management/Enquiry/index.jsx",
+      "line": 104,
+      "rawLine": "let url = `${BASE_URL}/api/admin/enquiry?page=${currentPage}&limit=${limit}`;"
+    },
+    "normalized": "/api/admin/enquiry"
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member",
+      "file": "src/views/Management/Events/View.jsx",
+      "line": 246,
+      "rawLine": "`${BASE_URL}/api/admin/member`,"
+    },
+    "normalized": "/api/admin/member"
+  },
+  {
+    "call": {
+      "endpoint": "/api/events",
+      "file": "src/views/Management/Events/index.jsx",
+      "line": 80,
+      "rawLine": "`${BASE_URL}/api/events?page=${page}`,"
+    },
+    "normalized": "/api/events"
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member",
+      "file": "src/views/Management/Members/index.jsx",
+      "line": 121,
+      "rawLine": "const response = await axios.get(`${BASE_URL}/api/admin/member`, { params });"
+    },
+    "normalized": "/api/admin/member"
+  },
+  {
+    "call": {
+      "endpoint": "/apiClient",
+      "file": "src/views/Uniques/Member/index.jsx",
+      "line": 100,
+      "rawLine": "import apiClient from \"@/services/apiClient\";"
+    },
+    "normalized": "/apiClient"
+  },
+  {
+    "call": {
+      "endpoint": "/api/member/members/${user",
+      "file": "src/views/Uniques/Member/index.jsx",
+      "line": 464,
+      "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/editProfile`,"
+    },
+    "normalized": "/api/member/members/${user"
+  },
+  {
+    "call": {
+      "endpoint": "/api/member/members/${user",
+      "file": "src/views/Uniques/Member/index.jsx",
+      "line": 577,
+      "rawLine": "`/api/member/members/${user._id}/profilePic`"
+    },
+    "normalized": "/api/member/members/${user"
+  },
+  {
+    "call": {
+      "endpoint": "/api/member/members/${user",
+      "file": "src/views/Uniques/Member/index.jsx",
+      "line": 655,
+      "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/achievements`,"
+    },
+    "normalized": "/api/member/members/${user"
+  },
+  {
+    "call": {
+      "endpoint": "/api/member/members/${user",
+      "file": "src/views/Uniques/Member/index.jsx",
+      "line": 697,
+      "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/achievements`,"
+    },
+    "normalized": "/api/member/members/${user"
+  },
+  {
+    "call": {
+      "endpoint": "/api/member/members/${user",
+      "file": "src/views/Uniques/Member/index.jsx",
+      "line": 829,
+      "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/certifications`,"
+    },
+    "normalized": "/api/member/members/${user"
+  },
+  {
+    "call": {
+      "endpoint": "/api/member/members/${user",
+      "file": "src/views/Uniques/Member/index.jsx",
+      "line": 871,
+      "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/certifications`,"
+    },
+    "normalized": "/api/member/members/${user"
+  },
+  {
+    "call": {
+      "endpoint": "/api/member/members/${user",
+      "file": "src/views/Uniques/Member/index.jsx",
+      "line": 1003,
+      "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/projects`,"
+    },
+    "normalized": "/api/member/members/${user"
+  },
+  {
+    "call": {
+      "endpoint": "/api/member/members/${user",
+      "file": "src/views/Uniques/Member/index.jsx",
+      "line": 1038,
+      "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/projects`,"
+    },
+    "normalized": "/api/member/members/${user"
+  },
+  {
+    "call": {
+      "endpoint": "/api/member/members/${user",
+      "file": "src/views/Uniques/Member/index.jsx",
+      "line": 1152,
+      "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/internships`,"
+    },
+    "normalized": "/api/member/members/${user"
+  },
+  {
+    "call": {
+      "endpoint": "/api/member/members/${user",
+      "file": "src/views/Uniques/Member/index.jsx",
+      "line": 1194,
+      "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/internships`,"
+    },
+    "normalized": "/api/member/members/${user"
+  },
+  {
+    "call": {
+      "endpoint": "/api/member/members/${user",
+      "file": "src/views/Uniques/Member/index.jsx",
+      "line": 1302,
+      "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/events`,"
+    },
+    "normalized": "/api/member/members/${user"
+  },
+  {
+    "call": {
+      "endpoint": "/api/member/members/${user",
+      "file": "src/views/Uniques/Member/index.jsx",
+      "line": 1343,
+      "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/events`,"
+    },
+    "normalized": "/api/member/members/${user"
+  },
+  {
+    "call": {
+      "endpoint": "/api/member/members/${user",
+      "file": "src/views/Uniques/Member/index.jsx",
+      "line": 1437,
+      "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/academics`,"
+    },
+    "normalized": "/api/member/members/${user"
+  },
+  {
+    "call": {
+      "endpoint": "/api/member/members/${user",
+      "file": "src/views/Uniques/Member/index.jsx",
+      "line": 1479,
+      "rawLine": "`${API_BASE_URL}/api/member/members/${user._id}/academics`,"
+    },
+    "normalized": "/api/member/members/${user"
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member",
+      "file": "src/views/Uniques360/Coordinator360/Uniques360.jsx",
+      "line": 113,
+      "rawLine": "const response = await axios.get(`${BASE_URL}/api/admin/member`, {"
+    },
+    "normalized": "/api/admin/member"
+  },
+  {
+    "call": {
+      "endpoint": "/api/admin/member",
+      "file": "src/views/Uniques360/Member360/uniques360.jsx",
+      "line": 33,
+      "rawLine": "const response = await axios.get(`${BASE_URL}/api/admin/member`, { withCredentials: true });"
+    },
+    "normalized": "/api/admin/member"
+  }
+]

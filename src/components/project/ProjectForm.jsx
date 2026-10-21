@@ -34,6 +34,11 @@ import {
   PROJECT_BATCHES,
   PROJECT_CATEGORIES,
 } from "@/utils/project/projectsData";
+import {
+  FILE_VALIDATION_PRESETS,
+  validateFile,
+  resetFileInput,
+} from "@/utils/fileValidation";
 
 /**
  * @component ProjectForm
@@ -89,8 +94,11 @@ const ProjectForm = ({ onSuccess }) => {
   };
 
   const handleImageFileChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (file) {
+      if (!validateFile(file, FILE_VALIDATION_PRESETS.IMAGE, { inputTarget: e })) {
+        return;
+      }
       if (imagePreview && imagePreview.startsWith("blob:")) {
         URL.revokeObjectURL(imagePreview);
       }
@@ -243,7 +251,7 @@ const ProjectForm = ({ onSuccess }) => {
             >
               <input
                 type="file"
-                accept="image/*"
+                accept={FILE_VALIDATION_PRESETS.IMAGE.accept}
                 id="project-image-upload"
                 style={{ display: "none" }}
                 onChange={handleImageFileChange}

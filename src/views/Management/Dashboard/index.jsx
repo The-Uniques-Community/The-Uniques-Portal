@@ -12,6 +12,11 @@ import EventOverView from "../dashboardComponents/EventOverView";
 import axios from "axios";
 import { BASE_URL } from "@/config";
 import {
+  FILE_VALIDATION_PRESETS,
+  validateFiles,
+  resetFileInput,
+} from "@/utils/fileValidation";
+import {
   Table,
   TableBody,
   TableCell,
@@ -90,15 +95,17 @@ const FinePaymentModal = ({
 
   // Handle file selection
   const handleFileChange = (e) => {
-    const selectedFiles = Array.from(e.target.files);
-    if (selectedFiles.length > 0) {
-      setFiles(selectedFiles);
+    const { validFiles, allValid } = validateFiles(e.target.files, FILE_VALIDATION_PRESETS.RECEIPT, { inputTarget: e });
+    if (!allValid || validFiles.length === 0) {
+      return;
+    }
 
-      // Create preview for image files
-      if (selectedFiles[0].type.startsWith("image/")) {
-        const url = URL.createObjectURL(selectedFiles[0]);
-        setPreviewUrl(url);
-      }
+    setFiles(validFiles);
+
+    // Create preview for image files
+    if (validFiles[0].type.startsWith("image/")) {
+      const url = URL.createObjectURL(validFiles[0]);
+      setPreviewUrl(url);
     }
   };
 
@@ -333,7 +340,7 @@ const FinePaymentModal = ({
                     <input
                       type="file"
                       hidden
-                      accept="image/*,.pdf"
+                      accept={FILE_VALIDATION_PRESETS.RECEIPT.accept}
                       onChange={handleFileChange}
                     />
                   </Button>
@@ -343,7 +350,7 @@ const FinePaymentModal = ({
                     mt={1}
                     color="textSecondary"
                   >
-                    Supported formats: JPG, PNG, PDF
+                    Supported formats: JPG, PNG, WEBP, PDF
                   </Typography>
                 </Box>
               )}

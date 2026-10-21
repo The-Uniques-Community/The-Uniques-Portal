@@ -1,0 +1,1202 @@
+[
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "*"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/approveProfile"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/blockMember"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/create"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/createAdmin"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/enquiry/"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/enquiry/"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/enquiry/:id"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/admin/enquiry/:id"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/enquiry/:id/reply"
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "path": "/api/admin/enquiry/:id/status"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/fine/fines/members"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/fine/fines/pending/members"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/fine/fines/statistics"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/fine/members/:memberId/fines"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/fine/members/:memberId/fines"
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "path": "/api/admin/fine/members/:memberId/fines/:fineId"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/admin/fine/members/:memberId/fines/:fineId"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/fine/members/:memberId/fines/pending"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/fine/members/search"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/imposeFine"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/listNewEvent"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/member/"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/member/:id"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/admin/member/:id"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/admin/member/:id"
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "path": "/api/admin/member/:id/block"
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "path": "/api/admin/member/:id/suspend"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/member/:memberId/fine"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/member/:memberId/fines"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/member/add"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/member/batch/:batch"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/member/counts"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/member/fines/all"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/member/get-all-fine-history"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/member/status/:status"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/member/supplementary/pending"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/member/supplementary/semester/:semester"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/migration/migrate-event-relationships"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/migration/rollback-migration"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/migration/verify-migration"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/trainers/add-trainer"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/admin/trainers/all-trainers"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/admin/trainers/delete-trainer/:id"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/admin/trainers/update-trainer/:id"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/admin/unblockMember"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/batches/:id"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/batches/add"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/batches/all"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/batches/name/:name"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/batches/profiles"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/batches/profiles/update"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/batches/profiles/update"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/blogs/"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/blogs/"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/blogs/:blogId"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/blogs/:blogId"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/blogs/member/:memberId"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/blogs/my-blogs"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/campus-ambassador"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/campus-ambassador/:id"
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "path": "/api/campus-ambassador/:id/status"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/campus-ambassador/apply"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/campus-ambassador/stats"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/community-benefits/"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/community-benefits/"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/community-benefits/"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/community-benefits/update"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/community-benefits/update"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/community/createCommunityAdmin"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/community/projects/"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/community/projects/"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/community/projects/:id"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/community/projects/:id"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/community/projects/:id"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/contact/"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/custom-members/"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/custom-members/:id"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/custom-members/:id"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/custom-members/add"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/events/"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/events/"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/events/:eventId/form-response"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/events/:eventId/form-responses"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/events/:id"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/events/:id"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/events/:id"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/events/:id/budget"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/events/:id/budget"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/events/:id/budget-allocations"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/events/:id/budget-allocations/:allocationId"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/events/:id/expenses"
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "path": "/api/events/:id/expenses/:expenseId"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/events/:id/expenses/:expenseId"
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "path": "/api/events/:id/gallery"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/events/:id/gallery"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/events/:id/members"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/events/:id/members"
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "path": "/api/events/:id/members"
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "path": "/api/events/:id/members/remove"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/events/:id/members/team"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/events/:id/members/team/:teamType/add"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/events/:id/members/team/:teamType/members"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/events/:id/migrate/event-members"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/events/:id/register"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/events/:id/sponsors"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/events/:id/sponsors/:sponsorId"
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "path": "/api/events/:id/status"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/events/available-members"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/events/counts"
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "path": "/api/events/form-responses/:responseId/status"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/events/link-guest"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/events/status/:status"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/fine/profile/fines"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/fine/profile/fines/pending"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/guest/add-guest"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/guest/bulkUpload"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/guest/get-all-guests"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/guest/get-guest/:id"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/health"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/image-proxy/:fileId"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/leave/:id"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/leave/:id"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/leave/:id"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/leave/:id/approve"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/leave/:id/reject"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/leave/all"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/leave/my-leaves"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/leave/pending"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/leave/submit"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/member/bulk-upload"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/member/getProfile"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/member/login"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/member/logout"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/member/members/:id/academics"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/member/members/:id/achievements"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/member/members/:id/certifications"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/member/members/:id/editProfile"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/member/members/:id/events"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/member/members/:id/internships"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/member/members/:id/profilePic"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/member/members/:id/projects"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/member/register"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/member/update-fine-data"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/projects/"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/projects/"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/projects/:id"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/projects/:id"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/projects/:id"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/public/members/"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/public/members/:id"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/public/members/counts"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/stats/"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/stats/"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/stats/"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/stats/all"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/stats/counts"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/stats/update"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/stats/update"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/uniques360/reports"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/uniques360/reports/task/:taskId"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/uniques360/tasks"
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "path": "/api/uniques360/tasks/:taskId"
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "path": "/api/uniques360/tasks/:taskId"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "path": "/api/uniques360/tasks/:taskId"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/uniques360/tasks/:taskId/members"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/uniques360/tasks/:taskId/members/remove"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/uniques360/tasks/coordinator/:coordinatorId"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/api/uniques360/tasks/member/:memberId"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/upload/add_subfolder"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/upload/budget_file_upload"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/upload/create_main_folder"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/upload/create_student_folder"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/upload/event_file_upload"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/upload/file_upload"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/upload/fine_file_upload"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/upload/project_file_upload"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/api/upload/trainer_file_upload"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/auth/emaillogin"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/auth/get_user"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/auth/google"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/auth/google/callback"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/auth/logout"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/auth/password-reset/resend-otp"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/auth/password-reset/reset-password"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/auth/password-reset/send-otp"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/auth/password-reset/verify-otp"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/auth/verify_role"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/auth/verify_user"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "path": "/health"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/upload/add_subfolder"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/upload/budget_file_upload"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/upload/create_main_folder"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/upload/create_student_folder"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/upload/event_file_upload"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/upload/file_upload"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/upload/fine_file_upload"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/upload/project_file_upload"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "path": "/upload/trainer_file_upload"
+  }
+]

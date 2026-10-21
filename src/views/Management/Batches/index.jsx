@@ -36,6 +36,11 @@ import {
   DEFAULT_BATCH_PROFILES,
 } from "@/utils/batch/batchProfilesData";
 import { addStoredBatch } from "@/utils/batch/batchesData";
+import {
+  FILE_VALIDATION_PRESETS,
+  validateFile,
+  resetFileInput,
+} from "@/utils/fileValidation";
 
 // Fast client-side image optimizer to prevent localStorage quota issues and speed up rendering
 const optimizeImageForStorage = (file, maxWidth = 1200, quality = 0.85) => {
@@ -117,17 +122,7 @@ const CoordinatorBatches = () => {
   const processSelectedFile = async (file) => {
     if (!file) return;
 
-    // Check if file is an image
-    const isImage =
-      (file.type && file.type.startsWith("image/")) ||
-      /\.(jpg|jpeg|png|webp|svg|gif|bmp|ico)$/i.test(file.name || "");
-
-    if (!isImage) {
-      setSnackbar({
-        open: true,
-        message: "Please choose an image file (JPG, PNG, WEBP, SVG, etc.).",
-        severity: "warning",
-      });
+    if (!validateFile(file, FILE_VALIDATION_PRESETS.IMAGE, { inputTarget: fileInputRef })) {
       return;
     }
 
@@ -157,15 +152,13 @@ const CoordinatorBatches = () => {
     }
   };
 
-  // Handle file picker selection (no accept attribute on input prevents Windows/Brave explorer hanging)
+  // Handle file picker selection
   const handleImageUpload = (event) => {
     const file = event.target.files?.[0];
     if (file) {
       processSelectedFile(file);
     }
-    if (event.target) {
-      event.target.value = "";
-    }
+    resetFileInput(event);
   };
 
   // Drag and Drop handlers
@@ -477,10 +470,11 @@ const CoordinatorBatches = () => {
                     transition: "all 0.2s ease",
                   }}
                 >
-                  {/* File input WITHOUT accept attribute - prevents Windows/Brave File Explorer freeze on Downloads */}
+                  {/* File input with explicit extension/mime accept string to prevent OS explorer lag */}
                   <input
                     ref={fileInputRef}
                     type="file"
+                    accept={FILE_VALIDATION_PRESETS.IMAGE.accept}
                     style={{ display: "none" }}
                     onChange={handleImageUpload}
                   />

@@ -43,6 +43,11 @@ import ZoomOut from '@mui/icons-material/ZoomOut';
 import RestartAlt from '@mui/icons-material/RestartAlt';
 import CloudUpload from '@mui/icons-material/CloudUpload';
 import Delete from '@mui/icons-material/Delete';
+import {
+  FILE_VALIDATION_PRESETS,
+  validateFile,
+  resetFileInput,
+} from '@/utils/fileValidation';
 import Close from '@mui/icons-material/Close';
 import Save from '@mui/icons-material/Save';
 import Check from '@mui/icons-material/Check';
@@ -156,15 +161,19 @@ const ProjectView = () => {
   };
 
   const handleImageFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-        setEditForm((prev) => ({ ...prev, image: reader.result }));
-      };
-      reader.readAsDataURL(file);
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!validateFile(file, FILE_VALIDATION_PRESETS.IMAGE, { inputTarget: e })) {
+      return;
     }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+      setEditForm((prev) => ({ ...prev, image: reader.result }));
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleRemoveImage = () => {
@@ -1262,7 +1271,7 @@ const ProjectView = () => {
             >
               <input
                 type="file"
-                accept="image/*"
+                accept={FILE_VALIDATION_PRESETS.IMAGE.accept}
                 id="edit-project-image-upload"
                 style={{ display: "none" }}
                 onChange={handleImageFileChange}
