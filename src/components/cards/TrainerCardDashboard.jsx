@@ -49,6 +49,8 @@ const TrainerProfileDialog = ({ open, handleClose, user }) => {
         });
     };
 
+    if (!user) return null;
+
     return (
         <Dialog
             fullScreen
@@ -236,7 +238,8 @@ const TrainerProfileDialog = ({ open, handleClose, user }) => {
     );
 };
 
-export const TrainerCardDashboard = ({ user }) => {
+export const TrainerCardDashboard = ({ user, trainer }) => {
+    const currentTrainer = user || trainer;
     const [open, setOpen] = useState(false);
 
     const handleClose = () => setOpen(false);
@@ -244,6 +247,9 @@ export const TrainerCardDashboard = ({ user }) => {
         if (!fileId) return "/placeholder.svg"; // Fallback image
         return `${BASE_URL}/api/image-proxy/${fileId}`;
     };
+
+    if (!currentTrainer) return null;
+
     return (
         <>
             {/* User Card */}
@@ -257,10 +263,10 @@ export const TrainerCardDashboard = ({ user }) => {
                                 alt="The Uniques"
                                 className="w-5 inline h-5 object-contain object-center"
                             />{" "}
-                            {user.teachingBatch || user.batch}
+                            {currentTrainer.teachingBatch || currentTrainer.batch || "N/A"}
                         </div>
                         <span className="bg-yellow-400 text-yellow-800 text-sm px-3 py-1 rounded-full">
-                            {user.profileStatus}
+                            {currentTrainer.profileStatus || "Active"}
                         </span>
                     </div>
 
@@ -268,17 +274,17 @@ export const TrainerCardDashboard = ({ user }) => {
                     <div className="flex items-center gap-3">
                         <img
                             src={
-                                user?.profilePic
-                                    ? getProxyImageUrl(user.profilePic.fileId || user.profilePic)
+                                currentTrainer?.profilePic
+                                    ? getProxyImageUrl(currentTrainer.profilePic.fileId || currentTrainer.profilePic)
                                     : userIcon
                             }
-                            alt={user.fullName}
+                            alt={currentTrainer.fullName || "Trainer"}
                             className="w-16 h-16 rounded-full object-cover object-center"
                         />
                         <div>
-                            <h2 className="text-lg font-semibold">{user.fullName}</h2>
+                            <h2 className="text-lg font-semibold">{currentTrainer.fullName || "Trainer"}</h2>
                             <p className="text-gray-500 text-sm">
-                                {user.bio ? user.bio.slice(0, 36) + "..." : "No bio available"}
+                                {currentTrainer.bio ? currentTrainer.bio.slice(0, 36) + "..." : "No bio available"}
                             </p>
                         </div>
                     </div>
@@ -286,10 +292,10 @@ export const TrainerCardDashboard = ({ user }) => {
                     {/* Social Media Links */}
                     <div className="flex justify-start gap-x-4 mt-3">
                         {[
-                            { link: user.githubProfile, icon: <GitHubIcon fontSize="medium" className="text-white" />, bg: "bg-black" },
-                            { link: user.linkedinProfile, icon: <LinkedInIcon fontSize="medium" className="text-white" />, bg: "bg-black" },
-                            { link: user.twitterProfile, icon: <XIcon fontSize="medium" className="text-white" />, bg: "bg-black" },
-                            { link: user.whatsappContact ? `https://wa.me/${user.whatsappContact}` : null, icon: <WhatsAppIcon fontSize="medium" className="text-white" />, bg: "bg-black" }
+                            { link: currentTrainer.githubProfile, icon: <GitHubIcon fontSize="medium" className="text-white" />, bg: "bg-black" },
+                            { link: currentTrainer.linkedinProfile, icon: <LinkedInIcon fontSize="medium" className="text-white" />, bg: "bg-black" },
+                            { link: currentTrainer.twitterProfile, icon: <XIcon fontSize="medium" className="text-white" />, bg: "bg-black" },
+                            { link: currentTrainer.whatsappContact ? `https://wa.me/${currentTrainer.whatsappContact}` : null, icon: <WhatsAppIcon fontSize="medium" className="text-white" />, bg: "bg-black" }
                         ].map((social, idx) => social.link && (
                             <Link key={idx} to={social.link} target="_blank">
                                 <div className={`w-10 h-10 p-1 ${social.bg} rounded-full`}>
@@ -319,7 +325,7 @@ export const TrainerCardDashboard = ({ user }) => {
             <TrainerProfileDialog
                 handleClose={() => setOpen(false)}
                 open={open}
-                user={user}
+                user={currentTrainer}
             />
         </>
     );
