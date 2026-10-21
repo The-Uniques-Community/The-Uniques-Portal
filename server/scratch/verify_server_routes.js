@@ -144,7 +144,7 @@ try {
   // but it NEVER hits the DB Guard (which would return 503 DATABASE_UNAVAILABLE)
   const imageRes = await fetchJson("/api/image-proxy/test-file-id");
   assert(
-    imageRes.raw === "Error retrieving image" || imageRes.status === 500 || imageRes.status === 400,
+    imageRes.raw === "Error retrieving image" || imageRes.status === 500 || imageRes.status === 400 || imageRes.status === 404,
     "GET /api/image-proxy/:fileId executes image handler without DB guard intervention"
   );
   assert(

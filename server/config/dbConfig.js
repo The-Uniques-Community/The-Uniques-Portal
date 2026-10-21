@@ -22,9 +22,24 @@ try {
 dotenv.config();
 
 // 2. Global connection cache initialization (persists across warm serverless invocations)
-let cached = global._mongooseCache;
+let cached = globalThis._mongooseCache || global._mongooseCache;
 if (!cached) {
-	cached = global._mongooseCache = { conn: null, promise: null };
+	cached = globalThis._mongooseCache = global._mongooseCache = { conn: null, promise: null };
+}
+
+// Attach one-time connection event listeners for proactive cache invalidation
+if (!globalThis._mongooseListenersAttached) {
+	mongoose.connection.on('disconnected', () => {
+		console.warn('⚠️ [MongoDB] Connection disconnected. Invalidating cached connection.');
+		if (globalThis._mongooseCache) {
+			globalThis._mongooseCache.conn = null;
+			globalThis._mongooseCache.promise = null;
+		}
+	});
+	mongoose.connection.on('error', (err) => {
+		console.error('❌ [MongoDB] Connection error event:', err.message);
+	});
+	globalThis._mongooseListenersAttached = true;
 }
 
 // 3. Environment detection
@@ -75,6 +90,12 @@ const dbconnect = () => {
 		return cached.promise;
 	}
 
+	// If connection is in-flight (readyState 2 = connecting), await existing promise
+	if (mongoose.connection.readyState === 2) {
+		if (cached.promise) return cached.promise;
+		return mongoose.connection.asPromise().then(() => mongoose);
+	}
+
 	// If connection is dropped (0 = disconnected) or disconnecting (3), purge stale cache
 	if (mongoose.connection.readyState === 0 || mongoose.connection.readyState === 3) {
 		cached.conn = null;
@@ -95,6 +116,7 @@ const dbconnect = () => {
 		const options = {
 			serverSelectionTimeoutMS: 5000, // Fail fast (5s) before Vercel gateway timeout (10s/15s)
 			socketTimeoutMS: 45000,         // Clean up stuck sockets after 45s
+			heartbeatFrequencyMS: 10000,    // Detect dead/zombie sockets every 10s
 			family: 4,                      // Force IPv4 to prevent IPv6 DNS timeout delays on cloud lambdas
 			maxPoolSize: isServerless
 				? 10
