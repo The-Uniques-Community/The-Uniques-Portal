@@ -79,7 +79,6 @@ export const register = async (req, res) => {
             // address,
             // contact,
             // whatsappContact,
-            profileStatus:"active"
         });
         console.log(newMember);
         await newMember.save();
@@ -125,12 +124,12 @@ export const login = async (req, res) => {
         if (!member) {
             return res.status(400).json({ message: "Invalid credentials" });
         }
-        if(member.profileStatus === "pending" && member.isVerified === false){
-            return res.status(400).json({ message: "Your profile is pending approval" });
+        if (member.isSuspended) {
+            return res.status(400).json({ message: "Your profile is blocked/suspended" });
         }
 
-        if(member.profileStatus === "blocked" && member.isVerified === false){
-            return res.status(400).json({ message: "Your profile is blocked" });
+        if (!member.isVerified) {
+            return res.status(400).json({ message: "Your profile is pending approval" });
         }
 
         const isPasswordCorrect = await bcrypt.compare(password, member.password);

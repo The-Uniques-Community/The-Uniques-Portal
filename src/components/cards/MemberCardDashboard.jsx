@@ -20,6 +20,7 @@ import Delete from '@mui/icons-material/Delete';
 import "tailwindcss/tailwind.css";
 import ProfileModal from "@/components/modals/ProfileModal";
 import userIcon from "@/assets/img/user-icon.png";
+import { getMemberStatus, getMemberStatusBadgeProps } from "@/utils/memberStatus";
 const UserProfileModal = ({ open, handleClose, userData }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
@@ -75,15 +76,23 @@ const UserProfileModal = ({ open, handleClose, userData }) => {
             <Typography variant="body2" style={{ color: theme.palette.text.secondary }}>
               {userData?.course} - {userData?.batch}
             </Typography>
+            {userData?.graduationYear && (
+              <Typography variant="body2" style={{ color: theme.palette.text.secondary }}>
+                Graduation Year: {userData.graduationYear}
+              </Typography>
+            )}
             <Typography variant="body2" style={{ color: theme.palette.text.secondary }}>
               Status:{" "}
               <span
-                className={`capitalize ${userData?.profileStatus === "active"
-                  ? "text-green-600 font-semibold"
-                  : "text-red-600 font-semibold"
-                  }`}
+                className={`capitalize font-semibold ${
+                  getMemberStatus(userData) === "active"
+                    ? "text-green-600"
+                    : getMemberStatus(userData) === "suspended" || getMemberStatus(userData) === "blocked"
+                    ? "text-red-600"
+                    : "text-gray-500"
+                }`}
               >
-                {userData?.profileStatus}
+                {getMemberStatus(userData)}
               </span>
             </Typography>
 
@@ -329,8 +338,8 @@ export const MemberCardDashboard = ({ user, onEdit, onDelete, refreshData }) => 
               />{" "}
               {user.batch}
             </div>
-            <span className="bg-yellow-400 text-yellow-800 text-sm px-3 py-1 rounded-full">
-              {user.profileStatus}
+            <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${getMemberStatusBadgeProps(getMemberStatus(user)).className}`}>
+              {getMemberStatusBadgeProps(getMemberStatus(user)).label}
             </span>
           </div>
 

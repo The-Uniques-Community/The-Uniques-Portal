@@ -1192,9 +1192,9 @@ export default function CoordinatorProfile() {
                   Account Status
                 </Typography>
                 <Chip
-                  label={activeProfile?.profileStatus?.toUpperCase() || 'ACTIVE'}
+                  label={(activeProfile?.status || activeProfile?.profileStatus || 'active').toUpperCase()}
                   size="small"
-                  color={getStatusColor(activeProfile?.profileStatus || 'active')}
+                  color={getStatusColor(activeProfile?.status || activeProfile?.profileStatus || 'active')}
                   sx={{ fontWeight: 700, borderRadius: '6px' }}
                 />
               </Box>

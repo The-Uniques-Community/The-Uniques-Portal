@@ -328,7 +328,7 @@ const Index = () => {
         />
       );
     } else {
-      return <Chip label={user.profileStatus} color="default" size="small" />;
+      return <Chip label={user.status || user.profileStatus || "Active"} color="default" size="small" />;
     }
   };
 

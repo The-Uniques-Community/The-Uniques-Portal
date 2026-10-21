@@ -84,18 +84,19 @@ export const toggleBlockStatus = async (req, res) => {
       });
     }
 
-    // Toggle block status
-    const newStatus = member.profileStatus === 'blocked' ? 'active' : 'blocked';
-    member.profileStatus = newStatus;
+    // Toggle block status via isSuspended flag
+    member.isSuspended = !member.isSuspended;
 
     await member.save();
 
     return res.status(200).json({
       success: true,
-      message: `Member has been ${newStatus === 'blocked' ? 'blocked' : 'unblocked'} successfully`,
+      message: `Member has been ${member.isSuspended ? 'blocked' : 'unblocked'} successfully`,
       data: {
         id: member._id,
-        profileStatus: member.profileStatus
+        isSuspended: member.isSuspended,
+        status: member.isSuspended ? 'blocked' : member.status,
+        profileStatus: member.isSuspended ? 'blocked' : member.status
       }
     });
   } catch (error) {
@@ -379,7 +380,7 @@ export const getMembersByProfileStatus = async (req, res) => {
     const { status } = req.params;
 
     // Validate status
-    const validStatuses = ["inactive", "active", "pending", "blocked"];
+    const validStatuses = ["inactive", "active", "pending", "blocked", "suspended"];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({
         success: false,
@@ -387,8 +388,15 @@ export const getMembersByProfileStatus = async (req, res) => {
       });
     }
 
-    const members = await Member.find({ profileStatus: status })
-      .select('-password');
+    let members = [];
+    if (status === "blocked" || status === "suspended") {
+      members = await Member.find({ isSuspended: true }).select('-password');
+    } else if (status === "pending") {
+      members = await Member.find({ isVerified: false }).select('-password');
+    } else {
+      const allMembers = await Member.find({ isSuspended: false }).select('-password');
+      members = allMembers.filter((m) => m.status === status);
+    }
 
     return res.status(200).json({
       success: true,
@@ -610,7 +618,7 @@ export const getAdminMemberCounts = async (req, res) => {
       Member.countDocuments({ batch: "The Uniques 4.0" }),
       Member.countDocuments({ batch: "The Uniques 5.0" }),
       Member.countDocuments({ batch: "The Uniques 6.0" }),
-      Member.countDocuments({ $or: [{ isSuspended: true }, { profileStatus: "blocked" }] }),
+      Member.countDocuments({ isSuspended: true }),
     ]);
 
     return res.status(200).json({

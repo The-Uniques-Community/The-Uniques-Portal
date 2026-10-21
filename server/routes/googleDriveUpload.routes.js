@@ -456,7 +456,7 @@ router.post("/event_file_upload", upload.array("files", 10), async (req, res) =>
     }
 
     // Check if fileKey is valid based on event schema
-    const validFileKeys = ['eventBanner', 'eventGallery'];
+    const validFileKeys = ['eventBanner', 'eventGallery', 'sponsorReceipt'];
     if (!validFileKeys.includes(fileKey)) {
       return res.status(400).json({
         message: `Invalid fileKey. Must be one of: ${validFileKeys.join(', ')}`
@@ -576,9 +576,19 @@ router.post("/event_file_upload", upload.array("files", 10), async (req, res) =>
     } else {
       // No event ID, just upload files without linking
       for (const file of tempFiles) {
+        let categoryName = "event-gallery";
+        let typeName = "gallery";
+        if (fileKey === 'eventBanner') {
+          categoryName = "event-banner";
+          typeName = "banner";
+        } else if (fileKey === 'sponsorReceipt') {
+          categoryName = "sponsor-receipt";
+          typeName = "receipt";
+        }
+
         const fileUploadResult = await uploadFile(file.path, targetFolderId, {
           eventName,
-          category: fileKey === 'eventBanner' ? "event-banner" : "event-gallery",
+          category: categoryName,
           customPrefix: file.originalname.substring(0, 15).replace(/[^a-zA-Z0-9-_]/g, '')
         });
 
@@ -593,7 +603,7 @@ router.post("/event_file_upload", upload.array("files", 10), async (req, res) =>
         uploadedFiles.push({
           ...fileUploadResult,
           ...unlinkedAttachment,
-          type: fileKey === 'eventBanner' ? "banner" : "gallery",
+          type: typeName,
           status: "unlinked"
         });
       }

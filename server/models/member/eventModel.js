@@ -23,6 +23,19 @@ const eventSchema = new mongoose.Schema({
   eventBanner: {
     type: fileAttachmentSchema,
     default: null,
+    set: function (v) {
+      if (!v) return null;
+      if (typeof v === "string") {
+        if (!v.trim()) return null;
+        return {
+          fileId: v.trim(),
+          fileUrl: v.trim().startsWith("http") ? v.trim() : "",
+          url: v.trim().startsWith("http") ? v.trim() : "",
+          fileName: "",
+        };
+      }
+      return v;
+    },
   },
   eventDate: {
     type: Date,
@@ -72,6 +85,12 @@ const eventSchema = new mongoose.Schema({
       guestId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Guest",
+        set: function (v) {
+          if (!v) return undefined;
+          if (typeof v === "string" && !v.trim()) return undefined;
+          if (typeof v === "object" && v?._id) return v._id;
+          return v;
+        },
       },
       guestTag: {
         type: String,
@@ -94,6 +113,27 @@ const eventSchema = new mongoose.Schema({
   eventGallery: {
     type: [fileAttachmentSchema],
     default: [],
+    set: function (v) {
+      if (!v) return [];
+      if (Array.isArray(v)) {
+        return v
+          .map((item) => {
+            if (!item) return null;
+            if (typeof item === "string") {
+              if (!item.trim()) return null;
+              return {
+                fileId: item.trim(),
+                fileUrl: item.trim().startsWith("http") ? item.trim() : "",
+                url: item.trim().startsWith("http") ? item.trim() : "",
+                fileName: "",
+              };
+            }
+            return item;
+          })
+          .filter(Boolean);
+      }
+      return v;
+    },
   },
 
   attendees: [
@@ -193,6 +233,19 @@ const eventSchema = new mongoose.Schema({
       receiptId: {
         type: fileAttachmentSchema,
         default: null,
+        set: function (v) {
+          if (!v) return null;
+          if (typeof v === "string") {
+            if (!v.trim()) return null;
+            return {
+              fileId: v.trim(),
+              fileUrl: v.trim().startsWith("http") ? v.trim() : "",
+              url: v.trim().startsWith("http") ? v.trim() : "",
+              fileName: "",
+            };
+          }
+          return v;
+        },
       },
       receivedStatus: {
         type: String,
@@ -246,7 +299,23 @@ const eventSchema = new mongoose.Schema({
           message: "Receipt upload required to mark payment as completed",
         },
       },
-      receiptId: { type: fileAttachmentSchema, default: null },
+      receiptId: {
+        type: fileAttachmentSchema,
+        default: null,
+        set: function (v) {
+          if (!v) return null;
+          if (typeof v === "string") {
+            if (!v.trim()) return null;
+            return {
+              fileId: v.trim(),
+              fileUrl: v.trim().startsWith("http") ? v.trim() : "",
+              url: v.trim().startsWith("http") ? v.trim() : "",
+              fileName: "",
+            };
+          }
+          return v;
+        },
+      },
       paidBy: { type: String },
       paidOn: Date,
       notes: String,
@@ -308,6 +377,18 @@ const eventSchema = new mongoose.Schema({
       timestamp: { type: Date, default: Date.now },
     },
   ],
+});
+
+/**
+ * Pre-validate middleware to sanitize eventGuests, removing empty or invalid guest references.
+ */
+eventSchema.pre("validate", function (next) {
+  if (Array.isArray(this.eventGuests)) {
+    this.eventGuests = this.eventGuests.filter(
+      (g) => g && g.guestId && mongoose.Types.ObjectId.isValid(g.guestId)
+    );
+  }
+  next();
 });
 
 /**

@@ -46,8 +46,7 @@ export const getPublicMembers = async (req, res) => {
       // Execute query without pagination and order by complete profiles first
       const members = await Member.find(queryConditions)
         .sort({ 
-          // Sort complete profiles first, then by batch and name
-          profileStatus: -1, // 'active' comes before other statuses alphabetically
+          // Sort verified profiles first, then by batch and name
           isVerified: -1,    // true comes before false in descending order
           isSuspended: 1,    // false comes before true in ascending order
           batch: 1, 
@@ -92,8 +91,9 @@ export const getPublicMembers = async (req, res) => {
         // Community contributions - ensure arrays exist
         eventContributionType: member.eventContributionType || [],
         
-        // Add profile status info that might be useful for UI rendering
-        profileStatus: member.profileStatus || "incomplete",
+        // Add dynamic profile status info calculated on the fly
+        status: member.status || "active",
+        profileStatus: member.status || "active",
         isVerified: !!member.isVerified,
         isSuspended: !!member.isSuspended
       }));

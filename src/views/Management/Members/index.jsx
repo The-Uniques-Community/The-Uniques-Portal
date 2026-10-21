@@ -138,7 +138,7 @@ const MembersIndex = () => {
       } else if (value === "7") {
         filteredMembers = filteredMembers.filter(member => member.batch === "The Uniques 6.0");
       } else if (value === "8") {
-        filteredMembers = filteredMembers.filter(member => member.isSuspended === true || member.profileStatus === "blocked");
+        filteredMembers = filteredMembers.filter(member => member.isSuspended === true);
       }
 
       // Update state with filtered data

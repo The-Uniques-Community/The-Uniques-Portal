@@ -556,6 +556,26 @@ const handleRemoveMember = async (memberId, memberTeam) => {
       // Show loading indicator
       setLoading(true);
 
+      const payload = { ...editedEvent };
+      if (typeof payload.eventBanner === "string" && !payload.eventBanner.trim()) {
+        payload.eventBanner = null;
+      }
+      if (Array.isArray(payload.eventGuests)) {
+        payload.eventGuests = payload.eventGuests
+          .filter((g) => {
+            if (!g) return false;
+            const gid = typeof g.guestId === "object" ? g.guestId?._id : g.guestId;
+            return gid && typeof gid === "string" && gid.trim() !== "";
+          })
+          .map((g) => {
+            const gid = typeof g.guestId === "object" ? g.guestId?._id : g.guestId;
+            return {
+              guestId: gid.trim(),
+              guestTag: g.guestTag || "others",
+            };
+          });
+      }
+
       const response = await fetch(
         `${BASE_URL}/api/events/${id}`,
         {
@@ -564,7 +584,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
             "Content-Type": "application/json",
           },
           credentials: "include",
-          body: JSON.stringify(editedEvent),
+          body: JSON.stringify(payload),
         }
       );
 
