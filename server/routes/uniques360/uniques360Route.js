@@ -6,6 +6,7 @@
  */
 import express from 'express';
 import verifyToken from '../../middlewares/verifyToken.js';
+import verifyRole from '../../middlewares/verifyRole.js';
 import { 
   createTask, 
   getMemberTasks, 
@@ -23,18 +24,20 @@ import {
 
 const router = express.Router();
 
-// Task Routes
-router.post('/tasks', verifyToken, createTask);
-router.get('/tasks/member/:memberId', verifyToken, getMemberTasks);
-router.get('/tasks/coordinator/:coordinatorId', verifyToken, getCoordinatorTasks);
-router.patch('/tasks/:taskId', verifyToken, updateTaskStatus);
-router.put('/tasks/:taskId', verifyToken, updateTask);
-router.delete('/tasks/:taskId', verifyToken, deleteTask);
-router.post('/tasks/:taskId/members', verifyToken, addMemberToTask);
-router.post('/tasks/:taskId/members/remove', verifyToken, removeMemberFromTask);
+// Coordinator & Admin management routes
+router.post('/tasks', verifyToken, verifyRole(['admin', 'coordinator', 'communityadmin']), createTask);
+router.get('/tasks/coordinator/:coordinatorId', verifyToken, verifyRole(['admin', 'coordinator', 'communityadmin']), getCoordinatorTasks);
+router.put('/tasks/:taskId', verifyToken, verifyRole(['admin', 'coordinator', 'communityadmin']), updateTask);
+router.delete('/tasks/:taskId', verifyToken, verifyRole(['admin', 'coordinator', 'communityadmin']), deleteTask);
+
+// Member & Collaboration routes
+router.get('/tasks/member/:memberId', verifyToken, verifyRole(['admin', 'coordinator', 'member', 'communityadmin']), getMemberTasks);
+router.patch('/tasks/:taskId', verifyToken, verifyRole(['admin', 'coordinator', 'member', 'communityadmin']), updateTaskStatus);
+router.post('/tasks/:taskId/members', verifyToken, verifyRole(['admin', 'coordinator', 'member', 'communityadmin']), addMemberToTask);
+router.post('/tasks/:taskId/members/remove', verifyToken, verifyRole(['admin', 'coordinator', 'member', 'communityadmin']), removeMemberFromTask);
 
 // Report Routes
-router.post('/reports', verifyToken, submitReport);
-router.get('/reports/task/:taskId', verifyToken, getTaskReports);
+router.post('/reports', verifyToken, verifyRole(['admin', 'coordinator', 'member', 'communityadmin']), submitReport);
+router.get('/reports/task/:taskId', verifyToken, verifyRole(['admin', 'coordinator', 'member', 'communityadmin']), getTaskReports);
 
 export default router;

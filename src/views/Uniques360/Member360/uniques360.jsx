@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Avatar, Box, Button, Chip, Grid, Paper, Typography, CircularProgress } from "@mui/material";
+import React, { useEffect, useRef, useState } from "react";
+import { Avatar, Box, Button, Chip, Grid, Paper, Typography } from "@mui/material";
 import CompleteIcon from '@mui/icons-material/CheckCircleOutline';
 import ProjectIcon from '@mui/icons-material/FolderOutlined';
 import DateIcon from '@mui/icons-material/CalendarTodayOutlined';
@@ -7,8 +7,6 @@ import axios from "axios";
 import { BASE_URL } from "@/config";
 import { toast } from "react-toastify";
 import { useThemeContext } from "@/theme/ThemeProvider";
-import logoCommunity from "@/assets/logos/theuniquesCommunity.png";
-import logoWhite from "@/assets/logos/uniqueswhite.png";
 import TaskSidebar from "./components/TaskSidebar";
 import ReportFeed from "./components/ReportFeed";
 import ReportComposer from "./components/ReportComposer";
@@ -18,9 +16,6 @@ const Uniques360Member = () => {
   const [tasks, setTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
   const [reports, setReports] = useState([]);
-  const [members, setMembers] = useState([]);
-  const [batches, setBatches] = useState([]);
-  const [selectedBatch, setSelectedBatch] = useState("");
   const [newReport, setNewReport] = useState("");
   const [progressPercent, setProgressPercent] = useState("");
   const [loading, setLoading] = useState(true);
@@ -28,19 +23,6 @@ const Uniques360Member = () => {
   const [sending, setSending] = useState(false);
   const scrollRef = useRef(null);
   const { isDarkMode } = useThemeContext();
-
-  const fetchMembers = async () => {
-    try {
-      const response = await axios.get(`${BASE_URL}/api/admin/member`, { withCredentials: true });
-      const allMembers = response.data?.data || [];
-      setMembers(allMembers);
-      const uniqueBatches = [...new Set(allMembers.map((m) => m.batch).filter(Boolean))].sort();
-      setBatches(uniqueBatches);
-    } catch (error) {
-      console.error(error);
-      toast.error(error.response?.data?.message || "Error fetching members");
-    }
-  };
 
   const fetchTasks = async () => {
     try {
@@ -76,7 +58,7 @@ const Uniques360Member = () => {
     const init = async () => {
       try {
         setLoading(true);
-        await Promise.all([fetchTasks(), fetchMembers()]);
+        await fetchTasks();
       } finally {
         setLoading(false);
       }
@@ -91,12 +73,6 @@ const Uniques360Member = () => {
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [reports]);
-
-  const availableMembers = useMemo(() => {
-    return members
-      .filter((m) => !selectedBatch || m.batch === selectedBatch)
-      .filter((m) => !selectedTask?.assignedTo?.some((at) => ((at.member && at.member._id) || at._id) === m._id));
-  }, [members, selectedBatch, selectedTask]);
 
   const taskStatusLabel = (status) => (status === "pending" ? "Pending" : status);
 
