@@ -36,6 +36,7 @@ const ForgetPassword = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [email, setEmail] = useState("");
+  const [resetSessionToken, setResetSessionToken] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -63,6 +64,7 @@ const ForgetPassword = () => {
 
       if (response.data.success) {
         setEmail(values.email);
+        setResetSessionToken("");
         setActiveStep(1);
         resetFormStates(); // Reset form states
         resetForm(); // Reset Formik form
@@ -92,6 +94,12 @@ const ForgetPassword = () => {
       });
 
       if (response.data.success) {
+        const token = response.data.resetSessionToken || response.data.resetToken;
+        if (!token) {
+          toast.error("Failed to obtain reset session token. Please try again.");
+          return;
+        }
+        setResetSessionToken(token);
         setActiveStep(2);
         resetFormStates(); // Reset form states
         resetForm(); // Reset Formik form
@@ -113,12 +121,20 @@ const ForgetPassword = () => {
 
   // Step 3: Reset Password
   const handleResetPassword = async (values, { setErrors, setSubmitting }) => {
+    if (!resetSessionToken) {
+      toast.error("Password reset session has expired or is invalid. Please verify OTP again.");
+      setActiveStep(1);
+      return;
+    }
+
     try {
       setLoading(true);
       const response = await axios.post(`${BASE_URL}/auth/password-reset/reset-password`, {
         email,
         newPassword: values.newPassword,
         confirmPassword: values.confirmPassword,
+        resetSessionToken,
+        resetToken: resetSessionToken,
       });
 
       if (response.data.success) {
@@ -126,6 +142,7 @@ const ForgetPassword = () => {
         // Reset all states before navigation
         setActiveStep(0);
         setEmail("");
+        setResetSessionToken("");
         resetFormStates();
         navigate("/");
       } else {
@@ -152,6 +169,7 @@ const ForgetPassword = () => {
       });
 
       if (response.data.success) {
+        setResetSessionToken("");
         toast.success("New OTP sent to your email!");
       } else {
         toast.error(response.data.message || "Failed to resend OTP");
