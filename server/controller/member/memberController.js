@@ -10,6 +10,7 @@ import dotenv from "dotenv";
 import { bulkUploadMembers } from "./members.js";
 import Member from "../../models/member/memberModel.js";
 import { deleteFile } from "../googleDriveService.js";
+import { findUserById } from "../Authentication/auth.controller.js";
 dotenv.config();
 
 /**
@@ -272,9 +273,12 @@ export const editProfile = async (req, res) => {
  */
 export const getProfile = async (req, res) => {
     try {
-        const { id } = req.user;
-        const member = await Member.findById(id)
+        const id = req.user.id || req.user._id;
+        let member = await Member.findById(id)
             .select("-password");
+        if (!member) {
+            member = await findUserById(id);
+        }
         if (!member) {
             return res.status(400).json({ message: "User does not exist" });
         }

@@ -9,6 +9,7 @@ import Member from "../../models/member/memberModel.js";
 import Admin from "../../models/admin/adminModel.js";
 import bcrypt from "bcryptjs";
 import CommunityAdmin from "../../models/community/communityAdmin.js";
+import User from "../../models/user/userModel.js";
 import mongoose from "mongoose";
 
 const getJwtSecret = () => {
@@ -30,6 +31,121 @@ const generateToken = (member, fallbackRole) => {
     batch: member.batch || null,
   };
   return jwt.sign(payload, secret, { expiresIn: "1d" });
+};
+
+/**
+ * Normalizes user documents from raw collections so profilePic, avatarUrl, and fullName are guaranteed.
+ * @param {Object} raw - Plain user document from MongoDB collection
+ * @returns {Object} Normalized user document
+ */
+export const normalizeUserProfilePic = (raw) => {
+  if (!raw) return raw;
+  if (raw.name && !raw.fullName) {
+    raw.fullName = raw.name;
+  }
+  if (typeof raw.profilePic === "string" && raw.profilePic.trim()) {
+    const url = raw.profilePic.trim();
+    raw.avatarUrl = raw.avatarUrl || url;
+    raw.profilePic = {
+      fileId: url,
+      fileUrl: url,
+      url: url,
+      fileName: "profile_pic",
+    };
+  } else if (
+    raw.profilePic &&
+    typeof raw.profilePic === "object" &&
+    !(raw.profilePic.fileUrl || raw.profilePic.url || raw.profilePic.fileId)
+  ) {
+    const fileIdStr = raw.profilePic._id
+      ? raw.profilePic._id.toString()
+      : raw.profilePic.toString();
+    raw.profilePic = {
+      fileId: fileIdStr,
+      fileUrl: "",
+      url: "",
+      fileName: "profile_pic",
+    };
+  } else if (
+    (!raw.profilePic || !raw.profilePic.fileUrl) &&
+    raw.avatarUrl &&
+    typeof raw.avatarUrl === "string"
+  ) {
+    const url = raw.avatarUrl.trim();
+    raw.profilePic = {
+      fileId: url,
+      fileUrl: url,
+      url: url,
+      fileName: "avatar",
+    };
+  }
+
+  if (raw.profilePic && typeof raw.profilePic === "object") {
+    if (raw.profilePic.fileUrl && !raw.profilePic.url) {
+      raw.profilePic.url = raw.profilePic.fileUrl;
+    } else if (raw.profilePic.url && !raw.profilePic.fileUrl) {
+      raw.profilePic.fileUrl = raw.profilePic.url;
+    }
+    if (!raw.avatarUrl && (raw.profilePic.fileUrl || raw.profilePic.url)) {
+      raw.avatarUrl = raw.profilePic.fileUrl || raw.profilePic.url;
+    }
+  }
+  return raw;
+};
+
+/**
+ * Robust multi-collection user lookup helper resolving identity by ObjectId or string ID.
+ * @param {string|mongoose.Types.ObjectId} userId - ID of user document
+ * @returns {Promise<Object|null>} Fully hydrated and normalized user document
+ */
+export const findUserById = async (userId) => {
+  if (!userId) return null;
+  const isObjectId = mongoose.Types.ObjectId.isValid(userId);
+  const objectId = isObjectId ? new mongoose.Types.ObjectId(userId) : null;
+  const idQuery = objectId
+    ? { $or: [{ _id: objectId }, { _id: userId.toString() }] }
+    : { _id: userId };
+
+  // 1. Try canonical User model
+  if (User) {
+    try {
+      const user = await User.findOne(idQuery).select("-password");
+      if (user) return user;
+    } catch (_err) {}
+  }
+
+  // 2. Try Member model
+  try {
+    const member = await Member.findOne(idQuery).select("-password");
+    if (member) return member;
+  } catch (_err) {}
+
+  // 3. Try Admin model
+  try {
+    const admin = await Admin.findOne(idQuery).select("-password");
+    if (admin) return admin;
+  } catch (_err) {}
+
+  // 4. Try CommunityAdmin model
+  try {
+    const commAdmin = await CommunityAdmin.findOne(idQuery).select("-password");
+    if (commAdmin) return commAdmin;
+  } catch (_err) {}
+
+  // 5. Direct raw collection fallbacks for split-state or unmigrated databases
+  if (mongoose.connection.readyState === 1 && mongoose.connection.db) {
+    for (const collName of ["users", "members", "admins", "communityadmins"]) {
+      try {
+        const raw = await mongoose.connection.db.collection(collName).findOne(idQuery);
+        if (raw) {
+          delete raw.password;
+          return normalizeUserProfilePic(raw);
+        }
+      } catch (_e) {}
+    }
+  }
+
+  return null;
 };
 
 /**
@@ -150,7 +266,7 @@ export const emailLogin = async (req, res) => {
       try {
         const rawMember = await mongoose.connection.db.collection("members").findOne({ email: emailRegex });
         if (rawMember) {
-          member = rawMember;
+          member = normalizeUserProfilePic(rawMember);
           role = rawMember.role || "member";
         }
       } catch (err) {
@@ -162,7 +278,7 @@ export const emailLogin = async (req, res) => {
         try {
           const rawAdmin = await mongoose.connection.db.collection("admins").findOne({ email: emailRegex });
           if (rawAdmin) {
-            member = rawAdmin;
+            member = normalizeUserProfilePic(rawAdmin);
             role = rawAdmin.role || "admin";
           }
         } catch (err) {
@@ -175,7 +291,7 @@ export const emailLogin = async (req, res) => {
         try {
           const rawCommAdmin = await mongoose.connection.db.collection("communityadmins").findOne({ email: emailRegex });
           if (rawCommAdmin) {
-            member = rawCommAdmin;
+            member = normalizeUserProfilePic(rawCommAdmin);
             role = rawCommAdmin.role || "coordinator";
           }
         } catch (err) {
@@ -236,14 +352,27 @@ export const emailLogin = async (req, res) => {
  * @access  Private
  * @returns {Object} Authenticated user profile data
  */
-export const getCurrentUser = (req, res) => {
+export const getCurrentUser = async (req, res) => {
   if (!req.user) {
     return res.status(401).json({ message: "Unauthorized" });
   }
-  const safeUser = req.user.toObject ? req.user.toObject() : { ...req.user };
-  if (safeUser.password) delete safeUser.password;
-  if (safeUser.__v !== undefined) delete safeUser.__v;
-  return res.status(200).json(safeUser);
+  try {
+    const userId = req.user.id || req.user._id;
+    const fullUser = await findUserById(userId);
+    if (!fullUser) {
+      const safeUser = req.user.toObject ? req.user.toObject() : { ...req.user };
+      if (safeUser.password) delete safeUser.password;
+      if (safeUser.__v !== undefined) delete safeUser.__v;
+      return res.status(200).json(safeUser);
+    }
+    const safeUser = fullUser.toObject ? fullUser.toObject() : { ...fullUser };
+    if (safeUser.password) delete safeUser.password;
+    if (safeUser.__v !== undefined) delete safeUser.__v;
+    return res.status(200).json(safeUser);
+  } catch (error) {
+    console.error("getCurrentUser error:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
 };
 
 /**
