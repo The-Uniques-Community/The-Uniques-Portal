@@ -128,7 +128,15 @@ export const createTask = async (req, res) => {
 export const getMemberTasks = async (req, res) => {
   try {
     const { memberId } = req.params;
-    const id = toObjectId(memberId === "me" ? getRequesterId(req) : memberId);
+    const requesterId = getRequesterId(req);
+    const requesterRole = (req.user?.role || "").toLowerCase();
+    const isManager = ["admin", "superadmin", "coordinator", "communityadmin"].includes(requesterRole);
+
+    if (!isManager && memberId !== "me" && !idsEqual(memberId, requesterId)) {
+      return res.status(403).json({ message: "Unauthorized to view tasks for another member" });
+    }
+
+    const id = toObjectId(memberId === "me" ? requesterId : memberId);
     let tasks = await Task.find({ 'assignedTo.member': id }).populate('assignedTo.member', 'fullName email').sort({ createdAt: -1 });
     // Backwards compatibility: if no tasks found using new shape, try legacy shape
     if (!tasks.length) {
