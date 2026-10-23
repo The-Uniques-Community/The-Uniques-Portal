@@ -2132,7 +2132,6 @@ const Index = () => {
                     variant="outlined"
                     color="primary"
                     size="small"
-                    startIcon={<EditIcon />}
                     onClick={() => toggleEditMode("profile")}
                     sx={{
                       borderColor: "#ca0019",
