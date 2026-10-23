@@ -67,6 +67,8 @@ const defaultOrigins = [
   "http://localhost:3000",
   "https://theuniquesportal.vercel.app",
   "https://the-uniques-portal.vercel.app",
+  "https://theuniquescommunity.vercel.app",
+  "https://the-uniques-community.vercel.app",
   "https://www.theuniques.in",
   "https://theuniques.in",
 ].filter(Boolean);
@@ -83,9 +85,9 @@ export const isAllowedOrigin = (origin) => {
   if (process.env.NODE_ENV !== "production") return true;
   if (allowedOrigins.includes(origin)) return true;
 
-  // Pattern matches the-uniques-portal, theuniquesportal, theuniquesportal-server and preview deployments on Vercel
-  const vercelPortalRegex = /^https:\/\/(the-?uniques-?portal|theuniquesportal-server)(-[a-z0-9-]+)?\.vercel\.app$/i;
-  if (vercelPortalRegex.test(origin)) return true;
+  // Pattern matches the-uniques-portal, theuniquesportal, theuniquescommunity, the-uniques-community, theuniquesportal-server and preview deployments on Vercel
+  const vercelDomainRegex = /^https:\/\/(the-?uniques-?(portal|community)|theuniquesportal-server)(-[a-z0-9-]+)?\.vercel\.app$/i;
+  if (vercelDomainRegex.test(origin)) return true;
 
   // Pattern matches theuniques.in and subdomains (e.g., https://www.theuniques.in)
   const uniquesDomainRegex = /^https:\/\/(?:[a-z0-9-]+\.)*theuniques\.in$/i;

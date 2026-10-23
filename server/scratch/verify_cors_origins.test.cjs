@@ -53,7 +53,27 @@ async function runTests() {
     true,
     "Should allow backend preview deployment: theuniquesportal-server-git-main.vercel.app"
   );
-  console.log("   ✅ Vercel preview URLs match pattern correctly");
+  assert.strictEqual(
+    isAllowedOrigin("https://theuniquescommunity.vercel.app"),
+    true,
+    "Should allow community production domain: theuniquescommunity.vercel.app"
+  );
+  assert.strictEqual(
+    isAllowedOrigin("https://the-uniques-community.vercel.app"),
+    true,
+    "Should allow community production domain with hyphens: the-uniques-community.vercel.app"
+  );
+  assert.strictEqual(
+    isAllowedOrigin("https://theuniquescommunity-git-main.vercel.app"),
+    true,
+    "Should allow community preview deployment: theuniquescommunity-git-main.vercel.app"
+  );
+  assert.strictEqual(
+    isAllowedOrigin("https://the-uniques-community-git-feature.vercel.app"),
+    true,
+    "Should allow community preview deployment with hyphens: the-uniques-community-git-feature.vercel.app"
+  );
+  console.log("   ✅ Vercel preview & community URLs match pattern correctly");
 
   // Test 3b: Production custom domain theuniques.in & www.theuniques.in
   assert.strictEqual(
