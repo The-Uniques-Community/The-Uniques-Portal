@@ -170,6 +170,72 @@ userSchema.index({ role: 1 });
 userSchema.index({ batch: 1 });
 userSchema.index({ graduationYear: 1 });
 
+// Pre-init hook: Normalize raw MongoDB document fields before Mongoose casts/validates them
+userSchema.pre("init", function (raw) {
+  if (raw) {
+    // 1. Normalize legacy name field -> fullName
+    if (raw.name && !raw.fullName) {
+      raw.fullName = raw.name;
+    }
+
+    // 2. Normalize profilePic
+    // Case A: profilePic is stored as a direct string URL (e.g. Google avatar, Cloudinary, Drive link)
+    if (typeof raw.profilePic === "string" && raw.profilePic.trim()) {
+      const url = raw.profilePic.trim();
+      raw.avatarUrl = raw.avatarUrl || url;
+      raw.profilePic = {
+        fileId: url,
+        fileUrl: url,
+        url: url,
+        fileName: "profile_pic",
+      };
+    }
+    // Case B: profilePic is stored as legacy ObjectId reference to File document
+    else if (
+      raw.profilePic &&
+      typeof raw.profilePic === "object" &&
+      !(raw.profilePic.fileUrl || raw.profilePic.url || raw.profilePic.fileId)
+    ) {
+      const fileIdStr = raw.profilePic._id
+        ? raw.profilePic._id.toString()
+        : raw.profilePic.toString();
+      raw.profilePic = {
+        fileId: fileIdStr,
+        fileUrl: "",
+        url: "",
+        fileName: "profile_pic",
+      };
+    }
+    // Case C: avatarUrl exists but profilePic is null/empty
+    else if (
+      (!raw.profilePic || !raw.profilePic.fileUrl) &&
+      raw.avatarUrl &&
+      typeof raw.avatarUrl === "string"
+    ) {
+      const url = raw.avatarUrl.trim();
+      raw.profilePic = {
+        fileId: url,
+        fileUrl: url,
+        url: url,
+        fileName: "avatar",
+      };
+    }
+
+    // 3. Ensure profilePic has both `url` and `fileUrl` populated if one exists
+    if (raw.profilePic && typeof raw.profilePic === "object") {
+      if (raw.profilePic.fileUrl && !raw.profilePic.url) {
+        raw.profilePic.url = raw.profilePic.fileUrl;
+      } else if (raw.profilePic.url && !raw.profilePic.fileUrl) {
+        raw.profilePic.fileUrl = raw.profilePic.url;
+      }
+      if (!raw.avatarUrl && (raw.profilePic.fileUrl || raw.profilePic.url)) {
+        raw.avatarUrl = raw.profilePic.fileUrl || raw.profilePic.url;
+      }
+    }
+  }
+  return raw;
+});
+
 // Pre-save hook: Hash passwords safely and calculate academic years
 userSchema.pre("save", async function (next) {
   if (!this.admissionYear) {
