@@ -103,16 +103,32 @@ export const authService = {
     }
   },
 
+  /**
+   * Dispatches a password reset OTP to user's registered email address.
+   * @param {string} email
+   * @returns {Promise<Object>}
+   */
   async sendPasswordResetOtp(email) {
     const response = await apiClient.post("/auth/password-reset/send-otp", { email });
     return response.data;
   },
 
+  /**
+   * Verifies the 6-digit OTP and retrieves single-use reset authorization token.
+   * @param {string} email
+   * @param {string} otp
+   * @returns {Promise<{ success: boolean, message: string, resetSessionToken?: string, resetToken?: string }>}
+   */
   async verifyPasswordResetOtp(email, otp) {
     const response = await apiClient.post("/auth/password-reset/verify-otp", { email, otp });
     return response.data;
   },
 
+  /**
+   * Completes password reset using single-use session authorization token.
+   * @param {{ email: string, newPassword: string, confirmPassword?: string, resetSessionToken: string, resetToken?: string }} payload
+   * @returns {Promise<{ success: boolean, message: string }>}
+   */
   async resetPassword(payload) {
     const response = await apiClient.post("/auth/password-reset/reset-password", payload);
     return response.data;
