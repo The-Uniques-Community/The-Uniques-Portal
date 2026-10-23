@@ -62,6 +62,16 @@ import {
   PROJECT_BATCHES,
   PROJECT_CATEGORIES,
 } from "@/utils/project/projectsData";
+import { BASE_URL } from "@/config";
+
+const getSafeProjectImage = (img) => {
+  if (!img) return "/projects/unicare.webp";
+  if (typeof img === "string" && img.startsWith("/api/image-proxy/")) {
+    const prefix = BASE_URL ? BASE_URL.replace(/\/+$/, "") : "";
+    return `${prefix}${img}`;
+  }
+  return img;
+};
 
 const ProjectView = () => {
   const { id } = useParams();
@@ -536,11 +546,11 @@ const ProjectView = () => {
               {/* Centered Image with Zoom Control */}
               <Box
                 component="img"
-                src={project.image || "/projects/unicare.webp"}
+                src={getSafeProjectImage(project.image)}
                 alt={project.title}
                 onError={(e) => {
-                  e.currentTarget.src =
-                    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80";
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = "/projects/unicare.webp";
                 }}
                 sx={{
                   maxWidth: "92%",
