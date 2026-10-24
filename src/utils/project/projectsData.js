@@ -3,38 +3,38 @@ import projectService from "@/services/projectService";
 export const INITIAL_PROJECTS = [
   {
     id: 1,
-    title: "UNI CARE",
-    batch: "Uniques 4.0",
+    title: "TU Portal",
+    batch: "Uniques 1.0",
     description:
-      "A student-support system that identifies potential problem areas and flags them for timely attention and appropriate support.",
+      "A centralized student data portal containing profiles, academic information, records, and essential data of all Uniques students.",
     overview:
-      "An intelligent student wellness and support platform engineered to assist academic communities in detecting early signs of distress, academic fatigue, and mentorship gaps.",
+      "The single source of truth for The Uniques Community student records, tracking member milestones, verification status, project portfolios, and administrative records.",
     detailedDescription:
-      "UNI CARE is a comprehensive student-centric initiative developed by The Uniques Community to foster psychological safety, academic guidance, and peer-to-peer mentorship. By coupling an accessible help-desk interface with intelligent alert tracking, UNI CARE bridges the communication barrier between students and faculty mentors, ensuring that every student receives proactive attention before minor difficulties turn into critical hurdles.",
+      "TU Portal is the core administrative and academic spine of The Uniques Community. Serving hundreds of registered members across consecutive batches, the portal centralizes student profiles, skills verification, project contributions, event attendance, and community credentials into a single authenticated ecosystem.",
     problemStatement:
-      "Students in higher education frequently navigate rigorous academic demands, career pressures, and adjustment hurdles in isolation. Without a dedicated, non-stigmatizing channel to voice concerns or request one-on-one guidance, early distress often goes unnoticed until examinations or academic performance suffer.",
+      "Managing student profiles, verifying event participations, and coordinating member milestones across fragmented spreadsheets leads to administrative friction, duplicate entries, and lack of accountability.",
     solution:
-      "A proactive, privacy-respecting digital support platform that integrates anonymous assistance requests, mentorship ticket assignment, wellness check-in indicators, and rapid coordinator intervention to deliver immediate academic and personal support.",
+      "An enterprise-grade, role-based community management platform providing authenticated student dashboards, administrative verification tools, and real-time community directory sync.",
     features: [
-      "Confidential Student Wellness & Guidance Ticketing",
-      "Automated Support Routing to Relevant Faculty & Student Mentors",
-      "Real-time Issue Status Tracking and Feedback Closure",
-      "Integrated Resource Library for Academic Guidance and Stress Management",
-      "Strict Data Privacy & Optional Anonymous Inquiry Submission",
+      "Role-Based Access Control (Admin, Coordinator, Member)",
+      "Centralized Student Profile & Skill Credential Verification",
+      "Automated Attendance & Community Milestone Tracking",
+      "Batch-wise Analytics, Performance Reports & Data Export",
+      "Seamless Integration with Community Notification Channels",
     ],
     team: [
-      { name: "The Uniques 4.0", role: "Organizing & Tech Wing", initials: "TU" },
-      { name: "Mentorship Cell", role: "Student Counselors", initials: "MC" },
+      { name: "The Uniques 1.0", role: "Lead Architecture Team", initials: "TU" },
+      { name: "Admin Council", role: "Community Operations", initials: "AC" },
     ],
     status: "Completed",
-    image: "/projects/unicare.webp",
-    technologies: ["REACT", "NODE.JS", "MONGODB", "AI"],
-    category: "Support & Mentorship",
-    link: "https://uniques-care.vercel.app/",
-    liveUrl: "https://uniques-care.vercel.app/",
+    image: "/projects/tuportal.webp",
+    technologies: ["REACT", "NODE.JS", "MONGODB", "TAILWIND"],
+    category: "Student Records & LMS",
+    link: "https://theuniquesportal.vercel.app/",
+    liveUrl: "https://theuniquesportal.vercel.app/",
     githubUrl: "https://github.com/theuniquesofflicial",
     buttonColor: "#ea384c",
-    createdAt: "2026-01-15",
+    createdAt: "2026-01-05",
   },
   {
     id: 2,
@@ -60,7 +60,7 @@ export const INITIAL_PROJECTS = [
     team: [
       { name: "The Uniques 1.0", role: "Founding Engineering Team", initials: "TU" },
     ],
-    status: "Completed",
+    status: "Active",
     image: "/projects/libraria.webp",
     technologies: ["REACT", "NODE.JS", "MONGODB", "TAILWIND"],
     category: "Digital Library",
@@ -72,107 +72,106 @@ export const INITIAL_PROJECTS = [
   },
   {
     id: 3,
-    title: "TU Portal",
-    batch: "Uniques 1.0",
+    title: "UNI CARE",
+    batch: "Uniques 4.0",
     description:
-      "A centralized student data portal containing profiles, academic information, records, and essential data of all Uniques students.",
+      "A student-support system that identifies potential problem areas and flags them for timely attention and appropriate support.",
     overview:
-      "The single source of truth for The Uniques Community student records, tracking member milestones, verification status, project portfolios, and administrative records.",
+      "An intelligent student wellness and support platform engineered to assist academic communities in detecting early signs of distress, academic fatigue, and mentorship gaps.",
     detailedDescription:
-      "TU Portal is the core administrative and academic spine of The Uniques Community. Serving hundreds of registered members across consecutive batches, the portal centralizes student profiles, skills verification, project contributions, event attendance, and community credentials into a single authenticated ecosystem.",
+      "UNI CARE is a comprehensive student-centric initiative developed by The Uniques Community to foster psychological safety, academic guidance, and peer-to-peer mentorship. By coupling an accessible help-desk interface with intelligent alert tracking, UNI CARE bridges the communication barrier between students and faculty mentors, ensuring that every student receives proactive attention before minor difficulties turn into critical hurdles.",
     problemStatement:
-      "Managing student profiles, verifying event participations, and coordinating member milestones across fragmented spreadsheets leads to administrative friction, duplicate entries, and lack of accountability.",
+      "Students in higher education frequently navigate rigorous academic demands, career pressures, and adjustment hurdles in isolation. Without a dedicated, non-stigmatizing channel to voice concerns or request one-on-one guidance, early distress often goes unnoticed until examinations or academic performance suffer.",
     solution:
-      "An enterprise-grade, role-based community management platform providing authenticated student dashboards, administrative verification tools, and real-time community directory sync.",
+      "A proactive, privacy-respecting digital support platform that integrates anonymous assistance requests, mentorship ticket assignment, wellness check-in indicators, and rapid coordinator intervention to deliver immediate academic and personal support.",
     features: [
-      "Role-Based Access Control (Admin, Coordinator, Member)",
-      "Centralized Student Profile & Skill Credential Verification",
-      "Automated Attendance & Community Milestone Tracking",
-      "Batch-wise Analytics, Performance Reports & Data Export",
-      "Seamless Integration with Community Notification Channels",
+      "Confidential Student Wellness & Guidance Ticketing",
+      "Automated Support Routing to Relevant Faculty & Student Mentors",
+      "Real-time Issue Status Tracking and Feedback Closure",
+      "Integrated Resource Library for Academic Guidance and Stress Management",
+      "Strict Data Privacy & Optional Anonymous Inquiry Submission",
     ],
     team: [
-      { name: "The Uniques 1.0", role: "Lead Architecture Team", initials: "TU" },
-      { name: "Admin Council", role: "Community Operations", initials: "AC" },
+      { name: "The Uniques 4.0", role: "Organizing & Tech Wing", initials: "TU" },
+      { name: "Mentorship Cell", role: "Student Counselors", initials: "MC" },
     ],
-    status: "Live / Production",
-    image: "/projects/tuportal.webp",
-    technologies: ["REACT", "NODE.JS", "MONGODB", "TAILWIND"],
-    category: "Student Records & LMS",
-    link: "https://theuniquesportal.vercel.app/",
-    liveUrl: "https://theuniquesportal.vercel.app/",
+    status: "Active",
+    image: "/projects/unicare.webp",
+    technologies: ["REACT", "NODE.JS", "MONGODB", "AI"],
+    category: "Support & Mentorship",
+    link: "https://uniques-care.vercel.app/",
+    liveUrl: "https://uniques-care.vercel.app/",
     githubUrl: "https://github.com/theuniquesofflicial",
     buttonColor: "#ea384c",
-    createdAt: "2026-01-05",
+    createdAt: "2026-01-15",
   },
   {
     id: 4,
-    title: "Code crusade 0.5",
-    batch: "Uniques 5.0",
+    title: "Uniques eGyan",
+    batch: "Uniques 4.0",
     description:
-      "A 7-day intensive workshop designed to develop industry-grade coding skills and evaluate students' knowledge through practical tests.",
+      "UNIQUE eGYAN is a centralized, free academic resource platform designed exclusively for members of The Uniques Community. Acting as a one-stop academic repository with PYQs, study guides, and verified lecture notes.",
     overview:
-      "An intensive developer bootcamp and real-time coding challenge portal designed to elevate fundamental algorithmic thinking into production-level problem-solving.",
+      "A comprehensive academic knowledge portal curated by top-performing seniors to help students excel in university examinations and competitive tests.",
     detailedDescription:
-      "Code Crusade 0.5 was conceptualized as a high-intensity programming sprint that immersed student developers in real-world problem sets, algorithmic patterns, and clean code principles. Built with an integrated challenge submission and automated evaluation suite, the platform tracked participant solutions in real-time throughout the seven-day workshop.",
+      "UNIQUE eGYAN is a centralized, free academic resource platform designed exclusively for members of The Uniques Community. Acting as a one-stop academic repository with PYQs, study guides, and verified lecture notes, the platform organizes handwritten notes, syllabus blueprints, and previous year examination solutions into an easily searchable archive.",
     problemStatement:
-      "Engineering students often lack hands-on, test-driven programming practice, struggling to bridge the gap between academic theory and competitive coding standards.",
+      "Exam study materials, previous year question papers (PYQs), and handwritten notes are typically scattered across drives, making last-minute exam preparation chaotic.",
     solution:
-      "A structured daily module platform combining guided workshop curricula, automated test harnesses, and leaderboard-driven assessments.",
+      "A structured, searchable knowledge base categorized by semester, branch, subject code, and exam type.",
     features: [
-      "7-Day Progressive Challenge Curriculum (Beginner to Advanced)",
-      "Automated Test Case Runner with Instant Execution Feedback",
-      "Live Gamified Leaderboard with Real-Time Ranking Updates",
-      "Detailed Solution Walkthroughs & Peer Code Reviews",
-      "Automated Digital Certificate of Completion Generation",
+      "Complete Repository of University Previous Year Questions (PYQs)",
+      "Handwritten Verified Lecture Notes by Top Academic Performers",
+      "Semester & Branch Hierarchical Navigation Filter",
+      "Fast Cloud PDF Downloads with Offline Accessibility",
+      "Community Note Contribution & Review Verification System",
     ],
     team: [
-      { name: "The Uniques 5.0", role: "Curriculum & Tech Team", initials: "TU" },
-      { name: "Competitive Coding Leads", role: "Problem Setters", initials: "CC" },
+      { name: "The Uniques 4.0", role: "Academic Cell Leads", initials: "TU" },
     ],
-    status: "Completed",
-    image: "/projects/codecrusade.webp",
-    technologies: ["WORKSHOP", "CODING", "ASSESSMENT", "PYTHON"],
-    category: "Workshop & Testing",
-    link: "https://codecrusade2026.vercel.app/",
-    liveUrl: "https://codecrusade2026.vercel.app/",
+    status: "Active",
+    image: "/projects/unicare.webp",
+    technologies: ["REACT", "NODE.JS", "MONGODB", "TAILWIND"],
+    category: "Academic & Learning",
+    link: "https://github.com/theuniquesofflicial",
+    liveUrl: null,
     githubUrl: "https://github.com/theuniquesofflicial",
     buttonColor: "#ea384c",
-    createdAt: "2026-02-01",
+    createdAt: "2026-03-10",
   },
   {
     id: 5,
-    title: "Ideajam 2026",
+    title: "Elevate 3.0",
     batch: "Uniques 4.0",
     description:
-      "An internal hackathon portal enabling student teams to pitch innovative ideas and selecting top teams to participate in the Smart India Hackathon (SIH).",
+      "An official induction and orientation web portal organized for first-year students to inspire, connect, and onboard them into the community.",
     overview:
-      "The premier internal innovation battleground for The Uniques Community, serving as the official incubation and screening pipeline for national competitions like SIH.",
+      "The flagship onboarding experience of The Uniques Community, welcoming incoming freshmen into an ecosystem of peer learning, technology domains, and leadership opportunities.",
     detailedDescription:
-      "Ideajam 2026 served as the premier internal innovation battleground for The Uniques Community. Built to simulate national hackathon pressure, the web portal enabled dozens of multi-disciplinary teams to submit pitch decks, problem solutions, and prototypes for scrutiny by senior industry mentors and jury panels selecting finalists for the Smart India Hackathon (SIH).",
+      "Elevate 3.0 represents the flagship onboarding experience of The Uniques Community, welcoming incoming freshmen into an ecosystem of peer learning, technology domains, and leadership opportunities. Featuring high-energy animations, domain breakdowns, mentor introductions, and an integrated induction form, the platform engaged hundreds of first-year students.",
     problemStatement:
-      "Filtering high-potential student projects and assembling balanced teams for national competitions requires rigorous, transparent screening, structured feedback rounds, and documented rubric scoring.",
+      "Freshers entering university often feel overwhelmed and unaware of active technical communities, club cultures, and skill development paths.",
     solution:
-      "An end-to-end hackathon management system covering idea submissions, jury scoring rubrics, mentor feedback rounds, and finalist shortlisting.",
+      "An interactive portal with timeline roadmaps, domain overviews, orientation schedules, and direct community registration.",
     features: [
-      "Team Formation & Multi-Member Invitation System",
-      "SIH Problem Statement Categorization & Deck Uploads",
-      "Standardized Jury Scoring Rubric with Real-time Normalization",
-      "Interactive Mentorship Slot Booking & Review Feedback Logs",
-      "Stage-wise Milestone Announcements & Finalist Showcases",
+      "Fluid Framer Motion Interactive Presentations & Domain Spotlights",
+      "Live Orientation Itinerary & Speaker Announcements",
+      "One-Click Freshman Induction Registration & Skill Survey",
+      "Alumni & Senior Success Story Interactive Carousel",
+      "Direct Community Onboarding Channels",
     ],
     team: [
-      { name: "The Uniques 4.0", role: "Hackathon Council", initials: "TU" },
+      { name: "The Uniques 4.0", role: "Induction Committee", initials: "TU" },
     ],
-    status: "Completed",
-    image: "/projects/ideajam2026.webp",
-    technologies: ["REACT", "NODE.JS", "TAILWIND", "SIH"],
-    category: "Hackathon & SIH",
-    link: "https://ideajam2026.vercel.app/",
-    liveUrl: "https://ideajam2026.vercel.app/",
+    status: "Active",
+    image: "/projects/elevate.webp",
+    technologies: ["REACT", "TAILWIND", "FRAMER", "INDUCTION"],
+    category: "Induction & Orientation",
+    link: "https://elevate-sviet.vercel.app/",
+    liveUrl: "https://elevate-sviet.vercel.app/",
     githubUrl: "https://github.com/theuniquesofflicial",
     buttonColor: "#ea384c",
-    createdAt: "2026-02-15",
+    createdAt: "2026-03-01",
   },
   {
     id: 6,
@@ -198,7 +197,7 @@ export const INITIAL_PROJECTS = [
     team: [
       { name: "The Uniques 4.0", role: "Organizing Committee", initials: "TU" },
     ],
-    status: "Completed",
+    status: "Active",
     image: "/projects/eureka.webp",
     technologies: ["REACT", "NODE.JS", "MONGODB", "INNOVATION"],
     category: "National Ideathon",
@@ -210,110 +209,75 @@ export const INITIAL_PROJECTS = [
   },
   {
     id: 7,
-    title: "Elevate 3.0",
+    title: "Ideajam 2026",
     batch: "Uniques 4.0",
     description:
-      "An official induction and orientation web portal organized for first-year students to inspire, connect, and onboard them into the community.",
+      "An internal hackathon portal enabling student teams to pitch innovative ideas and selecting top teams to participate in the Smart India Hackathon (SIH).",
     overview:
-      "The flagship onboarding experience of The Uniques Community, welcoming incoming freshmen into an ecosystem of peer learning, technology domains, and leadership opportunities.",
+      "The premier internal innovation battleground for The Uniques Community, serving as the official incubation and screening pipeline for national competitions like SIH.",
     detailedDescription:
-      "Elevate 3.0 represents the flagship onboarding experience of The Uniques Community, welcoming incoming freshmen into an ecosystem of peer learning, technology domains, and leadership opportunities. Featuring high-energy animations, domain breakdowns, mentor introductions, and an integrated induction form, the platform engaged hundreds of first-year students.",
+      "Ideajam 2026 served as the premier internal innovation battleground for The Uniques Community. Built to simulate national hackathon pressure, the web portal enabled dozens of multi-disciplinary teams to submit pitch decks, problem solutions, and prototypes for scrutiny by senior industry mentors and jury panels selecting finalists for the Smart India Hackathon (SIH).",
     problemStatement:
-      "Freshers entering university often feel overwhelmed and unaware of active technical communities, club cultures, and skill development paths.",
+      "Filtering high-potential student projects and assembling balanced teams for national competitions requires rigorous, transparent screening, structured feedback rounds, and documented rubric scoring.",
     solution:
-      "An interactive portal with timeline roadmaps, domain overviews, orientation schedules, and direct community registration.",
+      "An end-to-end hackathon management system covering idea submissions, jury scoring rubrics, mentor feedback rounds, and finalist shortlisting.",
     features: [
-      "Fluid Framer Motion Interactive Presentations & Domain Spotlights",
-      "Live Orientation Itinerary & Speaker Announcements",
-      "One-Click Freshman Induction Registration & Skill Survey",
-      "Alumni & Senior Success Story Interactive Carousel",
-      "Direct Community Onboarding Channels",
+      "Team Formation & Multi-Member Invitation System",
+      "SIH Problem Statement Categorization & Deck Uploads",
+      "Standardized Jury Scoring Rubric with Real-time Normalization",
+      "Interactive Mentorship Slot Booking & Review Feedback Logs",
+      "Stage-wise Milestone Announcements & Finalist Showcases",
     ],
     team: [
-      { name: "The Uniques 4.0", role: "Induction Committee", initials: "TU" },
+      { name: "The Uniques 4.0", role: "Hackathon Council", initials: "TU" },
     ],
-    status: "Completed",
-    image: "/projects/elevate.webp",
-    technologies: ["REACT", "TAILWIND", "FRAMER", "INDUCTION"],
-    category: "Induction & Orientation",
-    link: "https://elevate-sviet.vercel.app/",
-    liveUrl: "https://elevate-sviet.vercel.app/",
+    status: "Active",
+    image: "/projects/ideajam2026.webp",
+    technologies: ["REACT", "NODE.JS", "TAILWIND", "SIH"],
+    category: "Hackathon & SIH",
+    link: "https://ideajam2026.vercel.app/",
+    liveUrl: "https://ideajam2026.vercel.app/",
     githubUrl: "https://github.com/theuniquesofflicial",
     buttonColor: "#ea384c",
-    createdAt: "2026-03-01",
+    createdAt: "2026-02-15",
   },
   {
     id: 8,
-    title: "Uniques E-Gyan",
-    batch: "Uniques 4.0",
+    title: "Code crusade 0.5",
+    batch: "Uniques 5.0",
     description:
-      "A centralized academic platform providing students with PYQs, notes, study materials, and exam-focused resources.",
+      "A 7-day intensive workshop designed to develop industry-grade coding skills and evaluate students' knowledge through practical tests.",
     overview:
-      "A comprehensive academic knowledge portal curated by top-performing seniors to help students excel in university examinations and competitive tests.",
+      "An intensive developer bootcamp and real-time coding challenge portal designed to elevate fundamental algorithmic thinking into production-level problem-solving.",
     detailedDescription:
-      "Uniques E-Gyan is a comprehensive academic knowledge portal developed to democratize high-quality study materials across all engineering disciplines. Curated by top scorers and academic coordinators, the platform organizes handwritten notes, syllabus blueprints, and previous year examination solutions into an easily searchable archive.",
+      "Code Crusade 0.5 was conceptualized as a high-intensity programming sprint that immersed student developers in real-world problem sets, algorithmic patterns, and clean code principles. Built with an integrated challenge submission and automated evaluation suite, the platform tracked participant solutions in real-time throughout the seven-day workshop.",
     problemStatement:
-      "Exam study materials, previous year question papers (PYQs), and handwritten notes are typically scattered across drives, making last-minute exam preparation chaotic.",
+      "Engineering students often lack hands-on, test-driven programming practice, struggling to bridge the gap between academic theory and competitive coding standards.",
     solution:
-      "A structured, searchable knowledge base categorized by semester, branch, subject code, and exam type.",
+      "A structured daily module platform combining guided workshop curricula, automated test harnesses, and leaderboard-driven assessments.",
     features: [
-      "Complete Repository of University Previous Year Questions (PYQs)",
-      "Handwritten Verified Lecture Notes by Top Academic Performers",
-      "Semester & Branch Hierarchical Navigation Filter",
-      "Fast Cloud PDF Downloads with Offline Accessibility",
-      "Community Note Contribution & Review Verification System",
+      "7-Day Progressive Challenge Curriculum (Beginner to Advanced)",
+      "Automated Test Case Runner with Instant Execution Feedback",
+      "Live Gamified Leaderboard with Real-Time Ranking Updates",
+      "Detailed Solution Walkthroughs & Peer Code Reviews",
+      "Automated Digital Certificate of Completion Generation",
     ],
     team: [
-      { name: "The Uniques 4.0", role: "Academic Cell Leads", initials: "TU" },
+      { name: "The Uniques 5.0", role: "Curriculum & Tech Team", initials: "TU" },
+      { name: "Competitive Coding Leads", role: "Problem Setters", initials: "CC" },
     ],
     status: "Active",
-    image:
-      "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1200&q=80",
-    technologies: ["REACT", "NODE.JS", "MONGODB", "TAILWIND"],
-    category: "Academic & Learning",
-    link: "https://github.com/theuniquesofflicial",
-    liveUrl: null,
+    image: "/projects/codecrusade.webp",
+    technologies: ["WORKSHOP", "CODING", "ASSESSMENT", "PYTHON"],
+    category: "Workshop & Testing",
+    link: "https://codecrusade2026.vercel.app/",
+    liveUrl: "https://codecrusade2026.vercel.app/",
     githubUrl: "https://github.com/theuniquesofflicial",
     buttonColor: "#ea384c",
-    createdAt: "2026-03-10",
+    createdAt: "2026-02-01",
   },
   {
     id: 9,
-    title: "Uniques Assess",
-    batch: "Uniques 4.0",
-    description:
-      "An online assessment platform for conducting college examinations, managing tests, evaluating students, and tracking performance.",
-    overview:
-      "A robust computerized examination and aptitude evaluation platform built to conduct secure campus assessments, mock placement tests, and weekly quizzes.",
-    detailedDescription:
-      "Uniques Assess is an automated testing platform engineered to administer mock placement tests, coding assessments, and semester practice exams. Featuring real-time proctoring safeguards, auto-grading pipelines, and deep sectional analytics, it allows students to benchmark their readiness against industry standards.",
-    problemStatement:
-      "Manual test evaluation and physical exam papers take excessive turnaround time and lack detailed performance analytics for students to gauge their weak areas.",
-    solution:
-      "An automated online testing platform equipped with timed quizzes, randomized questions, auto-grading, and deep sectional analytics.",
-    features: [
-      "Timed Online Test Runner with Tab-Switch Monitoring",
-      "Instant Automated Evaluation for Objective & Subjective Questions",
-      "Detailed Sectional Performance Breakdown and Percentile Benchmarks",
-      "Instructor Dashboard for Question Bank Management",
-      "Automated Student Scorecard & Rank Generation",
-    ],
-    team: [
-      { name: "The Uniques 4.0", role: "Evaluation & Tech Wing", initials: "TU" },
-    ],
-    status: "Active",
-    image:
-      "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200&q=80",
-    technologies: ["REACT", "NODE.JS", "MONGODB", "TAILWIND"],
-    category: "Assessment & Exams",
-    link: "https://github.com/theuniquesofflicial",
-    liveUrl: null,
-    githubUrl: "https://github.com/theuniquesofflicial",
-    buttonColor: "#ea384c",
-    createdAt: "2026-03-15",
-  },
-  {
-    id: 10,
     title: "Uniques 360",
     batch: "Uniques 1.0",
     description:
@@ -337,15 +301,48 @@ export const INITIAL_PROJECTS = [
       { name: "The Uniques 1.0", role: "Founding Engineering Wing", initials: "TU" },
     ],
     status: "Active",
-    image:
-      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80",
+    image: "/projects/unicare.webp",
     technologies: ["REACT", "NODE.JS", "MONGODB", "TAILWIND"],
     category: "Analytics & Activities",
-    link: "https://github.com/theuniquesofflicial",
-    liveUrl: null,
+    link: "https://theuniquesportal.vercel.app/",
+    liveUrl: "https://theuniquesportal.vercel.app/",
     githubUrl: "https://github.com/theuniquesofflicial",
     buttonColor: "#ea384c",
     createdAt: "2026-03-20",
+  },
+  {
+    id: 10,
+    title: "Uniques Assess",
+    batch: "Uniques 4.0",
+    description:
+      "An online assessment platform for conducting college examinations, managing tests, evaluating students, and tracking performance.",
+    overview:
+      "A robust computerized examination and aptitude evaluation platform built to conduct secure campus assessments, mock placement tests, and weekly quizzes.",
+    detailedDescription:
+      "Uniques Assess is an automated testing platform engineered to administer mock placement tests, coding assessments, and semester practice exams. Featuring real-time proctoring safeguards, auto-grading pipelines, and deep sectional analytics, it allows students to benchmark their readiness against industry standards.",
+    problemStatement:
+      "Manual test evaluation and physical exam papers take excessive turnaround time and lack detailed performance analytics for students to gauge their weak areas.",
+    solution:
+      "An automated online testing platform equipped with timed quizzes, randomized questions, auto-grading, and deep sectional analytics.",
+    features: [
+      "Timed Online Test Runner with Tab-Switch Monitoring",
+      "Instant Automated Evaluation for Objective & Subjective Questions",
+      "Detailed Sectional Performance Breakdown and Percentile Benchmarks",
+      "Instructor Dashboard for Question Bank Management",
+      "Automated Student Scorecard & Rank Generation",
+    ],
+    team: [
+      { name: "The Uniques 4.0", role: "Evaluation & Tech Wing", initials: "TU" },
+    ],
+    status: "Active",
+    image: "/projects/unicare.webp",
+    technologies: ["REACT", "NODE.JS", "MONGODB", "TAILWIND"],
+    category: "Assessment & Exams",
+    link: "https://theuniquesportal.vercel.app/",
+    liveUrl: "https://theuniquesportal.vercel.app/",
+    githubUrl: "https://github.com/theuniquesofflicial",
+    buttonColor: "#ea384c",
+    createdAt: "2026-03-15",
   },
 ];
 
@@ -391,12 +388,28 @@ export const getStoredProjects = () => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_PROJECTS));
       return INITIAL_PROJECTS.map(normalizeProject);
     }
-    const parsed = JSON.parse(raw);
+    let parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
-      // Merge with INITIAL_PROJECTS so enriched fields are always present
+      // Find any canonical projects missing from stored list
+      const missingCanonical = INITIAL_PROJECTS.filter(
+        (init) =>
+          !parsed.some(
+            (p) =>
+              p.title?.toLowerCase().trim() === init.title.toLowerCase().trim() ||
+              String(p.id) === String(init.id)
+          )
+      );
+
+      if (missingCanonical.length > 0) {
+        parsed = [...parsed, ...missingCanonical];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+      }
+
       return parsed.map((item) => {
         const initialMatch = INITIAL_PROJECTS.find(
-          (init) => String(init.id) === String(item.id) || init.title === item.title
+          (init) =>
+            String(init.id) === String(item.id) ||
+            init.title?.toLowerCase().trim() === item.title?.toLowerCase().trim()
         );
         return normalizeProject({
           ...(initialMatch || {}),
@@ -412,11 +425,75 @@ export const getStoredProjects = () => {
   }
 };
 
+// Returns paginated and filtered local projects data conforming to API structure
+export const getPaginatedStoredProjects = (params = {}) => {
+  const allProjects = getStoredProjects();
+  let filtered = [...allProjects];
+
+  if (params.search) {
+    const q = params.search.toLowerCase().trim();
+    filtered = filtered.filter(
+      (p) =>
+        p.title?.toLowerCase().includes(q) ||
+        p.description?.toLowerCase().includes(q) ||
+        p.category?.toLowerCase().includes(q) ||
+        p.batch?.toLowerCase().includes(q)
+    );
+  }
+
+  if (params.batch && params.batch !== "All" && params.batch !== "All Batches") {
+    filtered = filtered.filter((p) => p.batch === params.batch);
+  }
+
+  if (params.category && params.category !== "All") {
+    filtered = filtered.filter((p) => p.category === params.category);
+  }
+
+  if (params.status && params.status !== "All") {
+    filtered = filtered.filter(
+      (p) => (p.status || "").toLowerCase() === params.status.toLowerCase()
+    );
+  }
+
+  const page = Math.max(1, Number(params.page) || 1);
+  const limit = Math.max(1, Number(params.limit) || 10);
+  const total = filtered.length;
+  const pages = Math.max(1, Math.ceil(total / limit));
+  const startIndex = (page - 1) * limit;
+  const paginatedData = filtered.slice(startIndex, startIndex + limit);
+
+  return {
+    success: true,
+    data: paginatedData,
+    pagination: {
+      total,
+      page,
+      limit,
+      pages,
+      hasNextPage: page < pages,
+      hasPrevPage: page > 1,
+    },
+  };
+};
+
+// Resilient paginated query: attempts backend first, seamlessly falls back to stored projects
+export const getPaginatedProjects = async (params = {}) => {
+  try {
+    const res = await projectService.getProjects(params);
+    if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+      return res;
+    }
+  } catch (err) {
+    console.warn("Backend /api/projects unreachable, serving stored projects:", err?.message || err);
+  }
+  return getPaginatedStoredProjects(params);
+};
+
 // Fetch latest projects from MongoDB backend API and sync with localStorage cache
 export const fetchProjects = async () => {
   try {
     const data = await projectService.getProjects();
-    if (data && data.success && Array.isArray(data.data)) {
+    if (data && data.success && Array.isArray(data.data) && data.data.length > 0) {
       const normalized = data.data.map((item) => {
         const initialMatch = INITIAL_PROJECTS.find(
           (init) => String(init.id) === String(item.id) || init.title === item.title
