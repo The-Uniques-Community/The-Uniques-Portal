@@ -37,6 +37,7 @@ import SchoolIcon from "@mui/icons-material/School";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import ClassIcon from "@mui/icons-material/Class";
 import Diversity3Icon from "@mui/icons-material/Diversity3";
+import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 
 // Navigation items with paths relative to /coordinator
 const STUDENT_NAVIGATION = [
@@ -44,6 +45,7 @@ const STUDENT_NAVIGATION = [
   { segment: "members-overview", title: "Members", icon: <GroupIcon /> },
   { segment: "events-overview", title: "Events", icon: <EventIcon /> },
   { segment: "projects-overview", title: "Projects", icon: <AccountTreeIcon /> },
+  { segment: "success-stories", title: "Success Stories", icon: <AutoStoriesIcon /> },
   { segment: "accounts", title: "Accounts", icon: <AccountBalance /> },
   { segment: "enquiry", title: "Enquiry", icon: <AnnouncementIcon /> },
   { segment: "leave-management", title: "Leave Management", icon: <CalendarMonthIcon /> },
@@ -326,20 +328,30 @@ function CoordinatorLayout() {
 
       <AppBar
         position="fixed"
+        elevation={0}
         sx={{
-          backgroundColor: theme.palette.background.appBar,
-          boxShadow: "none !important",
+          top: 0,
+          marginTop: 0,
+          backgroundColor: isDarkMode
+            ? "rgba(18, 18, 18, 0.92)"
+            : "rgba(255, 255, 255, 0.92)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          borderBottom: "1px solid",
+          borderColor: isDarkMode ? "rgba(255, 255, 255, 0.08)" : "#e2e8f0",
+          boxShadow: isDarkMode
+            ? "0 4px 20px -2px rgba(0, 0, 0, 0.5)"
+            : "0 4px 20px -2px rgba(0, 0, 0, 0.04)",
           height: 56,
           zIndex: (theme) => theme.zIndex.drawer + 1,
           left: isMobile ? 0 : drawerOpen ? 256 : 91,
           width: isMobile ? "100%" : `calc(100% - ${drawerOpen ? 256 : 91}px)`,
-          marginTop: isMobile ? 0 : "16px",
           transition: "left 0.3s, width 0.3s",
         }}
       >
-        <Toolbar>
+        <Toolbar sx={{ minHeight: "56px !important", px: { xs: 1.5, sm: 2 } }}>
           {isMobile && (
-            <IconButton edge="start" aria-label="menu" onClick={toggleDrawer}>
+            <IconButton edge="start" aria-label="menu" onClick={toggleDrawer} sx={{ mr: 1 }}>
               <MenuIcon sx={{ color: theme.palette.primary.main }} />
             </IconButton>
           )}

@@ -34,6 +34,7 @@ export const PATHS = {
     UNIQUES360: "/admin/uniques360",
     PROJECT_INSIGHTS: "/admin/project-insights",
     EVENT_INSIGHTS: "/admin/event-insights",
+    SUCCESS_STORIES: "/admin/success-stories",
   },
 
   // Coordinator Portal
@@ -58,6 +59,7 @@ export const PATHS = {
     UNIQUES360: "/coordinator/uniques360",
     PROJECT_INSIGHTS: "/coordinator/project-insights",
     EVENT_INSIGHTS: "/coordinator/event-insights",
+    SUCCESS_STORIES: "/coordinator/success-stories",
   },
 
   // Member Portal

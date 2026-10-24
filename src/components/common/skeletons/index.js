@@ -40,3 +40,5 @@ export { default as BlogPageSkeleton } from "./pages/BlogPageSkeleton";
 export { default as MemberLeaveSkeleton } from "./pages/MemberLeaveSkeleton";
 export { default as FormPageSkeleton } from "./pages/FormPageSkeleton";
 export { default as AuthPageSkeleton } from "./pages/AuthPageSkeleton";
+export { default as SuccessStoriesSkeleton } from "./pages/SuccessStoriesSkeleton";
+
