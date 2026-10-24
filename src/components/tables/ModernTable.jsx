@@ -27,6 +27,7 @@ const ModernTable = ({
   data = [],
   renderRow,
   containerStyles = {},
+  tableContainerStyles = {},
   loading = false,
   skeletonRows = 6,
   toolbar = null,
@@ -93,7 +94,7 @@ const ModernTable = ({
       )}
 
       <TableContainer
-        className="hide-scrollbar"
+        className={tableContainerStyles.maxHeight === "none" ? undefined : "hide-scrollbar"}
         sx={{
           maxHeight: 560,
           overflowX: "auto",
@@ -101,6 +102,7 @@ const ModernTable = ({
           maxWidth: "100%",
           scrollbarWidth: "none",
           "&::-webkit-scrollbar": { display: "none" },
+          ...tableContainerStyles,
         }}
       >
         <Table stickyHeader size="small">
@@ -212,6 +214,7 @@ ModernTable.propTypes = {
   data: PropTypes.array,
   renderRow: PropTypes.func.isRequired,
   containerStyles: PropTypes.object,
+  tableContainerStyles: PropTypes.object,
   loading: PropTypes.bool,
   skeletonRows: PropTypes.number,
   toolbar: PropTypes.node,

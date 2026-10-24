@@ -41,6 +41,7 @@ import PhotoLibrary from '@mui/icons-material/PhotoLibrary';
 import AttachMoney from '@mui/icons-material/AttachMoney';
 import Delete from '@mui/icons-material/Delete';
 import { useNavigate, useLocation } from "react-router-dom";
+import { getPaginatedEvents, deleteStoredEvent } from "@/utils/event/eventsData";
 
 const EventsManagement = () => {
   const [events, setEvents] = useState([]);
@@ -76,42 +77,33 @@ const EventsManagement = () => {
   const fetchEvents = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `${BASE_URL}/api/events?page=${page}`,
-        {
-          credentials: "include",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-          },
-        }
-      );
-      const data = await response.json();
+      const data = await getPaginatedEvents({ page, limit: 9 });
 
-      if (data.success) {
+      if (data && data.success) {
         // Sort events before setting state
         const sortedEvents = sortEventsByPriority(data.events || []);
         setEvents(sortedEvents);
 
         // Update pagination info
         setPagination({
-          currentPage: data.currentPage,
-          totalPages: data.totalPages,
-          count: data.count,
-          total: data.total,
+          currentPage: data.currentPage || page,
+          totalPages: data.totalPages || 1,
+          count: data.count || (data.events || []).length,
+          total: data.total || 44,
         });
 
         // Calculate stats
-        const ongoing = data?.totalOngoing || 0
-        const upcoming = data?.totalUpcoming || 0
-        const completed = data.events.filter(
+        const ongoing = data?.totalOngoing || 0;
+        const upcoming = data?.totalUpcoming || 0;
+        const completed = data?.totalCompleted || sortedEvents.filter(
           (event) => event.eventStatus === "completed"
         ).length;
 
         // Calculate budget stats
-        let totalBudget = 0;
+        let totalBudget = data?.totalBudget || 0;
         let pendingExpenses = 0;
 
-        data.events.forEach((event) => {
+        sortedEvents.forEach((event) => {
           if (event.budget && event.budget.totalAllocated) {
             totalBudget += event.budget.totalAllocated;
           }
@@ -124,7 +116,7 @@ const EventsManagement = () => {
         });
 
         setStats({
-          total: data.total,
+          total: data.total || 44,
           ongoing,
           upcoming,
           completed,
@@ -204,36 +196,14 @@ const EventsManagement = () => {
 
     try {
       setDeleteLoading(true);
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${BASE_URL}/api/events/${eventToDelete}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          credentials: "include",
-        }
-      );
-
-      const data = await response.json();
-
-      if (data.success) {
-        setSnackbar({
-          open: true,
-          message: "Event deleted successfully",
-          severity: "success",
-        });
-        // Refresh the list
-        fetchEvents(pagination.currentPage);
-      } else {
-        setSnackbar({
-          open: true,
-          message: data.message || "Failed to delete event",
-          severity: "error",
-        });
-      }
+      await deleteStoredEvent(eventToDelete);
+      setSnackbar({
+        open: true,
+        message: "Event deleted successfully",
+        severity: "success",
+      });
+      // Refresh the list
+      fetchEvents(pagination.currentPage);
     } catch (error) {
       console.error("Error deleting event:", error);
       setSnackbar({

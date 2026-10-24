@@ -439,6 +439,37 @@ const ProjectView = () => {
             width: { xs: "100%", sm: "auto" },
           }}
         >
+          {liveLink && (
+            <Button
+              variant="outlined"
+              color="primary"
+              startIcon={<Launch />}
+              component="a"
+              href={liveLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                borderRadius: 2,
+                px: { xs: 2, sm: 2.5 },
+                py: { xs: 1.1, sm: 1 },
+                fontWeight: 600,
+                textTransform: "none",
+                borderColor: (theme) => alpha(theme.palette.primary.main, 0.4),
+                color: "primary.main",
+                "&:hover": {
+                  borderColor: "primary.main",
+                  bgcolor: (theme) => alpha(theme.palette.primary.main, 0.04),
+                },
+                flex: { xs: "1 1 100%", sm: "none" },
+                justifyContent: "center",
+                fontSize: { xs: "0.875rem", sm: "0.925rem" },
+                minHeight: 42,
+              }}
+            >
+              Live Website
+            </Button>
+          )}
+
           <Button
             variant="contained"
             startIcon={<Edit />}

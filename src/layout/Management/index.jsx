@@ -78,6 +78,7 @@ export default function ManagementLayout({ role: explicitRole }) {
     ? explicitRole === "coordinator"
     : location.pathname.startsWith("/coordinator");
   const basePath = isCoordinator ? "/coordinator" : "/admin";
+  const isProjectsPage = location.pathname.includes("project");
 
   // Determine active item based on current URL
   const getActiveItemFromPath = React.useCallback(() => {
@@ -152,14 +153,13 @@ export default function ManagementLayout({ role: explicitRole }) {
           ml: isMobile ? 0 : 2,
           "& .MuiDrawer-paper": {
             width: isMobile ? 260 : drawerOpen ? 240 : 75,
-            height: isMobile ? "100vh" : "96vh",
-            marginTop: isMobile ? 0 : "16px",
+            height: isMobile ? "100vh" : "calc(100vh - 32px)",
+            top: isMobile ? 0 : "16px",
+            marginTop: 0,
             marginLeft: isMobile ? 0 : "16px",
             backgroundColor: theme.palette.background.drawer,
             borderRadius: isMobile ? "0 16px 16px 0" : "8px",
-            overflowX: "hidden",
-            overflowY: "auto",
-            overscrollBehavior: "contain",
+            overflow: "hidden",
             display: "flex",
             flexDirection: "column",
             scrollbarWidth: "none",
@@ -169,6 +169,9 @@ export default function ManagementLayout({ role: explicitRole }) {
             },
             transition: "width 0.3s",
             boxSizing: "border-box",
+            zIndex: "2000 !important",
+            border: "none !important",
+            boxShadow: "none !important",
           },
         }}
       >
@@ -180,12 +183,14 @@ export default function ManagementLayout({ role: explicitRole }) {
             flexShrink: 0,
             px: 2,
             pt: 2,
-            pb: 1,
+            pb: 1.5,
+            minHeight: "56px",
+            boxSizing: "border-box",
           }}
         >
           {(drawerOpen || isMobile) && (
-            <Box sx={{ width: 140 }}>
-              <img src={uniques_white} alt="Logo" style={{ maxWidth: "100%" }} />
+            <Box sx={{ width: 140, display: "flex", alignItems: "center" }}>
+              <img src={uniques_white} alt="Logo" style={{ maxWidth: "100%", height: "auto", display: "block" }} />
             </Box>
           )}
           <Box
@@ -210,13 +215,10 @@ export default function ManagementLayout({ role: explicitRole }) {
             overflowX: "hidden",
             minHeight: 0,
             overscrollBehavior: "contain",
-            scrollbarWidth: "thin",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
             "&::-webkit-scrollbar": {
-              width: "4px",
-            },
-            "&::-webkit-scrollbar-thumb": {
-              backgroundColor: "rgba(255, 255, 255, 0.2)",
-              borderRadius: "4px",
+              display: "none",
             },
           }}
         >
@@ -341,28 +343,52 @@ export default function ManagementLayout({ role: explicitRole }) {
       </Drawer>
 
       {/* Top Header - Seamless & borderless matching background */}
-      <AppBar
-        position="fixed"
-        sx={{
-          backgroundColor: theme.palette.background.appBar,
-          boxShadow: "none !important",
-          height: 56,
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-          left: isMobile ? 0 : drawerOpen ? 256 : 91,
-          width: isMobile ? "100%" : `calc(100% - ${drawerOpen ? 256 : 91}px)`,
-          marginTop: isMobile ? 0 : "16px",
-          transition: "left 0.3s, width 0.3s",
-        }}
-      >
-        <Toolbar sx={{ minHeight: "56px !important", px: { xs: 1.5, sm: 2 } }}>
-          {isMobile && !drawerOpen && (
-            <IconButton edge="start" aria-label="menu" onClick={toggleDrawer} sx={{ mr: 1 }}>
-              <MenuIcon sx={{ color: theme.palette.primary.main }} />
-            </IconButton>
-          )}
-          {(!drawerOpen || isMobile) && <Branding />}
-        </Toolbar>
-      </AppBar>
+      {(!isProjectsPage || isMobile) && (
+        <AppBar
+          position={isProjectsPage ? "static" : "fixed"}
+          elevation={0}
+          sx={{
+            backgroundColor: theme.palette.background.appBar,
+            boxShadow: "none !important",
+            border: "none !important",
+            borderTop: "none !important",
+            borderBottom: "none !important",
+            outline: "none !important",
+            height: "56px !important",
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+            left: 0,
+            width: "100%",
+            top: isProjectsPage ? "auto" : "0 !important",
+            paddingTop: "0 !important",
+            marginTop: "0 !important",
+            transition: "left 0.3s, width 0.3s",
+            "&::before": { display: "none !important" },
+            "&::after": { display: "none !important" },
+          }}
+        >
+          <Toolbar
+            sx={{
+              minHeight: "56px !important",
+              height: "56px !important",
+              px: { xs: 1.5, sm: 2 },
+              pl: isMobile ? "12px !important" : drawerOpen ? "272px !important" : "107px !important",
+              border: "none !important",
+              borderTop: "none !important",
+              borderBottom: "none !important",
+              boxShadow: "none !important",
+              outline: "none !important",
+              transition: "padding-left 0.3s",
+            }}
+          >
+            {isMobile && !drawerOpen && (
+              <IconButton edge="start" aria-label="menu" onClick={toggleDrawer} sx={{ mr: 1 }}>
+                <MenuIcon sx={{ color: theme.palette.primary.main }} />
+              </IconButton>
+            )}
+            {(!drawerOpen || isMobile) && !isProjectsPage && <Branding />}
+          </Toolbar>
+        </AppBar>
+      )}
 
       {/* Main Content Area */}
       <Box
@@ -370,7 +396,7 @@ export default function ManagementLayout({ role: explicitRole }) {
         sx={{
           flexGrow: 1,
           p: { xs: 1.5, sm: 2, md: 3 },
-          mt: { xs: 7, sm: 8 },
+          mt: isProjectsPage ? { xs: 0, md: 2 } : { xs: 7, sm: 8 },
           ml: isMobile ? 0 : drawerOpen ? "272px" : "107px",
           width: isMobile ? "100%" : `calc(100% - ${drawerOpen ? 272 : 107}px)`,
           maxWidth: "100vw",

@@ -19,7 +19,7 @@ import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import LogoutIcon from "@mui/icons-material/Logout";
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { toast } from "react-toastify";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useThemeContext } from "@/theme/ThemeProvider";
@@ -57,7 +57,9 @@ function DashboardLayoutAppBar() {
   const { isDarkMode, toggleTheme } = useThemeContext(); // Access dark mode state and toggle function
   const theme = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isProjectsPage = location.pathname.includes("project");
 
   // Retrieve the saved active item from localStorage on mount
   const savedActiveItem = localStorage.getItem("activeItem") || "Dashboard";
@@ -109,43 +111,56 @@ function DashboardLayoutAppBar() {
           "data-lenis-prevent": "true",
         }}
         sx={{
-          width: isMobile ? "auto" : drawerOpen ? 240 : 75,
+          width: isMobile ? 260 : drawerOpen ? 240 : 75,
           flexShrink: 0,
-          zIndex: '2000',
-          ml: 2, // Adds margin-left to create space
+          zIndex: 2000,
+          ml: isMobile ? 0 : 2,
           "& .MuiDrawer-paper": {
-            width: isMobile ? "auto" : drawerOpen ? 240 : 75,
-            height: "96vh",
-            marginTop: "16px",
-            marginLeft: "16px", // Adds spacing between the drawer and the edge
+            width: isMobile ? 260 : drawerOpen ? 240 : 75,
+            height: isMobile ? "100vh" : "calc(100vh - 32px)",
+            top: isMobile ? 0 : "16px",
+            marginTop: 0,
+            marginLeft: isMobile ? 0 : "16px",
             backgroundColor: theme.palette.background.drawer,
-            borderRadius: "8px",
+            borderRadius: isMobile ? "0 16px 16px 0" : "8px",
             overflow: "hidden",
             display: "flex",
             flexDirection: "column",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            "&::-webkit-scrollbar": {
+              display: "none",
+            },
             transition: "width 0.3s",
             boxSizing: "border-box",
+            zIndex: "2000 !important",
+            border: "none !important",
+            boxShadow: "none !important",
           },
         }}
       >
         <Box
           sx={{
             display: "flex",
-            justifyContent: "center",
+            justifyContent: "space-between",
             alignItems: "center",
             flexShrink: 0,
+            px: 2,
+            pt: 2,
+            pb: 1.5,
+            minHeight: "56px",
+            boxSizing: "border-box",
           }}
         >
-          {drawerOpen && !isMobile && (
-            <Box sx={{ width: 150 }}>
-              <img src={uniques_white} alt="Logo" />
+          {(drawerOpen || isMobile) && (
+            <Box sx={{ width: 140, display: "flex", alignItems: "center" }}>
+              <img src={uniques_white} alt="Logo" style={{ maxWidth: "100%", height: "auto", display: "block" }} />
             </Box>
           )}
           <Box
             sx={{
               display: "flex",
-              justifyContent: drawerOpen ? "flex-end" : "center",
-              p: 1,
+              justifyContent: "flex-end",
             }}
           >
             <IconButton onClick={toggleDrawer}>
@@ -164,13 +179,10 @@ function DashboardLayoutAppBar() {
             overflowX: "hidden",
             minHeight: 0,
             overscrollBehavior: "contain",
-            scrollbarWidth: "thin",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
             "&::-webkit-scrollbar": {
-              width: "4px",
-            },
-            "&::-webkit-scrollbar-thumb": {
-              backgroundColor: "rgba(255, 255, 255, 0.2)",
-              borderRadius: "4px",
+              display: "none",
             },
           }}
         >
@@ -305,35 +317,59 @@ function DashboardLayoutAppBar() {
         </List>
       </Drawer>
 
-      <AppBar
-        position="fixed"
-        sx={{
-          backgroundColor: theme.palette.background.appBar,
-          boxShadow: "none !important",
-          height: 56,
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-          left: isMobile ? 0 : drawerOpen ? 256 : 91,
-          width: isMobile ? "100%" : `calc(100% - ${drawerOpen ? 256 : 91}px)`,
-          marginTop: "16px", // Adds space between AppBar and top
-          transition: "left 0.3s, width 0.3s",
-        }}
-      >
-        <Toolbar>
-          {isMobile && !drawerOpen && (
-            <IconButton edge="start" aria-label="menu" onClick={toggleDrawer}>
-              <MenuIcon sx={{ color: theme.palette.primary.main }} />
-            </IconButton>
-          )}
-          {(!drawerOpen || isMobile) && <Branding />}
-        </Toolbar>
-      </AppBar>
+      {(!isProjectsPage || isMobile) && (
+        <AppBar
+          position={isProjectsPage ? "static" : "fixed"}
+          elevation={0}
+          sx={{
+            backgroundColor: theme.palette.background.appBar,
+            boxShadow: "none !important",
+            border: "none !important",
+            borderTop: "none !important",
+            borderBottom: "none !important",
+            outline: "none !important",
+            height: "56px !important",
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+            left: 0,
+            width: "100%",
+            top: isProjectsPage ? "auto" : "0 !important",
+            paddingTop: "0 !important",
+            marginTop: "0 !important",
+            transition: "left 0.3s, width 0.3s",
+            "&::before": { display: "none !important" },
+            "&::after": { display: "none !important" },
+          }}
+        >
+          <Toolbar
+            sx={{
+              minHeight: "56px !important",
+              height: "56px !important",
+              px: { xs: 1.5, sm: 2 },
+              pl: isMobile ? "12px !important" : drawerOpen ? "272px !important" : "107px !important",
+              border: "none !important",
+              borderTop: "none !important",
+              borderBottom: "none !important",
+              boxShadow: "none !important",
+              outline: "none !important",
+              transition: "padding-left 0.3s",
+            }}
+          >
+            {isMobile && !drawerOpen && (
+              <IconButton edge="start" aria-label="menu" onClick={toggleDrawer}>
+                <MenuIcon sx={{ color: theme.palette.primary.main }} />
+              </IconButton>
+            )}
+            {(!drawerOpen || isMobile) && !isProjectsPage && <Branding />}
+          </Toolbar>
+        </AppBar>
+      )}
 
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           p: 3,
-          mt: 8,
+          mt: isProjectsPage ? { xs: 0, sm: 2 } : 8,
           ml: isMobile ? 0 : drawerOpen ? "272px" : "107px", // Adjusted for sidebar spacing
           transition: "margin-left 0.3s",
         }}

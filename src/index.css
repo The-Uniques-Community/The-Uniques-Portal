@@ -4,6 +4,40 @@
 @tailwind components;
 @tailwind utilities;
 
+html, body, #root, #root > div {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  border-top: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  overscroll-behavior-y: none;
+}
+
+header.MuiAppBar-root,
+.MuiAppBar-root,
+.MuiToolbar-root {
+  border: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+header.MuiAppBar-root::before,
+header.MuiAppBar-root::after,
+.MuiToolbar-root::before,
+.MuiToolbar-root::after {
+  display: none !important;
+  content: none !important;
+  border: none !important;
+}
+
+.MuiDrawer-paper {
+  z-index: 2000 !important;
+  overflow: hidden !important;
+}
+
 /* Universal scrollbar hiding utility with smooth scrolling preserved */
 .hide-scrollbar {
   -ms-overflow-style: none !important;

@@ -1,6 +1,7 @@
 import { BASE_URL } from "@/config";
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { getEventById } from "@/utils/event/eventsData";
 import { toast } from "react-toastify"; // Make sure this is installed
 import { EventViewSkeleton, BaseSkeleton } from "@/components/common/skeletons";
 import LazyRender from "@/components/common/LazyRender";
@@ -455,7 +456,7 @@ const handleRemoveMember = async (memberId, memberTeam) => {
         );
         const data = await response.json();
 
-        if (data.success) {
+        if (data.success && data.event) {
           setEvent(data.event);
           setEditedEvent(data.event);
 
@@ -468,9 +469,20 @@ const handleRemoveMember = async (memberId, memberTeam) => {
           if (data.event.eventForm && data.event.eventForm.formId) {
             fetchFormResponses(data.event._id);
           }
+        } else {
+          const fallback = getEventById(id);
+          if (fallback) {
+            setEvent(fallback);
+            setEditedEvent(fallback);
+          }
         }
       } catch (error) {
-        console.error("Error fetching event details:", error);
+        console.warn("Backend fetch failed, using stored event:", error);
+        const fallback = getEventById(id);
+        if (fallback) {
+          setEvent(fallback);
+          setEditedEvent(fallback);
+        }
       } finally {
         setLoading(false);
       }
