@@ -1,11 +1,11 @@
 /**
  * @file batchController.js
- * @description Controller managing Uniques batch cohorts, batch name registrations, and batch profile descriptions with fallback seeding.
- * @architecture Mounted at `/api/batches` via `batchRoute.js`. Interacts with `BatchName` and `BatchProfile` models.
- * @agent_note Automatically seeds default batch cohorts (1.0 to 6.0) and descriptive batch profile cards when database collections are initially empty.
+ * @description Unified controller managing Uniques batch cohorts and batch profile metadata.
+ * @architecture Mounted at `/api/batches` via `batchRoute.js`. Interacts with the unified `Batch` model (mapped to `batchprofiles`).
+ * @agent_note Single Source of Truth architecture: both `/api/batches/all` and `/api/batches/profiles` derive from the unified Batch model.
  */
 import mongoose from "mongoose";
-import { BatchProfile, BatchName } from "../../models/community/batchModel.js";
+import { Batch } from "../../models/community/batchModel.js";
 
 const DEFAULT_BATCHES = [
   "The Uniques 1.0",
@@ -15,6 +15,30 @@ const DEFAULT_BATCHES = [
   "The Uniques 5.0",
   "The Uniques 6.0",
 ];
+
+const sortBatchesNaturally = (items, keyExtractor = (x) => x) => {
+  return [...items].sort((a, b) => {
+    const valA = keyExtractor(a);
+    const valB = keyExtractor(b);
+    const numA = parseFloat(String(valA).match(/(\d+(\.\d+)?)/)?.[1] || 9999);
+    const numB = parseFloat(String(valB).match(/(\d+(\.\d+)?)/)?.[1] || 9999);
+    if (numA !== numB) return numA - numB;
+    return String(valA).localeCompare(String(valB));
+  });
+};
+
+const formatCanonicalBatchName = (p) => {
+  if (p.label) {
+    const clean = p.label.trim();
+    if (clean.toLowerCase().startsWith("the uniques")) return clean;
+    if (clean.toLowerCase().startsWith("uniques")) return `The ${clean}`;
+    return `The Uniques ${clean}`;
+  }
+  if (p.title) {
+    return p.title.replace(/\s*batch\s*/i, " ").trim();
+  }
+  return p.id;
+};
 
 const DEFAULT_PROFILES = [
   {
@@ -74,21 +98,24 @@ const DEFAULT_PROFILES = [
 ];
 
 /**
- * @desc Retrieve all registered batch cohort names, seeding defaults if empty
+ * @desc Retrieve all registered batch cohort names (derived from the single unified Batch model)
  * @route GET /api/batches/all
  * @access Public
  * @returns {Object} 200 - Array of batch name strings
  * @returns {Object} 500 - Server error
  */
-// Get all batch names
 export const getAllBatches = async (req, res) => {
   try {
-    let batches = await BatchName.find().sort({ createdAt: 1 });
-    if (!batches || batches.length === 0) {
-      await BatchName.insertMany(DEFAULT_BATCHES.map((name) => ({ name })));
-      batches = await BatchName.find().sort({ createdAt: 1 });
+    let profiles = await Batch.find().sort({ createdAt: 1 });
+    if (!profiles || profiles.length === 0) {
+      await Batch.insertMany(DEFAULT_PROFILES);
+      profiles = await Batch.find().sort({ createdAt: 1 });
     }
-    const names = batches.map((b) => b.name);
+    const validProfiles = profiles.filter(
+      (p) => !/-\d{10,}/.test(p.title || "") && !/-\d{10,}/.test(p.label || "")
+    );
+    const sortedProfiles = sortBatchesNaturally(validProfiles, (p) => p.label || p.title);
+    const names = sortedProfiles.map((p) => formatCanonicalBatchName(p));
     res.status(200).json({ success: true, data: names });
   } catch (error) {
     console.error("Error fetching batch names:", error);
@@ -97,7 +124,7 @@ export const getAllBatches = async (req, res) => {
 };
 
 /**
- * @desc Register a new batch cohort name with automatic prefix normalization
+ * @desc Register a new batch cohort with automatic prefix normalization and single-collection persistence
  * @route POST /api/batches/add
  * @access Public/Admin
  * @body {string} name - Raw batch name string (e.g., '7.0' or 'The Uniques 7.0')
@@ -105,7 +132,6 @@ export const getAllBatches = async (req, res) => {
  * @returns {Object} 400 - If batch name is missing
  * @returns {Object} 500 - Server error
  */
-// Add new batch name
 export const addBatch = async (req, res) => {
   try {
     let name = req.body.name || req.body.batchName;
@@ -119,12 +145,25 @@ export const addBatch = async (req, res) => {
       name = `The ${name}`;
     }
 
-    let existing = await BatchName.findOne({ name });
+    const cleanLabel = name.replace(/^the\s+/i, "").trim();
+    const cleanId = cleanLabel.toLowerCase().replace(/[^a-z0-9.]+/g, "-");
+
+    let existing = await Batch.findOne({
+      $or: [{ id: cleanId }, { label: cleanLabel }, { title: name }],
+    });
+
     if (!existing) {
-      existing = await BatchName.create({ name });
+      existing = await Batch.create({
+        id: cleanId,
+        label: cleanLabel,
+        title: name,
+        description: `${name} is actively engaged in advanced skills training, projects, and innovation within The Uniques Community.`,
+        image: "",
+        customImage: false,
+      });
     }
 
-    res.status(200).json({ success: true, message: "Batch added successfully", data: existing.name });
+    res.status(200).json({ success: true, message: "Batch added successfully", data: existing.title || existing.name });
   } catch (error) {
     console.error("Error adding batch:", error);
     res.status(500).json({ success: false, message: "Error adding batch", error: error.message });
@@ -138,15 +177,18 @@ export const addBatch = async (req, res) => {
  * @returns {Object} 200 - Array of batch profile objects
  * @returns {Object} 500 - Server error
  */
-// Get all batch profiles
 export const getBatchProfiles = async (req, res) => {
   try {
-    let profiles = await BatchProfile.find().sort({ createdAt: 1 });
+    let profiles = await Batch.find().sort({ createdAt: 1 });
     if (!profiles || profiles.length === 0) {
-      await BatchProfile.insertMany(DEFAULT_PROFILES);
-      profiles = await BatchProfile.find().sort({ createdAt: 1 });
+      await Batch.insertMany(DEFAULT_PROFILES);
+      profiles = await Batch.find().sort({ createdAt: 1 });
     }
-    res.status(200).json({ success: true, data: profiles });
+    const validProfiles = profiles.filter(
+      (p) => !/-\d{10,}/.test(p.title || "") && !/-\d{10,}/.test(p.label || "")
+    );
+    const sortedProfiles = sortBatchesNaturally(validProfiles, (p) => p.label || p.title);
+    res.status(200).json({ success: true, data: sortedProfiles });
   } catch (error) {
     console.error("Error fetching batch profiles:", error);
     res.status(500).json({ success: false, message: "Error fetching batch profiles", error: error.message });
@@ -154,7 +196,7 @@ export const getBatchProfiles = async (req, res) => {
 };
 
 /**
- * @desc Upsert multiple batch profile configuration objects
+ * @desc Upsert multiple batch profile configuration objects directly in the unified collection
  * @route POST /api/batches/profiles/update
  * @route PUT /api/batches/profiles/update
  * @access Public/Admin
@@ -163,7 +205,6 @@ export const getBatchProfiles = async (req, res) => {
  * @returns {Object} 400 - If profiles payload is not an array
  * @returns {Object} 500 - Server error
  */
-// Update/Save batch profiles
 export const saveBatchProfiles = async (req, res) => {
   try {
     const { profiles } = req.body;
@@ -173,7 +214,7 @@ export const saveBatchProfiles = async (req, res) => {
 
     for (const p of profiles) {
       if (!p.id) continue;
-      await BatchProfile.findOneAndUpdate(
+      await Batch.findOneAndUpdate(
         { id: p.id },
         {
           id: p.id,
@@ -187,8 +228,12 @@ export const saveBatchProfiles = async (req, res) => {
       );
     }
 
-    const allProfiles = await BatchProfile.find().sort({ createdAt: 1 });
-    res.status(200).json({ success: true, message: "Batch profiles updated", data: allProfiles });
+    const allProfiles = await Batch.find().sort({ createdAt: 1 });
+    const validProfiles = allProfiles.filter(
+      (p) => !/-\d{10,}/.test(p.title || "") && !/-\d{10,}/.test(p.label || "")
+    );
+    const sortedProfiles = sortBatchesNaturally(validProfiles, (p) => p.label || p.title);
+    res.status(200).json({ success: true, message: "Batch profiles updated", data: sortedProfiles });
   } catch (error) {
     console.error("Error saving batch profiles:", error);
     res.status(500).json({ success: false, message: "Error saving batch profiles", error: error.message });
@@ -196,25 +241,27 @@ export const saveBatchProfiles = async (req, res) => {
 };
 
 /**
- * @desc Delete a registered batch by document ID
+ * @desc Delete a registered batch atomically by document ID or string ID
  * @route DELETE /api/batches/:id
  * @access Private (Admin / Coordinator)
- * @params {string} id - Batch ObjectId
+ * @params {string} id - Batch ObjectId or string id
  * @returns {Object} 200 - Confirmation and deleted document
  */
 export const deleteBatchById = async (req, res) => {
   try {
     const { id } = req.params;
-    let deleted = null;
+    let query = {};
     if (mongoose.Types.ObjectId.isValid(id)) {
-      deleted = await BatchName.findByIdAndDelete(id);
+      query = { $or: [{ _id: id }, { id }] };
+    } else {
+      query = { id };
     }
-    if (!deleted) {
-      deleted = await BatchName.findOneAndDelete({ _id: id }).catch(() => null);
-    }
+
+    const deleted = await Batch.findOneAndDelete(query);
     if (!deleted) {
       return res.status(404).json({ success: false, message: "Batch not found" });
     }
+
     return res.status(200).json({
       success: true,
       message: "Batch deleted successfully",
@@ -227,11 +274,11 @@ export const deleteBatchById = async (req, res) => {
 };
 
 /**
- * @desc Delete a registered batch by name
+ * @desc Delete a registered batch atomically by cohort name
  * @route DELETE /api/batches/name/:name
  * @access Private (Admin / Coordinator)
  * @params {string} name - Batch cohort name
- * @returns {Object} 200 - Confirmation and deleted document
+ * @returns {Object} 200 - Confirmation and deleted details
  */
 export const deleteBatchByName = async (req, res) => {
   try {
@@ -248,12 +295,20 @@ export const deleteBatchByName = async (req, res) => {
       normalizedName = `The ${normalizedName}`;
     }
 
-    const escapedDecoded = decodedName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const deleted = await BatchName.findOneAndDelete({
+    const cleanLabel = decodedName.replace(/^the\s+/i, "").trim();
+    const cleanId = cleanLabel.toLowerCase().replace(/[^a-z0-9.]+/g, "-");
+    const escapedDecoded = decodedName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const escapedLabel = cleanLabel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+    const deleted = await Batch.findOneAndDelete({
       $or: [
-        { name: decodedName },
-        { name: normalizedName },
-        { name: new RegExp(`^${escapedDecoded}$`, 'i') },
+        { id: cleanId },
+        { id: `uniques-${cleanId}` },
+        { label: cleanLabel },
+        { label: new RegExp(`^${escapedLabel}$`, "i") },
+        { title: decodedName },
+        { title: normalizedName },
+        { title: new RegExp(`^${escapedDecoded}$`, "i") },
       ],
     });
 
@@ -263,8 +318,10 @@ export const deleteBatchByName = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Batch deleted successfully",
-      data: deleted,
+      message: `Batch "${decodedName}" deleted completely`,
+      data: {
+        batch: deleted,
+      },
     });
   } catch (error) {
     console.error("Error deleting batch by name:", error);

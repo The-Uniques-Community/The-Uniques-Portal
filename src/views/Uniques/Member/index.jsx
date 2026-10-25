@@ -137,10 +137,60 @@ function a11yProps(index) {
   };
 }
 
-// Add this helper function near the top of your component
-const getProxyImageUrl = (fileId) => {
-  if (!fileId) return "/placeholder.svg"; // Fallback image
-  return `${API_BASE_URL}/api/image-proxy/${fileId}`;
+// Robust helper to resolve avatar image URLs from fileId, profilePic object, user object, or URL string
+const getProxyImageUrl = (fileIdOrUser) => {
+  if (!fileIdOrUser) return null;
+
+  let target = fileIdOrUser;
+  if (typeof target === "object") {
+    if (target.profilePic) {
+      target = target.profilePic;
+    }
+    if (typeof target === "object") {
+      if (
+        target.fileId &&
+        typeof target.fileId === "string" &&
+        !target.fileId.startsWith("http") &&
+        !target.fileId.startsWith("data:")
+      ) {
+        return `${API_BASE_URL}/api/image-proxy/${target.fileId}`;
+      }
+      if (
+        target.fileUrl &&
+        (target.fileUrl.startsWith("http") || target.fileUrl.startsWith("data:"))
+      ) {
+        return target.fileUrl;
+      }
+      if (
+        target.url &&
+        (target.url.startsWith("http") || target.url.startsWith("data:"))
+      ) {
+        return target.url;
+      }
+      if (
+        fileIdOrUser.avatarUrl &&
+        typeof fileIdOrUser.avatarUrl === "string" &&
+        fileIdOrUser.avatarUrl.trim()
+      ) {
+        return fileIdOrUser.avatarUrl.trim();
+      }
+      return null;
+    }
+  }
+
+  if (typeof target === "string" && target.trim()) {
+    const trimmed = target.trim();
+    if (
+      trimmed.startsWith("http://") ||
+      trimmed.startsWith("https://") ||
+      trimmed.startsWith("data:")
+    ) {
+      return trimmed;
+    }
+    return `${API_BASE_URL}/api/image-proxy/${trimmed}`;
+  }
+
+  return null;
 };
 
 const Index = () => {
@@ -252,12 +302,7 @@ const Index = () => {
     const fetchUserData = async () => {
       try {
         setPageLoading(true);
-        const response = await axios.get(
-          `${API_BASE_URL}/api/member/getProfile`,
-          {
-            withCredentials: true,
-          }
-        );
+        const response = await apiClient.get('/api/member/getProfile');
 
         if (response.data && response.data.member) {
           setUser(response.data.member);
@@ -280,12 +325,7 @@ const Index = () => {
   const refreshData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(
-        `${API_BASE_URL}/api/member/getProfile`,
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await apiClient.get('/api/member/getProfile');
 
       if (response.data && response.data.member) {
         setUser(response.data.member);
@@ -380,14 +420,11 @@ const Index = () => {
       setLoading(true);
 
       // Make API call to impose fine
-      await axios.post(
-        `${API_BASE_URL}/api/admin/member/${user._id}/fine`,
+      await apiClient.post(
+        `/api/admin/member/${user._id}/fine`,
         {
           amount: Number(fineAmount),
           reason: fineReason.trim(),
-        },
-        {
-          withCredentials: true,
         }
       );
 
@@ -467,10 +504,9 @@ const Index = () => {
         };
       }
 
-      const response = await axios.put(
-        `${API_BASE_URL}/api/member/members/${user._id}/editProfile`,
-        dataToUpdate,
-        { withCredentials: true }
+      const response = await apiClient.put(
+        `/api/member/members/${user._id}/editProfile`,
+        dataToUpdate
       );
 
       if (response.data && response.data.member) {
@@ -492,7 +528,7 @@ const Index = () => {
       console.error("Error updating profile:", err);
       setAlert({
         open: true,
-        message: err.response?.data?.message || "Failed to update profile",
+        message: err.response?.data?.message || err.message || "Failed to update profile",
         severity: "error",
       });
     } finally {
@@ -548,20 +584,30 @@ const Index = () => {
       setLoading(true);
 
       const formData = new FormData();
-      formData.append("mainFolderName", user.batch);
-      formData.append("studentId", user.admno);
+      formData.append("mainFolderName", user.batch || "The Uniques");
+      formData.append("studentId", user.admno || user._id);
       formData.append("subfolder", "profile");
       formData.append("memberId", user._id);
       formData.append("files", profilePicture);
 
-      const uploadResponse = await axios.post(
-        `${API_BASE_URL}/upload/file_upload`,
+      const uploadResponse = await apiClient.post(
+        `/upload/file_upload`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
-          withCredentials: true,
         }
       );
+
+      if (uploadResponse.data && uploadResponse.data.files && uploadResponse.data.files.length > 0) {
+        const uploaded = uploadResponse.data.files[0];
+        const updatedUser = {
+          ...user,
+          profilePic: uploaded,
+          avatarUrl: uploaded.fileUrl || uploaded.url || `${API_BASE_URL}/api/image-proxy/${uploaded.fileId}`,
+        };
+        setUser(updatedUser);
+        setEditedUser(updatedUser);
+      }
 
       setAlert({
         open: true,
@@ -569,12 +615,16 @@ const Index = () => {
         severity: "success",
       });
 
+      setProfilePicture(null);
+      if (profilePictureInputRef.current) {
+        profilePictureInputRef.current.value = "";
+      }
       setProfilePictureDialogOpen(false);
       refreshData();
     } catch (err) {
       console.error("Error uploading profile picture:", err);
       setError(
-        err.response?.data?.message || "Failed to upload profile picture"
+        err.response?.data?.message || err.message || "Failed to upload profile picture"
       );
     } finally {
       setLoading(false);
@@ -598,6 +648,9 @@ const Index = () => {
       setUser(updatedUser);
       setEditedUser(updatedUser);
       setProfilePicture(null);
+      if (profilePictureInputRef.current) {
+        profilePictureInputRef.current.value = "";
+      }
       setProfilePictureDialogOpen(false);
 
       setAlert({
@@ -663,12 +716,9 @@ const Index = () => {
       }
 
       // Make API call to update achievements
-      await axios.put(
-        `${API_BASE_URL}/api/member/members/${user._id}/achievements`,
-        { achievements: updatedAchievements },
-        {
-          withCredentials: true,
-        }
+      await apiClient.put(
+        `/api/member/members/${user._id}/achievements`,
+        { achievements: updatedAchievements }
       );
 
       // Show success message
@@ -705,12 +755,9 @@ const Index = () => {
       updatedAchievements.splice(index, 1);
 
       // Make API call to update achievements
-      await axios.put(
-        `${API_BASE_URL}/api/member/members/${user._id}/achievements`,
-        { achievements: updatedAchievements },
-        {
-          withCredentials: true,
-        }
+      await apiClient.put(
+        `/api/member/members/${user._id}/achievements`,
+        { achievements: updatedAchievements }
       );
 
       // Show success message
@@ -797,20 +844,19 @@ const Index = () => {
       // If there's a new file, upload it first
       if (certificationFile) {
         const formData = new FormData();
-        formData.append("mainFolderName", user.batch);
-        formData.append("studentId", user.admno);
+        formData.append("mainFolderName", user.batch || "The Uniques");
+        formData.append("studentId", user.admno || user._id);
         formData.append("subfolder", "certificate");
         formData.append("memberId", user._id);
         formData.append("files", certificationFile);
 
-        const uploadResponse = await axios.post(
-          `${API_BASE_URL}/upload/file_upload`,
+        const uploadResponse = await apiClient.post(
+          `/upload/file_upload`,
           formData,
           {
             headers: {
               "Content-Type": "multipart/form-data",
             },
-            withCredentials: true,
           }
         );
 
@@ -842,12 +888,9 @@ const Index = () => {
       }
 
       // Make API call to update certifications
-      await axios.put(
-        `${API_BASE_URL}/api/member/members/${user._id}/certifications`,
-        { certifications: updatedCertifications },
-        {
-          withCredentials: true,
-        }
+      await apiClient.put(
+        `/api/member/members/${user._id}/certifications`,
+        { certifications: updatedCertifications }
       );
 
       // Show success message
@@ -884,12 +927,9 @@ const Index = () => {
       updatedCertifications.splice(index, 1);
 
       // Make API call to update certifications
-      await axios.put(
-        `${API_BASE_URL}/api/member/members/${user._id}/certifications`,
-        { certifications: updatedCertifications },
-        {
-          withCredentials: true,
-        }
+      await apiClient.put(
+        `/api/member/members/${user._id}/certifications`,
+        { certifications: updatedCertifications }
       );
 
       // Show success message
@@ -991,18 +1031,17 @@ const Index = () => {
 
       if (projectImage) {
         const formData = new FormData();
-        formData.append("mainFolderName", user.batch);
-        formData.append("studentId", user.admno);
+        formData.append("mainFolderName", user.batch || "The Uniques");
+        formData.append("studentId", user.admno || user._id);
         formData.append("subfolder", "projects");
         formData.append("memberId", user._id);
         formData.append("files", projectImage);
 
-        const uploadResponse = await axios.post(
-          `${API_BASE_URL}/upload/file_upload`,
+        const uploadResponse = await apiClient.post(
+          `/upload/file_upload`,
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
-            withCredentials: true,
           }
         );
 
@@ -1021,10 +1060,9 @@ const Index = () => {
         updatedProjects.push({ ...currentProject, imageUrl });
       }
 
-      await axios.put(
-        `${API_BASE_URL}/api/member/members/${user._id}/projects`,
-        { projects: updatedProjects },
-        { withCredentials: true }
+      await apiClient.put(
+        `/api/member/members/${user._id}/projects`,
+        { projects: updatedProjects }
       );
 
       setAlert({
@@ -1056,10 +1094,9 @@ const Index = () => {
       const updatedProjects = [...(user.projects || [])];
       updatedProjects.splice(index, 1);
 
-      await axios.put(
-        `${API_BASE_URL}/api/member/members/${user._id}/projects`,
-        { projects: updatedProjects },
-        { withCredentials: true }
+      await apiClient.put(
+        `/api/member/members/${user._id}/projects`,
+        { projects: updatedProjects }
       );
 
       setAlert({
@@ -1170,12 +1207,9 @@ const Index = () => {
       }
 
       // Make API call to update internships
-      await axios.put(
-        `${API_BASE_URL}/api/member/members/${user._id}/internships`,
-        { internships: updatedInternships },
-        {
-          withCredentials: true,
-        }
+      await apiClient.put(
+        `/api/member/members/${user._id}/internships`,
+        { internships: updatedInternships }
       );
 
       // Show success message
@@ -1212,12 +1246,9 @@ const Index = () => {
       updatedInternships.splice(index, 1);
 
       // Make API call to update internships
-      await axios.put(
-        `${API_BASE_URL}/api/member/members/${user._id}/internships`,
-        { internships: updatedInternships },
-        {
-          withCredentials: true,
-        }
+      await apiClient.put(
+        `/api/member/members/${user._id}/internships`,
+        { internships: updatedInternships }
       );
 
       // Show success message
@@ -1320,12 +1351,9 @@ const Index = () => {
       }
 
       // Make API call to update events
-      await axios.put(
-        `${API_BASE_URL}/api/member/members/${user._id}/events`,
-        { event_participation: updatedEvents },
-        {
-          withCredentials: true,
-        }
+      await apiClient.put(
+        `/api/member/members/${user._id}/events`,
+        { event_participation: updatedEvents }
       );
 
       // Show success message
@@ -1361,12 +1389,9 @@ const Index = () => {
       updatedEvents.splice(index, 1);
 
       // Make API call to update events
-      await axios.put(
-        `${API_BASE_URL}/api/member/members/${user._id}/events`,
-        { event_participation: updatedEvents },
-        {
-          withCredentials: true,
-        }
+      await apiClient.put(
+        `/api/member/members/${user._id}/events`,
+        { event_participation: updatedEvents }
       );
 
       // Show success message
@@ -1455,12 +1480,9 @@ const Index = () => {
       }
 
       // Make API call to update semesters
-      await axios.put(
-        `${API_BASE_URL}/api/member/members/${user._id}/academics`,
-        { semesterSGPA: updatedSemesters },
-        {
-          withCredentials: true,
-        }
+      await apiClient.put(
+        `/api/member/members/${user._id}/academics`,
+        { semesterSGPA: updatedSemesters }
       );
 
       // Show success message
@@ -1497,12 +1519,9 @@ const Index = () => {
       updatedSemesters.splice(index, 1);
 
       // Make API call to update semesters
-      await axios.put(
-        `${API_BASE_URL}/api/member/members/${user._id}/academics`,
-        { semesterSGPA: updatedSemesters },
-        {
-          withCredentials: true,
-        }
+      await apiClient.put(
+        `/api/member/members/${user._id}/academics`,
+        { semesterSGPA: updatedSemesters }
       );
 
       // Show success message
@@ -1725,7 +1744,7 @@ const Index = () => {
           >
             <Box sx={{ position: "relative" }}>
               <Avatar
-                src={getProxyImageUrl(user?.profilePic?.fileId)}
+                src={getProxyImageUrl(user)}
                 alt={user?.fullName || "User"}
                 sx={{
                   width: 120,
@@ -1739,7 +1758,9 @@ const Index = () => {
                   },
                 }}
                 onClick={handleProfilePictureClick}
-              />
+              >
+                {user?.fullName ? user.fullName.charAt(0).toUpperCase() : "U"}
+              </Avatar>
               <IconButton
                 sx={{
                   position: "absolute",
@@ -1758,7 +1779,7 @@ const Index = () => {
               >
                 <Upload size={16} />
               </IconButton>
-              {(user?.profilePic?.fileId || user?.profilePic) && (
+              {(user?.profilePic?.fileId || user?.profilePic || user?.avatarUrl) && (
                 <Tooltip title="Remove Profile Picture">
                   <IconButton
                     sx={{
@@ -3875,10 +3896,12 @@ const Index = () => {
               >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                   <Avatar
-                    src={getProxyImageUrl(user?.profilePic?.fileId)}
+                    src={getProxyImageUrl(user)}
                     alt={user?.fullName || "User"}
                     sx={{ width: 40, height: 40 }}
-                  />
+                  >
+                    {user?.fullName ? user.fullName.charAt(0).toUpperCase() : "U"}
+                  </Avatar>
                   <Box>
                     <Typography variant="body1" fontWeight="medium">
                       {user.fullName}
@@ -3973,7 +3996,7 @@ const Index = () => {
               src={
                 profilePicture
                   ? URL.createObjectURL(profilePicture)
-                  : getProxyImageUrl(user?.profilePic?.fileId)
+                  : getProxyImageUrl(user)
               }
               alt={user?.fullName || "User"}
               sx={{
@@ -3983,7 +4006,9 @@ const Index = () => {
                 border: "4px solid", borderColor: "divider",
                 boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
               }}
-            />
+            >
+              {user?.fullName ? user.fullName.charAt(0).toUpperCase() : "U"}
+            </Avatar>
 
             <Paper
               variant="outlined"
@@ -4033,7 +4058,7 @@ const Index = () => {
           </Box>
         </DialogContent>
         <DialogActions sx={{ justifyContent: "space-between", px: 3, pb: 2 }}>
-          {(user?.profilePic?.fileId || user?.profilePic) ? (
+          {(user?.profilePic?.fileId || user?.profilePic || user?.avatarUrl) ? (
             <Button
               variant="outlined"
               color="error"

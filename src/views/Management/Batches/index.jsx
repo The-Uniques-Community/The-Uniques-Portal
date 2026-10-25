@@ -31,11 +31,13 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { useThemeContext } from "@/theme/ThemeProvider";
 import {
   getStoredBatchProfiles,
+  fetchBatchProfiles,
   saveStoredBatchProfiles,
   resetStoredBatchProfiles,
+  deleteStoredBatchProfile,
   DEFAULT_BATCH_PROFILES,
 } from "@/utils/batch/batchProfilesData";
-import { addStoredBatch } from "@/utils/batch/batchesData";
+import { addStoredBatch, fetchBatches, deleteStoredBatch } from "@/utils/batch/batchesData";
 import {
   FILE_VALIDATION_PRESETS,
   validateFile,
@@ -98,10 +100,37 @@ const CoordinatorBatches = () => {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [newBatchName, setNewBatchName] = useState("");
 
-  // Load profiles and sync form fields
+  // Delete batch modal state
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Load profiles from backend with local cache fallback and live update subscription
   useEffect(() => {
-    const loaded = getStoredBatchProfiles();
-    setProfiles(loaded);
+    let isMounted = true;
+    const loadData = async () => {
+      try {
+        await fetchBatches();
+        const loaded = await fetchBatchProfiles();
+        if (isMounted && Array.isArray(loaded) && loaded.length > 0) {
+          setProfiles(loaded);
+        }
+      } catch (err) {
+        console.warn("Could not load batch profiles from backend:", err);
+      }
+    };
+    loadData();
+
+    const handleProfilesUpdate = (e) => {
+      if (Array.isArray(e.detail) && e.detail.length > 0) {
+        setProfiles(e.detail);
+      }
+    };
+
+    window.addEventListener("batch-profiles-updated", handleProfilesUpdate);
+    return () => {
+      isMounted = false;
+      window.removeEventListener("batch-profiles-updated", handleProfilesUpdate);
+    };
   }, []);
 
   useEffect(() => {
@@ -321,6 +350,39 @@ const CoordinatorBatches = () => {
     });
   };
 
+  // Delete the currently selected batch completely
+  const handleDeleteBatch = async () => {
+    if (!profiles[selectedIndex]) return;
+    const current = profiles[selectedIndex];
+    const batchName = current.title || current.label;
+
+    setIsDeleting(true);
+    try {
+      await deleteStoredBatch(batchName);
+      await deleteStoredBatchProfile(current.id || current.label);
+
+      const remaining = profiles.filter((_, idx) => idx !== selectedIndex);
+      setProfiles(remaining.length > 0 ? remaining : []);
+      setSelectedIndex(0);
+      setDeleteModalOpen(false);
+
+      setSnackbar({
+        open: true,
+        message: `Batch "${current.label}" deleted completely from the system.`,
+        severity: "success",
+      });
+    } catch (err) {
+      console.error("Error deleting batch:", err);
+      setSnackbar({
+        open: true,
+        message: "Failed to delete batch. Please try again.",
+        severity: "error",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const currentProfile = profiles[selectedIndex] || {};
 
   return (
@@ -384,6 +446,26 @@ const CoordinatorBatches = () => {
           </Grid>
           <Grid item xs={12} sm={4} md={6}>
             <Stack direction="row" spacing={1.5} justifyContent={{ xs: "flex-start", sm: "flex-end" }}>
+              <Button
+                variant="outlined"
+                color="error"
+                startIcon={<DeleteOutlineIcon />}
+                onClick={() => setDeleteModalOpen(true)}
+                disabled={profiles.length === 0}
+                sx={{
+                  borderColor: "#d32f2f",
+                  color: "#d32f2f",
+                  borderRadius: "10px",
+                  textTransform: "none",
+                  fontWeight: 600,
+                  "&:hover": {
+                    borderColor: "#9a0007",
+                    backgroundColor: "rgba(211, 47, 47, 0.08)",
+                  },
+                }}
+              >
+                Delete Batch
+              </Button>
               <Button
                 variant="outlined"
                 startIcon={<AddCircleOutlineIcon />}
@@ -593,16 +675,39 @@ const CoordinatorBatches = () => {
 
               {/* Action Buttons */}
               <Divider sx={{ my: 1 }} />
-              <Stack direction="row" spacing={2} justifyContent="space-between">
-                <Button
-                  variant="outlined"
-                  color="inherit"
-                  startIcon={<RestartAltIcon />}
-                  onClick={handleResetCurrent}
-                  sx={{ textTransform: "none", borderRadius: "10px" }}
-                >
-                  Reset to Default
-                </Button>
+              <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center">
+                <Stack direction="row" spacing={1.5}>
+                  <Button
+                    variant="outlined"
+                    color="inherit"
+                    startIcon={<RestartAltIcon />}
+                    onClick={handleResetCurrent}
+                    sx={{ textTransform: "none", borderRadius: "10px" }}
+                  >
+                    Reset to Default
+                  </Button>
+
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    startIcon={<DeleteOutlineIcon />}
+                    onClick={() => setDeleteModalOpen(true)}
+                    disabled={profiles.length === 0}
+                    sx={{
+                      borderColor: "#d32f2f",
+                      color: "#d32f2f",
+                      borderRadius: "10px",
+                      textTransform: "none",
+                      fontWeight: 600,
+                      "&:hover": {
+                        borderColor: "#9a0007",
+                        backgroundColor: "rgba(211, 47, 47, 0.08)",
+                      },
+                    }}
+                  >
+                    Delete Batch
+                  </Button>
+                </Stack>
 
                 <Button
                   variant="contained"
@@ -769,6 +874,64 @@ const CoordinatorBatches = () => {
             }}
           >
             Create Batch
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Batch Confirmation Dialog */}
+      <Dialog
+        open={deleteModalOpen}
+        onClose={() => !isDeleting && setDeleteModalOpen(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: "16px",
+            backgroundColor: isDarkMode ? "#1e1e1e" : "#ffffff",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            fontWeight: 700,
+            color: "#d32f2f",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          <DeleteOutlineIcon color="error" />
+          Delete Batch
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" sx={{ mb: 1, fontWeight: 600 }}>
+            Are you sure you want to delete &ldquo;{currentProfile.label || currentProfile.title}&rdquo;?
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            This will request the backend endpoint to delete the batch and its showcase profile completely from the database, portal, and community website.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 2.5, pt: 0 }}>
+          <Button
+            onClick={() => setDeleteModalOpen(false)}
+            disabled={isDeleting}
+            sx={{ color: "text.secondary", textTransform: "none" }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleDeleteBatch}
+            disabled={isDeleting}
+            sx={{
+              backgroundColor: "#d32f2f",
+              "&:hover": { backgroundColor: "#9a0007" },
+              textTransform: "none",
+              fontWeight: 600,
+            }}
+          >
+            {isDeleting ? "Deleting..." : "Delete Completely"}
           </Button>
         </DialogActions>
       </Dialog>

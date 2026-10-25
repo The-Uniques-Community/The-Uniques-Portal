@@ -4,10 +4,11 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test tests/**/*.test.js",
     "dev": "nodemon index.js",
     "start": "node index.js",
-    "seed:projects": "node seeds/seedProjects.js"
+    "seed:projects": "node seeds/seedProjects.js",
+    "seed:stories": "node seeds/seedSuccessStories.js"
   },
   "keywords": [],
   "author": "",

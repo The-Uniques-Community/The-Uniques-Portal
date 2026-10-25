@@ -20,15 +20,15 @@ const router = express.Router();
 
 // REST standard routes
 router.get("/", getAllBatches);
-router.post("/", verifyToken, verifyRole(["admin", "coordinator"]), addBatch);
+router.post("/", verifyToken, verifyRole(["admin", "coordinator", "communityadmin"]), addBatch);
 
 // Named action aliases
 router.get("/all", getAllBatches);
-router.post("/add", verifyToken, verifyRole(["admin", "coordinator"]), addBatch);
+router.post("/add", verifyToken, verifyRole(["admin", "coordinator", "communityadmin"]), addBatch);
 router.get("/profiles", getBatchProfiles);
-router.post("/profiles/update", verifyToken, verifyRole(["admin", "coordinator"]), saveBatchProfiles);
-router.put("/profiles/update", verifyToken, verifyRole(["admin", "coordinator"]), saveBatchProfiles);
-router.delete("/name/:name", verifyToken, verifyRole(["admin", "coordinator"]), deleteBatchByName);
-router.delete("/:id", verifyToken, verifyRole(["admin", "coordinator"]), deleteBatchById);
+router.post("/profiles/update", verifyToken, verifyRole(["admin", "coordinator", "communityadmin"]), saveBatchProfiles);
+router.put("/profiles/update", verifyToken, verifyRole(["admin", "coordinator", "communityadmin"]), saveBatchProfiles);
+router.delete("/name/:name", verifyToken, verifyRole(["admin", "coordinator", "communityadmin"]), deleteBatchByName);
+router.delete("/:id", verifyToken, verifyRole(["admin", "coordinator", "communityadmin"]), deleteBatchById);
 
 export default router;

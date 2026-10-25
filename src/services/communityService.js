@@ -35,6 +35,16 @@ export const communityService = {
     return response.data;
   },
 
+  async deleteBatchByName(name) {
+    const response = await apiClient.delete(`/api/batches/name/${encodeURIComponent(name)}`);
+    return response.data;
+  },
+
+  async deleteBatchById(id) {
+    const response = await apiClient.delete(`/api/batches/${id}`);
+    return response.data;
+  },
+
   async getCommunityBenefits() {
     const response = await apiClient.get('/api/community-benefits');
     return response.data;

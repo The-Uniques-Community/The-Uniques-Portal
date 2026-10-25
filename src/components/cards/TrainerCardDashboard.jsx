@@ -34,9 +34,21 @@ import userIcon from "@/assets/img/user-icon.png";
 import "tailwindcss/tailwind.css";
 
 const TrainerProfileDialog = ({ open, handleClose, user }) => {
-    const getProxyImageUrl = (fileId) => {
-        if (!fileId) return "/placeholder.svg"; // Fallback image
-        return `${BASE_URL}/api/image-proxy/${fileId}`;
+    const getProxyImageUrl = (fileIdOrPic) => {
+        if (!fileIdOrPic) return null;
+        if (typeof fileIdOrPic === "object") {
+            if (fileIdOrPic.fileId && !fileIdOrPic.fileId.startsWith("http") && !fileIdOrPic.fileId.startsWith("data:")) {
+                return `${BASE_URL}/api/image-proxy/${fileIdOrPic.fileId}`;
+            }
+            return fileIdOrPic.fileUrl || fileIdOrPic.url || null;
+        }
+        if (typeof fileIdOrPic === "string" && fileIdOrPic.trim()) {
+            const trimmed = fileIdOrPic.trim();
+            return trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("data:")
+                ? trimmed
+                : `${BASE_URL}/api/image-proxy/${trimmed}`;
+        }
+        return null;
     };
 
     const formatDate = (dateString) => {
@@ -82,12 +94,11 @@ const TrainerProfileDialog = ({ open, handleClose, user }) => {
                             <div className="relative mb-4">
                                 <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-slate-50">
                                     <img
-                                        src={
-                                            user?.profilePic
-                                                ? getProxyImageUrl(user.profilePic.fileId || user.profilePic)
-                                                : userIcon
-                                        }
+                                        src={getProxyImageUrl(user?.profilePic) || userIcon}
                                         alt="Profile"
+                                        onError={(e) => {
+                                            e.currentTarget.src = userIcon;
+                                        }}
                                         className="w-full h-full object-cover"
                                     />
                                 </div>
@@ -243,9 +254,21 @@ export const TrainerCardDashboard = ({ user, trainer }) => {
     const [open, setOpen] = useState(false);
 
     const handleClose = () => setOpen(false);
-    const getProxyImageUrl = (fileId) => {
-        if (!fileId) return "/placeholder.svg"; // Fallback image
-        return `${BASE_URL}/api/image-proxy/${fileId}`;
+    const getProxyImageUrl = (fileIdOrPic) => {
+        if (!fileIdOrPic) return null;
+        if (typeof fileIdOrPic === "object") {
+            if (fileIdOrPic.fileId && !fileIdOrPic.fileId.startsWith("http") && !fileIdOrPic.fileId.startsWith("data:")) {
+                return `${BASE_URL}/api/image-proxy/${fileIdOrPic.fileId}`;
+            }
+            return fileIdOrPic.fileUrl || fileIdOrPic.url || null;
+        }
+        if (typeof fileIdOrPic === "string" && fileIdOrPic.trim()) {
+            const trimmed = fileIdOrPic.trim();
+            return trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("data:")
+                ? trimmed
+                : `${BASE_URL}/api/image-proxy/${trimmed}`;
+        }
+        return null;
     };
 
     if (!currentTrainer) return null;
@@ -273,12 +296,11 @@ export const TrainerCardDashboard = ({ user, trainer }) => {
                     {/* User Details */}
                     <div className="flex items-center gap-3">
                         <img
-                            src={
-                                currentTrainer?.profilePic
-                                    ? getProxyImageUrl(currentTrainer.profilePic.fileId || currentTrainer.profilePic)
-                                    : userIcon
-                            }
+                            src={getProxyImageUrl(currentTrainer?.profilePic) || userIcon}
                             alt={currentTrainer.fullName || "Trainer"}
+                            onError={(e) => {
+                                e.currentTarget.src = userIcon;
+                            }}
                             className="w-16 h-16 rounded-full object-cover object-center"
                         />
                         <div>

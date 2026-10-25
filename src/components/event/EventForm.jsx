@@ -43,6 +43,7 @@ import { BASE_URL } from "@/config";
 import { useNavigate } from "react-router-dom";
 import ArrowBack from "@mui/icons-material/ArrowBack";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useBatches } from "@/hooks/useBatches";
 import AddIcon from "@mui/icons-material/Add";
 import SaveIcon from "@mui/icons-material/Save";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -158,6 +159,7 @@ const guestValidationSchema = Yup.object({
  */
 const EventForm = ({ event, onSuccess }) => {
   const navigate = useNavigate();
+  const { batches: dynamicBatches } = useBatches();
   // First define isEdit before using it in state declarations
   // const isEdit = Boolean(event);
 
@@ -1084,7 +1086,7 @@ const EventForm = ({ event, onSuccess }) => {
                   onChange={formik.handleChange}
                   label="Organizer Batch"
                 >
-                  {EVENT_BATCHES.map((batch) => (
+                  {dynamicBatches.map((batch) => (
                     <MenuItem key={batch} value={batch}>
                       {batch}
                     </MenuItem>

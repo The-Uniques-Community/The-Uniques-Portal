@@ -1,4 +1,6 @@
 import projectService from "@/services/projectService";
+import { getStoredBatches } from "@/utils/batch/batchesData";
+import { getSafeImageUrl } from "@/utils/imageHelper";
 
 export const INITIAL_PROJECTS = [
   {
@@ -130,11 +132,11 @@ export const INITIAL_PROJECTS = [
       { name: "The Uniques 4.0", role: "Academic Cell Leads", initials: "TU" },
     ],
     status: "Active",
-    image: "/projects/unicare.webp",
+    image: "/api/image-proxy/1ZN0H9bjTww8QHT2TY1eGACWyq7KxS4V9",
     technologies: ["REACT", "NODE.JS", "MONGODB", "TAILWIND"],
     category: "Academic & Learning",
-    link: "https://github.com/theuniquesofflicial",
-    liveUrl: null,
+    link: "https://uniques-egyan.theuniques.in/",
+    liveUrl: "https://uniques-egyan.theuniques.in/",
     githubUrl: "https://github.com/theuniquesofflicial",
     buttonColor: "#ea384c",
     createdAt: "2026-03-10",
@@ -346,14 +348,26 @@ export const INITIAL_PROJECTS = [
   },
 ];
 
-export const PROJECT_BATCHES = [
-  "Uniques 1.0",
-  "Uniques 2.0",
-  "Uniques 3.0",
-  "Uniques 4.0",
-  "Uniques 5.0",
-  "Uniques 6.0",
-];
+export const getProjectBatches = () => {
+  try {
+    const stored = getStoredBatches();
+    if (Array.isArray(stored) && stored.length > 0) {
+      return stored.map((b) => b.replace(/^The\s+/i, ""));
+    }
+  } catch (e) {
+    console.warn("Could not retrieve stored project batches:", e);
+  }
+  return [
+    "Uniques 1.0",
+    "Uniques 2.0",
+    "Uniques 3.0",
+    "Uniques 4.0",
+    "Uniques 5.0",
+    "Uniques 6.0",
+  ];
+};
+
+export const PROJECT_BATCHES = getProjectBatches();
 
 export const PROJECT_CATEGORIES = [
   "Support & Mentorship",
@@ -374,12 +388,16 @@ export const PROJECT_CATEGORIES = [
 
 const STORAGE_KEY = "tu_community_projects";
 
-// Normalizes project objects so both id and _id work seamlessly
-const normalizeProject = (p) => ({
-  ...p,
-  id: p._id || p.id,
-  _id: p._id || p.id,
-});
+// Normalizes project objects so both id and _id work seamlessly and image URLs are safe
+const normalizeProject = (p) => {
+  if (!p) return p;
+  return {
+    ...p,
+    id: p._id || p.id,
+    _id: p._id || p.id,
+    image: getSafeImageUrl(p.image, "/projects/unicare.webp"),
+  };
+};
 
 export const getStoredProjects = () => {
   try {
@@ -492,7 +510,7 @@ export const getPaginatedProjects = async (params = {}) => {
 // Fetch latest projects from MongoDB backend API and sync with localStorage cache
 export const fetchProjects = async () => {
   try {
-    const data = await projectService.getProjects();
+    const data = await projectService.getProjects({ limit: 100 });
     if (data && data.success && Array.isArray(data.data) && data.data.length > 0) {
       const normalized = data.data.map((item) => {
         const initialMatch = INITIAL_PROJECTS.find(

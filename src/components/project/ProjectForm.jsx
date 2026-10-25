@@ -31,9 +31,9 @@ import { BASE_URL } from "@/config";
 import {
   addProject,
   uploadProjectThumbnail,
-  PROJECT_BATCHES,
   PROJECT_CATEGORIES,
 } from "@/utils/project/projectsData";
+import { useBatches } from "@/hooks/useBatches";
 import {
   FILE_VALIDATION_PRESETS,
   validateFile,
@@ -54,6 +54,7 @@ import {
  */
 const ProjectForm = ({ onSuccess }) => {
   const navigate = useNavigate();
+  const { labels: dynamicBatches } = useBatches();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -148,7 +149,7 @@ const ProjectForm = ({ onSuccess }) => {
             formData.batch,
             formData.title
           );
-          finalImageUrl = `${BASE_URL}/api/image-proxy/${uploadResult.fileId}`;
+          finalImageUrl = `/api/image-proxy/${uploadResult.fileId}`;
         } catch (uploadErr) {
           console.error("Google Drive thumbnail upload failed:", uploadErr);
           setSnackbar({
@@ -350,7 +351,7 @@ const ProjectForm = ({ onSuccess }) => {
                     value={formData.batch}
                     onChange={handleInputChange}
                   >
-                    {PROJECT_BATCHES.map((batch) => (
+                    {dynamicBatches.map((batch) => (
                       <MenuItem key={batch} value={batch}>
                         {batch}
                       </MenuItem>

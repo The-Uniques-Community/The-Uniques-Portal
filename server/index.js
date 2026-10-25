@@ -46,6 +46,7 @@ import statsRouter from "./routes/community/statsRoute.js";
 import batchRouter from "./routes/community/batchRoute.js";
 import communityBenefitsRouter from "./routes/community/communityBenefitsRoute.js";
 import customMemberRouter from "./routes/community/customMemberRoute.js";
+import successStoriesRouter from "./routes/community/successStories.routes.js";
 dotenv.config();
 
 const app = express();
@@ -64,9 +65,12 @@ const defaultOrigins = [
   process.env.FRONTEND_URL,
   process.env.CLIENT_URL,
   "http://localhost:5173",
+  "http://localhost:5174",
   "http://localhost:3000",
   "https://theuniquesportal.vercel.app",
   "https://the-uniques-portal.vercel.app",
+  "https://theuniquescommunity.vercel.app",
+  "https://the-uniques-community.vercel.app",
   "https://www.theuniques.in",
   "https://theuniques.in",
 ].filter(Boolean);
@@ -83,11 +87,19 @@ export const isAllowedOrigin = (origin) => {
   if (process.env.NODE_ENV !== "production") return true;
   if (allowedOrigins.includes(origin)) return true;
 
+  // Pattern matches local development servers on any port (localhost / 127.0.0.1)
+  const localhostRegex = /^https?:\/\/(?:localhost|127\.0\.0\.1)(?::\d+)?$/i;
+  if (localhostRegex.test(origin)) return true;
+
   // Pattern matches the-uniques-portal, theuniquesportal, theuniquesportal-server and preview deployments on Vercel
   const vercelPortalRegex = /^https:\/\/(the-?uniques-?portal|theuniquesportal-server)(-[a-z0-9-]+)?\.vercel\.app$/i;
   if (vercelPortalRegex.test(origin)) return true;
 
-  // Pattern matches theuniques.in and subdomains (e.g., https://www.theuniques.in)
+  // Pattern matches the-uniques-community, theuniquescommunity and preview deployments on Vercel
+  const vercelCommunityRegex = /^https:\/\/(the-?uniques-?community)(-[a-z0-9-]+)?\.vercel\.app$/i;
+  if (vercelCommunityRegex.test(origin)) return true;
+
+  // Pattern matches theuniques.in and subdomains (e.g., https://www.theuniques.in, https://community.theuniques.in)
   const uniquesDomainRegex = /^https:\/\/(?:[a-z0-9-]+\.)*theuniques\.in$/i;
   if (uniquesDomainRegex.test(origin)) return true;
 
@@ -255,6 +267,8 @@ app.use("/api/stats", statsRouter);
 app.use("/api/batches", batchRouter);
 app.use("/api/community-benefits", communityBenefitsRouter);
 app.use("/api/custom-members", customMemberRouter);
+app.use("/api/success-stories", successStoriesRouter);
+app.use("/api/community/success-stories", successStoriesRouter);
 
 // Static asset serving and SPA fallback for standalone/production deployments
 if (fs.existsSync(distPath)) {

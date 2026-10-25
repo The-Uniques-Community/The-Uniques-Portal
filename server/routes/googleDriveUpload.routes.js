@@ -14,11 +14,13 @@ import Member from "../models/member/memberModel.js";
 import Event from "../models/member/eventModel.js";
 import Trainer from "../models/admin/trainerModel.js";
 import Project from "../models/projects/projectModel.js";
+import SuccessStory from "../models/community/successStoryModel.js";
 import {
   createFolder,
   findFolder,
   createFolderStructure,
   uploadFile,
+  deleteFile,
 } from "../controller/googleDriveService.js";
 import path from "path";
 import verifyToken from "../middlewares/verifyToken.js";
@@ -300,12 +302,10 @@ router.post("/add_subfolder", verifyToken, verifyRole(['admin']), async (req, re
 
 router.post("/file_upload", upload.array("files", 10), async (req, res) => {
   try {
-    const { mainFolderName, studentId, subfolder, memberId } = req.body;
+    let { mainFolderName, studentId, subfolder, memberId } = req.body;
     if (
       !req.files ||
       req.files.length === 0 ||
-      !mainFolderName ||
-      !studentId ||
       !subfolder ||
       !memberId
     ) {
@@ -313,6 +313,14 @@ router.post("/file_upload", upload.array("files", 10), async (req, res) => {
         .status(400)
         .json({ message: "Missing required fields or files." });
     }
+
+    // Sanitize folder names to avoid undefined paths
+    mainFolderName = (mainFolderName && mainFolderName !== 'undefined' && mainFolderName.trim())
+      ? mainFolderName.trim()
+      : "The Uniques";
+    studentId = (studentId && studentId !== 'undefined' && studentId.trim())
+      ? studentId.trim()
+      : memberId.toString();
 
     const folderStructure = await createFolderStructure(
       mainFolderName,
@@ -355,6 +363,10 @@ router.post("/file_upload", upload.array("files", 10), async (req, res) => {
           if (updateField === "profilePic") {
             const member = await Member.findById(memberId);
             const existingId = (member && member.profilePic && member.profilePic._id) ? member.profilePic._id : new mongoose.Types.ObjectId();
+            const oldFileId = (member && member.profilePic && member.profilePic.fileId && member.profilePic.fileId !== fileUploadResult.fileId)
+              ? member.profilePic.fileId
+              : null;
+
             const fileAttachment = {
               _id: existingId,
               fileName: fileUploadResult.fileName,
@@ -364,8 +376,18 @@ router.post("/file_upload", upload.array("files", 10), async (req, res) => {
             };
 
             await Member.findByIdAndUpdate(memberId, {
-              profilePic: fileAttachment
+              profilePic: fileAttachment,
+              avatarUrl: fileAttachment.fileUrl || fileAttachment.url,
             });
+
+            // Clean up previous Google Drive file if it existed
+            if (oldFileId) {
+              try {
+                await deleteFile(oldFileId);
+              } catch (delErr) {
+                console.warn("Could not delete previous profile picture from Drive:", delErr.message);
+              }
+            }
 
             uploadedFiles.push({
               ...fileUploadResult,
@@ -419,6 +441,13 @@ router.post("/file_upload", upload.array("files", 10), async (req, res) => {
           console.error("Error deleting temp file:", file.path, unlinkError);
         }
       }
+    }
+
+    if (req.files.length > 0 && uploadedFiles.length === 0) {
+      return res.status(500).json({
+        message: "Failed to upload files to Google Drive storage.",
+        files: [],
+      });
     }
 
     res.status(200).json({
@@ -1062,6 +1091,93 @@ router.post(
       res.status(500).json({
         success: false,
         message: "Error during project file upload.",
+        error: error.message,
+      });
+    } finally {
+      // Clean up temporary file
+      try {
+        if (tempFile && fs.existsSync(tempFile.path)) {
+          fs.unlinkSync(tempFile.path);
+        }
+      } catch (err) {
+        console.error("Error deleting temp file:", tempFile?.path, err);
+      }
+    }
+  }
+);
+
+/**
+ * POST /upload/story_file_upload
+ * Uploads a candidate avatar/image to Google Drive under 'The Uniques Success Stories' -> [Batch]
+ * Supports optional storyId to automatically update the story document,
+ * or returns { fileId, fileUrl, fileName, proxyUrl } for new story creation.
+ */
+router.post(
+  "/story_file_upload",
+  verifyToken,
+  verifyRole(["admin", "coordinator", "superadmin", "communityadmin"]),
+  upload.single("file"),
+  async (req, res) => {
+    const tempFile = req.file;
+
+    if (!tempFile) {
+      return res.status(400).json({
+        success: false,
+        message: "No file provided for upload.",
+      });
+    }
+
+    try {
+      const { batch, name, storyId } = req.body;
+      const batchName = (batch && batch.trim()) || "General Stories";
+      const candidateName = (name && name.trim()) || "Candidate";
+      const mainFolderName = "The Uniques Success Stories";
+
+      // Provision folder structure: The Uniques Success Stories -> [Batch] -> avatars
+      const folderStructure = await createFolderStructure(
+        mainFolderName,
+        batchName,
+        ["avatars"]
+      );
+
+      const targetFolderId = folderStructure.subfolders["avatars"].id;
+
+      // Upload file to Google Drive
+      const fileUploadResult = await uploadFile(tempFile.path, targetFolderId, {
+        category: "story-avatar",
+        customPrefix: candidateName.substring(0, 15).replace(/[^a-zA-Z0-9-_]/g, ""),
+      });
+
+      // If storyId is provided, update the story document directly
+      if (storyId) {
+        if (mongoose.Types.ObjectId.isValid(storyId)) {
+          await SuccessStory.findByIdAndUpdate(storyId, {
+            image: `/api/image-proxy/${fileUploadResult.fileId}`,
+          });
+        } else {
+          await SuccessStory.findOneAndUpdate({ id: storyId }, {
+            image: `/api/image-proxy/${fileUploadResult.fileId}`,
+          });
+        }
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Candidate avatar uploaded successfully",
+        file: {
+          fileId: fileUploadResult.fileId,
+          fileUrl: fileUploadResult.fileUrl,
+          fileName: fileUploadResult.fileName,
+          proxyUrl: `/api/image-proxy/${fileUploadResult.fileId}`,
+        },
+        storyId: storyId || null,
+        batch: batchName,
+      });
+    } catch (error) {
+      console.error("Error in story file upload:", error);
+      res.status(500).json({
+        success: false,
+        message: "Error during story file upload.",
         error: error.message,
       });
     } finally {

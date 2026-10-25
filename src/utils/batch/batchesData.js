@@ -13,6 +13,15 @@ export const DEFAULT_BATCHES = [
 
 const BATCH_STORAGE_KEY = "tu_community_member_batches";
 
+const sortBatchesNaturally = (list) => {
+  return [...list].sort((a, b) => {
+    const numA = parseFloat(String(a).match(/(\d+(\.\d+)?)/)?.[1] || 9999);
+    const numB = parseFloat(String(b).match(/(\d+(\.\d+)?)/)?.[1] || 9999);
+    if (numA !== numB) return numA - numB;
+    return String(a).localeCompare(String(b));
+  });
+};
+
 export const getStoredBatches = () => {
   try {
     const raw = localStorage.getItem(BATCH_STORAGE_KEY);
@@ -22,13 +31,10 @@ export const getStoredBatches = () => {
     }
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
-      const merged = [...DEFAULT_BATCHES];
-      parsed.forEach((b) => {
-        if (b && !merged.includes(b)) {
-          merged.push(b);
-        }
-      });
-      return merged;
+      const valid = parsed.filter(
+        (b) => typeof b === "string" && b.trim().length > 0 && !/-\d{10,}/.test(b)
+      );
+      return sortBatchesNaturally(valid.length > 0 ? Array.from(new Set(valid)) : DEFAULT_BATCHES);
     }
     return [...DEFAULT_BATCHES];
   } catch (err) {
@@ -41,7 +47,10 @@ export const fetchBatches = async () => {
   try {
     const response = await apiClient.get(`${BASE_URL}/api/batches/all`);
     if (response.data && response.data.success && Array.isArray(response.data.data)) {
-      const batches = response.data.data;
+      const valid = response.data.data.filter(
+        (b) => typeof b === "string" && b.trim().length > 0 && !/-\d{10,}/.test(b)
+      );
+      const batches = sortBatchesNaturally(valid.length > 0 ? Array.from(new Set(valid)) : DEFAULT_BATCHES);
       localStorage.setItem(BATCH_STORAGE_KEY, JSON.stringify(batches));
       window.dispatchEvent(new CustomEvent("batches-updated", { detail: batches }));
       return batches;
@@ -97,6 +106,33 @@ export const addStoredBatch = async (batchName) => {
     return formatted;
   }
   return formatted;
+};
+
+export const deleteStoredBatch = async (batchName) => {
+  if (!batchName || !batchName.trim()) return false;
+  const trimmed = batchName.trim();
+  const cleanLabel = trimmed.replace(/^the\s+/i, "");
+  const fullTitle = trimmed.toLowerCase().startsWith("the ") ? trimmed : `The ${trimmed}`;
+
+  // 1. Delete from Backend MongoDB
+  try {
+    await apiClient.delete(`${BASE_URL}/api/batches/name/${encodeURIComponent(trimmed)}`);
+  } catch (err) {
+    console.warn("Backend MongoDB notice for batch delete:", err?.message || err);
+  }
+
+  // 2. Update local storage and broadcast to main webpage
+  const current = getStoredBatches();
+  const updated = current.filter(
+    (b) =>
+      b.toLowerCase() !== trimmed.toLowerCase() &&
+      b.toLowerCase() !== fullTitle.toLowerCase() &&
+      b.replace(/^the\s+/i, "").toLowerCase() !== cleanLabel.toLowerCase()
+  );
+
+  localStorage.setItem(BATCH_STORAGE_KEY, JSON.stringify(updated));
+  window.dispatchEvent(new CustomEvent("batches-updated", { detail: updated }));
+  return true;
 };
 
 /**

@@ -210,25 +210,27 @@ export const editProfile = async (req, res) => {
         admnNo,
         address,
         contact,
+        whatsappContact,
         githubProfile,
         linkedinProfile,
+        twitterProfile,
         bio,
         instagramProfile,
         skills,
         certifications,
       } = req.body;
-  
+
       const member = await Member.findById(id);
-  
+
       if (!member) {
         return res.status(404).json({ message: "User not found" });
       }
-  
+
       // Hash the password only if it's provided
       if (password) {
         member.password = await bcrypt.hash(password, 12);
       }
-  
+
       // Update fields directly
       member.fullName = fullName || member.fullName;
       member.email = email || member.email;
@@ -239,8 +241,14 @@ export const editProfile = async (req, res) => {
       member.admnNo = admnNo || member.admnNo;
       member.address = address || member.address;
       member.contact = contact || member.contact;
+      if (whatsappContact !== undefined) {
+        member.whatsappContact = whatsappContact;
+      }
       member.githubProfile = githubProfile || member.githubProfile;
       member.linkedinProfile = linkedinProfile || member.linkedinProfile;
+      if (twitterProfile !== undefined) {
+        member.twitterProfile = twitterProfile;
+      }
       if (bio !== undefined) {
         member.bio = bio;
       }

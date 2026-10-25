@@ -81,18 +81,51 @@ async function runTests() {
   );
   console.log("   ✅ Dynamic origins from ALLOWED_ORIGINS are allowed");
 
-  // Test 5: Local development URLs
+  // Test 5: Local development URLs on various ports
   assert.strictEqual(
     isAllowedOrigin("http://localhost:5173"),
     true,
     "Should allow http://localhost:5173"
   );
   assert.strictEqual(
+    isAllowedOrigin("http://localhost:5174"),
+    true,
+    "Should allow http://localhost:5174"
+  );
+  assert.strictEqual(
+    isAllowedOrigin("http://localhost:5175"),
+    true,
+    "Should allow http://localhost:5175"
+  );
+  assert.strictEqual(
+    isAllowedOrigin("http://127.0.0.1:4173"),
+    true,
+    "Should allow http://127.0.0.1:4173"
+  );
+  assert.strictEqual(
     isAllowedOrigin("http://localhost:3000"),
     true,
     "Should allow http://localhost:3000"
   );
-  console.log("   ✅ Localhost origins are allowed");
+  console.log("   ✅ Localhost / loopback origins on any port are allowed");
+
+  // Test 5b: Community domains on Vercel
+  assert.strictEqual(
+    isAllowedOrigin("https://theuniquescommunity.vercel.app"),
+    true,
+    "Should allow https://theuniquescommunity.vercel.app"
+  );
+  assert.strictEqual(
+    isAllowedOrigin("https://the-uniques-community.vercel.app"),
+    true,
+    "Should allow https://the-uniques-community.vercel.app"
+  );
+  assert.strictEqual(
+    isAllowedOrigin("https://the-uniques-community-git-preview-branch.vercel.app"),
+    true,
+    "Should allow community preview deployment: the-uniques-community-git-preview-branch.vercel.app"
+  );
+  console.log("   ✅ Community domains and Vercel preview URLs match pattern correctly");
 
   // Test 6: Disallowed external / malicious origin
   assert.strictEqual(

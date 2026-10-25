@@ -14,3 +14,4 @@ export { default as leaveService } from './leaveService';
 export { default as trainerService } from './trainerService';
 export { default as uniques360Service } from './uniques360Service';
 export { default as communityService } from './communityService';
+export { default as successStoriesService } from './successStoriesService';

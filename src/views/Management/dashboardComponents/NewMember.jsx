@@ -82,9 +82,21 @@ export const NewMember = ({ user, refreshData }) => {
     }));
   };
 
-  const getProxyImageUrl = (fileId) => {
-    if (!fileId) return "/placeholder.svg"; // Fallback image
-    return `${BASE_URL}/api/image-proxy/${fileId}`;
+  const getProxyImageUrl = (fileIdOrPic) => {
+    if (!fileIdOrPic) return null;
+    if (typeof fileIdOrPic === "object") {
+      if (fileIdOrPic.fileId && !fileIdOrPic.fileId.startsWith("http") && !fileIdOrPic.fileId.startsWith("data:")) {
+        return `${BASE_URL}/api/image-proxy/${fileIdOrPic.fileId}`;
+      }
+      return fileIdOrPic.fileUrl || fileIdOrPic.url || null;
+    }
+    if (typeof fileIdOrPic === "string" && fileIdOrPic.trim()) {
+      const trimmed = fileIdOrPic.trim();
+      return trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("data:")
+        ? trimmed
+        : `${BASE_URL}/api/image-proxy/${trimmed}`;
+    }
+    return null;
   };
   // Get status badge color
   const getStatusColor = (status) => {
@@ -286,12 +298,13 @@ export const NewMember = ({ user, refreshData }) => {
           {/* User Details */}
           <div className="flex items-center gap-3">
             <Avatar
-              src={
-                user?.profilePic?.fileId
-                  ? getProxyImageUrl(user.profilePic.fileId)
-                  : userIcon
-              }
+              src={getProxyImageUrl(user?.profilePic) || userIcon}
               alt={user?.fullName || "Member"}
+              imgProps={{
+                onError: (e) => {
+                  e.currentTarget.src = userIcon;
+                },
+              }}
               sx={{ 
                 width: 60, 
                 height: 60, 
@@ -303,7 +316,9 @@ export const NewMember = ({ user, refreshData }) => {
                   transform: 'scale(1.05)'
                 }
               }}
-            />
+            >
+              {user?.fullName ? user.fullName.charAt(0).toUpperCase() : "M"}
+            </Avatar>
             <div>
               <h2 style={{ color: theme.palette.text.primary }} className="text-lg font-semibold">{user.fullName}</h2>
               <p style={{ color: theme.palette.text.secondary }} className="text-sm">
@@ -368,11 +383,11 @@ export const NewMember = ({ user, refreshData }) => {
           <div className="flex items-center flex-wrap gap-y-5 justify-between mb-4">
             <div className="flex items-center gap-4">
               <img
-                src={user?.profilePic?.fileId ? 
-                  getProxyImageUrl(user.profilePic.fileId) : 
-                  userIcon
-                }
+                src={getProxyImageUrl(user?.profilePic) || userIcon}
                 alt={user?.fullName || "Member"}
+                onError={(e) => {
+                  e.currentTarget.src = userIcon;
+                }}
                 className="w-16 h-16 rounded-full object-cover"
               />
               <div>

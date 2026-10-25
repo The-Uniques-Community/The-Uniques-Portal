@@ -59,6 +59,17 @@ export const DEFAULT_BATCH_PROFILES = [
 
 const PROFILES_STORAGE_KEY = "tu_community_batch_profiles";
 
+const sortProfilesNaturally = (list) => {
+  return [...list].sort((a, b) => {
+    const nameA = a.label || a.title || "";
+    const nameB = b.label || b.title || "";
+    const numA = parseFloat(String(nameA).match(/(\d+(\.\d+)?)/)?.[1] || 9999);
+    const numB = parseFloat(String(nameB).match(/(\d+(\.\d+)?)/)?.[1] || 9999);
+    if (numA !== numB) return numA - numB;
+    return String(nameA).localeCompare(String(nameB));
+  });
+};
+
 export const getStoredBatchProfiles = () => {
   try {
     const raw = localStorage.getItem(PROFILES_STORAGE_KEY);
@@ -84,7 +95,7 @@ export const getStoredBatchProfiles = () => {
     memberBatches.forEach((batchName) => {
       const label = batchName.replace(/^The\s+/i, "");
       const exists = profiles.some(
-        (p) => p.label.toLowerCase() === label.toLowerCase() || p.title.toLowerCase() === batchName.toLowerCase()
+        (p) => p.label?.toLowerCase() === label.toLowerCase() || p.title?.toLowerCase() === batchName.toLowerCase()
       );
       if (!exists) {
         profiles.push({
@@ -98,7 +109,10 @@ export const getStoredBatchProfiles = () => {
       }
     });
 
-    return profiles;
+    const validProfiles = profiles.filter(
+      (p) => !/-\d{10,}/.test(p.title || "") && !/-\d{10,}/.test(p.label || "")
+    );
+    return sortProfilesNaturally(validProfiles);
   } catch (err) {
     console.error("Error reading stored batch profiles:", err);
     return [...DEFAULT_BATCH_PROFILES];
@@ -116,9 +130,13 @@ export const fetchBatchProfiles = async () => {
           image: p.customImage ? p.image : (defaultMatch ? defaultMatch.image : (p.image || uniques4)),
         };
       });
-      localStorage.setItem(PROFILES_STORAGE_KEY, JSON.stringify(remoteProfiles));
-      window.dispatchEvent(new CustomEvent("batch-profiles-updated", { detail: remoteProfiles }));
-      return remoteProfiles;
+      const validProfiles = remoteProfiles.filter(
+        (p) => !/-\d{10,}/.test(p.title || "") && !/-\d{10,}/.test(p.label || "")
+      );
+      const sorted = sortProfilesNaturally(validProfiles);
+      localStorage.setItem(PROFILES_STORAGE_KEY, JSON.stringify(sorted));
+      window.dispatchEvent(new CustomEvent("batch-profiles-updated", { detail: sorted }));
+      return sorted;
     }
   } catch (err) {
     console.warn("Could not fetch batch profiles from server, using cached:", err?.message || err);
@@ -170,6 +188,33 @@ export const updateSingleBatchProfile = async (updatedProfile) => {
 
   await saveStoredBatchProfiles(updatedList);
   return updatedList;
+};
+
+export const deleteStoredBatchProfile = async (identifier) => {
+  if (!identifier) return getStoredBatchProfiles();
+  const cleanId = String(identifier).trim().toLowerCase();
+  const cleanLabel = cleanId.replace(/^the\s+/i, "").replace(/^uniques\s*/i, "").trim();
+
+  // 1. Delete from Backend MongoDB
+  try {
+    await apiClient.delete(`${BASE_URL}/api/batches/name/${encodeURIComponent(identifier)}`);
+  } catch (err) {
+    console.warn("Backend notice for batch profile delete:", err?.message || err);
+  }
+
+  // 2. Update local profiles
+  const current = getStoredBatchProfiles();
+  const updated = current.filter(
+    (p) =>
+      p.id?.toLowerCase() !== cleanId &&
+      p.label?.toLowerCase() !== cleanId &&
+      p.label?.toLowerCase() !== `uniques ${cleanLabel}` &&
+      p.title?.toLowerCase() !== cleanId
+  );
+
+  localStorage.setItem(PROFILES_STORAGE_KEY, JSON.stringify(updated));
+  window.dispatchEvent(new CustomEvent("batch-profiles-updated", { detail: updated }));
+  return updated;
 };
 
 export const resetStoredBatchProfiles = () => {

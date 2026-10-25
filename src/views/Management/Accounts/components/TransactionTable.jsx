@@ -8,6 +8,7 @@ import React, { useState } from "react";
 import ModernTable from "@/components/tables/ModernTable";
 import SearchFilterBar from "@/components/common/filters/SearchFilterBar";
 import { usePaginatedQuery } from "@/hooks/usePaginatedQuery";
+import { useBatches } from "@/hooks/useBatches";
 import fineService from "@/services/fineService";
 import {
   Box,
@@ -151,6 +152,7 @@ export const FinePaymentModal = ({ open, onClose, memberId, fine, onPaymentCompl
 };
 
 export const TransactionTable = () => {
+  const { batches } = useBatches();
   const [alert, setAlert] = useState({ open: false, message: "", severity: "success" });
 
   const {
@@ -227,10 +229,11 @@ export const TransactionTable = () => {
                 onChange={(e) => setFilter("batch", e.target.value)}
               >
                 <MenuItem value="All Batches">All Batches</MenuItem>
-                <MenuItem value="The Uniques 1.0">Uniques 1.0</MenuItem>
-                <MenuItem value="The Uniques 2.0">Uniques 2.0</MenuItem>
-                <MenuItem value="The Uniques 3.0">Uniques 3.0</MenuItem>
-                <MenuItem value="The Uniques 4.0">Uniques 4.0</MenuItem>
+                {batches.map((b) => (
+                  <MenuItem key={b} value={b}>
+                    {b.replace(/^The\s+/i, "")}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </>

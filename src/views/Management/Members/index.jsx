@@ -4,7 +4,7 @@
  * wired usePaginatedQuery with batch filters and DataTablePagination.
  */
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
@@ -15,6 +15,7 @@ import DataTablePagination from "@/components/common/pagination/DataTablePaginat
 import SearchFilterBar from "@/components/common/filters/SearchFilterBar";
 import memberService from "@/services/memberService";
 import { usePaginatedQuery } from "@/hooks/usePaginatedQuery";
+import { useBatches } from "@/hooks/useBatches";
 import {
   Typography,
   Button,
@@ -35,19 +36,20 @@ import {
 import RefreshIcon from "@mui/icons-material/Refresh";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 
-const BATCH_TABS = [
-  { id: "1", label: "All Members", batch: null, isSuspended: null },
-  { id: "2", label: "Uniques 1.0", batch: "The Uniques 1.0" },
-  { id: "3", label: "Uniques 2.0", batch: "The Uniques 2.0" },
-  { id: "4", label: "Uniques 3.0", batch: "The Uniques 3.0" },
-  { id: "5", label: "Uniques 4.0", batch: "The Uniques 4.0" },
-  { id: "6", label: "Uniques 5.0", batch: "The Uniques 5.0" },
-  { id: "7", label: "Uniques 6.0", batch: "The Uniques 6.0" },
-  { id: "8", label: "Suspended", isSuspended: true },
-];
-
 const MembersIndex = () => {
-  const [tabValue, setTabValue] = useState("1");
+  const { batches } = useBatches();
+  const [tabValue, setTabValue] = useState("all");
+
+  const batchTabs = useMemo(() => [
+    { id: "all", label: "All Members", batch: null, isSuspended: null },
+    ...batches.map((batch) => ({
+      id: batch,
+      label: batch.replace(/^The\s+/i, ""),
+      batch: batch,
+      isSuspended: null,
+    })),
+    { id: "suspended", label: "Suspended", batch: null, isSuspended: true },
+  ], [batches]);
   const [addMemberOpen, setAddMemberOpen] = useState(false);
   const [addMemberLoading, setAddMemberLoading] = useState(false);
   const [newMember, setNewMember] = useState({
@@ -81,7 +83,7 @@ const MembersIndex = () => {
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
-    const target = BATCH_TABS.find((b) => b.id === newValue);
+    const target = batchTabs.find((b) => b.id === newValue);
     setFilter((prev) => ({
       ...prev,
       batch: target?.batch || undefined,
@@ -121,7 +123,7 @@ const MembersIndex = () => {
       <TabContext value={tabValue}>
         <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
           <TabList onChange={handleTabChange} variant="scrollable" scrollButtons="auto">
-            {BATCH_TABS.map((tab) => (
+            {batchTabs.map((tab) => (
               <Tab key={tab.id} label={tab.label} value={tab.id} />
             ))}
           </TabList>
@@ -237,12 +239,11 @@ const MembersIndex = () => {
               label="Batch"
               onChange={(e) => setNewMember({ ...newMember, batch: e.target.value })}
             >
-              <MenuItem value="The Uniques 1.0">The Uniques 1.0</MenuItem>
-              <MenuItem value="The Uniques 2.0">The Uniques 2.0</MenuItem>
-              <MenuItem value="The Uniques 3.0">The Uniques 3.0</MenuItem>
-              <MenuItem value="The Uniques 4.0">The Uniques 4.0</MenuItem>
-              <MenuItem value="The Uniques 5.0">The Uniques 5.0</MenuItem>
-              <MenuItem value="The Uniques 6.0">The Uniques 6.0</MenuItem>
+              {batches.map((batch) => (
+                <MenuItem key={batch} value={batch}>
+                  {batch}
+                </MenuItem>
+              ))}
             </Select>
             {formErrors.batch && <FormHelperText>{formErrors.batch}</FormHelperText>}
           </FormControl>

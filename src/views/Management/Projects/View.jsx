@@ -59,25 +59,19 @@ import {
   getProjectById,
   updateProject,
   fetchProjects,
-  PROJECT_BATCHES,
+  uploadProjectThumbnail,
   PROJECT_CATEGORIES,
 } from "@/utils/project/projectsData";
+import { useBatches } from "@/hooks/useBatches";
 import { BASE_URL } from "@/config";
-
-const getSafeProjectImage = (img) => {
-  if (!img) return "/projects/unicare.webp";
-  if (typeof img === "string" && img.startsWith("/api/image-proxy/")) {
-    const prefix = BASE_URL ? BASE_URL.replace(/\/+$/, "") : "";
-    return `${prefix}${img}`;
-  }
-  return img;
-};
+import { getSafeImageUrl } from "@/utils/imageHelper";
 
 const ProjectView = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
+  const { labels: dynamicBatches } = useBatches();
 
   // Determine back navigation route based on whether inside admin or coordinator
   const isCoordinator = location.pathname.startsWith("/coordinator");
@@ -105,6 +99,7 @@ const ProjectView = () => {
     githubUrl: "",
     image: "",
   });
+  const [selectedEditFile, setSelectedEditFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
   const [formErrors, setFormErrors] = useState({});
 
@@ -179,16 +174,17 @@ const ProjectView = () => {
       return;
     }
 
+    setSelectedEditFile(file);
     const reader = new FileReader();
     reader.onloadend = () => {
       setImagePreview(reader.result);
-      setEditForm((prev) => ({ ...prev, image: reader.result }));
     };
     reader.readAsDataURL(file);
   };
 
   const handleRemoveImage = () => {
     setImagePreview("");
+    setSelectedEditFile(null);
     setEditForm((prev) => ({ ...prev, image: "" }));
   };
 
@@ -211,6 +207,31 @@ const ProjectView = () => {
 
     try {
       setEditLoading(true);
+
+      let finalImage = editForm.image || project.image || "/projects/unicare.webp";
+      if (selectedEditFile) {
+        try {
+          const uploadRes = await uploadProjectThumbnail(
+            selectedEditFile,
+            editForm.batch,
+            editForm.title,
+            project.id || project._id
+          );
+          if (uploadRes?.fileId) {
+            finalImage = `/api/image-proxy/${uploadRes.fileId}`;
+          }
+        } catch (uploadErr) {
+          console.error("Failed to upload updated project thumbnail:", uploadErr);
+          setSnackbar({
+            open: true,
+            message: "Image upload failed: " + (uploadErr.response?.data?.message || uploadErr.message),
+            severity: "error",
+          });
+          setEditLoading(false);
+          return;
+        }
+      }
+
       const techArray = editForm.technologies
         ? editForm.technologies
             .split(",")
@@ -229,7 +250,7 @@ const ProjectView = () => {
         link: editForm.link.trim() || "#",
         liveUrl: editForm.link.trim() || "#",
         githubUrl: editForm.githubUrl.trim() || "https://github.com/theuniquesofflicial",
-        image: editForm.image || project.image || "/projects/unicare.webp",
+        image: finalImage,
       };
 
       await updateProject(project.id || project._id, payload);
@@ -246,6 +267,7 @@ const ProjectView = () => {
         message: "Project updated successfully!",
         severity: "success",
       });
+      setSelectedEditFile(null);
       setEditOpen(false);
     } catch (err) {
       console.error("Error updating project:", err);
@@ -577,7 +599,7 @@ const ProjectView = () => {
               {/* Centered Image with Zoom Control */}
               <Box
                 component="img"
-                src={getSafeProjectImage(project.image)}
+                src={getSafeImageUrl(project.image)}
                 alt={project.title}
                 onError={(e) => {
                   e.currentTarget.onerror = null;
@@ -1415,7 +1437,7 @@ const ProjectView = () => {
                     value={editForm.batch}
                     onChange={handleInputChange}
                   >
-                    {PROJECT_BATCHES.map((batch) => (
+                    {dynamicBatches.map((batch) => (
                       <MenuItem key={batch} value={batch}>
                         {batch}
                       </MenuItem>

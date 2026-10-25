@@ -60,8 +60,10 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import { CardSkeleton } from "@/components/common/skeletons";
 import tu from "@/assets/logos/tu.png";
 import ModernTable from "@/components/tables/ModernTable";
+import { useBatches } from "@/hooks/useBatches";
 
 const Trainers = () => {
+    const { batches: dynamicBatches } = useBatches();
     const burl = BASE_URL; // Ideally this should come from env or context
     const [search, setSearch] = useState("");
     const [trainers, setTrainers] = useState([]);
@@ -101,10 +103,20 @@ const Trainers = () => {
     };
 
     const getProxyImageUrl = (profilePic) => {
-        if (!profilePic) return "/placeholder.svg";
-        const fileId = profilePic.fileId || (typeof profilePic === 'string' ? profilePic : null);
-        if (fileId) return `${burl}/api/image-proxy/${fileId}`;
-        return "/placeholder.svg";
+        if (!profilePic) return null;
+        if (typeof profilePic === 'object') {
+            if (profilePic.fileId && !profilePic.fileId.startsWith('http') && !profilePic.fileId.startsWith('data:')) {
+                return `${burl}/api/image-proxy/${profilePic.fileId}`;
+            }
+            return profilePic.fileUrl || profilePic.url || null;
+        }
+        if (typeof profilePic === 'string' && profilePic.trim()) {
+            const trimmed = profilePic.trim();
+            return trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:')
+                ? trimmed
+                : `${burl}/api/image-proxy/${trimmed}`;
+        }
+        return null;
     };
 
     useEffect(() => {
@@ -382,7 +394,9 @@ const Trainers = () => {
                             <>
                                 <TableCell>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                        <Avatar src={getProxyImageUrl(trainer.profilePic)} alt={trainer.fullName} />
+                                        <Avatar src={getProxyImageUrl(trainer.profilePic)} alt={trainer.fullName}>
+                                            {trainer.fullName ? trainer.fullName.charAt(0).toUpperCase() : "T"}
+                                        </Avatar>
                                         <Typography variant="subtitle2">{trainer.fullName}</Typography>
                                     </Box>
                                 </TableCell>
@@ -522,12 +536,11 @@ const Trainers = () => {
                                             label="Uniques Batch (From)"
                                             onChange={formik.handleChange}
                                         >
-                                            <MenuItem value="The Uniques 1.0">The Uniques 1.0</MenuItem>
-                                            <MenuItem value="The Uniques 2.0">The Uniques 2.0</MenuItem>
-                                            <MenuItem value="The Uniques 3.0">The Uniques 3.0</MenuItem>
-                                            <MenuItem value="The Uniques 4.0">The Uniques 4.0</MenuItem>
-                                            <MenuItem value="The Uniques 5.0">The Uniques 5.0</MenuItem>
-                                            <MenuItem value="The Uniques 6.0">The Uniques 6.0</MenuItem>
+                                            {dynamicBatches.map((batch) => (
+                                                <MenuItem key={batch} value={batch}>
+                                                    {batch}
+                                                </MenuItem>
+                                            ))}
                                         </Select>
                                         {formik.touched.trainerBatch && formik.errors.trainerBatch && (
                                             <FormHelperText>{formik.errors.trainerBatch}</FormHelperText>
@@ -562,12 +575,11 @@ const Trainers = () => {
                                         label="Teaching Batch"
                                         onChange={formik.handleChange}
                                     >
-                                        <MenuItem value="The Uniques 1.0">The Uniques 1.0</MenuItem>
-                                        <MenuItem value="The Uniques 2.0">The Uniques 2.0</MenuItem>
-                                        <MenuItem value="The Uniques 3.0">The Uniques 3.0</MenuItem>
-                                        <MenuItem value="The Uniques 4.0">The Uniques 4.0</MenuItem>
-                                        <MenuItem value="The Uniques 5.0">The Uniques 5.0</MenuItem>
-                                        <MenuItem value="The Uniques 6.0">The Uniques 6.0</MenuItem>
+                                        {dynamicBatches.map((batch) => (
+                                            <MenuItem key={batch} value={batch}>
+                                                {batch}
+                                            </MenuItem>
+                                        ))}
                                     </Select>
                                     {formik.touched.teachingBatch && formik.errors.teachingBatch && (
                                         <FormHelperText>{formik.errors.teachingBatch}</FormHelperText>

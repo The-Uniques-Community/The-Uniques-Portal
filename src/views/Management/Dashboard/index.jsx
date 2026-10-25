@@ -884,9 +884,21 @@ const ManagementDashboard = () => {
       setOpenPaymentModal(true); // Open the payment modal
     }
   };
-  const getProxyImageUrl = (fileId) => {
-    if (!fileId) return '/placeholder.svg'; // Fallback image
-    return `${BASE_URL}/api/image-proxy/${fileId}`;
+  const getProxyImageUrl = (fileIdOrPic) => {
+    if (!fileIdOrPic) return null;
+    if (typeof fileIdOrPic === "object") {
+      if (fileIdOrPic.fileId && !fileIdOrPic.fileId.startsWith("http") && !fileIdOrPic.fileId.startsWith("data:")) {
+        return `${BASE_URL}/api/image-proxy/${fileIdOrPic.fileId}`;
+      }
+      return fileIdOrPic.fileUrl || fileIdOrPic.url || null;
+    }
+    if (typeof fileIdOrPic === "string" && fileIdOrPic.trim()) {
+      const trimmed = fileIdOrPic.trim();
+      return trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("data:")
+        ? trimmed
+        : `${BASE_URL}/api/image-proxy/${trimmed}`;
+    }
+    return null;
   };
 
   return (
@@ -1096,9 +1108,11 @@ const ManagementDashboard = () => {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Avatar
-                          src={getProxyImageUrl(member?.profilePic?.fileId || (typeof member?.profilePic === 'string' ? member.profilePic : null))}
+                          src={getProxyImageUrl(member?.profilePic)}
                           alt={member.name}
-                        />
+                        >
+                          {(member.name || "M").charAt(0).toUpperCase()}
+                        </Avatar>
                         <div>
                           <div className="font-medium">
                             {member.name}
@@ -1170,8 +1184,11 @@ const ManagementDashboard = () => {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Avatar
-                          src={getProxyImageUrl(member?.profilePic?.fileId || (typeof member?.profilePic === 'string' ? member.profilePic : null))}
-                        />
+                          src={getProxyImageUrl(member?.profilePic)}
+                          alt={member.fullName}
+                        >
+                          {(member.fullName || "M").charAt(0).toUpperCase()}
+                        </Avatar>
                         <div>
                           <div className="font-medium">
                             {member.fullName}
@@ -1258,11 +1275,13 @@ const ManagementDashboard = () => {
               {/* Member Basic Info */}
               <div className="flex items-center gap-4 mb-6">
                 <Avatar
-                  src={getProxyImageUrl(selectedMember?.profilePic?.fileId || (typeof selectedMember?.profilePic === 'string' ? selectedMember.profilePic : null))}
+                  src={getProxyImageUrl(selectedMember?.profilePic)}
                   alt={selectedMember.name}
                   sx={{ width: 64, height: 64 }}
                   className="border-2 border-[#ca0019]"
-                />
+                >
+                  {(selectedMember.name || "M").charAt(0).toUpperCase()}
+                </Avatar>
                 <div>
                   <Typography variant="h6" className="font-bold">
                     {selectedMember.name}

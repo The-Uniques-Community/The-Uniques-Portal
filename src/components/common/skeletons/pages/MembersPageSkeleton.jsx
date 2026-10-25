@@ -13,7 +13,7 @@ const MembersPageSkeleton = () => {
     <Box sx={{ width: "100%", p: 3, boxSizing: "border-box" }}>
       {/* Batch Tabs Bar */}
       <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2.5, pb: 1, display: "flex", gap: 1.5, overflowX: "auto" }}>
-        {["All Batches", "Uniques 1.0", "Uniques 2.0", "Uniques 3.0", "Uniques 4.0", "Uniques 5.0", "Uniques 6.0"].map((_, idx) => (
+        {Array.from({ length: 7 }).map((_, idx) => (
           <BaseSkeleton key={idx} variant="rounded" width={110} height={36} sx={{ borderRadius: "8px", flexShrink: 0 }} />
         ))}
       </Box>

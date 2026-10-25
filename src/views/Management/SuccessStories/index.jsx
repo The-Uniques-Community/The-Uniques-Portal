@@ -8,7 +8,7 @@
  * full journey detail modals matching the live site, and coordinator CRUD.
  */
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { useLocation, useNavigate, Link as RouterLink } from "react-router-dom";
 import {
   Box,
@@ -37,6 +37,8 @@ import {
   FormControl,
   InputLabel,
   Select,
+  Skeleton,
+  CircularProgress,
 } from "@mui/material";
 import { useTheme, alpha } from "@mui/material/styles";
 import { useThemeContext } from "@/theme/ThemeProvider";
@@ -45,7 +47,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { normalizeRole } from "@/utils/authUtils";
 import { FaEye } from "react-icons/fa";
 import ModernStatCard from "@/components/cards/ModernStatCard";
-import { SUCCESS_STORIES } from "@/utils/successStories/successStoriesData";
+import successStoriesService from "@/services/successStoriesService";
 
 // Icons
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -73,6 +75,8 @@ import AddIcon from "@mui/icons-material/Add";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { useBatches } from "@/hooks/useBatches";
 
 /**
  * Normalizes batch strings to use "Uniques X.0" (e.g. "Uniques 4.0") instead of "The Uniques"
@@ -107,8 +111,20 @@ export default function SuccessStoriesView() {
     (isAuthenticated || (typeof window !== "undefined" && Boolean(localStorage.getItem("token"))))
   );
 
-  // Data State with local mutation support
-  const [stories, setStories] = useState(() => SUCCESS_STORIES);
+  // Data State with backend synchronization
+  const [stories, setStories] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [stats, setStats] = useState({
+    totalStories: 0,
+    uniqueCompanies: 0,
+    activeBatches: 0,
+    verifiedPlacementRate: 100,
+  });
+
+  const fileInputRef = useRef(null);
 
   // Filter States
   const [searchTerm, setSearchTerm] = useState("");
@@ -122,33 +138,120 @@ export default function SuccessStoriesView() {
 
   // CRUD Dialog States
   const [storyFormOpen, setStoryFormOpen] = useState(false);
+  const [formTab, setFormTab] = useState(0);
   const [editingStory, setEditingStory] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [storyToDelete, setStoryToDelete] = useState(null);
 
-  // Form Fields State
-  const [formData, setFormData] = useState({
+  // Dynamic batches fetched from backend API
+  const { labels: dynamicBatchLabels } = useBatches();
+
+  // Empty form generator
+  const getEmptyFormData = useCallback((defaultBatch = "Uniques 4.0") => ({
     name: "",
     role: "",
     company: "",
-    batch: "Uniques 4.0",
+    batch: defaultBatch,
     summary: "",
-    skills: "",
     image: "",
     video: "",
-    degree: "",
-    institution: "",
-  });
+    officialUrl: "",
+    education: {
+      institution: "",
+      degree: "",
+      duration: "",
+      location: "",
+      details: "",
+    },
+    skillsLanguages: "",
+    skillsTechnologies: "",
+    skillsTools: "",
+    timeline: [],
+    experience: [],
+    projects: [],
+    leadership: {
+      organization: "",
+      role: "",
+      duration: "",
+      achievements: "",
+    },
+  }), []);
 
-  // Batch navigation pills (with "Uniques 4.0" explicitly formatted)
-  const primaryBatches = [
+  // Form Fields State
+  const [formData, setFormData] = useState(() => getEmptyFormData());
+
+  // Fetch stats from backend
+  const loadStats = useCallback(async () => {
+    try {
+      const statsRes = await successStoriesService.getSuccessStoryStats();
+      if (statsRes?.stats) {
+        setStats(statsRes.stats);
+      }
+    } catch (err) {
+      console.warn("[SuccessStories] Could not load backend stats, falling back to local calculation:", err);
+    }
+  }, []);
+
+  // Fetch stories from backend
+  const loadStories = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const [storiesRes, statsRes] = await Promise.all([
+        successStoriesService.getSuccessStories({ all: "true" }),
+        successStoriesService.getSuccessStoryStats().catch(() => null),
+      ]);
+
+      const storyData =
+        storiesRes?.data ||
+        storiesRes?.items ||
+        (Array.isArray(storiesRes) ? storiesRes : []);
+
+      setStories(storyData);
+
+      if (statsRes?.stats) {
+        setStats(statsRes.stats);
+      } else if (storyData.length > 0) {
+        const distinctComp = new Set(storyData.map((s) => s.company).filter(Boolean)).size;
+        const distinctBatch = new Set(storyData.map((s) => formatBatchLabel(s.batch)).filter(Boolean)).size;
+        setStats({
+          totalStories: storyData.length,
+          uniqueCompanies: distinctComp,
+          activeBatches: distinctBatch,
+          verifiedPlacementRate: 100,
+        });
+      } else {
+        setStats({
+          totalStories: 0,
+          uniqueCompanies: 0,
+          activeBatches: 0,
+          verifiedPlacementRate: 0,
+        });
+      }
+    } catch (err) {
+      console.error("[SuccessStories] Failed to load success stories data:", err);
+      toast.error("Failed to load success stories.");
+      setStories([]);
+      setStats({
+        totalStories: 0,
+        uniqueCompanies: 0,
+        activeBatches: 0,
+        verifiedPlacementRate: 0,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadStories();
+  }, [loadStories]);
+
+  // Batch navigation pills dynamically computed
+  const primaryBatches = useMemo(() => [
     { id: "ALL", label: "All Batches" },
-    { id: "Uniques 1.0", label: "Uniques 1.0" },
-    { id: "Uniques 2.0", label: "Uniques 2.0" },
-    { id: "Uniques 3.0", label: "Uniques 3.0" },
-    { id: "Uniques 4.0", label: "Uniques 4.0" },
-  ];
-  const moreBatches = ["Uniques 5.0", "Uniques 6.0", "Uniques 7.0"];
+    ...dynamicBatchLabels.slice(0, 4).map((label) => ({ id: label, label })),
+  ], [dynamicBatchLabels]);
+  const moreBatches = useMemo(() => dynamicBatchLabels.slice(4), [dynamicBatchLabels]);
   const isMoreBatchSelected = moreBatches.includes(selectedBatch);
 
   // Helper to extract skills cleanly
@@ -190,16 +293,6 @@ export default function SuccessStoriesView() {
     });
   }, [stories, searchTerm, selectedBatch]);
 
-  // Compute Summary KPI Stats
-  const kpiStats = useMemo(() => {
-    const totalStories = stories.length;
-    const uniqueCompanies = new Set(stories.map((s) => s.company).filter(Boolean)).size;
-    return {
-      totalStories,
-      uniqueCompanies,
-    };
-  }, [stories]);
-
   // Modal Handlers
   const handleOpenModal = (story) => {
     setSelectedStory(story);
@@ -218,18 +311,8 @@ export default function SuccessStoriesView() {
       return;
     }
     setEditingStory(null);
-    setFormData({
-      name: "",
-      role: "",
-      company: "",
-      batch: "Uniques 4.0",
-      summary: "",
-      skills: "React.js, Node.js, MongoDB",
-      image: "https://www.theuniques.in/assets/ronit-jaiprakash-C3zV97zZ.webp",
-      video: "",
-      degree: "B.Tech Computer Science & Engineering",
-      institution: "Swami Vivekananda Institute of Engineering & Technology",
-    });
+    setFormTab(0);
+    setFormData(getEmptyFormData(dynamicBatchLabels[0] || "Uniques 4.0"));
     setStoryFormOpen(true);
   };
 
@@ -239,22 +322,195 @@ export default function SuccessStoriesView() {
       return;
     }
     setEditingStory(story);
+    setFormTab(0);
     setFormData({
       name: story.name || "",
       role: story.role || "",
       company: story.company || "",
       batch: formatBatchLabel(story.batch) || "Uniques 4.0",
       summary: story.summary || "",
-      skills: getSkillsList(story).join(", "),
       image: story.image || "",
       video: story.video || "",
-      degree: story.education?.degree || "",
-      institution: story.education?.institution || "",
+      officialUrl: story.officialUrl || "",
+      education: {
+        institution: story.education?.institution || "",
+        degree: story.education?.degree || "",
+        duration: story.education?.duration || "",
+        location: story.education?.location || "",
+        details: story.education?.details || "",
+      },
+      skillsLanguages: Array.isArray(story.skills?.languages)
+        ? story.skills.languages.join(", ")
+        : "",
+      skillsTechnologies: Array.isArray(story.skills?.technologies)
+        ? story.skills.technologies.join(", ")
+        : Array.isArray(story.skills)
+        ? story.skills.join(", ")
+        : typeof story.skills === "string"
+        ? story.skills
+        : "",
+      skillsTools: Array.isArray(story.skills?.tools)
+        ? story.skills.tools.join(", ")
+        : "",
+      timeline: Array.isArray(story.timeline)
+        ? story.timeline.map((t) => ({
+            year: t.year || new Date().getFullYear(),
+            achievements: Array.isArray(t.achievements)
+              ? t.achievements.join("\n")
+              : t.achievements || "",
+          }))
+        : [],
+      experience: Array.isArray(story.experience)
+        ? story.experience.map((e) => ({
+            company: e.company || "",
+            role: e.role || "",
+            duration: e.duration || "",
+            location: e.location || "",
+            responsibilities: Array.isArray(e.responsibilities)
+              ? e.responsibilities.join("\n")
+              : e.responsibilities || "",
+          }))
+        : [],
+      projects: Array.isArray(story.projects)
+        ? story.projects.map((p) => ({
+            name: p.name || "",
+            technologies: p.technologies || "",
+            date: p.date || "",
+            description: p.description || "",
+            achievements: Array.isArray(p.achievements)
+              ? p.achievements.join("\n")
+              : p.achievements || "",
+            projectUrl: p.projectUrl || "",
+          }))
+        : [],
+      leadership: {
+        organization: story.leadership?.organization || "",
+        role: story.leadership?.role || "",
+        duration: story.leadership?.duration || "",
+        achievements: Array.isArray(story.leadership?.achievements)
+          ? story.leadership.achievements.join("\n")
+          : story.leadership?.achievements || "",
+      },
     });
     setStoryFormOpen(true);
   };
 
-  const handleSaveStoryForm = () => {
+  const handleAvatarFileUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file (PNG, JPG, WEBP).");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image file size exceeds 5MB limit.");
+      return;
+    }
+
+    const uploadFormData = new FormData();
+    uploadFormData.append("file", file);
+    uploadFormData.append("name", formData.name || "Candidate");
+    uploadFormData.append("batch", formData.batch || "General Stories");
+    if (editingStory) {
+      uploadFormData.append("storyId", editingStory._id || editingStory.id);
+    }
+
+    try {
+      setIsUploading(true);
+      const res = await successStoriesService.uploadCandidateAvatar(uploadFormData);
+      if (res?.file?.proxyUrl) {
+        setFormData((prev) => ({ ...prev, image: res.file.proxyUrl }));
+        toast.success("Avatar image uploaded successfully!");
+      } else if (res?.file?.fileUrl) {
+        setFormData((prev) => ({ ...prev, image: res.file.fileUrl }));
+        toast.success("Avatar image uploaded successfully!");
+      }
+    } catch (err) {
+      console.error("[SuccessStories] Avatar upload error:", err);
+      toast.error(err.response?.data?.message || "Failed to upload avatar image.");
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const handleAddTimelineItem = () => {
+    setFormData((prev) => ({
+      ...prev,
+      timeline: [...prev.timeline, { year: new Date().getFullYear(), achievements: "" }],
+    }));
+  };
+
+  const handleUpdateTimelineItem = (index, field, value) => {
+    setFormData((prev) => {
+      const updated = [...prev.timeline];
+      updated[index] = { ...updated[index], [field]: value };
+      return { ...prev, timeline: updated };
+    });
+  };
+
+  const handleRemoveTimelineItem = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      timeline: prev.timeline.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleAddExperienceItem = () => {
+    setFormData((prev) => ({
+      ...prev,
+      experience: [
+        ...prev.experience,
+        { company: "", role: "", duration: "", location: "", responsibilities: "" },
+      ],
+    }));
+  };
+
+  const handleUpdateExperienceItem = (index, field, value) => {
+    setFormData((prev) => {
+      const updated = [...prev.experience];
+      updated[index] = { ...updated[index], [field]: value };
+      return { ...prev, experience: updated };
+    });
+  };
+
+  const handleRemoveExperienceItem = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      experience: prev.experience.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleAddProjectItem = () => {
+    setFormData((prev) => ({
+      ...prev,
+      projects: [
+        ...prev.projects,
+        { name: "", technologies: "", date: "", description: "", achievements: "", projectUrl: "" },
+      ],
+    }));
+  };
+
+  const handleUpdateProjectItem = (index, field, value) => {
+    setFormData((prev) => {
+      const updated = [...prev.projects];
+      updated[index] = { ...updated[index], [field]: value };
+      return { ...prev, projects: updated };
+    });
+  };
+
+  const handleRemoveProjectItem = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      projects: prev.projects.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleSaveStoryForm = async () => {
     if (!canPerformCrud) {
       toast.error("Unauthorized: Only Admin or Coordinator can save success stories.");
       return;
@@ -264,54 +520,124 @@ export default function SuccessStoriesView() {
       return;
     }
 
-    const parsedSkills = formData.skills
+    const parsedLanguages = formData.skillsLanguages
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean);
 
-    if (editingStory) {
-      setStories((prev) =>
-        prev.map((item) =>
-          item.id === editingStory.id
-            ? {
-                ...item,
-                ...formData,
-                batch: formatBatchLabel(formData.batch),
-                skills: {
-                  ...item.skills,
-                  technologies: parsedSkills,
-                },
-                education: {
-                  ...item.education,
-                  degree: formData.degree,
-                  institution: formData.institution,
-                },
-              }
-            : item
-        )
-      );
-      toast.success("Success story updated successfully.");
-    } else {
-      const newId = `Story_${Date.now()}`;
-      const newStory = {
-        id: newId,
-        ...formData,
-        batch: formatBatchLabel(formData.batch),
-        skills: {
-          technologies: parsedSkills,
-          domain: ["Full Stack Development"],
-        },
-        education: {
-          degree: formData.degree,
-          institution: formData.institution,
-          duration: "2021 - 2025",
-        },
-      };
-      setStories((prev) => [newStory, ...prev]);
-      toast.success("New success story added successfully.");
-    }
+    const parsedTechnologies = formData.skillsTechnologies
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
 
-    setStoryFormOpen(false);
+    const parsedTools = formData.skillsTools
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    const parsedTimeline = formData.timeline
+      .map((t) => ({
+        year: Number(t.year) || new Date().getFullYear(),
+        achievements: (typeof t.achievements === "string" ? t.achievements.split("\n") : t.achievements || [])
+          .map((a) => a.trim())
+          .filter(Boolean),
+      }))
+      .filter((t) => t.year && t.achievements.length > 0);
+
+    const parsedExperience = formData.experience
+      .map((e) => ({
+        company: e.company.trim(),
+        role: e.role.trim(),
+        duration: e.duration.trim(),
+        location: e.location.trim(),
+        responsibilities: (typeof e.responsibilities === "string"
+          ? e.responsibilities.split("\n")
+          : e.responsibilities || []
+        )
+          .map((r) => r.trim())
+          .filter(Boolean),
+      }))
+      .filter((e) => e.company && e.role);
+
+    const parsedProjects = formData.projects
+      .map((p) => ({
+        name: p.name.trim(),
+        technologies: p.technologies.trim(),
+        date: p.date.trim(),
+        description: p.description.trim(),
+        projectUrl: p.projectUrl.trim(),
+        achievements: (typeof p.achievements === "string" ? p.achievements.split("\n") : p.achievements || [])
+          .map((a) => a.trim())
+          .filter(Boolean),
+      }))
+      .filter((p) => p.name);
+
+    const parsedLeadershipAchievements = (
+      typeof formData.leadership?.achievements === "string"
+        ? formData.leadership.achievements.split("\n")
+        : formData.leadership?.achievements || []
+    )
+      .map((a) => a.trim())
+      .filter(Boolean);
+
+    const payload = {
+      name: formData.name.trim(),
+      role: formData.role.trim(),
+      company: formData.company.trim(),
+      batch: formatBatchLabel(formData.batch),
+      summary: formData.summary.trim(),
+      image: formData.image.trim(),
+      video: formData.video.trim(),
+      officialUrl: formData.officialUrl.trim(),
+      education: {
+        institution: formData.education.institution.trim(),
+        degree: formData.education.degree.trim(),
+        duration: formData.education.duration.trim(),
+        location: formData.education.location.trim(),
+        details: formData.education.details.trim(),
+      },
+      skills: {
+        languages: parsedLanguages,
+        technologies: parsedTechnologies,
+        tools: parsedTools,
+      },
+      timeline: parsedTimeline,
+      experience: parsedExperience,
+      projects: parsedProjects,
+      leadership: {
+        organization: formData.leadership?.organization?.trim() || "",
+        role: formData.leadership?.role?.trim() || "",
+        duration: formData.leadership?.duration?.trim() || "",
+        achievements: parsedLeadershipAchievements,
+      },
+    };
+
+    try {
+      setIsSaving(true);
+      if (editingStory) {
+        const idToUpdate = editingStory._id || editingStory.id;
+        const res = await successStoriesService.updateSuccessStory(idToUpdate, payload);
+        const updatedStory = res?.data || res?.story || { ...editingStory, ...payload };
+        setStories((prev) =>
+          prev.map((item) =>
+            (item._id && item._id === idToUpdate) || item.id === idToUpdate ? updatedStory : item
+          )
+        );
+        toast.success("Success story updated successfully.");
+      } else {
+        const res = await successStoriesService.createSuccessStory(payload);
+        const newStory = res?.data || res?.story || payload;
+        setStories((prev) => [newStory, ...prev]);
+        toast.success("New success story created successfully.");
+      }
+      setStoryFormOpen(false);
+      loadStats();
+    } catch (err) {
+      console.error("[SuccessStories] Save story error:", err);
+      toast.error(err.response?.data?.message || "Failed to save success story.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleDeleteStory = (story) => {
@@ -323,16 +649,29 @@ export default function SuccessStoriesView() {
     setDeleteDialogOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (!canPerformCrud) {
       toast.error("Unauthorized: Only Admin or Coordinator can delete success stories.");
       return;
     }
-    if (storyToDelete) {
-      setStories((prev) => prev.filter((item) => item.id !== storyToDelete.id));
+    if (!storyToDelete) return;
+
+    try {
+      setIsDeleting(true);
+      const idToDelete = storyToDelete._id || storyToDelete.id;
+      await successStoriesService.deleteSuccessStory(idToDelete);
+      setStories((prev) =>
+        prev.filter((item) => (item._id ? item._id !== idToDelete : item.id !== idToDelete))
+      );
       toast.success(`Removed story for ${storyToDelete.name}.`);
       setDeleteDialogOpen(false);
       setStoryToDelete(null);
+      loadStats();
+    } catch (err) {
+      console.error("[SuccessStories] Delete story error:", err);
+      toast.error(err.response?.data?.message || "Failed to delete success story.");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -513,7 +852,7 @@ export default function SuccessStoriesView() {
             <ModernStatCard
               icon={<AutoStoriesIcon fontSize="small" />}
               label="Total Success Stories"
-              value={kpiStats.totalStories}
+              value={stats.totalStories}
               color="#ca0019"
               progress={65}
             />
@@ -522,7 +861,7 @@ export default function SuccessStoriesView() {
             <ModernStatCard
               icon={<BusinessIcon fontSize="small" />}
               label="Top Tech Companies"
-              value={`${kpiStats.uniqueCompanies}+`}
+              value={`${stats.uniqueCompanies}+`}
               color="#2e7d32"
               progress={65}
             />
@@ -531,7 +870,7 @@ export default function SuccessStoriesView() {
             <ModernStatCard
               icon={<SchoolIcon fontSize="small" />}
               label="Active Batches"
-              value="4 Batches"
+              value={`${stats.activeBatches} Batches`}
               color="#2196F3"
               progress={65}
             />
@@ -540,7 +879,7 @@ export default function SuccessStoriesView() {
             <ModernStatCard
               icon={<WorkIcon fontSize="small" />}
               label="Verified Placement"
-              value="100%"
+              value={`${stats.verifiedPlacementRate}%`}
               color="#f59e0b"
               progress={65}
             />
@@ -676,71 +1015,75 @@ export default function SuccessStoriesView() {
           })}
 
           {/* More batches dropdown */}
-          <Button
-            size="small"
-            onClick={(e) => setMoreBatchAnchor(e.currentTarget)}
-            endIcon={<KeyboardArrowDownIcon sx={{ fontSize: 16 }} />}
-            sx={{
-              borderRadius: "8px",
-              border: "1px solid",
-              borderColor: isMoreBatchSelected
-                ? "#ca0019"
-                : isDarkMode
-                ? "rgba(255,255,255,0.08)"
-                : "#e2e8f0",
-              textTransform: "none",
-              fontWeight: isMoreBatchSelected ? 700 : 500,
-              fontSize: "0.82rem",
-              color: isMoreBatchSelected ? "#ffffff" : "text.secondary",
-              bgcolor: isMoreBatchSelected
-                ? "#ca0019"
-                : isDarkMode
-                ? "rgba(255,255,255,0.03)"
-                : "#f8fafc",
-              px: 1.5,
-              py: 0.5,
-              minHeight: 32,
-              "&:hover": {
-                bgcolor: isMoreBatchSelected
-                  ? "#a30014"
-                  : isDarkMode
-                  ? "rgba(255,255,255,0.07)"
-                  : "#f1f5f9",
-                color: isMoreBatchSelected ? "#ffffff" : "text.primary",
-              },
-            }}
-          >
-            {isMoreBatchSelected ? selectedBatch : "More"}
-          </Button>
-
-          <Menu
-            anchorEl={moreBatchAnchor}
-            open={Boolean(moreBatchAnchor)}
-            onClose={() => setMoreBatchAnchor(null)}
-            PaperProps={{
-              sx: {
-                borderRadius: "10px",
-                mt: 0.5,
-                border: "1px solid",
-                borderColor: "divider",
-                boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
-              },
-            }}
-          >
-            {moreBatches.map((batch) => (
-              <MenuItem
-                key={batch}
-                onClick={() => {
-                  setSelectedBatch(batch);
-                  setMoreBatchAnchor(null);
+          {moreBatches.length > 0 && (
+            <>
+              <Button
+                size="small"
+                onClick={(e) => setMoreBatchAnchor(e.currentTarget)}
+                endIcon={<KeyboardArrowDownIcon sx={{ fontSize: 16 }} />}
+                sx={{
+                  borderRadius: "8px",
+                  border: "1px solid",
+                  borderColor: isMoreBatchSelected
+                    ? "#ca0019"
+                    : isDarkMode
+                    ? "rgba(255,255,255,0.08)"
+                    : "#e2e8f0",
+                  textTransform: "none",
+                  fontWeight: isMoreBatchSelected ? 700 : 500,
+                  fontSize: "0.82rem",
+                  color: isMoreBatchSelected ? "#ffffff" : "text.secondary",
+                  bgcolor: isMoreBatchSelected
+                    ? "#ca0019"
+                    : isDarkMode
+                    ? "rgba(255,255,255,0.03)"
+                    : "#f8fafc",
+                  px: 1.5,
+                  py: 0.5,
+                  minHeight: 32,
+                  "&:hover": {
+                    bgcolor: isMoreBatchSelected
+                      ? "#a30014"
+                      : isDarkMode
+                      ? "rgba(255,255,255,0.07)"
+                      : "#f1f5f9",
+                    color: isMoreBatchSelected ? "#ffffff" : "text.primary",
+                  },
                 }}
-                selected={selectedBatch === batch}
-                sx={{ fontSize: "0.85rem", fontWeight: 500, py: 0.8, px: 2 }}
               >
-                {batch}
-              </MenuItem>
-            ))}
-          </Menu>
+                {isMoreBatchSelected ? selectedBatch : "More"}
+              </Button>
+
+              <Menu
+                anchorEl={moreBatchAnchor}
+                open={Boolean(moreBatchAnchor)}
+                onClose={() => setMoreBatchAnchor(null)}
+                PaperProps={{
+                  sx: {
+                    borderRadius: "10px",
+                    mt: 0.5,
+                    border: "1px solid",
+                    borderColor: "divider",
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+                  },
+                }}
+              >
+                {moreBatches.map((batch) => (
+                  <MenuItem
+                    key={batch}
+                    onClick={() => {
+                      setSelectedBatch(batch);
+                      setMoreBatchAnchor(null);
+                    }}
+                    selected={selectedBatch === batch}
+                    sx={{ fontSize: "0.85rem", fontWeight: 500, py: 0.8, px: 2 }}
+                  >
+                    {batch}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </>
+          )}
         </Box>
       </Paper>
 
@@ -804,7 +1147,50 @@ export default function SuccessStoriesView() {
       </Box>
 
       {/* 5. SUCCESS STORIES CARDS GRID (Minimal, Spacious 3-Column Layout) */}
-      {filteredStories.length === 0 ? (
+      {isLoading ? (
+        <Grid container spacing={3}>
+          {[1, 2, 3, 4, 5, 6].map((sk) => (
+            <Grid item xs={12} sm={6} lg={4} key={sk}>
+              <Card
+                elevation={0}
+                sx={{
+                  height: "100%",
+                  minHeight: 380,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  borderRadius: "20px",
+                  border: "1px solid",
+                  borderColor: isDarkMode ? "rgba(255, 255, 255, 0.08)" : "#e2e8f0",
+                  bgcolor: isDarkMode ? "background.paper" : "#ffffff",
+                  p: 3,
+                }}
+              >
+                <Box>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+                    <Skeleton variant="rounded" width={84} height={26} sx={{ borderRadius: "6px" }} />
+                    <Skeleton variant="rounded" width={92} height={26} sx={{ borderRadius: "6px" }} />
+                  </Box>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2.2 }}>
+                    <Skeleton variant="circular" width={62} height={62} />
+                    <Box sx={{ flex: 1 }}>
+                      <Skeleton variant="text" width="75%" height={26} />
+                      <Skeleton variant="text" width="55%" height={20} />
+                    </Box>
+                  </Box>
+                  <Skeleton variant="rounded" width="100%" height={68} sx={{ borderRadius: "10px", mb: 2 }} />
+                  <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 2 }}>
+                    <Skeleton variant="rounded" width={65} height={24} sx={{ borderRadius: "6px" }} />
+                    <Skeleton variant="rounded" width={80} height={24} sx={{ borderRadius: "6px" }} />
+                    <Skeleton variant="rounded" width={70} height={24} sx={{ borderRadius: "6px" }} />
+                  </Box>
+                </Box>
+                <Skeleton variant="rounded" width="100%" height={40} sx={{ borderRadius: "10px" }} />
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      ) : filteredStories.length === 0 ? (
         <Paper
           elevation={0}
           sx={{
@@ -838,7 +1224,7 @@ export default function SuccessStoriesView() {
       ) : (
         <Grid container spacing={3}>
           {filteredStories.map((story) => (
-            <Grid item xs={12} sm={6} lg={4} key={story.id}>
+            <Grid item xs={12} sm={6} lg={4} key={story.id || story._id}>
               <Card
                 elevation={0}
                 sx={{
@@ -2413,102 +2799,647 @@ export default function SuccessStoriesView() {
         );
       })()}
 
-      {/* 7. ADD / EDIT STORY FORM DIALOG */}
+      {/* 7. ENHANCED ADD / EDIT STORY FORM DIALOG */}
       {canPerformCrud && (
         <Dialog
           open={storyFormOpen}
-          onClose={() => setStoryFormOpen(false)}
+          onClose={() => !isSaving && setStoryFormOpen(false)}
           fullWidth
-          maxWidth="sm"
+          maxWidth="md"
           PaperProps={{
-            sx: { borderRadius: "16px", p: 1 },
+            sx: { borderRadius: "18px", p: 0.5, maxHeight: "90vh" },
           }}
         >
-          <DialogTitle sx={{ fontWeight: 800, pb: 1 }}>
-            {editingStory ? "Edit Success Story" : "Add New Success Story"}
+          <DialogTitle sx={{ fontWeight: 800, pb: 1, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span>{editingStory ? "Edit Success Story" : "Add New Success Story"}</span>
+            <IconButton size="small" onClick={() => setStoryFormOpen(false)} disabled={isSaving}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
           </DialogTitle>
-          <DialogContent dividers sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 2 }}>
-            <TextField
-              label="Student Full Name"
-              fullWidth
-              size="small"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              required
-            />
 
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+          <Tabs
+            value={formTab}
+            onChange={(_, val) => setFormTab(val)}
+            variant="scrollable"
+            scrollButtons="auto"
+            sx={{
+              px: 3,
+              borderBottom: "1px solid",
+              borderColor: "divider",
+              minHeight: 44,
+              "& .MuiTab-root": {
+                textTransform: "none",
+                fontWeight: 600,
+                fontSize: "0.85rem",
+                minHeight: 44,
+              },
+              "& .Mui-selected": { color: "#ca0019 !important" },
+              "& .MuiTabs-indicator": { bgcolor: "#ca0019" },
+            }}
+          >
+            <Tab icon={<PersonIcon sx={{ fontSize: 17 }} />} iconPosition="start" label="Basic Info" />
+            <Tab icon={<SchoolIcon sx={{ fontSize: 17 }} />} iconPosition="start" label="Education & Skills" />
+            <Tab icon={<TimelineIcon sx={{ fontSize: 17 }} />} iconPosition="start" label={`Timeline (${formData.timeline.length})`} />
+            <Tab icon={<WorkIcon sx={{ fontSize: 17 }} />} iconPosition="start" label={`Experience & Projects (${formData.experience.length + formData.projects.length})`} />
+          </Tabs>
+
+          <DialogContent dividers sx={{ p: 3, display: "flex", flexDirection: "column", gap: 2.5 }}>
+            {/* TAB 0: BASIC INFO */}
+            {formTab === 0 && (
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Student Full Name *"
+                      fullWidth
+                      size="small"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="e.g. Ronit Jaiprakash"
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl fullWidth size="small">
+                      <InputLabel>Batch *</InputLabel>
+                      <Select
+                        value={formData.batch}
+                        label="Batch *"
+                        onChange={(e) => setFormData({ ...formData, batch: e.target.value })}
+                      >
+                        {(dynamicBatchLabels.length > 0
+                          ? dynamicBatchLabels
+                          : ["Uniques 1.0", "Uniques 2.0", "Uniques 3.0", "Uniques 4.0", "Uniques 5.0", "Uniques 6.0", "Uniques 7.0"]
+                        ).map((batchLabel) => (
+                          <MenuItem key={batchLabel} value={batchLabel}>
+                            {batchLabel}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Role / Designation *"
+                      fullWidth
+                      size="small"
+                      value={formData.role}
+                      onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                      placeholder="e.g. Software Engineer"
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Company Name *"
+                      fullWidth
+                      size="small"
+                      value={formData.company}
+                      onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                      placeholder="e.g. Google, Microsoft, Adobe"
+                    />
+                  </Grid>
+                </Grid>
+
+                {/* Avatar Image URL & Upload Button */}
+                <Box sx={{ p: 2, borderRadius: "12px", border: "1px solid", borderColor: "divider", bgcolor: isDarkMode ? "rgba(255,255,255,0.02)" : "#f8fafc" }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1.5, display: "flex", alignItems: "center", gap: 1 }}>
+                    <PersonIcon sx={{ fontSize: 18, color: "#ca0019" }} />
+                    Candidate Avatar / Photo
+                  </Typography>
+
+                  <Grid container spacing={2} alignItems="center">
+                    <Grid item>
+                      <Avatar
+                        src={formData.image}
+                        alt={formData.name || "Preview"}
+                        sx={{ width: 56, height: 56, border: "2px solid #ca0019" }}
+                      />
+                    </Grid>
+                    <Grid item xs>
+                      <TextField
+                        label="Image URL (CDN, Cloudinary, or Google Drive proxy)"
+                        fullWidth
+                        size="small"
+                        value={formData.image}
+                        onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                        placeholder="https://..."
+                      />
+                    </Grid>
+                    <Grid item>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        accept="image/*"
+                        style={{ display: "none" }}
+                        onChange={handleAvatarFileUpload}
+                      />
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        disabled={isUploading}
+                        startIcon={isUploading ? <CircularProgress size={16} /> : <CloudUploadIcon />}
+                        onClick={() => fileInputRef.current?.click()}
+                        sx={{
+                          borderRadius: "8px",
+                          textTransform: "none",
+                          fontWeight: 600,
+                          borderColor: "#ca0019",
+                          color: "#ca0019",
+                          "&:hover": { borderColor: "#a30014", bgcolor: "rgba(202,0,25,0.04)" },
+                        }}
+                      >
+                        {isUploading ? "Uploading..." : "Upload Photo"}
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </Box>
+
                 <TextField
-                  label="Role / Designation"
+                  label="Summary / Inspirational Quote"
                   fullWidth
                   size="small"
-                  value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  required
+                  multiline
+                  rows={3}
+                  value={formData.summary}
+                  onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
+                  placeholder="Share a short inspiring excerpt or summary of their transformation and accomplishments in The Uniques..."
                 />
-              </Grid>
-              <Grid item xs={12} sm={6}>
+
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Video Journey URL (YouTube / Drive - Optional)"
+                      fullWidth
+                      size="small"
+                      value={formData.video}
+                      onChange={(e) => setFormData({ ...formData, video: e.target.value })}
+                      placeholder="https://www.youtube.com/watch?v=..."
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Official Profile / LinkedIn URL (Optional)"
+                      fullWidth
+                      size="small"
+                      value={formData.officialUrl}
+                      onChange={(e) => setFormData({ ...formData, officialUrl: e.target.value })}
+                      placeholder="https://linkedin.com/in/..."
+                    />
+                  </Grid>
+                </Grid>
+              </Box>
+            )}
+
+            {/* TAB 1: EDUCATION & SKILLS */}
+            {formTab === 1 && (
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "text.primary" }}>
+                  Academic Credentials
+                </Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Degree / Major"
+                      fullWidth
+                      size="small"
+                      value={formData.education.degree}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          education: { ...formData.education, degree: e.target.value },
+                        })
+                      }
+                      placeholder="e.g. B.Tech Computer Science"
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Institution / University"
+                      fullWidth
+                      size="small"
+                      value={formData.education.institution}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          education: { ...formData.education, institution: e.target.value },
+                        })
+                      }
+                      placeholder="e.g. SVIET / Chandigarh University"
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Duration / Batch Years"
+                      fullWidth
+                      size="small"
+                      value={formData.education.duration}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          education: { ...formData.education, duration: e.target.value },
+                        })
+                      }
+                      placeholder="e.g. 2020 - 2024"
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Location / Campus"
+                      fullWidth
+                      size="small"
+                      value={formData.education.location}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          education: { ...formData.education, location: e.target.value },
+                        })
+                      }
+                      placeholder="e.g. Mohali, Punjab"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Academic Details / Highlights"
+                      fullWidth
+                      size="small"
+                      value={formData.education.details}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          education: { ...formData.education, details: e.target.value },
+                        })
+                      }
+                      placeholder="e.g. Graduated with Honors; 8.8 CGPA"
+                    />
+                  </Grid>
+                </Grid>
+
+                <Divider sx={{ my: 1 }} />
+
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "text.primary" }}>
+                  Technical Skills & Proficiencies
+                </Typography>
+
                 <TextField
-                  label="Company Name"
+                  label="Programming Languages (comma-separated)"
                   fullWidth
                   size="small"
-                  value={formData.company}
-                  onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                  required
+                  value={formData.skillsLanguages}
+                  onChange={(e) => setFormData({ ...formData, skillsLanguages: e.target.value })}
+                  placeholder="e.g. JavaScript, TypeScript, Python, C++, Java"
                 />
-              </Grid>
-            </Grid>
 
-            <FormControl fullWidth size="small">
-              <InputLabel>Batch</InputLabel>
-              <Select
-                value={formData.batch}
-                label="Batch"
-                onChange={(e) => setFormData({ ...formData, batch: e.target.value })}
-              >
-                <MenuItem value="Uniques 1.0">Uniques 1.0</MenuItem>
-                <MenuItem value="Uniques 2.0">Uniques 2.0</MenuItem>
-                <MenuItem value="Uniques 3.0">Uniques 3.0</MenuItem>
-                <MenuItem value="Uniques 4.0">Uniques 4.0</MenuItem>
-                <MenuItem value="Uniques 5.0">Uniques 5.0</MenuItem>
-                <MenuItem value="Uniques 6.0">Uniques 6.0</MenuItem>
-              </Select>
-            </FormControl>
+                <TextField
+                  label="Frameworks & Technologies (comma-separated)"
+                  fullWidth
+                  size="small"
+                  value={formData.skillsTechnologies}
+                  onChange={(e) => setFormData({ ...formData, skillsTechnologies: e.target.value })}
+                  placeholder="e.g. React.js, Next.js, Node.js, Express, MongoDB, Tailwind CSS"
+                />
 
-            <TextField
-              label="Summary Quote"
-              fullWidth
-              size="small"
-              multiline
-              rows={3}
-              value={formData.summary}
-              onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
-              placeholder="A versatile Full Stack Developer with expertise in..."
-            />
+                <TextField
+                  label="Developer Tools, Platforms & DevOps (comma-separated)"
+                  fullWidth
+                  size="small"
+                  value={formData.skillsTools}
+                  onChange={(e) => setFormData({ ...formData, skillsTools: e.target.value })}
+                  placeholder="e.g. Git, Docker, Kubernetes, AWS, Postman, Figma"
+                />
+              </Box>
+            )}
 
-            <TextField
-              label="Key Skills (comma-separated)"
-              fullWidth
-              size="small"
-              value={formData.skills}
-              onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
-              placeholder="React.js, Node.js, MongoDB, AWS"
-            />
+            {/* TAB 2: TIMELINE MILESTONES */}
+            {formTab === 2 && (
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <Box>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                      Yearly Growth Milestones
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Document key milestones from first joining The Uniques through placements.
+                    </Typography>
+                  </Box>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    startIcon={<AddIcon />}
+                    onClick={handleAddTimelineItem}
+                    sx={{
+                      borderRadius: "8px",
+                      textTransform: "none",
+                      fontWeight: 600,
+                      borderColor: "#ca0019",
+                      color: "#ca0019",
+                    }}
+                  >
+                    Add Milestone
+                  </Button>
+                </Box>
 
-            <TextField
-              label="Avatar Image URL"
-              fullWidth
-              size="small"
-              value={formData.image}
-              onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-              placeholder="https://..."
-            />
+                {formData.timeline.length === 0 ? (
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 3,
+                      textAlign: "center",
+                      borderRadius: "12px",
+                      border: "1px dashed",
+                      borderColor: "divider",
+                    }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      No milestones recorded. Click <strong>Add Milestone</strong> to add yearly accomplishments.
+                    </Typography>
+                  </Paper>
+                ) : (
+                  formData.timeline.map((item, index) => (
+                    <Paper
+                      key={index}
+                      elevation={0}
+                      sx={{
+                        p: 2,
+                        borderRadius: "12px",
+                        border: "1px solid",
+                        borderColor: "divider",
+                        bgcolor: isDarkMode ? "rgba(255,255,255,0.02)" : "#f8fafc",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 1.5,
+                      }}
+                    >
+                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <TextField
+                          label="Year"
+                          type="number"
+                          size="small"
+                          sx={{ width: 140 }}
+                          value={item.year}
+                          onChange={(e) => handleUpdateTimelineItem(index, "year", e.target.value)}
+                        />
+                        <IconButton
+                          size="small"
+                          color="error"
+                          onClick={() => handleRemoveTimelineItem(index)}
+                          title="Remove milestone"
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                      <TextField
+                        label="Achievements & Highlights (one per line)"
+                        fullWidth
+                        size="small"
+                        multiline
+                        rows={2}
+                        value={item.achievements}
+                        onChange={(e) => handleUpdateTimelineItem(index, "achievements", e.target.value)}
+                        placeholder="Joined The Uniques Community&#10;Built first full-stack web application&#10;Won regional hackathon"
+                      />
+                    </Paper>
+                  ))
+                )}
+              </Box>
+            )}
+
+            {/* TAB 3: EXPERIENCE & PROJECTS */}
+            {formTab === 3 && (
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                {/* Work Experience */}
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                      Work & Internship Experience
+                    </Typography>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      startIcon={<AddIcon />}
+                      onClick={handleAddExperienceItem}
+                      sx={{
+                        borderRadius: "8px",
+                        textTransform: "none",
+                        fontWeight: 600,
+                        borderColor: "#ca0019",
+                        color: "#ca0019",
+                      }}
+                    >
+                      Add Experience
+                    </Button>
+                  </Box>
+
+                  {formData.experience.length === 0 ? (
+                    <Typography variant="caption" color="text.secondary" sx={{ fontStyle: "italic" }}>
+                      No work experience added yet.
+                    </Typography>
+                  ) : (
+                    formData.experience.map((exp, index) => (
+                      <Paper
+                        key={index}
+                        elevation={0}
+                        sx={{
+                          p: 2,
+                          borderRadius: "12px",
+                          border: "1px solid",
+                          borderColor: "divider",
+                          bgcolor: isDarkMode ? "rgba(255,255,255,0.02)" : "#f8fafc",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 1.5,
+                        }}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <Typography variant="caption" sx={{ fontWeight: 700, color: "text.secondary" }}>
+                            Experience #{index + 1}
+                          </Typography>
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => handleRemoveExperienceItem(index)}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                        <Grid container spacing={2}>
+                          <Grid item xs={12} sm={6}>
+                            <TextField
+                              label="Company"
+                              fullWidth
+                              size="small"
+                              value={exp.company}
+                              onChange={(e) => handleUpdateExperienceItem(index, "company", e.target.value)}
+                              placeholder="e.g. Microsoft"
+                            />
+                          </Grid>
+                          <Grid item xs={12} sm={6}>
+                            <TextField
+                              label="Role"
+                              fullWidth
+                              size="small"
+                              value={exp.role}
+                              onChange={(e) => handleUpdateExperienceItem(index, "role", e.target.value)}
+                              placeholder="e.g. SDE Intern"
+                            />
+                          </Grid>
+                          <Grid item xs={12} sm={6}>
+                            <TextField
+                              label="Duration"
+                              fullWidth
+                              size="small"
+                              value={exp.duration}
+                              onChange={(e) => handleUpdateExperienceItem(index, "duration", e.target.value)}
+                              placeholder="e.g. Jan 2024 - Present"
+                            />
+                          </Grid>
+                          <Grid item xs={12} sm={6}>
+                            <TextField
+                              label="Location"
+                              fullWidth
+                              size="small"
+                              value={exp.location}
+                              onChange={(e) => handleUpdateExperienceItem(index, "location", e.target.value)}
+                              placeholder="e.g. Hyderabad, India"
+                            />
+                          </Grid>
+                        </Grid>
+                        <TextField
+                          label="Key Responsibilities (one per line)"
+                          fullWidth
+                          size="small"
+                          multiline
+                          rows={2}
+                          value={exp.responsibilities}
+                          onChange={(e) => handleUpdateExperienceItem(index, "responsibilities", e.target.value)}
+                          placeholder="Architected backend APIs&#10;Reduced query latency by 35%"
+                        />
+                      </Paper>
+                    ))
+                  )}
+                </Box>
+
+                <Divider />
+
+                {/* Key Projects */}
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                      Featured Portfolio Projects
+                    </Typography>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      startIcon={<AddIcon />}
+                      onClick={handleAddProjectItem}
+                      sx={{
+                        borderRadius: "8px",
+                        textTransform: "none",
+                        fontWeight: 600,
+                        borderColor: "#ca0019",
+                        color: "#ca0019",
+                      }}
+                    >
+                      Add Project
+                    </Button>
+                  </Box>
+
+                  {formData.projects.length === 0 ? (
+                    <Typography variant="caption" color="text.secondary" sx={{ fontStyle: "italic" }}>
+                      No projects added yet.
+                    </Typography>
+                  ) : (
+                    formData.projects.map((proj, index) => (
+                      <Paper
+                        key={index}
+                        elevation={0}
+                        sx={{
+                          p: 2,
+                          borderRadius: "12px",
+                          border: "1px solid",
+                          borderColor: "divider",
+                          bgcolor: isDarkMode ? "rgba(255,255,255,0.02)" : "#f8fafc",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 1.5,
+                        }}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <Typography variant="caption" sx={{ fontWeight: 700, color: "text.secondary" }}>
+                            Project #{index + 1}
+                          </Typography>
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => handleRemoveProjectItem(index)}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                        <Grid container spacing={2}>
+                          <Grid item xs={12} sm={6}>
+                            <TextField
+                              label="Project Name"
+                              fullWidth
+                              size="small"
+                              value={proj.name}
+                              onChange={(e) => handleUpdateProjectItem(index, "name", e.target.value)}
+                              placeholder="e.g. Uniques Portal"
+                            />
+                          </Grid>
+                          <Grid item xs={12} sm={6}>
+                            <TextField
+                              label="Technologies"
+                              fullWidth
+                              size="small"
+                              value={proj.technologies}
+                              onChange={(e) => handleUpdateProjectItem(index, "technologies", e.target.value)}
+                              placeholder="e.g. React, Node.js, MongoDB"
+                            />
+                          </Grid>
+                          <Grid item xs={12} sm={6}>
+                            <TextField
+                              label="Date / Period"
+                              fullWidth
+                              size="small"
+                              value={proj.date}
+                              onChange={(e) => handleUpdateProjectItem(index, "date", e.target.value)}
+                              placeholder="e.g. 2023"
+                            />
+                          </Grid>
+                          <Grid item xs={12} sm={6}>
+                            <TextField
+                              label="Live / Demo URL"
+                              fullWidth
+                              size="small"
+                              value={proj.projectUrl}
+                              onChange={(e) => handleUpdateProjectItem(index, "projectUrl", e.target.value)}
+                              placeholder="https://..."
+                            />
+                          </Grid>
+                        </Grid>
+                        <TextField
+                          label="Project Description"
+                          fullWidth
+                          size="small"
+                          multiline
+                          rows={2}
+                          value={proj.description}
+                          onChange={(e) => handleUpdateProjectItem(index, "description", e.target.value)}
+                          placeholder="Brief description of architecture and features..."
+                        />
+                      </Paper>
+                    ))
+                  )}
+                </Box>
+              </Box>
+            )}
           </DialogContent>
-          <DialogActions sx={{ p: 2 }}>
+
+          <DialogActions sx={{ p: 2, px: 3, justifyContent: "space-between" }}>
             <Button
               onClick={() => setStoryFormOpen(false)}
               variant="outlined"
+              disabled={isSaving}
               sx={{ borderRadius: "8px", textTransform: "none", fontWeight: 600 }}
             >
               Cancel
@@ -2516,6 +3447,8 @@ export default function SuccessStoriesView() {
             <Button
               onClick={handleSaveStoryForm}
               variant="contained"
+              disabled={isSaving}
+              startIcon={isSaving ? <CircularProgress size={16} color="inherit" /> : null}
               sx={{
                 borderRadius: "8px",
                 textTransform: "none",
@@ -2524,7 +3457,7 @@ export default function SuccessStoriesView() {
                 "&:hover": { bgcolor: "#a30014" },
               }}
             >
-              {editingStory ? "Save Changes" : "Create Story"}
+              {isSaving ? "Saving..." : editingStory ? "Save Changes" : "Create Story"}
             </Button>
           </DialogActions>
         </Dialog>
@@ -2551,6 +3484,7 @@ export default function SuccessStoriesView() {
               onClick={() => setDeleteDialogOpen(false)}
               variant="outlined"
               size="small"
+              disabled={isDeleting}
               sx={{ borderRadius: "8px", textTransform: "none" }}
             >
               Cancel
@@ -2560,9 +3494,11 @@ export default function SuccessStoriesView() {
               variant="contained"
               color="error"
               size="small"
+              disabled={isDeleting}
+              startIcon={isDeleting ? <CircularProgress size={14} color="inherit" /> : null}
               sx={{ borderRadius: "8px", textTransform: "none", fontWeight: 700 }}
             >
-              Delete
+              {isDeleting ? "Deleting..." : "Delete"}
             </Button>
           </DialogActions>
         </Dialog>

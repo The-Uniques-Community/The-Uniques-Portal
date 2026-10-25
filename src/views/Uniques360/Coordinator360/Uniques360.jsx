@@ -28,6 +28,7 @@ import ProgressIcon from '@mui/icons-material/TrendingUp';
 import CompleteIcon from '@mui/icons-material/CheckCircleOutline';
 
 import axios from "axios";
+import { useBatches } from "@/hooks/useBatches";
 import { BASE_URL } from "@/config";
 import { toast } from "react-toastify";
 import { useThemeContext } from "@/theme/ThemeProvider";
@@ -80,14 +81,7 @@ const Uniques360Coordinator = () => {
   const [editOpen, setEditOpen] = useState(false);
   const [teamOpen, setTeamOpen] = useState(false);
 
-  const batches = [
-    "The Uniques 1.0",
-    "The Uniques 2.0",
-    "The Uniques 3.0",
-    "The Uniques 4.0",
-    "The Uniques 5.0",
-    "The Uniques 6.0",
-  ];
+  const { batches } = useBatches();
 
   const { isDarkMode } = useThemeContext();
 

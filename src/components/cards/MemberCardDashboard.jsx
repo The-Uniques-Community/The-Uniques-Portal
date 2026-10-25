@@ -73,9 +73,21 @@ export const MemberCardDashboard = ({
   const [open, setOpen] = useState(false);
 
   const handleClose = () => setOpen(false);
-  const getProxyImageUrl = (fileId) => {
-    if (!fileId) return "/placeholder.svg"; // Fallback image
-    return `${BASE_URL}/api/image-proxy/${fileId}`;
+  const getProxyImageUrl = (fileIdOrPic) => {
+    if (!fileIdOrPic) return null;
+    if (typeof fileIdOrPic === "object") {
+      if (fileIdOrPic.fileId && !fileIdOrPic.fileId.startsWith("http") && !fileIdOrPic.fileId.startsWith("data:")) {
+        return `${BASE_URL}/api/image-proxy/${fileIdOrPic.fileId}`;
+      }
+      return fileIdOrPic.fileUrl || fileIdOrPic.url || null;
+    }
+    if (typeof fileIdOrPic === "string" && fileIdOrPic.trim()) {
+      const trimmed = fileIdOrPic.trim();
+      return trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("data:")
+        ? trimmed
+        : `${BASE_URL}/api/image-proxy/${trimmed}`;
+    }
+    return null;
   };
 
   if (!currentUser) return null;
@@ -145,12 +157,13 @@ export const MemberCardDashboard = ({
             {/* User Details */}
             <div className="flex items-center gap-3">
               <Avatar
-                src={
-                  currentUser?.profilePic?.fileId
-                    ? getProxyImageUrl(currentUser.profilePic.fileId)
-                    : userIcon
-                }
+                src={getProxyImageUrl(currentUser?.profilePic) || userIcon}
                 alt={currentUser.fullName || "Member"}
+                imgProps={{
+                  onError: (e) => {
+                    e.currentTarget.src = userIcon;
+                  },
+                }}
                 sx={{ 
                   width: 64, 
                   height: 64, 
@@ -162,7 +175,9 @@ export const MemberCardDashboard = ({
                     transform: 'scale(1.05)'
                   }
                 }}
-              />
+              >
+                {currentUser.fullName ? currentUser.fullName.charAt(0).toUpperCase() : "M"}
+              </Avatar>
               <div>
                 <h2 style={{ color: theme.palette.text.primary }} className="text-lg font-semibold">{currentUser.fullName || "Unnamed Member"}</h2>
                 <p style={{ color: theme.palette.text.secondary }} className="text-sm">

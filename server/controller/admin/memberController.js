@@ -429,22 +429,14 @@ export const getMembersByBatch = async (req, res) => {
   try {
     const { batch } = req.params;
 
-    const validBatches = [
-      "The Uniques 1.0",
-      "The Uniques 2.0",
-      "The Uniques 3.0",
-      "The Uniques 4.0",
-      "The Uniques 5.0",
-      "The Uniques 6.0",
-    ];
-    if (!validBatches.includes(batch)) {
+    if (!batch || typeof batch !== 'string' || !batch.trim()) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid batch'
+        message: 'Batch name is required'
       });
     }
 
-    const members = await Member.find({ batch })
+    const members = await Member.find({ batch: batch.trim() })
       .select('-password');
 
     return res.status(200).json({
@@ -614,28 +606,34 @@ export const getMembersWithPendingSupplementary = async (req, res) => {
  */
 export const getAdminMemberCounts = async (req, res) => {
   try {
-    const [total, batch1, batch2, batch3, batch4, batch5, batch6, blocked] = await Promise.all([
+    const [total, blocked, batchAgg] = await Promise.all([
       Member.countDocuments(),
-      Member.countDocuments({ batch: "The Uniques 1.0" }),
-      Member.countDocuments({ batch: "The Uniques 2.0" }),
-      Member.countDocuments({ batch: "The Uniques 3.0" }),
-      Member.countDocuments({ batch: "The Uniques 4.0" }),
-      Member.countDocuments({ batch: "The Uniques 5.0" }),
-      Member.countDocuments({ batch: "The Uniques 6.0" }),
       Member.countDocuments({ isSuspended: true }),
+      Member.aggregate([
+        { $match: { batch: { $exists: true, $ne: "" } } },
+        { $group: { _id: "$batch", count: { $sum: 1 } } },
+      ]),
     ]);
+
+    const byBatch = {};
+    batchAgg.forEach((item) => {
+      if (item._id) {
+        byBatch[item._id] = item.count;
+      }
+    });
 
     return res.status(200).json({
       success: true,
       message: "Admin member counts retrieved successfully",
       data: {
         all: total,
-        batch1,
-        batch2,
-        batch3,
-        batch4,
-        batch5,
-        batch6,
+        batch1: byBatch["The Uniques 1.0"] || 0,
+        batch2: byBatch["The Uniques 2.0"] || 0,
+        batch3: byBatch["The Uniques 3.0"] || 0,
+        batch4: byBatch["The Uniques 4.0"] || 0,
+        batch5: byBatch["The Uniques 5.0"] || 0,
+        batch6: byBatch["The Uniques 6.0"] || 0,
+        byBatch,
         blocked,
       },
     });

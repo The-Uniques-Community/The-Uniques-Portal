@@ -1,8 +1,8 @@
 /**
  * @file batchModel.js
- * @description Mongoose schemas and models for community batch profiles and batch nomenclature.
- * @architecture Defines cohort metadata, display banners, and registered batch identifiers used throughout community filters.
- * @agent_note Exports two models: BatchProfile (cohort details/imagery) and BatchName (unique registered batch tags).
+ * @description Canonical Mongoose schema and model for community batch cohorts.
+ * @architecture Defines cohort metadata, display banners, labels, and registered batch identifiers.
+ * @agent_note Unified Single-Source-of-Truth model replacing the previously redundant BatchName collection.
  */
 
 import mongoose from "mongoose";
@@ -10,36 +10,44 @@ import mongoose from "mongoose";
 /**
  * Mongoose schema definition for batch cohort profiles and showcase metadata.
  */
-const batchProfileSchema = new mongoose.Schema(
+const batchSchema = new mongoose.Schema(
   {
     id: { type: String, required: true, unique: true },
-    label: { type: String, required: true },
-    title: { type: String, required: true },
+    label: { type: String, required: true, trim: true },
+    title: { type: String, required: true, trim: true },
     description: { type: String, default: "" },
     image: { type: String, default: "" },
     customImage: { type: Boolean, default: false },
   },
-  { timestamps: true }
-);
-
-/**
- * Mongoose schema definition for unique registered batch names.
- */
-const batchNameSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, unique: true, trim: true },
-  },
-  { timestamps: true }
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
 
+// Virtual property for backward compatibility with code expecting `b.name`
+batchSchema.virtual("name").get(function () {
+  return this.title || (this.label ? `The ${this.label}` : "");
+});
+
 /**
+ * Canonical Batch model (maps to 'batchprofiles' collection to preserve existing data)
+ * @module Batch
+ */
+export const Batch =
+  mongoose.models.BatchProfile || mongoose.model("BatchProfile", batchSchema);
+
+/**
+ * Export BatchProfile for existing imports
  * @module BatchProfile
  */
-export const BatchProfile =
-  mongoose.models.BatchProfile || mongoose.model("BatchProfile", batchProfileSchema);
+export const BatchProfile = Batch;
 
 /**
+ * Export BatchName as an alias to Batch for complete backward compatibility
  * @module BatchName
  */
-export const BatchName =
-  mongoose.models.BatchName || mongoose.model("BatchName", batchNameSchema);
+export const BatchName = Batch;
+
+export default Batch;

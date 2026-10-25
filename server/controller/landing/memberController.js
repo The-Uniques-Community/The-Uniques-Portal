@@ -6,6 +6,7 @@
  */
 import mongoose from "mongoose";
 import Member from "../../models/member/memberModel.js";
+import { BatchProfile } from "../../models/community/batchModel.js";
 import Enquiry from "../../models/Enquiry/enquiryModel.js";
 import sendContactEmail from "../../services/members/sendContactEmail.js";
 
@@ -191,30 +192,69 @@ export const getPublicMemberById = async (req, res) => {
  * @returns {Object} 200 - Object mapping batch names to active member counts
  * @returns {Object} 500 - Server error
  */
+const formatCanonicalBatchName = (b) => {
+  if (!b) return "";
+  if (typeof b === "string") {
+    let clean = b.replace(/\s*batch\s*/i, " ").trim();
+    if (!clean.toLowerCase().startsWith("the uniques") && !clean.toLowerCase().startsWith("uniques")) {
+      return `The Uniques ${clean}`;
+    }
+    if (clean.toLowerCase().startsWith("uniques")) {
+      return `The ${clean}`;
+    }
+    return clean;
+  }
+  if (b.label) {
+    const clean = b.label.trim();
+    if (clean.toLowerCase().startsWith("the uniques")) return clean;
+    if (clean.toLowerCase().startsWith("uniques")) return `The ${clean}`;
+    return `The Uniques ${clean}`;
+  }
+  if (b.title) {
+    return b.title.replace(/\s*batch\s*/i, " ").trim();
+  }
+  return b.id || b.name || "";
+};
+
 // Add this method to get member counts by batch
 export const getMemberCounts = async (req, res) => {
     try {
       const baseFilter = { isSuspended: { $ne: true } };
-      const totalCount = await Member.countDocuments(baseFilter);
-
-      const batchAgg = await Member.aggregate([
-        { $match: baseFilter },
-        { $group: { _id: "$batch", count: { $sum: 1 } } }
+      const [totalCount, allBatchDocs, batchAgg] = await Promise.all([
+        Member.countDocuments(baseFilter),
+        BatchProfile.find().lean().catch(() => []),
+        Member.aggregate([
+          { $match: baseFilter },
+          { $group: { _id: "$batch", count: { $sum: 1 } } }
+        ])
       ]);
 
       const counts = {
         "All": totalCount,
-        "The Uniques 1.0": 0,
-        "The Uniques 2.0": 0,
-        "The Uniques 3.0": 0,
-        "The Uniques 4.0": 0,
-        "The Uniques 5.0": 0,
-        "The Uniques 6.0": 0,
       };
+
+      if (allBatchDocs && allBatchDocs.length > 0) {
+        allBatchDocs.forEach((b) => {
+          const batchName = formatCanonicalBatchName(b);
+          if (batchName) counts[batchName] = 0;
+        });
+      } else {
+        [
+          "The Uniques 1.0",
+          "The Uniques 2.0",
+          "The Uniques 3.0",
+          "The Uniques 4.0",
+          "The Uniques 5.0",
+          "The Uniques 6.0",
+        ].forEach((b) => {
+          counts[b] = 0;
+        });
+      }
 
       batchAgg.forEach((item) => {
         if (item._id) {
-          counts[item._id] = item.count;
+          const canonical = formatCanonicalBatchName(item._id);
+          counts[canonical] = (counts[canonical] || 0) + item.count;
         }
       });
 

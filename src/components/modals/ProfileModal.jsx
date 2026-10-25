@@ -177,9 +177,21 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
     });
   };
 
-  const getProxyImageUrl = (fileId) => {
-    if (!fileId) return '/placeholder.svg'; // Fallback image
-    return `${BASE_URL}/api/image-proxy/${fileId}`;
+  const getProxyImageUrl = (fileIdOrPic) => {
+    if (!fileIdOrPic) return null;
+    if (typeof fileIdOrPic === "object") {
+      if (fileIdOrPic.fileId && !fileIdOrPic.fileId.startsWith("http") && !fileIdOrPic.fileId.startsWith("data:")) {
+        return `${BASE_URL}/api/image-proxy/${fileIdOrPic.fileId}`;
+      }
+      return fileIdOrPic.fileUrl || fileIdOrPic.url || null;
+    }
+    if (typeof fileIdOrPic === "string" && fileIdOrPic.trim()) {
+      const trimmed = fileIdOrPic.trim();
+      return trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("data:")
+        ? trimmed
+        : `${BASE_URL}/api/image-proxy/${trimmed}`;
+    }
+    return null;
   };
 
 
@@ -279,12 +291,11 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
                 className="w-36 h-36 overflow-hidden rounded-full relative border border-slate-200"
               >
                 <img
-                  src={
-                    user?.profilePic?.fileId
-                      ? getProxyImageUrl(user.profilePic.fileId)
-                      : userIcon
-                  }
+                  src={getProxyImageUrl(user?.profilePic) || userIcon}
                   alt="Profile"
+                  onError={(e) => {
+                    e.currentTarget.src = userIcon;
+                  }}
                   className="w-full h-full object-contain"
                 />
                 {user?.isVerified && (
