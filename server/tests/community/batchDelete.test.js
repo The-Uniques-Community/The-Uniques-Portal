@@ -6,6 +6,7 @@ import {
   getAllBatches,
   getBatchProfiles,
   addBatch,
+  saveBatchProfiles,
   deleteBatchByName,
   deleteBatchById,
 } from "../../controller/Community/batchController.js";
@@ -111,6 +112,101 @@ describe("Unified Batch Controller Tests (Single Source of Truth)", () => {
       } finally {
         Batch.findOne = originalFindOne;
         Batch.create = originalCreate;
+      }
+    });
+  });
+
+  describe("saveBatchProfiles", () => {
+    test("returns 400 when profiles payload is not an array or object", async () => {
+      const req = { body: {} };
+      const res = createMockResponse();
+      await saveBatchProfiles(req, res);
+      assert.equal(res.statusCode, 400);
+      assert.equal(res.body.success, false);
+      assert.match(res.body.message, /profiles must be an array/i);
+    });
+
+    test("successfully upserts batch profiles including large image data URLs", async () => {
+      const originalFindOneAndUpdate = Batch.findOneAndUpdate;
+      const originalFind = Batch.find;
+
+      const upserted = [];
+      Batch.findOneAndUpdate = async (filter, update) => {
+        upserted.push({ filter, update });
+        return update;
+      };
+      Batch.find = () => ({
+        sort: () => [
+          { id: "uniques-1.0", label: "Uniques 1.0", title: "The Uniques 1.0", image: "data:image/webp;base64,AAA..." },
+        ],
+      });
+
+      try {
+        const req = {
+          body: {
+            profiles: [
+              {
+                id: "uniques-1.0",
+                label: "Uniques 1.0",
+                title: "The Uniques 1.0",
+                description: "Updated description",
+                image: "data:image/webp;base64,AAA...",
+                customImage: true,
+              },
+            ],
+          },
+        };
+        const res = createMockResponse();
+        await saveBatchProfiles(req, res);
+
+        assert.equal(res.statusCode, 200);
+        assert.equal(res.body.success, true);
+        assert.equal(upserted.length, 1);
+        assert.equal(upserted[0].filter.id, "uniques-1.0");
+        assert.equal(upserted[0].update.customImage, true);
+        assert.equal(res.body.data.length, 1);
+      } finally {
+        Batch.findOneAndUpdate = originalFindOneAndUpdate;
+        Batch.find = originalFind;
+      }
+    });
+
+    test("accepts single profile in req.body.profile", async () => {
+      const originalFindOneAndUpdate = Batch.findOneAndUpdate;
+      const originalFind = Batch.find;
+
+      const upserted = [];
+      Batch.findOneAndUpdate = async (filter, update) => {
+        upserted.push({ filter, update });
+        return update;
+      };
+      Batch.find = () => ({
+        sort: () => [
+          { id: "uniques-2.0", label: "Uniques 2.0", title: "The Uniques 2.0" },
+        ],
+      });
+
+      try {
+        const req = {
+          body: {
+            profile: {
+              id: "uniques-2.0",
+              label: "Uniques 2.0",
+              title: "The Uniques 2.0",
+              description: "Single profile update",
+            },
+          },
+        };
+        const res = createMockResponse();
+        await saveBatchProfiles(req, res);
+
+        assert.equal(res.statusCode, 200);
+        assert.equal(res.body.success, true);
+        assert.equal(upserted.length, 1);
+        assert.equal(upserted[0].filter.id, "uniques-2.0");
+      } finally {
+        Batch.findOneAndUpdate = originalFindOneAndUpdate;
+        Batch.find = originalFind;
       }
     });
   });

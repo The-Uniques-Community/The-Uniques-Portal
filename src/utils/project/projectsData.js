@@ -403,26 +403,10 @@ export const getStoredProjects = () => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_PROJECTS));
-      return INITIAL_PROJECTS.map(normalizeProject);
+      return [];
     }
     let parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
-      // Find any canonical projects missing from stored list
-      const missingCanonical = INITIAL_PROJECTS.filter(
-        (init) =>
-          !parsed.some(
-            (p) =>
-              p.title?.toLowerCase().trim() === init.title.toLowerCase().trim() ||
-              String(p.id) === String(init.id)
-          )
-      );
-
-      if (missingCanonical.length > 0) {
-        parsed = [...parsed, ...missingCanonical];
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
-      }
-
       return parsed.map((item) => {
         const initialMatch = INITIAL_PROJECTS.find(
           (init) =>
@@ -435,11 +419,10 @@ export const getStoredProjects = () => {
         });
       });
     }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_PROJECTS));
-    return INITIAL_PROJECTS.map(normalizeProject);
+    return [];
   } catch (err) {
     console.error("Error reading stored projects:", err);
-    return INITIAL_PROJECTS.map(normalizeProject);
+    return [];
   }
 };
 
@@ -634,7 +617,7 @@ export const getProjectById = (id) => {
   const match = findInList(existing);
   if (match) return match;
 
-  return findInList(INITIAL_PROJECTS.map(normalizeProject));
+  return null;
 };
 
 /**

@@ -6,56 +6,7 @@ import uniques3 from "@/assets/img/About/uniques3.webp";
 import uniques4 from "@/assets/img/About/uniques4.webp";
 import { getStoredBatches } from "./batchesData";
 
-export const DEFAULT_BATCH_PROFILES = [
-  {
-    id: "uniques-1.0",
-    label: "Uniques 1.0",
-    title: "The Uniques Batch 1.0",
-    description:
-      "The Uniques 1.0 batch is the pioneering group within The Uniques Community. These senior members have successfully completed their journey and are now placed in various esteemed organizations.\n\nThey have contributed immensely to the growth of the community and continue to mentor and inspire the upcoming batches.\n\nWith a strong foundation of innovation and leadership, Batch 1.0 has set high standards for excellence, paving the way for future cohorts to follow in their footsteps.",
-    image: uniques1,
-  },
-  {
-    id: "uniques-2.0",
-    label: "Uniques 2.0",
-    title: "The Uniques Batch 2.0",
-    description:
-      "The Uniques 2.0 batch consists of highly driven junior members who are actively enhancing their skills in modern technologies.\n\nWith a focus on collaboration and hands-on learning, they engage in real-world projects and hackathons, ensuring they are industry-ready.\n\nBatch 2.0 members benefit from mentorship programs, networking opportunities, and workshops to sharpen their expertise. They are on the path to becoming future innovators, following the footsteps of their predecessors while bringing fresh perspectives to the community.",
-    image: uniques2,
-  },
-  {
-    id: "uniques-3.0",
-    label: "Uniques 3.0",
-    title: "The Uniques Batch 3.0",
-    description:
-      "The latest addition to The Uniques Community, Batch 3.0, is a dynamic and ambitious group of individuals passionate about pushing boundaries.\n\nAs they embark on their journey, they are exposed to cutting-edge technologies, problem-solving challenges, and research-driven initiatives.\n\nWith an eagerness to learn and innovate, Batch 3.0 aims to make a lasting impact, bringing new ideas and energy to the community. They are being nurtured to be future leaders and trailblazers in their respective fields.",
-    image: uniques3,
-  },
-  {
-    id: "uniques-4.0",
-    label: "Uniques 4.0",
-    title: "The Uniques Batch 4.0",
-    description:
-      "The Uniques 4.0 batch is the newest cohort carrying forward the legacy of innovation. They are actively engaged in advanced skills training across Python, Full-Stack Development, DSA, and Salesforce CRM modules.\n\nFocused on real-world implementation, Batch 4.0 is collaborating with community mentors on modern engineering challenges to prepare for elite placements.",
-    image: uniques4,
-  },
-  {
-    id: "uniques-5.0",
-    label: "Uniques 5.0",
-    title: "The Uniques Batch 5.0",
-    description:
-      "The Uniques 5.0 batch accelerates modern engineering, working across full-stack applications, distributed architectures, and AI-driven workflows.\n\nCommitted to technical excellence, Batch 5.0 is building impactful software and leading collaborative community initiatives.",
-    image: uniques4,
-  },
-  {
-    id: "uniques-6.0",
-    label: "Uniques 6.0",
-    title: "The Uniques Batch 6.0",
-    description:
-      "The Uniques 6.0 batch represents the newest cohort of ambitious builders and innovators. Embracing emerging technologies and real-world problem-solving, Batch 6.0 is carrying the community forward.",
-    image: uniques4,
-  },
-];
+export const DEFAULT_BATCH_PROFILES = [];
 
 const PROFILES_STORAGE_KEY = "tu_community_batch_profiles";
 
@@ -78,20 +29,19 @@ export const getStoredBatchProfiles = () => {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
         profiles = parsed.map((p) => {
-          const defaultMatch = DEFAULT_BATCH_PROFILES.find((d) => d.label === p.label || d.id === p.id);
           return {
             ...p,
-            image: p.customImage ? p.image : (defaultMatch ? defaultMatch.image : (p.image || uniques4)),
+            image: p.customImage ? p.image : (p.image || uniques4),
           };
         });
       }
     }
 
-    if (profiles.length === 0) {
-      profiles = [...DEFAULT_BATCH_PROFILES];
+    const memberBatches = getStoredBatches();
+    if (profiles.length === 0 && memberBatches.length === 0) {
+      return [];
     }
 
-    const memberBatches = getStoredBatches();
     memberBatches.forEach((batchName) => {
       const label = batchName.replace(/^The\s+/i, "");
       const exists = profiles.some(
@@ -115,7 +65,7 @@ export const getStoredBatchProfiles = () => {
     return sortProfilesNaturally(validProfiles);
   } catch (err) {
     console.error("Error reading stored batch profiles:", err);
-    return [...DEFAULT_BATCH_PROFILES];
+    return [];
   }
 };
 
@@ -124,10 +74,9 @@ export const fetchBatchProfiles = async () => {
     const response = await apiClient.get(`${BASE_URL}/api/batches/profiles`);
     if (response.data && response.data.success && Array.isArray(response.data.data)) {
       const remoteProfiles = response.data.data.map((p) => {
-        const defaultMatch = DEFAULT_BATCH_PROFILES.find((d) => d.label === p.label || d.id === p.id);
         return {
           ...p,
-          image: p.customImage ? p.image : (defaultMatch ? defaultMatch.image : (p.image || uniques4)),
+          image: p.customImage ? p.image : (p.image || uniques4),
         };
       });
       const validProfiles = remoteProfiles.filter(
@@ -144,13 +93,34 @@ export const fetchBatchProfiles = async () => {
   return getStoredBatchProfiles();
 };
 
+/**
+ * Uploads a cohort batch profile picture to Google Drive via backend multipart endpoint.
+ * Returns { fileId, fileUrl, fileName, proxyUrl } so only the 40-byte URL is stored in database.
+ * @param {File} file - Image file to upload
+ * @param {string} [batchName] - Name of the cohort batch
+ * @param {string} [batchId] - Optional existing batch ID to link directly
+ * @returns {Promise<{fileId: string, fileUrl: string, fileName: string, proxyUrl: string}>}
+ */
+export const uploadBatchImage = async (file, batchName = "General Batches", batchId = null) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("batch", batchName);
+  formData.append("batchName", batchName);
+  if (batchId) formData.append("batchId", batchId);
+
+  const response = await apiClient.post(`${BASE_URL}/upload/batch_file_upload`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data?.file;
+};
+
 export const saveStoredBatchProfiles = async (profiles) => {
   try {
     const toSave = profiles.map((p) => {
       const isCustom = Boolean(
         p.image &&
         (typeof p.image === "string") &&
-        (p.image.startsWith("data:") || p.image.startsWith("http://") || p.image.startsWith("https://") || p.image.startsWith("blob:"))
+        (p.image.startsWith("data:") || p.image.startsWith("http://") || p.image.startsWith("https://") || p.image.startsWith("/api/"))
       );
       return {
         id: p.id,
@@ -164,7 +134,10 @@ export const saveStoredBatchProfiles = async (profiles) => {
 
     localStorage.setItem(PROFILES_STORAGE_KEY, JSON.stringify(toSave));
     window.dispatchEvent(new CustomEvent("batch-profiles-updated", { detail: profiles }));
-    await apiClient.post(`${BASE_URL}/api/batches/profiles/update`, { profiles: toSave });
+    const response = await apiClient.post(`${BASE_URL}/api/batches/profiles/update`, { profiles: toSave });
+    if (response?.data?.data && Array.isArray(response.data.data)) {
+      localStorage.setItem(PROFILES_STORAGE_KEY, JSON.stringify(response.data.data));
+    }
     return true;
   } catch (err) {
     console.error("Error saving batch profiles:", err);
@@ -186,8 +159,42 @@ export const updateSingleBatchProfile = async (updatedProfile) => {
     updatedList = [...current, updatedProfile];
   }
 
-  await saveStoredBatchProfiles(updatedList);
-  return updatedList;
+  // Update local cache immediately for zero-latency UI
+  localStorage.setItem(PROFILES_STORAGE_KEY, JSON.stringify(updatedList));
+  window.dispatchEvent(new CustomEvent("batch-profiles-updated", { detail: updatedList }));
+
+  // Send ONLY the single modified profile to backend (< 1 KB payload!)
+  try {
+    const isCustom = Boolean(
+      updatedProfile.image &&
+      (typeof updatedProfile.image === "string") &&
+      (updatedProfile.image.startsWith("data:") ||
+        updatedProfile.image.startsWith("http://") ||
+        updatedProfile.image.startsWith("https://") ||
+        updatedProfile.image.startsWith("/api/"))
+    );
+
+    const singlePayload = {
+      id: updatedProfile.id,
+      label: updatedProfile.label,
+      title: updatedProfile.title,
+      description: updatedProfile.description,
+      image: isCustom ? updatedProfile.image : "",
+      customImage: isCustom,
+    };
+
+    const response = await apiClient.post(`${BASE_URL}/api/batches/profiles/update`, {
+      profile: singlePayload,
+    });
+
+    if (response?.data?.data && Array.isArray(response.data.data)) {
+      localStorage.setItem(PROFILES_STORAGE_KEY, JSON.stringify(response.data.data));
+    }
+    return true;
+  } catch (err) {
+    console.error("Error saving single batch profile:", err);
+    return false;
+  }
 };
 
 export const deleteStoredBatchProfile = async (identifier) => {
@@ -221,11 +228,11 @@ export const resetStoredBatchProfiles = () => {
   try {
     localStorage.removeItem(PROFILES_STORAGE_KEY);
     window.dispatchEvent(
-      new CustomEvent("batch-profiles-updated", { detail: DEFAULT_BATCH_PROFILES })
+      new CustomEvent("batch-profiles-updated", { detail: [] })
     );
-    return DEFAULT_BATCH_PROFILES;
+    return [];
   } catch (err) {
     console.error("Error resetting batch profiles:", err);
-    return DEFAULT_BATCH_PROFILES;
+    return [];
   }
 };

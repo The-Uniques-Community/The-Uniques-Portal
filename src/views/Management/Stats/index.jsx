@@ -32,12 +32,7 @@ import {
 
 const StatsManagement = () => {
   const theme = useTheme();
-  const [stats, setStats] = useState({
-    Earnings: 860000,
-    Clients: 100,
-    Projects: 150,
-    Events: 40,
-  });
+  const [stats, setStats] = useState(() => getStoredStats());
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 

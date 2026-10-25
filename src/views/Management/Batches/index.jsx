@@ -35,7 +35,8 @@ import {
   saveStoredBatchProfiles,
   resetStoredBatchProfiles,
   deleteStoredBatchProfile,
-  DEFAULT_BATCH_PROFILES,
+  updateSingleBatchProfile,
+  uploadBatchImage,
 } from "@/utils/batch/batchProfilesData";
 import { addStoredBatch, fetchBatches, deleteStoredBatch } from "@/utils/batch/batchesData";
 import {
@@ -45,8 +46,8 @@ import {
 } from "@/utils/fileValidation";
 
 // Fast client-side image optimizer to prevent localStorage quota issues and speed up rendering
-const optimizeImageForStorage = (file, maxWidth = 1200, quality = 0.85) => {
-  return new Promise((resolve) => {
+const optimizeImageForStorage = (file, maxWidth = 1000, quality = 0.75) => {
+  return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = new Image();
@@ -66,13 +67,17 @@ const optimizeImageForStorage = (file, maxWidth = 1200, quality = 0.85) => {
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, width, height);
 
-        const dataUrl = canvas.toDataURL("image/jpeg", quality);
+        // Try webp first for minimal payload, falling back to jpeg
+        let dataUrl = canvas.toDataURL("image/webp", quality);
+        if (!dataUrl.startsWith("data:image/webp")) {
+          dataUrl = canvas.toDataURL("image/jpeg", quality);
+        }
         resolve(dataUrl);
       };
-      img.onerror = () => resolve(e.target.result);
+      img.onerror = () => reject(new Error("Unable to parse image data"));
       img.src = e.target.result;
     };
-    reader.onerror = () => resolve(null);
+    reader.onerror = () => reject(new Error("Failed to read image file"));
     reader.readAsDataURL(file);
   });
 };
@@ -88,6 +93,7 @@ const CoordinatorBatches = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
 
   // Notification state
   const [snackbar, setSnackbar] = useState({
@@ -103,6 +109,7 @@ const CoordinatorBatches = () => {
   // Delete batch modal state
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Load profiles from backend with local cache fallback and live update subscription
   useEffect(() => {
@@ -111,7 +118,7 @@ const CoordinatorBatches = () => {
       try {
         await fetchBatches();
         const loaded = await fetchBatchProfiles();
-        if (isMounted && Array.isArray(loaded) && loaded.length > 0) {
+        if (isMounted && Array.isArray(loaded)) {
           setProfiles(loaded);
         }
       } catch (err) {
@@ -121,7 +128,7 @@ const CoordinatorBatches = () => {
     loadData();
 
     const handleProfilesUpdate = (e) => {
-      if (Array.isArray(e.detail) && e.detail.length > 0) {
+      if (Array.isArray(e.detail)) {
         setProfiles(e.detail);
       }
     };
@@ -134,12 +141,25 @@ const CoordinatorBatches = () => {
   }, []);
 
   useEffect(() => {
+    if (selectedIndex >= profiles.length && profiles.length > 0) {
+      setSelectedIndex(0);
+    }
+  }, [profiles.length, selectedIndex]);
+
+  useEffect(() => {
     if (profiles.length > 0 && profiles[selectedIndex]) {
       const current = profiles[selectedIndex];
       setLabel(current.label || "");
       setTitle(current.title || "");
       setDescription(current.description || "");
       setImage(current.image || "");
+      setSelectedFile(null);
+    } else {
+      setLabel("");
+      setTitle("");
+      setDescription("");
+      setImage("");
+      setSelectedFile(null);
     }
   }, [selectedIndex, profiles]);
 
@@ -147,8 +167,8 @@ const CoordinatorBatches = () => {
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [imageUrlValue, setImageUrlValue] = useState("");
 
-  // Process and optimize any selected image file (from input, drag-and-drop, or paste)
-  const processSelectedFile = async (file) => {
+  // Process selected image file with instant local object URL preview
+  const processSelectedFile = (file) => {
     if (!file) return;
 
     if (!validateFile(file, FILE_VALIDATION_PRESETS.AVATAR, { inputTarget: fileInputRef })) {
@@ -156,28 +176,21 @@ const CoordinatorBatches = () => {
     }
 
     try {
-      const optimizedUrl = await optimizeImageForStorage(file);
-      if (optimizedUrl) {
-        setImage(optimizedUrl);
-        setSnackbar({
-          open: true,
-          message: "Photo loaded successfully! Click 'Save Changes' to update the batch.",
-          severity: "success",
-        });
-      }
+      setSelectedFile(file);
+      const localPreview = URL.createObjectURL(file);
+      setImage(localPreview);
+      setSnackbar({
+        open: true,
+        message: "Photo selected! Click 'Save Changes' to upload to cloud storage and update the batch.",
+        severity: "info",
+      });
     } catch (err) {
-      console.error("Error reading photo:", err);
-      // Fallback: direct FileReader
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImage(e.target.result);
-        setSnackbar({
-          open: true,
-          message: "Photo loaded! Click 'Save Changes' to update the batch.",
-          severity: "info",
-        });
-      };
-      reader.readAsDataURL(file);
+      console.error("Error setting image preview:", err);
+      setSnackbar({
+        open: true,
+        message: "Failed to read image file. Please select a valid JPG, PNG, or WEBP under 5MB.",
+        severity: "error",
+      });
     }
   };
 
@@ -236,6 +249,7 @@ const CoordinatorBatches = () => {
   const handleApplyUrl = () => {
     if (!imageUrlValue.trim()) return;
     setImage(imageUrlValue.trim());
+    setSelectedFile(null);
     setImageUrlValue("");
     setShowUrlInput(false);
     setSnackbar({
@@ -246,63 +260,93 @@ const CoordinatorBatches = () => {
   };
 
   // Save changes to the selected batch profile
-  const handleSave = () => {
-    if (!profiles[selectedIndex]) return;
+  const handleSave = async () => {
+    if (!profiles[selectedIndex] || isSaving) return;
 
-    const updatedProfile = {
-      ...profiles[selectedIndex],
-      label: label.trim() || profiles[selectedIndex].label,
-      title: title.trim() || profiles[selectedIndex].title,
-      description: description.trim(),
-      image: image || profiles[selectedIndex].image,
-      customImage: Boolean(
-        image &&
-        (image.startsWith("data:") ||
-          image.startsWith("http://") ||
-          image.startsWith("https://"))
-      ),
-    };
+    setIsSaving(true);
+    try {
+      let finalImageUrl = image;
 
-    const updatedList = [...profiles];
-    updatedList[selectedIndex] = updatedProfile;
+      // 1. If a new binary file was chosen, upload directly via multipart stream to cloud storage
+      if (selectedFile) {
+        try {
+          const targetName = title.trim() || profiles[selectedIndex].title || label.trim();
+          const uploadRes = await uploadBatchImage(selectedFile, targetName, profiles[selectedIndex].id);
+          if (uploadRes?.proxyUrl) {
+            finalImageUrl = uploadRes.proxyUrl;
+          }
+        } catch (uploadErr) {
+          console.warn("Cloud storage upload failed, attempting local fallback compression:", uploadErr);
+          // If cloud upload is unavailable in current environment, fallback to a tiny thumbnail (< 30KB)
+          try {
+            finalImageUrl = await optimizeImageForStorage(selectedFile, 500, 0.55);
+          } catch (optErr) {
+            setSnackbar({
+              open: true,
+              message: "Failed to upload photo: " + (uploadErr.response?.data?.message || uploadErr.message),
+              severity: "error",
+            });
+            setIsSaving(false);
+            return;
+          }
+        }
+      }
 
-    saveStoredBatchProfiles(updatedList);
-    setProfiles(updatedList);
+      const updatedProfile = {
+        ...profiles[selectedIndex],
+        label: label.trim() || profiles[selectedIndex].label,
+        title: title.trim() || profiles[selectedIndex].title,
+        description: description.trim(),
+        image: finalImageUrl || profiles[selectedIndex].image || "",
+        customImage: Boolean(finalImageUrl),
+      };
 
-    setSnackbar({
-      open: true,
-      message: `Batch "${updatedProfile.label}" updated successfully! Changes are live on the website.`,
-      severity: "success",
-    });
+      // 2. Save ONLY this single modified profile (< 1 KB payload!)
+      const success = await updateSingleBatchProfile(updatedProfile);
+      if (success) {
+        setSelectedFile(null);
+        setImage(finalImageUrl);
+        const updatedList = [...profiles];
+        updatedList[selectedIndex] = updatedProfile;
+        setProfiles(updatedList);
+        setSnackbar({
+          open: true,
+          message: `Batch "${updatedProfile.label}" updated successfully! Changes are live on the website.`,
+          severity: "success",
+        });
+      } else {
+        setSnackbar({
+          open: true,
+          message: `Failed to save batch "${updatedProfile.label}". Please check your network connection.`,
+          severity: "error",
+        });
+      }
+    } catch (err) {
+      console.error("Error saving batch:", err);
+      setSnackbar({
+        open: true,
+        message: `Failed to save batch: ${err.message || "Request failed"}`,
+        severity: "error",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  // Reset current batch or all batches to defaults
+  // Discard unsaved changes and reset current batch form to saved values
   const handleResetCurrent = () => {
-    const defaultItem = DEFAULT_BATCH_PROFILES.find(
-      (d) => d.id === profiles[selectedIndex]?.id || d.label === profiles[selectedIndex]?.label
-    );
-
-    if (defaultItem) {
-      setLabel(defaultItem.label);
-      setTitle(defaultItem.title);
-      setDescription(defaultItem.description);
-      setImage(defaultItem.image);
-
-      const updatedList = [...profiles];
-      updatedList[selectedIndex] = { ...defaultItem };
-      saveStoredBatchProfiles(updatedList);
-      setProfiles(updatedList);
+    if (profiles[selectedIndex]) {
+      const current = profiles[selectedIndex];
+      setLabel(current.label || "");
+      setTitle(current.title || "");
+      setDescription(current.description || "");
+      setImage(current.image || "");
+      setSelectedFile(null);
 
       setSnackbar({
         open: true,
-        message: `Batch "${defaultItem.label}" reset to default values.`,
+        message: `Discarded unsaved changes for batch "${current.label}".`,
         severity: "info",
-      });
-    } else {
-      setSnackbar({
-        open: true,
-        message: "No default preset found for this custom batch.",
-        severity: "warning",
       });
     }
   };
@@ -431,16 +475,23 @@ const CoordinatorBatches = () => {
               <InputLabel id="select-batch-label">Select Batch</InputLabel>
               <Select
                 labelId="select-batch-label"
-                value={selectedIndex}
+                value={profiles.length > 0 ? selectedIndex : ""}
                 label="Select Batch"
+                disabled={profiles.length === 0}
                 onChange={(e) => setSelectedIndex(Number(e.target.value))}
                 sx={{ borderRadius: "10px" }}
               >
-                {profiles.map((p, idx) => (
-                  <MenuItem key={p.id || idx} value={idx}>
-                    {p.label || `Batch ${idx + 1}`} - {p.title}
+                {profiles.length === 0 ? (
+                  <MenuItem value="" disabled>
+                    No batches available
                   </MenuItem>
-                ))}
+                ) : (
+                  profiles.map((p, idx) => (
+                    <MenuItem key={p.id || idx} value={idx}>
+                      {p.label || `Batch ${idx + 1}`} - {p.title}
+                    </MenuItem>
+                  ))
+                )}
               </Select>
             </FormControl>
           </Grid>
@@ -489,8 +540,60 @@ const CoordinatorBatches = () => {
         </Grid>
       </Card>
 
-      {/* Main Content Grid: Editor on Left, Live Preview on Right */}
-      <Grid container spacing={3}>
+      {/* Main Content Grid: Editor on Left, Live Preview on Right OR Empty State */}
+      {profiles.length === 0 ? (
+        <Card
+          sx={{
+            borderRadius: "16px",
+            p: 6,
+            textAlign: "center",
+            backgroundColor: isDarkMode ? "#1e1e1e" : "#ffffff",
+            border: isDarkMode ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0,0,0,0.08)",
+          }}
+        >
+          <Box
+            sx={{
+              width: 64,
+              height: 64,
+              mx: "auto",
+              mb: 2,
+              borderRadius: "50%",
+              backgroundColor: "rgba(202, 0, 25, 0.1)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#CA0019",
+            }}
+          >
+            <ClassIcon sx={{ fontSize: 32 }} />
+          </Box>
+          <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
+            No Batch Profiles Found
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 480, mx: "auto", mb: 3 }}>
+            There are currently no community batch profiles configured or data fetching returned no cohorts. Click below to add your first cohort batch.
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<AddCircleOutlineIcon />}
+            onClick={() => setAddModalOpen(true)}
+            sx={{
+              backgroundColor: "#CA0019",
+              borderRadius: "10px",
+              px: 3,
+              py: 1.2,
+              textTransform: "none",
+              fontWeight: 600,
+              "&:hover": {
+                backgroundColor: "#a60014",
+              },
+            }}
+          >
+            Add New Batch
+          </Button>
+        </Card>
+      ) : (
+        <Grid container spacing={3}>
         {/* Editor Form */}
         <Grid item xs={12} lg={6}>
           <Card
@@ -684,7 +787,7 @@ const CoordinatorBatches = () => {
                     onClick={handleResetCurrent}
                     sx={{ textTransform: "none", borderRadius: "10px" }}
                   >
-                    Reset to Default
+                    Discard Changes
                   </Button>
 
                   <Button
@@ -713,6 +816,7 @@ const CoordinatorBatches = () => {
                   variant="contained"
                   startIcon={<SaveIcon />}
                   onClick={handleSave}
+                  disabled={isSaving}
                   sx={{
                     backgroundColor: "#CA0019",
                     color: "#fff",
@@ -721,9 +825,10 @@ const CoordinatorBatches = () => {
                     borderRadius: "10px",
                     px: 3,
                     "&:hover": { backgroundColor: "#a60014" },
+                    "&.Mui-disabled": { backgroundColor: "#e0e0e0" },
                   }}
                 >
-                  Save Changes
+                  {isSaving ? "Saving..." : "Save Changes"}
                 </Button>
               </Stack>
             </Stack>
@@ -826,6 +931,7 @@ const CoordinatorBatches = () => {
           </Card>
         </Grid>
       </Grid>
+      )}
 
       {/* Add New Batch Modal */}
       <Dialog

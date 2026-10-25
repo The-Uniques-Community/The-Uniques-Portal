@@ -2,10 +2,10 @@ import apiClient from "@/services/apiClient";
 import { BASE_URL } from "@/config";
 
 export const DEFAULT_STATS = {
-  Earnings: 860000,
-  Clients: 100,
-  Projects: 150,
-  Events: 40,
+  Earnings: 0,
+  Clients: 0,
+  Projects: 0,
+  Events: 0,
 };
 
 const STATS_STORAGE_KEY = "tu_community_stats";

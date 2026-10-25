@@ -2,14 +2,7 @@ import apiClient from "@/services/apiClient";
 import { BASE_URL } from "@/config";
 import { getMemberStatus } from "@/utils/memberStatus";
 
-export const DEFAULT_BATCHES = [
-  "The Uniques 1.0",
-  "The Uniques 2.0",
-  "The Uniques 3.0",
-  "The Uniques 4.0",
-  "The Uniques 5.0",
-  "The Uniques 6.0",
-];
+export const DEFAULT_BATCHES = [];
 
 const BATCH_STORAGE_KEY = "tu_community_member_batches";
 
@@ -26,20 +19,19 @@ export const getStoredBatches = () => {
   try {
     const raw = localStorage.getItem(BATCH_STORAGE_KEY);
     if (!raw) {
-      localStorage.setItem(BATCH_STORAGE_KEY, JSON.stringify(DEFAULT_BATCHES));
-      return [...DEFAULT_BATCHES];
+      return [];
     }
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
       const valid = parsed.filter(
         (b) => typeof b === "string" && b.trim().length > 0 && !/-\d{10,}/.test(b)
       );
-      return sortBatchesNaturally(valid.length > 0 ? Array.from(new Set(valid)) : DEFAULT_BATCHES);
+      return sortBatchesNaturally(valid.length > 0 ? Array.from(new Set(valid)) : []);
     }
-    return [...DEFAULT_BATCHES];
+    return [];
   } catch (err) {
     console.error("Error reading stored batches:", err);
-    return [...DEFAULT_BATCHES];
+    return [];
   }
 };
 
@@ -50,7 +42,7 @@ export const fetchBatches = async () => {
       const valid = response.data.data.filter(
         (b) => typeof b === "string" && b.trim().length > 0 && !/-\d{10,}/.test(b)
       );
-      const batches = sortBatchesNaturally(valid.length > 0 ? Array.from(new Set(valid)) : DEFAULT_BATCHES);
+      const batches = sortBatchesNaturally(valid.length > 0 ? Array.from(new Set(valid)) : []);
       localStorage.setItem(BATCH_STORAGE_KEY, JSON.stringify(batches));
       window.dispatchEvent(new CustomEvent("batches-updated", { detail: batches }));
       return batches;
@@ -62,7 +54,7 @@ export const fetchBatches = async () => {
 };
 
 export const suggestNextBatch = (existingBatches = getStoredBatches()) => {
-  let maxNum = 4.0;
+  let maxNum = 0.0;
   existingBatches.forEach((b) => {
     const match = String(b).match(/(\d+(\.\d+)?)/);
     if (match) {
@@ -72,7 +64,7 @@ export const suggestNextBatch = (existingBatches = getStoredBatches()) => {
       }
     }
   });
-  const nextNum = (Math.floor(maxNum) + 1).toFixed(1);
+  const nextNum = maxNum > 0 ? (Math.floor(maxNum) + 1).toFixed(1) : "1.0";
   return `The Uniques ${nextNum}`;
 };
 

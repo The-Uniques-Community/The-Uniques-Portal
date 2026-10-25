@@ -207,23 +207,26 @@ export const getBatchProfiles = async (req, res) => {
  */
 export const saveBatchProfiles = async (req, res) => {
   try {
-    const { profiles } = req.body;
-    if (!Array.isArray(profiles)) {
+    const rawProfiles = req.body?.profiles || (req.body?.profile ? [req.body.profile] : null);
+    if (!Array.isArray(rawProfiles)) {
       return res.status(400).json({ success: false, message: "Profiles must be an array" });
     }
 
-    for (const p of profiles) {
-      if (!p.id) continue;
+    for (const p of rawProfiles) {
+      if (!p || !p.id) continue;
+      const updateDoc = {
+        id: p.id,
+        label: p.label,
+        title: p.title,
+        description: p.description,
+      };
+      if (p.image !== undefined) {
+        updateDoc.image = p.image || "";
+        updateDoc.customImage = Boolean(p.customImage);
+      }
       await Batch.findOneAndUpdate(
         { id: p.id },
-        {
-          id: p.id,
-          label: p.label,
-          title: p.title,
-          description: p.description,
-          image: p.image || "",
-          customImage: Boolean(p.customImage),
-        },
+        updateDoc,
         { upsert: true, new: true }
       );
     }

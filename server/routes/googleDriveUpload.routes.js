@@ -15,6 +15,7 @@ import Event from "../models/member/eventModel.js";
 import Trainer from "../models/admin/trainerModel.js";
 import Project from "../models/projects/projectModel.js";
 import SuccessStory from "../models/community/successStoryModel.js";
+import Batch from "../models/community/batchModel.js";
 import {
   createFolder,
   findFolder,
@@ -1178,6 +1179,93 @@ router.post(
       res.status(500).json({
         success: false,
         message: "Error during story file upload.",
+        error: error.message,
+      });
+    } finally {
+      // Clean up temporary file
+      try {
+        if (tempFile && fs.existsSync(tempFile.path)) {
+          fs.unlinkSync(tempFile.path);
+        }
+      } catch (err) {
+        console.error("Error deleting temp file:", tempFile?.path, err);
+      }
+    }
+  }
+);
+
+/**
+ * POST /upload/batch_file_upload
+ * Uploads a cohort batch profile picture to Google Drive under 'The Uniques Batches' -> [Batch] -> profile
+ * Supports optional batchId / batchName to automatically update the Batch document,
+ * or returns { fileId, fileUrl, fileName, proxyUrl } for decoupled updates.
+ */
+router.post(
+  "/batch_file_upload",
+  verifyToken,
+  verifyRole(["admin", "coordinator", "superadmin", "communityadmin"]),
+  upload.single("file"),
+  async (req, res) => {
+    const tempFile = req.file;
+
+    if (!tempFile) {
+      return res.status(400).json({
+        success: false,
+        message: "No file provided for upload.",
+      });
+    }
+
+    try {
+      const { batch, batchName, batchId } = req.body;
+      const targetBatch = (batchName || batch || "General Batches").trim();
+      const mainFolderName = "The Uniques Batches";
+
+      // Provision folder structure: The Uniques Batches -> [Batch] -> profile
+      const folderStructure = await createFolderStructure(
+        mainFolderName,
+        targetBatch,
+        ["profile"]
+      );
+
+      const targetFolderId = folderStructure.subfolders["profile"].id;
+
+      // Upload file to Google Drive
+      const fileUploadResult = await uploadFile(tempFile.path, targetFolderId, {
+        category: "batch-profile",
+        customPrefix: targetBatch.substring(0, 15).replace(/[^a-zA-Z0-9-_]/g, ""),
+      });
+
+      const proxyUrl = `/api/image-proxy/${fileUploadResult.fileId}`;
+
+      // If batchId or batchName is provided, update the Batch document directly
+      if (batchId) {
+        if (mongoose.Types.ObjectId.isValid(batchId)) {
+          await Batch.findByIdAndUpdate(batchId, { image: proxyUrl, customImage: true });
+        } else {
+          await Batch.findOneAndUpdate(
+            { $or: [{ id: batchId }, { label: targetBatch }, { title: targetBatch }] },
+            { image: proxyUrl, customImage: true }
+          );
+        }
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Batch image uploaded successfully",
+        file: {
+          fileId: fileUploadResult.fileId,
+          fileUrl: fileUploadResult.fileUrl,
+          fileName: fileUploadResult.fileName,
+          proxyUrl,
+        },
+        batch: targetBatch,
+        batchId: batchId || null,
+      });
+    } catch (error) {
+      console.error("Error in batch file upload:", error);
+      res.status(500).json({
+        success: false,
+        message: "Error during batch file upload.",
         error: error.message,
       });
     } finally {

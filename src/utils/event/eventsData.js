@@ -331,32 +331,15 @@ const normalizeEvent = (evt) => ({
 
 export const getStoredEvents = () => {
   if (typeof window === "undefined") {
-    return INITIAL_EVENTS.map(normalizeEvent);
+    return [];
   }
   try {
     const raw = localStorage.getItem(EVENTS_STORAGE_KEY);
     if (!raw) {
-      localStorage.setItem(EVENTS_STORAGE_KEY, JSON.stringify(INITIAL_EVENTS));
-      return INITIAL_EVENTS.map(normalizeEvent);
+      return [];
     }
     let parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
-      // Find any canonical events missing from stored list and append
-      const missingCanonical = INITIAL_EVENTS.filter(
-        (init) =>
-          !parsed.some(
-            (e) =>
-              e.eventName?.toLowerCase().trim() === init.eventName.toLowerCase().trim() ||
-              String(e._id) === String(init._id) ||
-              String(e.id) === String(init.id)
-          )
-      );
-
-      if (missingCanonical.length > 0) {
-        parsed = [...parsed, ...missingCanonical];
-        localStorage.setItem(EVENTS_STORAGE_KEY, JSON.stringify(parsed));
-      }
-
       return parsed.map((item) => {
         const initialMatch = INITIAL_EVENTS.find(
           (init) =>
@@ -370,11 +353,10 @@ export const getStoredEvents = () => {
         });
       });
     }
-    localStorage.setItem(EVENTS_STORAGE_KEY, JSON.stringify(INITIAL_EVENTS));
-    return INITIAL_EVENTS.map(normalizeEvent);
+    return [];
   } catch (e) {
     console.error("Failed to parse stored events:", e);
-    return INITIAL_EVENTS.map(normalizeEvent);
+    return [];
   }
 };
 
@@ -418,7 +400,7 @@ export const getPaginatedStoredEvents = (params = {}) => {
 
   const page = Math.max(1, Number(params.page) || 1);
   const limit = Math.max(1, Number(params.limit) || 9);
-  const total = Math.max(44, filtered.length);
+  const total = filtered.length;
   const pages = Math.max(1, Math.ceil(filtered.length / limit));
   const startIndex = (page - 1) * limit;
   const paginatedData = filtered.slice(startIndex, startIndex + limit);
