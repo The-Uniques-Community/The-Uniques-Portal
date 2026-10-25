@@ -322,40 +322,28 @@ function DashboardLayoutAppBar() {
           position={isProjectsPage ? "static" : "fixed"}
           elevation={0}
           sx={{
-            backgroundColor: theme.palette.background.appBar,
-            boxShadow: "none !important",
-            border: "none !important",
-            borderTop: "none !important",
-            borderBottom: "none !important",
-            outline: "none !important",
+            top: isProjectsPage ? "auto" : 0,
+            marginTop: 0,
+            backgroundColor: isDarkMode
+              ? "rgba(18, 18, 18, 0.92)"
+              : "rgba(255, 255, 255, 0.92)",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            borderBottom: "1px solid",
+            borderColor: isDarkMode ? "rgba(255, 255, 255, 0.08)" : "#e2e8f0",
+            boxShadow: isDarkMode
+              ? "0 4px 20px -2px rgba(0, 0, 0, 0.5)"
+              : "0 4px 20px -2px rgba(0, 0, 0, 0.04)",
             height: "56px !important",
             zIndex: (theme) => theme.zIndex.drawer + 1,
-            left: 0,
-            width: "100%",
-            top: isProjectsPage ? "auto" : "0 !important",
-            paddingTop: "0 !important",
-            marginTop: "0 !important",
+            left: isMobile ? 0 : drawerOpen ? "272px" : "107px",
+            width: isMobile ? "100%" : `calc(100% - ${drawerOpen ? 272 : 107}px)`,
             transition: "left 0.3s, width 0.3s",
-            "&::before": { display: "none !important" },
-            "&::after": { display: "none !important" },
           }}
         >
-          <Toolbar
-            sx={{
-              minHeight: "56px !important",
-              height: "56px !important",
-              px: { xs: 1.5, sm: 2 },
-              pl: isMobile ? "12px !important" : drawerOpen ? "272px !important" : "107px !important",
-              border: "none !important",
-              borderTop: "none !important",
-              borderBottom: "none !important",
-              boxShadow: "none !important",
-              outline: "none !important",
-              transition: "padding-left 0.3s",
-            }}
-          >
+          <Toolbar sx={{ minHeight: "56px !important", px: { xs: 1.5, sm: 2 } }}>
             {isMobile && !drawerOpen && (
-              <IconButton edge="start" aria-label="menu" onClick={toggleDrawer}>
+              <IconButton edge="start" aria-label="menu" onClick={toggleDrawer} sx={{ mr: 1 }}>
                 <MenuIcon sx={{ color: theme.palette.primary.main }} />
               </IconButton>
             )}

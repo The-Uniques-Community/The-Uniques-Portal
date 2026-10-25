@@ -31,6 +31,7 @@ import {
   ProjectInsightsSkeleton,
   EventInsightsSkeleton,
   FormPageSkeleton,
+  SuccessStoriesSkeleton,
 } from "@/components/common/skeletons";
 
 // Lazy-loaded views configured with exact page skeletons
@@ -53,6 +54,7 @@ const LeaveManagement = Loader(lazy(() => import("@/views/Management/LeaveManage
 const Uniques360 = Loader(lazy(() => import("@/views/Uniques360/Coordinator360/Uniques360")), true, Coordinator360Skeleton);
 const ProjectInsights = Loader(lazy(() => import("@/views/Uniques360/Projects/ProjectInsights")), true, ProjectInsightsSkeleton);
 const EventInsights = Loader(lazy(() => import("@/views/Uniques360/Events/EventInsights")), true, EventInsightsSkeleton);
+const SuccessStories = Loader(lazy(() => import("@/views/Management/SuccessStories")), true, SuccessStoriesSkeleton);
 
 /**
  * Generates portal route configuration for a designated management role.
@@ -89,6 +91,7 @@ export const createManagementRoutes = (baseRole) => ({
     { path: "uniques360", element: <Uniques360 /> },
     { path: "project-insights", element: <ProjectInsights /> },
     { path: "event-insights", element: <EventInsights /> },
+    { path: "success-stories", element: <SuccessStories /> },
   ],
 });
 

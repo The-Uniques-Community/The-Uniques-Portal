@@ -21,8 +21,13 @@ import { toast } from "react-toastify";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import Avatar from "@mui/material/Avatar";
+import Chip from "@mui/material/Chip";
+import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
 import { useThemeContext } from "@/theme/ThemeProvider";
 import authService from "@/services/authService";
+import { useAuth } from "@/hooks/useAuth";
 
 const ConfirmationModal = lazy(() => import("@/components/modals/ConfirmationModal"));
 import logo from "@/assets/logos/theuniquesCommunity.png";
@@ -35,9 +40,10 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import SchoolIcon from "@mui/icons-material/School";
-import BarChartIcon from "@mui/icons-material/BarChart";
 import ClassIcon from "@mui/icons-material/Class";
 import PersonIcon from "@mui/icons-material/Person";
+import AutoStoriesIcon from "@mui/icons-material/AutoStories";
+import BarChartIcon from "@mui/icons-material/BarChart";
 
 // Navigation items with paths relative to the active management portal (/admin or /coordinator)
 const MANAGEMENT_NAVIGATION = [
@@ -45,6 +51,7 @@ const MANAGEMENT_NAVIGATION = [
   { segment: "members-overview", title: "Members", icon: <GroupIcon /> },
   { segment: "events-overview", title: "Events", icon: <EventIcon /> },
   { segment: "projects-overview", title: "Projects", icon: <AccountTreeIcon /> },
+  { segment: "success-stories", title: "Success Stories", icon: <AutoStoriesIcon /> },
   { segment: "accounts", title: "Accounts", icon: <AccountBalance /> },
   { segment: "enquiry", title: "Enquiry", icon: <AnnouncementIcon /> },
   { segment: "leave-management", title: "Leave Management", icon: <CalendarMonthIcon /> },
@@ -73,6 +80,7 @@ export default function ManagementLayout({ role: explicitRole }) {
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const { user } = useAuth();
 
   const isCoordinator = explicitRole
     ? explicitRole === "coordinator"
@@ -342,50 +350,141 @@ export default function ManagementLayout({ role: explicitRole }) {
         </List>
       </Drawer>
 
-      {/* Top Header - Seamless & borderless matching background */}
+      {/* Top Header - Glassmorphic fixed bar with user info, hidden on desktop projects page for smooth scrolling */}
       {(!isProjectsPage || isMobile) && (
         <AppBar
           position={isProjectsPage ? "static" : "fixed"}
           elevation={0}
           sx={{
-            backgroundColor: theme.palette.background.appBar,
-            boxShadow: "none !important",
-            border: "none !important",
-            borderTop: "none !important",
-            borderBottom: "none !important",
-            outline: "none !important",
+            top: isProjectsPage ? "auto" : 0,
+            marginTop: 0,
+            backgroundColor: isDarkMode
+              ? "rgba(18, 18, 18, 0.92)"
+              : "rgba(255, 255, 255, 0.92)",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            borderBottom: "1px solid",
+            borderColor: isDarkMode ? "rgba(255, 255, 255, 0.08)" : "#e2e8f0",
+            boxShadow: isDarkMode
+              ? "0 4px 20px -2px rgba(0, 0, 0, 0.5)"
+              : "0 4px 20px -2px rgba(0, 0, 0, 0.04)",
             height: "56px !important",
             zIndex: (theme) => theme.zIndex.drawer + 1,
-            left: 0,
-            width: "100%",
-            top: isProjectsPage ? "auto" : "0 !important",
-            paddingTop: "0 !important",
-            marginTop: "0 !important",
-            transition: "left 0.3s, width 0.3s",
-            "&::before": { display: "none !important" },
-            "&::after": { display: "none !important" },
+            left: isMobile ? 0 : drawerOpen ? "272px" : "107px",
+            width: isMobile ? "100%" : `calc(100% - ${drawerOpen ? 272 : 107}px)`,
+            transition: "left 0.3s ease, width 0.3s ease, background-color 0.2s ease",
           }}
         >
           <Toolbar
             sx={{
               minHeight: "56px !important",
-              height: "56px !important",
-              px: { xs: 1.5, sm: 2 },
-              pl: isMobile ? "12px !important" : drawerOpen ? "272px !important" : "107px !important",
-              border: "none !important",
-              borderTop: "none !important",
-              borderBottom: "none !important",
-              boxShadow: "none !important",
-              outline: "none !important",
-              transition: "padding-left 0.3s",
+              px: { xs: 1.5, sm: 2.5 },
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
             }}
           >
-            {isMobile && !drawerOpen && (
-              <IconButton edge="start" aria-label="menu" onClick={toggleDrawer} sx={{ mr: 1 }}>
-                <MenuIcon sx={{ color: theme.palette.primary.main }} />
-              </IconButton>
-            )}
-            {(!drawerOpen || isMobile) && !isProjectsPage && <Branding />}
+            {/* Left section: Drawer Toggle + Branding or Context */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              {isMobile && !drawerOpen && (
+                <IconButton edge="start" aria-label="menu" onClick={toggleDrawer} sx={{ mr: 0.5 }}>
+                  <MenuIcon sx={{ color: theme.palette.primary.main }} />
+                </IconButton>
+              )}
+              {(!drawerOpen || isMobile) ? (
+                <Branding />
+              ) : (
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: "0.875rem",
+                    color: isDarkMode ? "#e2e8f0" : "#1e293b",
+                    letterSpacing: "0.2px",
+                  }}
+                >
+                  {activeItem}
+                </Typography>
+              )}
+            </Box>
+
+            {/* Right section: Role Badge, Theme Toggle & User Info */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1, sm: 1.5 } }}>
+              <Chip
+                label={isCoordinator ? "Coordinator" : "Admin"}
+                size="small"
+                sx={{
+                  fontWeight: 700,
+                  fontSize: "0.72rem",
+                  height: 24,
+                  borderRadius: "6px",
+                  bgcolor: isCoordinator
+                    ? isDarkMode ? "rgba(2, 132, 199, 0.15)" : "#e0f2fe"
+                    : isDarkMode ? "rgba(202, 0, 25, 0.15)" : "#ffe4e6",
+                  color: isCoordinator
+                    ? isDarkMode ? "#38bdf8" : "#0284c7"
+                    : isDarkMode ? "#ff4d6d" : "#ca0019",
+                  border: "1px solid",
+                  borderColor: isCoordinator
+                    ? isDarkMode ? "rgba(2, 132, 199, 0.3)" : "#bae6fd"
+                    : isDarkMode ? "rgba(202, 0, 25, 0.3)" : "#fecdd3",
+                }}
+              />
+
+              <Tooltip title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}>
+                <IconButton
+                  size="small"
+                  onClick={toggleTheme}
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: "8px",
+                    color: "text.primary",
+                    border: "1px solid",
+                    borderColor: isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)",
+                    bgcolor: isDarkMode ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.02)",
+                    transition: "all 0.2s ease",
+                    "&:hover": {
+                      bgcolor: isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)",
+                    },
+                  }}
+                >
+                  {isDarkMode ? <Brightness7Icon sx={{ fontSize: 17 }} /> : <Brightness4Icon sx={{ fontSize: 17 }} />}
+                </IconButton>
+              </Tooltip>
+
+              {user && (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Avatar
+                    sx={{
+                      width: 30,
+                      height: 30,
+                      fontSize: "0.75rem",
+                      fontWeight: 700,
+                      bgcolor: isCoordinator ? "#0284c7" : "#ca0019",
+                      color: "#ffffff",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+                    }}
+                  >
+                    {(user?.name || user?.email || "U").charAt(0).toUpperCase()}
+                  </Avatar>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      display: { xs: "none", sm: "block" },
+                      fontWeight: 600,
+                      color: "text.secondary",
+                      maxWidth: 120,
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {user?.name || user?.email?.split("@")[0] || "User"}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
           </Toolbar>
         </AppBar>
       )}
