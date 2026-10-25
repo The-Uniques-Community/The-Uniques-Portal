@@ -448,6 +448,10 @@ const FineDetailsModal = ({ open, onClose, selectedFine, onPayFine, loading, onV
       fullWidth
       maxWidth="md"
       aria-labelledby="fine-details-dialog"
+      PaperProps={{
+        "data-lenis-prevent": "true",
+        sx: { maxHeight: "90vh" },
+      }}
     >
       <DialogTitle>
         <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -458,7 +462,12 @@ const FineDetailsModal = ({ open, onClose, selectedFine, onPayFine, loading, onV
         </Box>
       </DialogTitle>
 
-      <DialogContent>
+      <DialogContent
+        dividers
+        data-lenis-prevent="true"
+        onWheel={(e) => e.stopPropagation()}
+        sx={{ overflowY: "auto", p: { xs: 1.5, sm: 2.5 } }}
+      >
         {/* Summary Card */}
         <Card variant="outlined" sx={{ mb: 3 }}>
           <CardContent>
@@ -507,6 +516,7 @@ const FineDetailsModal = ({ open, onClose, selectedFine, onPayFine, loading, onV
         {/* Fine List */}
         <ModernTable
           title="Fines"
+          tableContainerStyles={{ maxHeight: 380 }}
           columns={[
             { id: "date", label: "Date" },
             { id: "reason", label: "Reason" },
@@ -1014,13 +1024,21 @@ const ManagementDashboard = () => {
               </Typography>
             </Box>
             <Box
+              data-lenis-prevent="true"
+              data-scrollable="true"
+              onWheel={(e) => e.stopPropagation()}
               sx={{
                 overflowY: "auto",
                 overflowX: "hidden",
                 maxHeight: { xs: 400, md: 500 },
                 py: 1,
-                overscrollBehavior: "auto",
+                overscrollBehavior: "contain",
                 WebkitOverflowScrolling: "touch",
+                scrollbarWidth: "thin",
+                scrollbarColor: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "rgba(255, 255, 255, 0.2) transparent"
+                    : "rgba(0, 0, 0, 0.15) transparent",
                 "&::-webkit-scrollbar": {
                   width: "4px",
                 },
@@ -1251,8 +1269,19 @@ const ManagementDashboard = () => {
         open={modalOpen}
         onClose={handleCloseModal}
         aria-labelledby="member-details-modal"
+        data-lenis-prevent="true"
+        slotProps={{
+          backdrop: {
+            "data-lenis-prevent": "true",
+            onWheel: (e) => e.stopPropagation(),
+          },
+        }}
       >
-        <Box className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-xl p-6 w-11/12 max-w-3xl max-h-[90vh] overflow-y-auto">
+        <Box
+          data-lenis-prevent="true"
+          onWheel={(e) => e.stopPropagation()}
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-xl p-6 w-11/12 max-w-3xl max-h-[90vh] overflow-y-auto"
+        >
           {selectedMember && (
             <>
               {/* Modal Header */}

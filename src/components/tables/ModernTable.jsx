@@ -38,6 +38,7 @@ const ModernTable = ({
   return (
     <Paper
       elevation={0}
+      data-lenis-prevent="true"
       sx={{
         borderRadius: "12px",
         overflow: "hidden",
@@ -94,14 +95,42 @@ const ModernTable = ({
       )}
 
       <TableContainer
-        className={tableContainerStyles.maxHeight === "none" ? undefined : "hide-scrollbar"}
+        data-lenis-prevent="true"
+        data-scrollable="true"
+        onWheel={(e) => e.stopPropagation()}
+        className={tableContainerStyles.hideScrollbar ? "hide-scrollbar" : undefined}
         sx={{
           maxHeight: 560,
           overflowX: "auto",
           overflowY: "auto",
           maxWidth: "100%",
-          scrollbarWidth: "none",
-          "&::-webkit-scrollbar": { display: "none" },
+          overscrollBehavior: "contain",
+          WebkitOverflowScrolling: "touch",
+          scrollbarWidth: "thin",
+          scrollbarColor: (theme) =>
+            theme.palette.mode === "dark"
+              ? "rgba(255, 255, 255, 0.2) transparent"
+              : "rgba(0, 0, 0, 0.2) transparent",
+          "&::-webkit-scrollbar": {
+            width: "6px",
+            height: "6px",
+          },
+          "&::-webkit-scrollbar-track": {
+            background: "transparent",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: (theme) =>
+              theme.palette.mode === "dark"
+                ? "rgba(255, 255, 255, 0.2)"
+                : "rgba(0, 0, 0, 0.2)",
+            borderRadius: "4px",
+          },
+          "&::-webkit-scrollbar-thumb:hover": {
+            backgroundColor: (theme) =>
+              theme.palette.mode === "dark"
+                ? "rgba(255, 255, 255, 0.35)"
+                : "rgba(0, 0, 0, 0.35)",
+          },
           ...tableContainerStyles,
         }}
       >

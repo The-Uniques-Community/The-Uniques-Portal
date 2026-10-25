@@ -5,6 +5,7 @@ import uniques2 from "@/assets/img/About/uniques2.webp";
 import uniques3 from "@/assets/img/About/uniques3.webp";
 import uniques4 from "@/assets/img/About/uniques4.webp";
 import { getStoredBatches } from "./batchesData";
+import { getSafeImageUrl } from "../imageHelper";
 
 export const DEFAULT_BATCH_PROFILES = [];
 
@@ -31,7 +32,7 @@ export const getStoredBatchProfiles = () => {
         profiles = parsed.map((p) => {
           return {
             ...p,
-            image: p.customImage ? p.image : (p.image || uniques4),
+            image: getSafeImageUrl(p.image, uniques4),
           };
         });
       }
@@ -76,7 +77,7 @@ export const fetchBatchProfiles = async () => {
       const remoteProfiles = response.data.data.map((p) => {
         return {
           ...p,
-          image: p.customImage ? p.image : (p.image || uniques4),
+          image: getSafeImageUrl(p.image, uniques4),
         };
       });
       const validProfiles = remoteProfiles.filter(

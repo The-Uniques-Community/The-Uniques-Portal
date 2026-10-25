@@ -32,7 +32,7 @@ const lenis = new Lenis({
       document.body.style.overflow === "hidden" ||
       Boolean(
         node?.closest?.(
-          '.MuiModal-root, .MuiDialog-root, [role="dialog"], [data-lenis-prevent]'
+          '.MuiModal-root, .MuiDialog-root, [role="dialog"], [data-lenis-prevent], .MuiTableContainer-root, [data-scrollable]'
         )
       )
     );

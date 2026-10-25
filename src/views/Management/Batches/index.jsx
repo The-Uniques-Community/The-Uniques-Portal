@@ -38,6 +38,8 @@ import {
   updateSingleBatchProfile,
   uploadBatchImage,
 } from "@/utils/batch/batchProfilesData";
+import { getSafeImageUrl } from "@/utils/imageHelper";
+import uniques4 from "@/assets/img/About/uniques4.webp";
 import { addStoredBatch, fetchBatches, deleteStoredBatch } from "@/utils/batch/batchesData";
 import {
   FILE_VALIDATION_PRESETS,
@@ -685,8 +687,13 @@ const CoordinatorBatches = () => {
                       title="Click to browse photo"
                     >
                       <img
-                        src={image}
+                        src={getSafeImageUrl(image, uniques4)}
                         alt={title}
+                        onError={(e) => {
+                          if (e.currentTarget.src !== uniques4) {
+                            e.currentTarget.src = uniques4;
+                          }
+                        }}
                         style={{ width: "100%", height: "100%", objectFit: "cover" }}
                       />
                     </Box>
@@ -872,8 +879,13 @@ const CoordinatorBatches = () => {
                 }}
               >
                 <img
-                  src={image}
+                  src={getSafeImageUrl(image, uniques4)}
                   alt={title}
+                  onError={(e) => {
+                    if (e.currentTarget.src !== uniques4) {
+                      e.currentTarget.src = uniques4;
+                    }
+                  }}
                   style={{
                     width: "100%",
                     height: "100%",
