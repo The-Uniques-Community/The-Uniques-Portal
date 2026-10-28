@@ -53,11 +53,12 @@ const TeamDialog = ({
   });
   
   const assignedMembers = members.filter((member) => assignedIds.includes(member._id));
-  const availableMembers = members.filter(
-    (member) =>
-      (!selectedBatch || member.batch === selectedBatch) &&
-      !assignedIds.includes(member._id)
-  );
+  const normBatch = selectedBatch ? selectedBatch.replace(/^the\s+/i, "").trim().toLowerCase() : null;
+  const availableMembers = members.filter((member) => {
+    const mBatch = (member.batch || "").replace(/^the\s+/i, "").trim().toLowerCase();
+    const batchMatches = !normBatch || mBatch === normBatch;
+    return batchMatches && !assignedIds.includes(member._id);
+  });
 
   const getRole = (memberId) => {
     const item = (task.assignedTo || []).find((entry) => {

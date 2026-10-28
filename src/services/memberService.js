@@ -20,6 +20,11 @@ export const memberService = {
     return response.data;
   },
 
+  async getMemberLookup(params = {}) {
+    const response = await apiClient.get('/api/admin/member/lookup', { params });
+    return response.data;
+  },
+
   async getAdminMemberCounts() {
     const response = await apiClient.get('/api/admin/member/counts');
     return response.data;

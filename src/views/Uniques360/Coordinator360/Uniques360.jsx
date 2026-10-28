@@ -107,7 +107,7 @@ const Uniques360Coordinator = () => {
   // ================= FETCH MEMBERS =================
   const fetchMembers = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/admin/member`, {
+      const response = await axios.get(`${BASE_URL}/api/admin/member/lookup`, {
         withCredentials: true,
       });
       setMembers(response.data?.data || []);
@@ -213,9 +213,19 @@ const Uniques360Coordinator = () => {
   const handleUpdateTask = async () => {
     try {
       setSubmitting(true);
-      await axios.put(`${BASE_URL}/api/uniques360/tasks/${selectedTask._id}`, selectedTask, {
-        withCredentials: true,
+      const roles = selectedTask.assignedRoles || {};
+      const assignedToPayload = (selectedTask.assignedTo || []).map((id) => {
+        const rawId = typeof id === "object" ? (id._id || id.member || id) : id;
+        return {
+          member: rawId,
+          role: roles[rawId] || null,
+        };
       });
+      await axios.put(
+        `${BASE_URL}/api/uniques360/tasks/${selectedTask._id}`,
+        { ...selectedTask, assignedTo: assignedToPayload },
+        { withCredentials: true }
+      );
       toast.success("Task updated");
       setEditOpen(false);
       fetchTasks();
@@ -576,12 +586,22 @@ const Uniques360Coordinator = () => {
               fetchReports(task._id);
             }}
             onEdit={(task) => {
+              const existingRoles = {};
+              const assignedIds = [];
+              (task.assignedTo || []).forEach((item) => {
+                const inner = item && item.member ? item.member : item;
+                const id = (inner?._id || inner?.id || inner)?.toString?.();
+                if (id) {
+                  assignedIds.push(id);
+                  if (item && item.role) {
+                    existingRoles[id] = item.role;
+                  }
+                }
+              });
               setSelectedTask({
                 ...task,
-                assignedTo: task.assignedTo?.map((item) => {
-                  const inner = item && item.member ? item.member : item;
-                  return inner?._id || inner?.id || inner;
-                }) || [],
+                assignedTo: assignedIds,
+                assignedRoles: existingRoles,
               });
               setEditOpen(true);
             }}
@@ -640,6 +660,7 @@ const Uniques360Coordinator = () => {
             task={selectedTask}
             setTask={setSelectedTask}
             members={members}
+            batches={batches}
           />
         </React.Suspense>
       )}
