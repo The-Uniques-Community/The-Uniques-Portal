@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useMemo } from "react";
 import {
   Box,
   Button,
@@ -13,6 +13,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Typography,
 } from "@mui/material";
 
 const EditTaskDialog = ({
@@ -23,10 +24,23 @@ const EditTaskDialog = ({
   task,
   setTask,
   members,
+  batches = [],
 }) => {
   if (!task) return null;
 
+  const [selectedBatch, setSelectedBatch] = useState("");
+
   const assignedIds = task.assignedTo || [];
+  const assignedRoles = task.assignedRoles || {};
+
+  const filteredMembers = useMemo(() => {
+    if (!selectedBatch) return members;
+    const norm = selectedBatch.replace(/^the\s+/i, "").trim().toLowerCase();
+    return members.filter((member) => {
+      const mBatch = (member.batch || "").replace(/^the\s+/i, "").trim().toLowerCase();
+      return mBatch === norm || assignedIds.includes(member._id);
+    });
+  }, [members, selectedBatch, assignedIds]);
 
   return (
     <Dialog 
@@ -126,6 +140,25 @@ const EditTaskDialog = ({
             </Grid>
           </Grid>
 
+          {/* Filter by Batch */}
+          {Array.isArray(batches) && batches.length > 0 && (
+            <FormControl fullWidth size="small">
+              <InputLabel>Filter by Batch</InputLabel>
+              <Select
+                value={selectedBatch}
+                label="Filter by Batch"
+                onChange={(e) => setSelectedBatch(e.target.value)}
+              >
+                <MenuItem value="">All Batches</MenuItem>
+                {batches.map((batch) => (
+                  <MenuItem key={batch} value={batch}>
+                    {batch}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+
           {/* Assigned Members Allocation Matrix */}
           <FormControl fullWidth size="small">
             <InputLabel>Assign Members</InputLabel>
@@ -135,19 +168,22 @@ const EditTaskDialog = ({
               label="Assign Members"
               onChange={(e) => {
                 const value = e.target.value;
+                const nextIds = typeof value === "string" ? value.split(",") : value;
                 setTask({
                   ...task,
-                  assignedTo: typeof value === "string" ? value.split(",") : value,
+                  assignedTo: nextIds,
                 });
               }}
               renderValue={(selected) => (
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                   {selected.map((id) => {
                     const member = members.find((item) => item._id === id);
+                    const role = assignedRoles[id];
+                    const labelText = member?.fullName || id;
                     return (
                       <Chip 
                         key={id} 
-                        label={member?.fullName || id} 
+                        label={role ? `${labelText} (${role})` : labelText} 
                         size="small" 
                         sx={{ 
                           borderRadius: "4px",
@@ -162,13 +198,68 @@ const EditTaskDialog = ({
                 </Box>
               )}
             >
-              {members.map((member) => (
+              {filteredMembers.map((member) => (
                 <MenuItem key={member._id} value={member._id}>
-                  {member.fullName}
+                  {member.fullName} {member.batch ? `(${member.batch})` : ""}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
+
+          {/* Inline Role Settings Interface Panel */}
+          {assignedIds.length > 0 && (
+            <Box 
+              sx={{ 
+                p: 2, 
+                borderRadius: "8px", 
+                border: "1px dashed", 
+                borderColor: "divider",
+                backgroundColor: "background.default",
+                display: "flex", 
+                flexDirection: "column", 
+                gap: 1.5,
+                maxHeight: "180px",
+                overflowY: "auto",
+              }}
+            >
+              <Typography variant="caption" sx={{ fontWeight: 700, color: "text.secondary", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                Member Work Roles
+              </Typography>
+              
+              {assignedIds.map((memberId) => {
+                const member = members.find((item) => item._id === memberId);
+                return (
+                  <Box key={memberId} sx={{ display: "flex", gap: 2, alignItems: "center", justifyContent: "space-between" }}>
+                    <Box sx={{ minWidth: 140, maxWidth: 180 }}>
+                      <Typography variant="body2" noWrap sx={{ fontWeight: 600, fontSize: "13px" }}>
+                        {member?.fullName || "Member"}
+                      </Typography>
+                    </Box>
+                    <TextField
+                      label="Assigned Role"
+                      size="small"
+                      value={assignedRoles?.[memberId] || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setTask((prev) => ({
+                          ...prev,
+                          assignedRoles: {
+                            ...(prev.assignedRoles || {}),
+                            [memberId]: val,
+                          },
+                        }));
+                      }}
+                      placeholder="e.g., Lead Frontend, UI design"
+                      sx={{ 
+                        flexGrow: 1,
+                        "& .MuiInputBase-input": { fontSize: "12.5px", py: 0.75 }
+                      }}
+                    />
+                  </Box>
+                );
+              })}
+            </Box>
+          )}
         </Box>
       </DialogContent>
 

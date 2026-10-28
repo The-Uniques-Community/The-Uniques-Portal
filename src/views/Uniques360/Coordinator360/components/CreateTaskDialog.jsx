@@ -31,9 +31,12 @@ const CreateTaskDialog = ({
   members,
 }) => {
   const AtlanticFilterMembers = useMemo(() => {
-    return selectedBatch
-      ? members.filter((member) => member.batch === selectedBatch)
-      : members;
+    if (!selectedBatch) return members;
+    const norm = selectedBatch.replace(/^the\s+/i, "").trim().toLowerCase();
+    return members.filter((member) => {
+      const mBatch = (member.batch || "").replace(/^the\s+/i, "").trim().toLowerCase();
+      return mBatch === norm;
+    });
   }, [members, selectedBatch]);
 
   return (

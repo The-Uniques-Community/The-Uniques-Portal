@@ -11,7 +11,7 @@ import Event from "../../models/member/eventModel.js";
 import Task from "../../models/uniques360/Task.js";
 import Report from "../../models/uniques360/Report.js";
 import mongoose from "mongoose";
-import { paginateQuery, buildSearchQuery } from "../../utils/queryHelper.js";
+import { paginateQuery, buildSearchQuery, escapeRegex } from "../../utils/queryHelper.js";
 
 /**
  * @desc    Fetch a single member profile by ID with populated relations (excluding password)
@@ -323,11 +323,12 @@ export const deleteMember = async (req, res) => {
  * @access  Private (Admin)
  * @param   {string} [req.query.sortBy='createdAt'] - Field to sort by
  * @param   {string} [req.query.order='desc'] - Sort direction ('asc' | 'desc')
+ * @param   {string} [req.query.all] - If 'true', return all records without pagination
  * @returns {Object} List of members and total count
  */
 export const getAllMembers = async (req, res) => {
   try {
-    const { page, limit, sortBy = 'createdAt', order = 'desc', search, batch, status } = req.query;
+    const { page, limit, sortBy = 'createdAt', order = 'desc', search, batch, status, all, paginate } = req.query;
     const sort = { [sortBy]: order === 'asc' ? 1 : -1 };
     const filter = { ...buildSearchQuery(search, ['fullName', 'email', 'admno']) };
 
@@ -344,6 +345,27 @@ export const getAllMembers = async (req, res) => {
         filter.isSuspended = false;
         filter.status = status;
       }
+    }
+
+    if (all === 'true' || paginate === 'false') {
+      const data = await Member.find(filter)
+        .sort(sort)
+        .select('-password')
+        .populate('event_participation')
+        .lean();
+      return res.status(200).json({
+        success: true,
+        data,
+        count: data.length,
+        pagination: {
+          total: data.length,
+          page: 1,
+          limit: data.length,
+          pages: 1,
+          hasNextPage: false,
+          hasPrevPage: false,
+        },
+      });
     }
 
     const result = await paginateQuery(Member, filter, {
@@ -363,6 +385,65 @@ export const getAllMembers = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching members:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * @desc    Lightweight member lookup for dropdowns and selection lists
+ * @route   GET /api/admin/member/lookup
+ * @access  Private (Admin / Coordinator)
+ * @param   {string} [req.query.batch] - Filter by batch
+ * @param   {string} [req.query.role] - Filter by role (default: member & coordinator)
+ * @param   {string} [req.query.search] - Search by fullName or email or admno
+ * @param   {string} [req.query.includeSuspended='false'] - Whether to include suspended members
+ * @returns {Object} List of lightweight member records sorted alphabetically
+ */
+export const getMemberLookup = async (req, res) => {
+  try {
+    const { batch, role, search, includeSuspended } = req.query;
+    const filter = {};
+
+    if (includeSuspended !== 'true') {
+      filter.isSuspended = { $ne: true };
+    }
+
+    if (role && role !== 'all') {
+      filter.role = role;
+    } else {
+      filter.role = { $in: ['member', 'coordinator'] };
+    }
+
+    if (batch && batch !== 'All' && batch !== 'All Batches') {
+      const normalizedBatch = batch.replace(/^the\s+/i, '').trim();
+      filter.batch = new RegExp(`^(The\\s+)?${escapeRegex(normalizedBatch)}$`, 'i');
+    }
+
+    if (search && search.trim()) {
+      const escaped = escapeRegex(search.trim());
+      filter.$or = [
+        { fullName: { $regex: escaped, $options: 'i' } },
+        { email: { $regex: escaped, $options: 'i' } },
+        { admno: { $regex: escaped, $options: 'i' } }
+      ];
+    }
+
+    const members = await Member.find(filter)
+      .select('_id fullName email batch role avatar profilePic isVerified')
+      .sort({ fullName: 1 })
+      .lean();
+
+    return res.status(200).json({
+      success: true,
+      data: members,
+      count: members.length,
+    });
+  } catch (error) {
+    console.error('Error fetching member lookup:', error);
     return res.status(500).json({
       success: false,
       message: 'Server error',

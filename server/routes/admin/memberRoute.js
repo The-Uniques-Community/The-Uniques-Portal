@@ -18,6 +18,7 @@ import {
   updateMemberProfile,
   deleteMember,
   getAdminMemberCounts,
+  getMemberLookup,
 } from '../../controller/admin/memberController.js';
 import { getAllMembersWithFines, imposeFine } from '../../controller/admin/fineController.js';
 import verifyToken from '../../middlewares/verifyToken.js';
@@ -31,8 +32,9 @@ memberAdminRouter.use(verifyToken, verifyRole(['admin', 'coordinator']));
 // Get all members (with pagination)
 memberAdminRouter.get('/', getAllMembers);
 
-// Literal /counts MUST precede parameterized /:id to prevent /counts being treated as an ObjectId
+// Literal /counts and /lookup MUST precede parameterized /:id to prevent them being treated as an ObjectId
 memberAdminRouter.get('/counts', getAdminMemberCounts);
+memberAdminRouter.get('/lookup', getMemberLookup);
 
 // Get a single member by ID
 memberAdminRouter.get('/:id', getSingleMember);
