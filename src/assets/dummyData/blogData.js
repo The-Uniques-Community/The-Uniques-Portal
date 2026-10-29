@@ -1,3 +1,14 @@
+/**
+ * @file blogData.js
+ * @description Mock blog and technical article data fixtures covering React development, event logistics, and backend scalability architectures.
+ * @architecture Used in blog feeds, student knowledge sharing modules, and educational resource previews.
+ * @agent_note Each article record includes reading time, banner image URL, multiple structured sub-content sections, and relevant topic tags.
+ */
+
+/**
+ * @desc Array of sample blog articles with sub-headings, paragraphs, and taxonomy tags.
+ * @type {Array<{title: string, description: string, category: string, readTime: number, image: string, subContents: Array<{heading: string, paragraph: string}>, tags: string[]}>}
+ */
 export const blogData = [
   {
     title: "Getting Started with React: A Beginner's Guide",

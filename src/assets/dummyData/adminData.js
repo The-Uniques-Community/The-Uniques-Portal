@@ -1,3 +1,14 @@
+/**
+ * @file adminData.js
+ * @description Mock data fixtures representing administrative CRM metrics, enterprise deal pipelines, partner details, file attachments, and audit history.
+ * @architecture Used across administrative partnership dashboards, contract detail views, and client engagement tabs.
+ * @agent_note Provides structured sample records simulating an enterprise partner (e.g. Microsoft) relationship with associated contact points, documents, and negotiation milestones.
+ */
+
+/**
+ * @desc Executive summary mock data comprising recent deal activities and key pipeline metrics.
+ * @type {{recentActivities: Array<{date: string, title: string, description: string, type: string, icon: string}>, keyMetrics: {dealValue: string, probability: string, expectedClose: string, stage: string}}}
+ */
 export const summaryData = {
     recentActivities: [
       {
@@ -30,7 +41,11 @@ export const summaryData = {
     }
   };
   
-  export const analyticsData = {
+  /**
+ * @desc Communication engagement statistics and milestone dates for administrative partner tracking.
+ * @type {{engagementMetrics: {emailsExchanged: number, meetingsHeld: number, documentsShared: number, responseRate: string}, timeline: {firstContact: string, lastActivity: string, nextAction: string}}}
+ */
+export const analyticsData = {
     engagementMetrics: {
       emailsExchanged: 45,
       meetingsHeld: 8,
@@ -44,7 +59,11 @@ export const summaryData = {
     }
   };
   
-  export const detailsData = {
+  /**
+ * @desc Enterprise organization details and associated corporate contacts directory.
+ * @type {{company: Object, contacts: Array<{name: string, role: string, email: string, phone: string}>}}
+ */
+export const detailsData = {
     company: {
       name: "Microsoft",
       industry: "Technology",
@@ -71,7 +90,11 @@ export const summaryData = {
     ]
   };
   
-  export const filesData = [
+  /**
+ * @desc Enterprise document repository mock fixtures (proposals, contracts, spreadsheets).
+ * @type {Array<{name: string, size: string, uploadedOn: string, uploadedBy: string, type: string, status: string}>}
+ */
+export const filesData = [
     {
       name: "Project_Proposal_v2.pdf",
       size: "2.4 MB",
@@ -98,7 +121,11 @@ export const summaryData = {
     }
   ];
   
-  export const historyData = [
+  /**
+ * @desc Historical audit activity logs tracking agreement milestones and meetings.
+ * @type {Array<{date: string, action: string, user: string, details: string, type: string}>}
+ */
+export const historyData = [
     {
       date: "2024-03-15",
       action: "Contract signed",

@@ -1,3 +1,10 @@
+/**
+ * @file Banner.jsx
+ * @description Promotional and quick-navigation hero banner displayed at the top of Management dashboards (Admin/Coordinator).
+ * @architecture Connects to React Router DOM (`useLocation`, `Link`) to route users to student/event management based on their role (`/admin` vs `/coordinator`).
+ * @agent_note When modifying routes or roles, ensure `roleName` and `basePath` resolution stay in sync with the route definitions in `routes.jsx`.
+ */
+
 import React from "react";
 import { Box, Button, Typography, Stack, useTheme, Chip } from "@mui/material";
 import { alpha } from "@mui/material/styles";
@@ -6,6 +13,14 @@ import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlin
 import TrendingUpOutlinedIcon from "@mui/icons-material/TrendingUpOutlined";
 import { Link, useLocation } from "react-router-dom";
 
+/**
+ * @component Banner
+ * @description Renders a themed hero banner with gradient backgrounds, role command center badge, descriptive text, and navigation links.
+ * @param {Object} props - Component properties.
+ * @param {string} [props.role] - Optional user role ('Admin' or 'Coordinator') to determine navigation prefix; defaults to path sniffing.
+ * @state None - Pure presentation component reading route and theme context.
+ * @api None - No direct API endpoints called.
+ */
 export default function Banner(props) {
   const theme = useTheme();
   const location = useLocation();

@@ -1,3 +1,10 @@
+/**
+ * @file ReportComposer.jsx
+ * @description Input editor for composing daily task updates and entering target percentage progress with keyboard submit shortcuts.
+ * @architecture Sub-component of Uniques360Member, docked at the bottom of the workspace to submit progress reports.
+ * @agent_note Supports Enter-to-submit (Shift+Enter for newline) and constrains numerical progress values to 0-100.
+ */
+
 import React, { useRef } from "react";
 import { Box, CircularProgress, IconButton, Paper, TextField, InputAdornment, Typography } from "@mui/material";
 import SendIcon from '@mui/icons-material/Send';
@@ -8,6 +15,18 @@ import {
   resetFileInput,
 } from "@/utils/fileValidation";
 
+/**
+ * @component ReportComposer
+ * @description Text area and progress input controls for writing and submitting status reports on an active task.
+ * @param {Object} props - Component properties
+ * @param {Object|null} props.selectedTask - Current active task object
+ * @param {string} props.newReport - Text draft of report content
+ * @param {Function} props.setNewReport - Dispatcher for report content
+ * @param {string|number} props.progressPercent - Current progress percentage string or number
+ * @param {Function} props.setProgressPercent - Dispatcher for progress percentage
+ * @param {boolean} props.sending - Whether submission is currently pending
+ * @param {Function} props.onSubmit - Submission action handler
+ */
 const ReportComposer = ({ selectedTask, newReport, setNewReport, progressPercent, setProgressPercent, sending, onSubmit }) => {
   const fileInputRef = useRef(null);
 

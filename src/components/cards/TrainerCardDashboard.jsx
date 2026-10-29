@@ -1,4 +1,11 @@
 
+/**
+ * @file TrainerCardDashboard.jsx
+ * @description Dashboard trainer profile card and comprehensive full-screen detail inspection dialog for trainers.
+ * @architecture Used in trainer directory and administrative dashboard overviews. Integrates with the image proxy service.
+ * @agent_note Supports both `user` and `trainer` props interchangeably. Includes `TrainerProfileDialog` modal with contact and batch metadata.
+ */
+
 import React, { useState, forwardRef } from "react";
 import { BASE_URL } from "@/config";
 import {
@@ -33,7 +40,21 @@ import { Link } from "react-router-dom";
 import userIcon from "@/assets/img/user-icon.png";
 import "tailwindcss/tailwind.css";
 
+/**
+ * @component TrainerProfileDialog
+ * @description Fullscreen inspection dialog displaying detailed trainer metrics, contact info, bio, and technical skills.
+ * @param {Object} props - Component properties
+ * @param {boolean} props.open - Dialog visibility flag
+ * @param {Function} props.handleClose - Close handler callback
+ * @param {Object} props.user - Trainer data record
+ * @state None - Controlled dialog presentation
+ */
 const TrainerProfileDialog = ({ open, handleClose, user }) => {
+    /**
+     * @desc Normalizes image references to proxy endpoints or static assets.
+     * @param {string|Object} fileIdOrPic - Image identifier or object
+     * @returns {string|null} Resolved image URL
+     */
     const getProxyImageUrl = (fileIdOrPic) => {
         if (!fileIdOrPic) return null;
         if (typeof fileIdOrPic === "object") {
@@ -51,6 +72,11 @@ const TrainerProfileDialog = ({ open, handleClose, user }) => {
         return null;
     };
 
+    /**
+     * @desc Formats an ISO date string into readable short date format.
+     * @param {string|Date} dateString - Input date
+     * @returns {string} Formatted date string
+     */
     const formatDate = (dateString) => {
         if (!dateString) return "N/A";
         const date = new Date(dateString);
@@ -249,11 +275,26 @@ const TrainerProfileDialog = ({ open, handleClose, user }) => {
     );
 };
 
+/**
+ * @component TrainerCardDashboard
+ * @description Card rendering a trainer's summary (avatar, batch, active status, bio, and social handles) with button to open detail dialog.
+ * @param {Object} props - Component properties
+ * @param {Object} [props.user] - Trainer user object
+ * @param {Object} [props.trainer] - Alternative prop alias for trainer entity
+ * @state {boolean} open - Controls TrainerProfileDialog modal open state
+ * @api Interacts with `/api/image-proxy/:fileId` via `getProxyImageUrl`
+ */
 export const TrainerCardDashboard = ({ user, trainer }) => {
     const currentTrainer = user || trainer;
     const [open, setOpen] = useState(false);
 
     const handleClose = () => setOpen(false);
+
+    /**
+     * @desc Normalizes image references (URLs or file IDs) to proxy or direct URLs.
+     * @param {string|Object} fileIdOrPic - Image identifier or object
+     * @returns {string|null} Resolved image URL
+     */
     const getProxyImageUrl = (fileIdOrPic) => {
         if (!fileIdOrPic) return null;
         if (typeof fileIdOrPic === "object") {

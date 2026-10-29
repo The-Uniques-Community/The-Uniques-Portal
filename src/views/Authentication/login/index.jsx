@@ -1,3 +1,10 @@
+/**
+ * @file index.jsx
+ * @description Portal login screen providing credential-based email authentication and Google OAuth popup flows with role-based routing.
+ * @architecture Entry authentication view, dispatching user state to Redux userSlice, saving credentials in authUtils, and navigating via getRoleDashboard.
+ * @agent_note Listens for window postMessage events sent from Google OAuth popup window containing token and user profile payloads.
+ */
+
 /* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
@@ -31,13 +38,28 @@ import { getRoleDashboard } from "@/routes/paths";
 import authService from "@/services/authService";
 import { storeAuth } from "@/utils/authUtils";
 
+/**
+ * @component Login
+ * @description Portal authentication view with email/password form and Google OAuth popup integration.
+ * @state {boolean} showPassword - Password visibility toggle state
+ * @api {POST} /auth/login (via authService.emailLogin) - Validates credentials and returns JWT session
+ * @api {GET} /auth/google - Backend redirect initiator for Google OAuth handshake
+ */
 const Login = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
 
+  /**
+   * @desc Toggles visibility of the password input between text and password types.
+   */
   const handleClickShowPassword = () => setShowPassword((prev) => !prev);
+
+  /**
+   * @desc Prevents mouse-down default action to retain input focus when toggling password view.
+   * @param {React.MouseEvent} event - Mouse down event
+   */
   const handleMouseDownPassword = (event) => event.preventDefault();
 
   // Listen for the message from the popup. The backend sends token, role, and user.
@@ -62,6 +84,9 @@ const Login = () => {
   }, [navigate, dispatch]);
 
   // Google login using a popup
+  /**
+   * @desc Opens a centered popup window pointing to the backend Google OAuth initiation route.
+   */
   const handleGoogleLogin = () => {
     const googleLoginUrl = `${BASE_URL}/auth/google`;
     const width = 500;

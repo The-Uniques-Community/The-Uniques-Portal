@@ -1,12 +1,41 @@
+/**
+ * @file TitledCard.jsx
+ * @description 3D physics-based tilt image card powered by Framer Motion springs, featuring cursor-following tooltip caption and layered 3D depth.
+ * @architecture Used for rich media showcases and featured projects with 3D perspective transforms.
+ * @agent_note Implements CSS 3D transforms (`[perspective:800px]`, `preserve-3d`, `translateZ`) coupled with Framer Motion spring values.
+ */
+
 import { useRef, useState } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 
+/**
+ * @desc Framer Motion physics spring configuration constants for realistic momentum and damping.
+ */
 const springValues = {
     damping: 30,
     stiffness: 100,
     mass: 2,
 };
 
+/**
+ * @component TiltedCard
+ * @description Renders a 3D tilting card responding to mouse trajectory with smooth spring physics, depth layer, and dynamic floating tooltip.
+ * @param {Object} props - Component properties
+ * @param {string} props.imageSrc - Source URL of the display image
+ * @param {string} [props.altText="Tilted card image"] - Image alternative text description
+ * @param {string} [props.captionText=""] - Text displayed inside mouse-following tooltip
+ * @param {string} [props.containerHeight="300px"] - Container CSS height
+ * @param {string} [props.containerWidth="100%"] - Container CSS width
+ * @param {string} [props.imageHeight="300px"] - Inner image CSS height
+ * @param {string} [props.imageWidth="300px"] - Inner image CSS width
+ * @param {number} [props.scaleOnHover=1.1] - Scale multiplier applied during hover
+ * @param {number} [props.rotateAmplitude=14] - Maximum tilt rotation amplitude in degrees
+ * @param {boolean} [props.showMobileWarning=true] - Whether to display warning text on small screens
+ * @param {boolean} [props.showTooltip=true] - Whether to show the floating figcaption tooltip
+ * @param {React.ReactNode} [props.overlayContent=null] - Optional JSX element elevated on the 3D Z-plane
+ * @param {boolean} [props.displayOverlayContent=false] - Whether to render overlay content
+ * @state {number} lastY - Previous vertical mouse coordinate used to calculate rotational velocity for figcaption
+ */
 export default function TiltedCard({
     imageSrc,
     altText = "Tilted card image",
@@ -37,6 +66,10 @@ export default function TiltedCard({
 
     const [lastY, setLastY] = useState(0);
 
+    /**
+     * @desc Calculates 3D tilt angles and tooltip positions from mouse event coordinates.
+     * @param {React.MouseEvent<HTMLElement>} e - Mouse event
+     */
     function handleMouse(e) {
         if (!ref.current) return;
 
@@ -58,11 +91,17 @@ export default function TiltedCard({
         setLastY(offsetY);
     }
 
+    /**
+     * @desc Resets scale and opacity springs on mouse enter.
+     */
     function handleMouseEnter() {
         scale.set(scaleOnHover);
         opacity.set(1);
     }
 
+    /**
+     * @desc Restores default upright rotation, scale, and opacity on mouse leave.
+     */
     function handleMouseLeave() {
         opacity.set(0);
         scale.set(1);

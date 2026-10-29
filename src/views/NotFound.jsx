@@ -1,8 +1,21 @@
+/**
+ * @file NotFound.jsx
+ * @description 404 error fallback view displayed when user attempts to access an unmapped or invalid application route.
+ * @architecture Catch-all route component configured at the root router level in `routes.jsx` (`path: "*"`). Provides quick recovery navigation back to root `/`.
+ * @agent_note Dynamically computes window innerHeight on resize to eliminate 100vh scrolling cutoffs on mobile devices with collapsible browser navigation chrome.
+ */
+
 import { Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import bg from "@/assets/img/404bg.jpg";
 import { useEffect, useState } from "react";
 
+/**
+ * @component NotFound
+ * @description Full-screen 404 page featuring background imagery, informative error copy, and a recovery link routing back to root.
+ * @state {string} windowHeight - Dynamically tracked viewport height in pixels ensuring complete screen coverage on mobile browsers.
+ * @api None - Pure presentation fallback.
+ */
 const NotFound = () => {
   const [windowHeight, setWindowHeight] = useState("100vh");
 

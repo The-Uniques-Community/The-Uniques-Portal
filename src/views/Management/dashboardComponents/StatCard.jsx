@@ -1,8 +1,27 @@
+/**
+ * @file StatCard.jsx
+ * @description Metric visualization card displaying key performance indicators, custom icons, and optional drill-down navigation links.
+ * @architecture Used across management and statistical dashboards (`Management/Dashboard`, `Management/Stats`) to display summary metrics.
+ * @agent_note Conditionally wraps the card body in React Router's `<Link>` if a non-empty `link` string prop is supplied. Theme-aware border and background tinting adapt to dark/light mode.
+ */
+
 import { useTheme } from "@mui/material/styles";
 import tu from "@/assets/logos/tu.png";
 import stat from "@/assets/img/stat-bg.png";
 import { Link } from "react-router-dom";
 
+/**
+ * @component StatCard
+ * @description Renders a stylized card with background graphic, metric icon, title label, and primary statistic value.
+ * @param {Object} props - Component properties.
+ * @param {string} props.title - Label or description of the statistic metric.
+ * @param {string|number} props.value - Numeric or formatted metric value to display.
+ * @param {React.ReactNode} [props.icon] - Optional custom icon component; falls back to brand logo if omitted.
+ * @param {string} [props.bgColor] - Optional Tailwind color string to tint borders and backgrounds.
+ * @param {string} [props.link] - Optional target URL/route path to navigate to when the card is clicked.
+ * @state None - Pure presentation component reading theme tokens.
+ * @api None - No direct API endpoints called.
+ */
 const StatCard = (props) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";

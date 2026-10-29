@@ -1,3 +1,10 @@
+/**
+ * @file EventOverView.jsx
+ * @description Compact preview card displaying essential event details and lifecycle status for the Management Dashboard.
+ * @architecture Rendered inside the Management Dashboard (`views/Management/Dashboard`) event list feed; receives individual event objects retrieved via `eventService`.
+ * @agent_note Supports diverse event statuses ('upcoming', 'ongoing', 'completed') with reactive color tags and truncates descriptions to preserve compact card layouts.
+ */
+
 import React from "react";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import ScheduleOutlinedIcon from "@mui/icons-material/ScheduleOutlined";
@@ -13,6 +20,22 @@ import { useTheme } from "@mui/material/styles";
 import { alpha } from "@mui/material/styles";
 import { Box, Typography } from "@mui/material";
 
+/**
+ * @component EventOverView
+ * @description Renders a card displaying event meta information including title, status badges, date, time, venue, and organizer batch.
+ * @param {Object} props - Component properties.
+ * @param {Object} props.event - The event data object.
+ * @param {string} [props.event.eventName] - Name or title of the event.
+ * @param {string} [props.event.eventStatus] - Current status ('upcoming' | 'ongoing' | 'completed').
+ * @param {string} [props.event.eventType] - Categorization of the event.
+ * @param {string|Date} [props.event.eventDate] - Date string or Date object for the scheduled event.
+ * @param {string} [props.event.eventTime] - Time string of the event.
+ * @param {string} [props.event.eventVenue] - Physical or virtual location of the event.
+ * @param {string} [props.event.eventOrganizerBatch] - Batch code of the student organizers.
+ * @param {string} [props.event.eventDescription] - Short description summary of the event.
+ * @state None - Pure presentation component reading theme tokens.
+ * @api None - No direct API calls initiated.
+ */
 const EventOverView = ({ event }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
@@ -29,7 +52,11 @@ const EventOverView = ({ event }) => {
     eventType
   } = event || {};
 
-  // Format date for display if it's a Date object
+  /**
+   * @desc Formats an ISO date string or Date instance into a standard YYYY-MM-DD display representation.
+   * @param {string|Date} dateString - Input date to format.
+   * @returns {string} Formatted date string (YYYY-MM-DD) or empty string if invalid.
+   */
   const formatDateForInput = (dateString) => {
     if (!dateString) return "";
 

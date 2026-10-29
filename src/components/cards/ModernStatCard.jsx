@@ -1,9 +1,30 @@
+/**
+ * @file ModernStatCard.jsx
+ * @description KPI and dashboard metric card displaying an icon, title, headline statistic, progress bar, and navigation arrow.
+ * @architecture Used across administrator, student, and trainer analytics dashboards for numerical KPI displays.
+ * @agent_note Conditionally wraps the card in a react-router `Link` if `link` is passed, otherwise renders as interactive or static Box.
+ */
+
 import React from "react";
 import { Paper, Typography, Box } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { Link } from "react-router-dom";
 import NorthEastIcon from "@mui/icons-material/NorthEast";
 
+/**
+ * @component ModernStatCard
+ * @description Modern dashboard statistic card with custom accent color, progress percentage fill bar, and optional route redirection.
+ * @param {Object} props - Component properties
+ * @param {string} props.label - Metric label description (e.g. "Total Members")
+ * @param {string|number} props.value - Numerical or string value of the KPI stat
+ * @param {React.ReactNode} props.icon - Icon element rendered inside accent badge
+ * @param {string} [props.color="#ca0019"] - Hex color token used for accenting, borders, and bar fill
+ * @param {string} [props.gradient] - Optional gradient token
+ * @param {string} [props.link] - Optional router navigation link target
+ * @param {Function} [props.onClick] - Optional click handler if not using route navigation
+ * @param {number} [props.progress=65] - Percentage value (0-100) determining the width of the bottom accent bar
+ * @state None - Pure presentation component
+ */
 const ModernStatCard = ({
   label,
   value,

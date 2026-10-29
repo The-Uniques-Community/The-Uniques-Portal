@@ -1,11 +1,27 @@
+/**
+ * @file batchesData.js
+ * @description Cohort batches registry managing local storage caching, backend synchronization, natural sorting, automatic next-batch suggestions, and membership lifecycle statuses.
+ * @architecture Data utility serving member filters, project batch selectors, coordinator dashboards, and batch management panels. Integrates with `/api/batches` endpoints.
+ * @agent_note Broadcasts the `batches-updated` CustomEvent on the window object upon state modifications. Enforces standard "The Uniques X.X" batch name format.
+ */
+
 import apiClient from "@/services/apiClient";
 import { BASE_URL } from "@/config";
 import { getMemberStatus } from "@/utils/memberStatus";
 
+/**
+ * @desc Default initial batches fallback array.
+ * @type {string[]}
+ */
 export const DEFAULT_BATCHES = [];
 
 const BATCH_STORAGE_KEY = "tu_community_member_batches";
 
+/**
+ * @desc Sorts batch name strings naturally based on their numeric version (e.g. 1.0 < 2.0 < 10.0).
+ * @param {string[]} list - Array of batch name strings.
+ * @returns {string[]} Sorted array of batch names.
+ */
 const sortBatchesNaturally = (list) => {
   return [...list].sort((a, b) => {
     const numA = parseFloat(String(a).match(/(\d+(\.\d+)?)/)?.[1] || 9999);
@@ -15,6 +31,10 @@ const sortBatchesNaturally = (list) => {
   });
 };
 
+/**
+ * @desc Retrieves stored cohort batch names from localStorage.
+ * @returns {string[]} Array of unique, valid batch name strings.
+ */
 export const getStoredBatches = () => {
   try {
     const raw = localStorage.getItem(BATCH_STORAGE_KEY);
@@ -35,6 +55,10 @@ export const getStoredBatches = () => {
   }
 };
 
+/**
+ * @desc Fetches registered batches from backend MongoDB, caches them in localStorage, and triggers a broadcast event.
+ * @returns {Promise<string[]>} List of batch names.
+ */
 export const fetchBatches = async () => {
   try {
     const response = await apiClient.get(`${BASE_URL}/api/batches/all`);
@@ -53,6 +77,11 @@ export const fetchBatches = async () => {
   return getStoredBatches();
 };
 
+/**
+ * @desc Inspects currently registered batches and calculates the next incremented batch name (e.g. "The Uniques 6.0").
+ * @param {string[]} [existingBatches=getStoredBatches()] - Existing batch names.
+ * @returns {string} Suggested next batch title.
+ */
 export const suggestNextBatch = (existingBatches = getStoredBatches()) => {
   let maxNum = 0.0;
   existingBatches.forEach((b) => {
@@ -68,6 +97,11 @@ export const suggestNextBatch = (existingBatches = getStoredBatches()) => {
   return `The Uniques ${nextNum}`;
 };
 
+/**
+ * @desc Formats and adds a new cohort batch, syncing with backend MongoDB and localStorage.
+ * @param {string} batchName - Name of the batch to create.
+ * @returns {Promise<string|null>} Formatted batch name or null if invalid.
+ */
 export const addStoredBatch = async (batchName) => {
   if (!batchName || !batchName.trim()) return null;
   let formatted = batchName.trim();
@@ -100,6 +134,11 @@ export const addStoredBatch = async (batchName) => {
   return formatted;
 };
 
+/**
+ * @desc Deletes a batch from MongoDB backend and localStorage, notifying listening UI views.
+ * @param {string} batchName - Name of the batch to delete.
+ * @returns {Promise<boolean>} True if successfully deleted.
+ */
 export const deleteStoredBatch = async (batchName) => {
   if (!batchName || !batchName.trim()) return false;
   const trimmed = batchName.trim();
@@ -128,8 +167,9 @@ export const deleteStoredBatch = async (batchName) => {
 };
 
 /**
- * Returns dynamic active/inactive/suspended status based on graduation cutoff:
- * Honors suspended/blocked states and calculates status on the fly.
+ * @desc Returns dynamic active, inactive, or suspended status for a cohort batch or member user based on graduation cutoffs.
+ * @param {string|Object} batchOrUser - Batch name string or user profile object.
+ * @returns {string} Calculated status string.
  */
 export const getBatchStatus = (batchOrUser) => {
   if (!batchOrUser) return "inactive";

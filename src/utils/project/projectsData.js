@@ -1,7 +1,18 @@
+/**
+ * @file projectsData.js
+ * @description Comprehensive project data manager and repository handling seed projects, resilient API queries, local pagination, filter pipelines, and Google Drive thumbnail uploads.
+ * @architecture Serves public projects showcase (`/projects`), single project detail routes (`/projects/:id`), and management operations in Admin/Coordinator portals.
+ * @agent_note Interacts with `projectService`. Broadcasts `projects-updated` CustomEvents upon mutations. Resolves both legacy numeric IDs and MongoDB `_id` hashes via `normalizeProject`.
+ */
+
 import projectService from "@/services/projectService";
 import { getStoredBatches } from "@/utils/batch/batchesData";
 import { getSafeImageUrl } from "@/utils/imageHelper";
 
+/**
+ * @desc Baseline seed projects catalogue reflecting flagship community-developed software initiatives.
+ * @type {Array<Object>}
+ */
 export const INITIAL_PROJECTS = [
   {
     id: 1,
@@ -348,6 +359,10 @@ export const INITIAL_PROJECTS = [
   },
 ];
 
+/**
+ * @desc Retrieves all active cohort batch labels designated for project associations.
+ * @returns {string[]} Formatted cohort batch labels.
+ */
 export const getProjectBatches = () => {
   try {
     const stored = getStoredBatches();
@@ -367,8 +382,16 @@ export const getProjectBatches = () => {
   ];
 };
 
+/**
+ * @desc Cached list of available project cohort batches.
+ * @type {string[]}
+ */
 export const PROJECT_BATCHES = getProjectBatches();
 
+/**
+ * @desc Standard categories for classifying community projects.
+ * @type {string[]}
+ */
 export const PROJECT_CATEGORIES = [
   "Support & Mentorship",
   "Digital Library",
@@ -388,7 +411,11 @@ export const PROJECT_CATEGORIES = [
 
 const STORAGE_KEY = "tu_community_projects";
 
-// Normalizes project objects so both id and _id work seamlessly and image URLs are safe
+/**
+ * @desc Normalizes project records so that both `id` and `_id` are populated and images point to safe URLs.
+ * @param {Object} p - Raw project record.
+ * @returns {Object} Normalized project record.
+ */
 const normalizeProject = (p) => {
   if (!p) return p;
   return {
@@ -399,6 +426,10 @@ const normalizeProject = (p) => {
   };
 };
 
+/**
+ * @desc Retrieves all stored project entities from local storage, merging with seed projects.
+ * @returns {Array<Object>} List of normalized project objects.
+ */
 export const getStoredProjects = () => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -426,7 +457,11 @@ export const getStoredProjects = () => {
   }
 };
 
-// Returns paginated and filtered local projects data conforming to API structure
+/**
+ * @desc Filters, searches, and paginates locally cached project records.
+ * @param {Object} [params={}] - Filter criteria (search, batch, category, status, page, limit).
+ * @returns {{ success: boolean, data: Array<Object>, pagination: Object }} Paginated project response payload.
+ */
 export const getPaginatedStoredProjects = (params = {}) => {
   const allProjects = getStoredProjects();
   let filtered = [...allProjects];
@@ -477,7 +512,11 @@ export const getPaginatedStoredProjects = (params = {}) => {
   };
 };
 
-// Resilient paginated query: attempts backend first, seamlessly falls back to stored projects
+/**
+ * @desc Resilient paginated project fetch querying the backend API first with seamless fallback to local storage cache.
+ * @param {Object} [params={}] - Search and filter parameters.
+ * @returns {Promise<{ success: boolean, data: Array<Object>, pagination?: Object }>} Resolves to paginated projects result.
+ */
 export const getPaginatedProjects = async (params = {}) => {
   try {
     const res = await projectService.getProjects(params);
@@ -490,7 +529,10 @@ export const getPaginatedProjects = async (params = {}) => {
   return getPaginatedStoredProjects(params);
 };
 
-// Fetch latest projects from MongoDB backend API and sync with localStorage cache
+/**
+ * @desc Fetches the latest projects from MongoDB backend API and synchronizes the local cache.
+ * @returns {Promise<Array<Object>>} Resolves to normalized project array.
+ */
 export const fetchProjects = async () => {
   try {
     const data = await projectService.getProjects({ limit: 100 });
@@ -514,7 +556,11 @@ export const fetchProjects = async () => {
   return getStoredProjects();
 };
 
-// Add new project - calls MongoDB Backend API + falls back to cache
+/**
+ * @desc Persists a new project to MongoDB backend with optimistic local storage fallback and broadcast notification.
+ * @param {Object} projectData - Project payload to create.
+ * @returns {Promise<Object>} The persisted project object.
+ */
 export const addProject = async (projectData) => {
   try {
     const data = await projectService.createProject(projectData);
@@ -547,7 +593,12 @@ export const addProject = async (projectData) => {
   return newProject;
 };
 
-// Update existing project in MongoDB Backend API
+/**
+ * @desc Updates an existing project in MongoDB and synchronizes the change in local cache.
+ * @param {string|number} id - Target project identifier (id or _id).
+ * @param {Object} projectData - Updated attributes map.
+ * @returns {Promise<Object>} The updated project object.
+ */
 export const updateProject = async (id, projectData) => {
   try {
     const data = await projectService.updateProject(id, projectData);
@@ -576,7 +627,11 @@ export const updateProject = async (id, projectData) => {
   return updated.find((p) => String(p.id) === String(id));
 };
 
-// Delete project in MongoDB Backend API
+/**
+ * @desc Deletes a project from MongoDB backend and removes it from local cache.
+ * @param {string|number} id - Target project identifier (id or _id).
+ * @returns {Promise<Array<Object>>} Remaining project objects.
+ */
 export const deleteProject = async (id) => {
   try {
     await projectService.deleteProject(id);
@@ -595,7 +650,11 @@ export const deleteProject = async (id) => {
   return updated;
 };
 
-// Find single project by numeric id, mongo _id, "project-1", or slug
+/**
+ * @desc Retrieves a single project matching numeric ID, MongoDB ObjectId, or kebab-case title slug.
+ * @param {string|number} id - Identifier, ObjectId, or slug.
+ * @returns {Object|null} Matching project object or null if not found.
+ */
 export const getProjectById = (id) => {
   if (!id) return null;
   const existing = getStoredProjects();
@@ -621,12 +680,12 @@ export const getProjectById = (id) => {
 };
 
 /**
- * Uploads a project thumbnail to Google Drive via backend multipart endpoint.
- * @param {File} file - Image file to upload
- * @param {string} [batch] - Target batch name
- * @param {string} [title] - Project title
- * @param {string} [projectId] - Optional existing project ObjectId to link
- * @returns {Promise<{fileId: string, fileUrl: string, fileName: string, proxyUrl: string}>}
+ * @desc Uploads a project thumbnail to Google Drive via backend multipart endpoint.
+ * @param {File} file - Image file to upload.
+ * @param {string} [batch="General Projects"] - Target batch name.
+ * @param {string} [title="Project"] - Project title.
+ * @param {string|null} [projectId=null] - Optional existing project ObjectId to link.
+ * @returns {Promise<{fileId: string, fileUrl: string, fileName: string, proxyUrl: string}>} Uploaded file details.
  */
 export const uploadProjectThumbnail = async (file, batch = "General Projects", title = "Project", projectId = null) => {
   const formData = new FormData();

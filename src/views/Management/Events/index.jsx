@@ -1,3 +1,10 @@
+/**
+ * @file index.jsx
+ * @description Master event catalog and lifecycle administration table with metric counters, priority sorting, pagination, and deletion workflows.
+ * @architecture Primary events entry point routed via `/admin/events-overview` or `/coordinator/events-overview`. Communicates with `@/utils/event/eventsData` services (`getPaginatedEvents`, `deleteStoredEvent`) and routes to event view/edit (`View.jsx`), budget tracking (`Budget.jsx`), or creation form.
+ * @agent_note Implements status-prioritized sorting via `sortEventsByPriority` (ongoing > upcoming > completed) with chronologically ordered upcoming items. Delete confirmation cascades to associated event documents.
+ */
+
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -43,6 +50,20 @@ import Delete from '@mui/icons-material/Delete';
 import { useNavigate, useLocation } from "react-router-dom";
 import { getPaginatedEvents, deleteStoredEvent } from "@/utils/event/eventsData";
 
+/**
+ * @component EventsManagement
+ * @description High-level event dashboard rendering operational KPI summary cards and an interactive table with pagination, status badges, and management quick links.
+ * @state {Array<Object>} events - Current page collection of event records.
+ * @state {boolean} loading - Loading indicator flag during data fetching.
+ * @state {Object} stats - Aggregate event count and financial metrics `{ total, ongoing, upcoming, completed, totalBudget, pendingExpenses }`.
+ * @state {Object} pagination - Pagination tracker `{ currentPage, totalPages, count, total }`.
+ * @state {boolean} deleteDialogOpen - Controls visibility of the permanent event deletion modal.
+ * @state {string|null} eventToDelete - Target event ID staged for deletion.
+ * @state {boolean} deleteLoading - Spinner flag during deletion request.
+ * @state {Object} snackbar - Notification feedback state `{ open, message, severity }`.
+ * @api `getPaginatedEvents` - Fetches paginated event records and aggregate metrics.
+ * @api `deleteStoredEvent` - Deletes event by ID.
+ */
 const EventsManagement = () => {
   const [events, setEvents] = useState([]);
   const location = useLocation();

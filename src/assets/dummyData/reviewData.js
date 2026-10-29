@@ -1,3 +1,14 @@
+/**
+ * @file reviewData.js
+ * @description Mock testimonial and peer feedback fixtures celebrating member growth, technical mentoring, and community achievements.
+ * @architecture Supplies testimonial card carousels on the public landing page and social proof components across the portal.
+ * @agent_note Each review record specifies member name, professional role, company affiliation, avatar avatar URL, star rating, and testimonial commentary.
+ */
+
+/**
+ * @desc Collection of student and alumni testimonial review objects with ratings and company titles.
+ * @type {Array<{name: string, title: string, company: string, image: string, review: string, rating: number, date: string}>}
+ */
 export const reviews = [
     {
       name: 'Alice Johnson',

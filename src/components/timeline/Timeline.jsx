@@ -1,6 +1,27 @@
+/**
+ * @file Timeline.jsx
+ * @description Milestone history timeline rendering alternating left/right event nodes with year tags, media thumbnails, narratives, and quote callouts.
+ * @architecture Used in the "About Us" and community journey views to present chronological milestones.
+ * @agent_note Paired with `Timeline.css` for zig-zag connector paths, tilt angles on start/end years, and responsive layout stacking.
+ */
+
 import React from 'react';
 import './Timeline.css';
 
+/**
+ * @component Timeline
+ * @description Chronological milestone timeline component with alternating cards, imagery, connector lines, and quotes.
+ * @param {Object} props - Component properties
+ * @param {Array<Object>} props.events - List of milestone events
+ * @param {string|number} props.events[].year - Event year or timeframe label
+ * @param {string} props.events[].image - Thumbnail image URL for the milestone
+ * @param {string} props.events[].heading - Title heading of the event
+ * @param {string} [props.events[].subheading] - Optional secondary heading
+ * @param {string} props.events[].brief - Descriptive summary or narrative of the achievement
+ * @param {string} [props.events[].quote] - Optional testimonial or historic quote
+ * @param {string} [props.events[].quoteAuthor] - Author attribution for the quote
+ * @state None - Pure presentation component
+ */
 const Timeline = ({ events }) => {
   if (!events || events.length === 0) return null;
 

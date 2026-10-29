@@ -1,3 +1,10 @@
+/**
+ * @file index.jsx
+ * @description Member blog management console for authoring articles, organizing multi-section subcontents, filtering drafts, and publishing blogs.
+ * @architecture Uniques Member feature view, leveraging a dedicated axios instance communicating with /api/blogs endpoints.
+ * @agent_note Validates subcontent blocks (ensuring non-empty paragraph text) prior to payload submission, and automatically sorts blogs descending by createdAt.
+ */
+
 import React, { useState, useEffect } from "react";
 import {
   Container,
@@ -62,6 +69,24 @@ api.interceptors.response.use(
   }
 );
 
+/**
+ * @component BlogManagement
+ * @description View allowing members to author, edit, tag, search, and delete articles and subcontent sections.
+ * @state {Object} blogForm - Draft state for blog title, description, category, tags, readTime, cover image, and subContents
+ * @state {Array} blogs - Collection of all blogs authored by the member
+ * @state {Array} filteredBlogs - Search-filtered subset of member blogs
+ * @state {string} searchTerm - Query text for filtering blogs
+ * @state {boolean} isLoading - Loading state during API operations
+ * @state {boolean} isEditing - Whether editor is in update mode vs create mode
+ * @state {string|null} currentBlogId - MongoDB ID of blog currently being edited
+ * @state {boolean} showForm - Controls visibility of blog authoring form card
+ * @state {Object} confirmDialog - State for deletion confirmation dialog
+ * @state {Object} snackbar - Notification alert state
+ * @api {GET} /api/blogs/my-blogs - Fetches blogs belonging to authenticated member
+ * @api {POST} /api/blogs - Publishes a new blog article
+ * @api {PUT} /api/blogs/:id - Updates an existing blog article
+ * @api {DELETE} /api/blogs/:id - Deletes a blog article
+ */
 const BlogManagement = () => {
   // State for blog form
   const [blogForm, setBlogForm] = useState({
@@ -112,6 +137,10 @@ const BlogManagement = () => {
   ];
 
   // Fetch member's blogs with cookies
+  /**
+   * @desc Fetches member blogs from backend and sorts them newest first.
+   * @returns {Promise<void>}
+   */
   const fetchMemberBlogs = async () => {
     setIsLoading(true);
     try {
@@ -235,6 +264,10 @@ const BlogManagement = () => {
   };
 
   // Create new blog with cookie authentication
+  /**
+   * @desc Validates required fields and dispatches POST or PUT request to create or update blog.
+   * @returns {Promise<void>}
+   */
   const handleSubmitBlog = async () => {
     try {
       setIsLoading(true);
@@ -292,6 +325,11 @@ const BlogManagement = () => {
   };
 
   // Delete blog with confirmation
+  /**
+   * @desc Sends delete request to remove specified blog and updates local state.
+   * @param {string} blogId - MongoDB ID of the blog
+   * @returns {Promise<void>}
+   */
   const handleDeleteBlog = async (blogId) => {
     try {
       setIsLoading(true);
@@ -322,6 +360,10 @@ const BlogManagement = () => {
   };
 
   // Edit blog - load data into form
+  /**
+   * @desc Populates the authoring form with existing blog data for editing.
+   * @param {Object} blog - The blog item to edit
+   */
   const handleEditBlog = (blog) => {
     setBlogForm({
       title: blog.title,
@@ -343,6 +385,9 @@ const BlogManagement = () => {
   };
 
   // Reset form to defaults
+  /**
+   * @desc Resets the blog drafting form to its blank initial state.
+   */
   const resetForm = () => {
     setBlogForm({
       title: "",

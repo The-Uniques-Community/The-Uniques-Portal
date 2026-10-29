@@ -1,3 +1,14 @@
+/**
+ * @file palette.js
+ * @description Material UI theme palette definitions for light and dark modes, specifying brand primary, background surfaces, text, and action colors.
+ * @architecture Exported to `src/theme/themes.js` to initialize light and dark MUI theme instances.
+ * @agent_note Notice the custom `background.drawer` token (#0d0d0d) used across navigation drawers for a consistent dark aesthetic even in light mode. Brand primary red is `#ca0019`.
+ */
+
+/**
+ * @desc Light mode palette tokens defining brand reds, dark drawer background, neutral surfaces, and action states.
+ * @type {Object}
+ */
 export const lightPalette = {
   mode: "light",
   primary: {
@@ -27,6 +38,10 @@ export const lightPalette = {
   },
 };
 
+/**
+ * @desc Dark mode palette tokens defining dark grays, elevated card surfaces, vibrant red links, and focused elements.
+ * @type {Object}
+ */
 export const darkPalette = {
   mode: "dark",
   primary: {

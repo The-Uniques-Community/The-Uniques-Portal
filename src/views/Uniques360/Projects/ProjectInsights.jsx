@@ -1,3 +1,10 @@
+/**
+ * @file ProjectInsights.jsx
+ * @description Project operations dashboard displaying analytics, workload metrics, aging task alerts, and execution progress for project-type tasks.
+ * @architecture Uniques360 view for project coordinators, filtering current coordinator tasks by taskType === 'project'.
+ * @agent_note Calculates aging tasks by comparing task deadline with today's date for all uncompleted tasks.
+ */
+
 import React, { useState, useEffect, useMemo } from "react";
 import {
   Box,
@@ -34,6 +41,14 @@ import axios from "axios";
 import { BASE_URL } from "@/config";
 import { toast } from "react-toastify";
 
+/**
+ * @component ProjectInsights
+ * @description Dashboard view providing analytics, project task tables, progress meters, and team workload widgets for project-type initiatives.
+ * @state {Array} tasks - Project tasks assigned to coordinator
+ * @state {boolean} loading - Loading flag for initial API fetch
+ * @api {GET} /api/uniques360/tasks/coordinator/current - Fetches coordinator tasks (filtered for taskType === 'project')
+ * @api {PATCH} /api/uniques360/tasks/:taskId - Marks a project task completed
+ */
 const ProjectInsights = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -47,6 +62,10 @@ const ProjectInsights = () => {
     lightGray: isDark ? "rgba(255, 255, 255, 0.08)" : "#f3f3f3",
   };
 
+  /**
+   * @desc Fetches coordinator tasks and filters exclusively for project tasks.
+   * @returns {Promise<void>}
+   */
   const fetchProjectTasks = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/api/uniques360/tasks/coordinator/current`, {
@@ -68,6 +87,11 @@ const ProjectInsights = () => {
     fetchProjectTasks();
   }, []);
 
+  /**
+   * @desc Marks a project task completed after user confirmation.
+   * @param {string} taskId - Target task ID
+   * @returns {Promise<void>}
+   */
   const handleMarkComplete = async (taskId) => {
     if (!window.confirm("Mark this task as completed?")) return;
     try {
@@ -94,6 +118,11 @@ const ProjectInsights = () => {
     };
   }, [tasks]);
 
+  /**
+   * @desc Resolves theme color corresponding to task priority level.
+   * @param {string} priority - Priority value ('high' | 'medium' | 'low')
+   * @returns {string} Color token hex string
+   */
   const getPriorityColor = (priority) => {
     switch (priority?.toLowerCase()) {
       case "high": return themeColors.red;

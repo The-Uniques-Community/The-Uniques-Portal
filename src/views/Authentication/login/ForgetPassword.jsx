@@ -1,3 +1,10 @@
+/**
+ * @file ForgetPassword.jsx
+ * @description 3-step password recovery wizard providing OTP generation, verification, and password reset flows with Formik and Yup validation.
+ * @architecture Authenticated password-recovery sub-view, integrated with backend /auth/password-reset endpoints.
+ * @agent_note Preserves resetSessionToken generated during OTP verification, which is required by the password reset endpoint. Formik forms use resetKey to force remounting across steps.
+ */
+
 import { useState } from "react";
 import { useTheme } from "@mui/material/styles";
 import {
@@ -31,6 +38,21 @@ import { BASE_URL } from "@/config";
 import logo from "@/assets/logos/theuniquesCommunity.png";
 import bg from "@/assets/img/login/bg.png";
 
+/**
+ * @component ForgetPassword
+ * @description Stepper wizard guiding users through password reset by verifying email, confirming a one-time passcode (OTP), and submitting a new password.
+ * @state {number} activeStep - Current wizard step (0: Enter Email, 1: Verify OTP, 2: Reset Password)
+ * @state {string} email - User email address under recovery
+ * @state {string} resetSessionToken - Temporary auth session token returned upon valid OTP verification
+ * @state {boolean} showPassword - Visibility toggle for new password field
+ * @state {boolean} showConfirmPassword - Visibility toggle for confirm password field
+ * @state {boolean} loading - Network in-flight indicator
+ * @state {number} resetKey - Numeric counter to trigger re-mounting of Formik steps
+ * @api {POST} /auth/password-reset/send-otp - Requests OTP code dispatch to target email
+ * @api {POST} /auth/password-reset/verify-otp - Validates user input OTP and returns session token
+ * @api {POST} /auth/password-reset/reset-password - Sets new password using reset session token
+ * @api {POST} /auth/password-reset/resend-otp - Re-dispatches a fresh OTP
+ */
 const ForgetPassword = () => {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -55,6 +77,12 @@ const ForgetPassword = () => {
   };
 
   // Step 1: Send OTP to email
+  /**
+   * @desc Submits user email to backend to dispatch password reset OTP.
+   * @param {Object} values - Formik values containing email
+   * @param {Object} helpers - Formik helpers (setErrors, setSubmitting, resetForm)
+   * @returns {Promise<void>}
+   */
   const handleSendOTP = async (values, { setErrors, setSubmitting, resetForm }) => {
     try {
       setLoading(true);
@@ -85,6 +113,12 @@ const ForgetPassword = () => {
   };
 
   // Step 2: Verify OTP
+  /**
+   * @desc Verifies OTP against backend and extracts reset session token.
+   * @param {Object} values - Formik values containing otp
+   * @param {Object} helpers - Formik helpers (setErrors, setSubmitting, resetForm)
+   * @returns {Promise<void>}
+   */
   const handleVerifyOTP = async (values, { setErrors, setSubmitting, resetForm }) => {
     try {
       setLoading(true);
@@ -120,6 +154,12 @@ const ForgetPassword = () => {
   };
 
   // Step 3: Reset Password
+  /**
+   * @desc Commits new password using the validated reset session token.
+   * @param {Object} values - Form values with newPassword and confirmPassword
+   * @param {Object} helpers - Formik helpers (setErrors, setSubmitting)
+   * @returns {Promise<void>}
+   */
   const handleResetPassword = async (values, { setErrors, setSubmitting }) => {
     if (!resetSessionToken) {
       toast.error("Password reset session has expired or is invalid. Please verify OTP again.");
@@ -161,6 +201,10 @@ const ForgetPassword = () => {
   };
 
   // Resend OTP
+  /**
+   * @desc Requests a refreshed OTP code be sent to the current email.
+   * @returns {Promise<void>}
+   */
   const handleResendOTP = async () => {
     try {
       setLoading(true);

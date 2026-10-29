@@ -1,3 +1,10 @@
+/**
+ * @file NewMember.jsx
+ * @description Comprehensive member profile card and detailed modal manager for management and admin workflows.
+ * @architecture Used in Management views (`Dashboard`, `members-overview`) to render compact student profile cards with full drill-down modal views (Profile, Academic SGPA, Professional, Event History) and administrative actions (block/unblock, suspend/unsuspend, fine imposition).
+ * @agent_note Interacts with `memberService` (`blockMember`, `suspendMember`) and `fineService` (`addMemberFine`). Re-triggers `refreshData` prop after administrative mutations to synchronize parent lists.
+ */
+
 import React, { useState } from "react";
 import { useTheme } from "@mui/material/styles";
 import {
@@ -49,6 +56,28 @@ import { memberService, fineService } from "@/services";
 import userIcon from "@/assets/img/user-icon.png";
 import tu from "@/assets/logos/tu.png";
 
+/**
+ * @component NewMember
+ * @description Renders a compact member preview card with an expandable detail modal containing multi-tab information (Bio, Academics, Projects, Events) and admin moderation controls.
+ * @param {Object} props - Component properties.
+ * @param {Object} props.user - Member data object containing personal, academic, and administrative details.
+ * @param {Function} [props.refreshData] - Callback invoked to reload member records from parent view after status mutations.
+ * @state {boolean} open - Controls visibility of the main profile modal.
+ * @state {number} tabValue - Active tab index in the profile dialog (0: Profile, 1: Academic, 2: Professional, 3: Events).
+ * @state {Object} expandedSemesters - Map tracking open/collapsed state of supplementary subjects per semester.
+ * @state {boolean} loading - General API operation loading flag.
+ * @state {boolean} blockLoading - Spinner state during block/unblock mutation.
+ * @state {boolean} suspendLoading - Spinner state during suspend/unsuspend mutation.
+ * @state {boolean} suspendDialogOpen - Controls visibility of suspension reason input dialog.
+ * @state {string} suspendReason - Text justification captured when suspending a member.
+ * @state {boolean} fineDialogOpen - Controls visibility of the fine imposition modal.
+ * @state {string} fineAmount - Amount in INR to levy as a fine.
+ * @state {string} fineReason - Text reason explaining the penalty.
+ * @state {Object} alert - Toast alert state `{ open, message, severity }`.
+ * @api `memberService.blockMember` - Blocks/unblocks user account.
+ * @api `memberService.suspendMember` - Suspends user account with reason or unsuspends.
+ * @api `fineService.addMemberFine` - Levies financial penalty on member account.
+ */
 export const NewMember = ({ user, refreshData }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
@@ -71,10 +100,19 @@ export const NewMember = ({ user, refreshData }) => {
     severity: "success",
   });
 
+  /**
+   * @desc Handles tab switching inside the member detail modal.
+   * @param {Object} event - Synthetic event.
+   * @param {number} newValue - Index of the newly selected tab.
+   */
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
 
+  /**
+   * @desc Toggles the accordion expansion state for supplementary subjects of a given semester.
+   * @param {number|string} semester - Semester identifier.
+   */
   const toggleSemesterExpand = (semester) => {
     setExpandedSemesters((prev) => ({
       ...prev,
@@ -82,6 +120,11 @@ export const NewMember = ({ user, refreshData }) => {
     }));
   };
 
+  /**
+   * @desc Resolves image URLs or file identifiers to proxied backend URLs or fallback direct links.
+   * @param {string|Object} fileIdOrPic - Raw file identifier or object containing `fileId`/`fileUrl`.
+   * @returns {string|null} Resolved image URL or null.
+   */
   const getProxyImageUrl = (fileIdOrPic) => {
     if (!fileIdOrPic) return null;
     if (typeof fileIdOrPic === "object") {
@@ -98,7 +141,12 @@ export const NewMember = ({ user, refreshData }) => {
     }
     return null;
   };
-  // Get status badge color
+
+  /**
+   * @desc Returns appropriate Tailwind CSS background badge color class according to user status.
+   * @param {string} status - Current status of the member (active, pending, inactive, blocked).
+   * @returns {string} Tailwind CSS class name.
+   */
   const getStatusColor = (status) => {
     switch (status) {
       case "active":
@@ -114,7 +162,9 @@ export const NewMember = ({ user, refreshData }) => {
     }
   };
 
-  // Handle block/unblock user
+  /**
+   * @desc Toggles the block status of the user via `memberService.blockMember` and refreshes parent data.
+   */
   const handleToggleBlock = async () => {
     try {
       setBlockLoading(true);
@@ -147,13 +197,17 @@ export const NewMember = ({ user, refreshData }) => {
     }
   };
 
-  // Handle suspend dialog open
+  /**
+   * @desc Clears suspension reason input and opens the suspension prompt dialog.
+   */
   const handleOpenSuspendDialog = () => {
     setSuspendReason("");
     setSuspendDialogOpen(true);
   };
 
-  // Handle suspend/unsuspend user
+  /**
+   * @desc Executes suspension or unsuspension via `memberService.suspendMember` and refreshes parent data.
+   */
   const handleToggleSuspend = async () => {
     // If user is already suspended, we can unsuspend without a reason
     // If not, we need to check if a reason is provided
@@ -200,14 +254,18 @@ export const NewMember = ({ user, refreshData }) => {
     }
   };
 
-  // Handle fine dialog open
+  /**
+   * @desc Clears fine form fields and opens the impose fine dialog.
+   */
   const handleOpenFineDialog = () => {
     setFineAmount("");
     setFineReason("");
     setFineDialogOpen(true);
   };
 
-  // Handle imposing fine
+  /**
+   * @desc Validates input and levies a monetary penalty on the member using `fineService.addMemberFine`.
+   */
   const handleImposeFine = async () => {
     // Validate inputs
     if (!fineAmount || fineAmount <= 0) {

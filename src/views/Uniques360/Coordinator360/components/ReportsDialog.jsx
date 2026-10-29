@@ -1,3 +1,10 @@
+/**
+ * @file ReportsDialog.jsx
+ * @description Dialog modal displaying chronological member status reports, milestone updates, and progress logs for a specific task.
+ * @architecture Sub-component of Uniques360Coordinator, invoked when viewing activity logs for a selected task.
+ * @agent_note Displays student submission details including formatted timestamps, progress percentages, and multiline content. Renders FeedSkeleton while loading.
+ */
+
 import React from "react";
 import {
   Avatar,
@@ -14,6 +21,16 @@ import { FeedSkeleton } from "@/components/common/skeletons";
 import ReportIcon from '@mui/icons-material/AssignmentOutlined';
 import TimeIcon from '@mui/icons-material/AccessTimeOutlined';
 
+/**
+ * @component ReportsDialog
+ * @description Modal dialog that renders a feed list of work logs submitted by students for a task.
+ * @param {Object} props - Component properties
+ * @param {boolean} props.open - Whether the dialog is displayed
+ * @param {Function} props.onClose - Dialog close handler
+ * @param {Object|null} props.task - The task currently being inspected
+ * @param {Array<Object>} props.reports - List of report submission records
+ * @param {boolean} props.loading - Indicates if reports are actively loading
+ */
 const ReportsDialog = ({ open, onClose, task, reports, loading }) => {
   return (
     <Dialog 

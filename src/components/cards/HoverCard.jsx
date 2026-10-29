@@ -1,5 +1,17 @@
+/**
+ * @file HoverCard.jsx
+ * @description Interactive accordion card featuring expanding columns on mouse hover with animated rotated text labels.
+ * @architecture Used as an eye-catching interactive showcase component on landing or promotional pages.
+ * @agent_note Uses flex-grow transitions (`hover:flex-[4]`) and CSS rotation transforms (`rotate-[-90deg]` to `group-hover:rotate-0`).
+ */
+
 import React from "react";
 
+/**
+ * @component HoverCard
+ * @description Renders a dark-themed card containing 3 interactive vertical accordion panels that expand on hover.
+ * @state None - CSS transition-driven interaction
+ */
 const HoverCard = () => {
   return (
     <div className="flex gap-1.5 p-1.5 w-[210px] h-[254px] rounded-md bg-[#212121]">

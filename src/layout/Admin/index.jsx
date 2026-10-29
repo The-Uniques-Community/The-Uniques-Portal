@@ -1,3 +1,10 @@
+/**
+ * @file index.jsx
+ * @description Administrative dashboard layout containing a responsive collapsible drawer, glassmorphic top navigation bar, theme toggling, and nested route outlet.
+ * @architecture Layout parent for all `/admin/*` views. Coordinates route synchronization with ADMIN_NAVIGATION items, ThemeProvider context, and authService logout flow.
+ * @agent_note The desktop drawer toggles between 75px (compact) and 240px (expanded), with main container margin transitioning synchronously. Drawer list has `data-lenis-prevent="true"` and wheel stopPropagation to prevent Lenis scroll locking.
+ */
+
 import React from "react";
 import { useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
@@ -39,7 +46,10 @@ import Diversity3Icon from "@mui/icons-material/Diversity3";
 import PersonIcon from "@mui/icons-material/Person";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 
-// Navigation items with paths relative to /admin
+/**
+ * @desc Navigation menu items configuration for the admin dashboard.
+ * @type {Array<{segment: string, title: string, icon: React.ReactNode}>}
+ */
 const ADMIN_NAVIGATION = [
   { segment: "", title: "Dashboard", icon: <DashboardIcon /> },
   { segment: "members-overview", title: "Members", icon: <GroupIcon /> },
@@ -57,6 +67,11 @@ const ADMIN_NAVIGATION = [
   { segment: "community", title: "Community", icon: <Diversity3Icon /> },
 ];
 
+/**
+ * @component Branding
+ * @description Theme-responsive community logo component displayed in the top bar or sidebar.
+ * @state Consumes isDarkMode from ThemeContext.
+ */
 function Branding() {
   const { isDarkMode } = useThemeContext();
   return (
@@ -69,6 +84,16 @@ function Branding() {
   );
 }
 
+/**
+ * @component AdminLayout
+ * @description Root layout component for administrator views providing dynamic drawer navigation, top AppBar, and main view Outlet.
+ * @param {Object} props - Component properties.
+ * @param {Function} [props.window] - Optional DOM window getter for iframe contexts.
+ * @state {boolean} drawerOpen - Indicates whether desktop drawer is expanded.
+ * @state {string} activeItem - Current selected navigation title derived from location path.
+ * @state {boolean} isOpen - Controls display of the logout confirmation dialog.
+ * @api authService.logout - Invoked when user confirms logout.
+ */
 function AdminLayout() {
   const { isDarkMode, toggleTheme } = useThemeContext();
   const theme = useTheme();

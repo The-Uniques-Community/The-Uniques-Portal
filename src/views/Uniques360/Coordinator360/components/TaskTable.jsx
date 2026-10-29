@@ -1,3 +1,10 @@
+/**
+ * @file TaskTable.jsx
+ * @description Tabular presentation component for displaying tasks, assigned student teams, status indicators, completion meters, and operational action triggers.
+ * @architecture Reusable table view consumed directly inside Uniques360Coordinator, wrapping ModernTable with custom action buttons and status renderers.
+ * @agent_note Safely unpacks nested member documents (`item.member` vs plain ID) and role tags. Conditionally renders completion action only for uncompleted tasks.
+ */
+
 import React from "react";
 import {
   Box,
@@ -21,6 +28,20 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CompleteIcon from '@mui/icons-material/CheckCircle';
 import TeamIcon from '@mui/icons-material/People';
 
+/**
+ * @component TaskTable
+ * @description Table displaying operational tasks with priority labels, member tags, deadlines, and action handlers.
+ * @param {Object} props - Component properties
+ * @param {string} [props.title] - Optional table card header title
+ * @param {string} [props.description] - Optional subtitle description
+ * @param {Array<Object>} props.tasks - Array of task entities
+ * @param {Function} props.getStatusColor - Function returning theme color string for a status
+ * @param {Function} [props.onViewReports] - Callback when clicking to view task report submissions
+ * @param {Function} [props.onEdit] - Callback when clicking to edit task details
+ * @param {Function} [props.onManageTeam] - Callback when clicking to manage assigned team roster
+ * @param {Function} [props.onMarkComplete] - Callback to mark task complete
+ * @param {Function} [props.onDelete] - Callback to delete task
+ */
 const TaskTable = ({
   title,
   description,

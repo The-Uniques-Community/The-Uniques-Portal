@@ -1,7 +1,25 @@
+/**
+ * @file CelebrationHeader.jsx
+ * @description Hero celebration banner header displaying a dotted pattern backdrop, promotional chip badge, large title, and wavy SVG accent.
+ * @architecture Used on promotional and milestone-focused pages or landing hero headers.
+ * @agent_note Uses inline SVG background data URI with custom dot pattern and rounded bottom border (`rounded-b-[50px]`).
+ */
+
 import React from "react";
 import Person2OutlinedIcon from "@mui/icons-material/Person2Outlined";
 import { Box, Container, Stack, Chip, Typography } from "@mui/material";
 
+/**
+ * @component CelebrationComponent
+ * @description Hero celebration header banner with nested badge chips, responsive typography, and decorative SVG wave ornament.
+ * @param {Object} props - Component properties
+ * @param {string} [props.title="More Than a Community → The Uniques ✦"] - Main headline text
+ * @param {string} [props.subtitle="Over 200+"] - Metric or introductory tag prefix
+ * @param {string} [props.chipLabel="Design Blocks"] - Highlighted chip label
+ * @param {string} [props.backgroundColor="#f1f4f9"] - Background color behind the dot pattern
+ * @param {string} [props.highlightColor="#ca0019"] - Accent color for chip and wave SVG stroke
+ * @state None - Pure presentation component
+ */
 const CelebrationComponent = ({
     title = "More Than a Community → The Uniques ✦",
     subtitle = "Over 200+",

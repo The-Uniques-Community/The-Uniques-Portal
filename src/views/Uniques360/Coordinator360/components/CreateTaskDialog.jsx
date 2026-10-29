@@ -1,3 +1,10 @@
+/**
+ * @file CreateTaskDialog.jsx
+ * @description Dialog modal for creating and assigning tasks with batch filtering, multi-member selection, custom role mapping, and priority setting.
+ * @architecture Used as a lazy-loaded sub-component by Uniques360Coordinator to configure new task assignments.
+ * @agent_note Batch filtering normalizes string casing and 'the ' prefixes. Wheel events and scroll are contained to prevent conflict with global smooth scrolling (Lenis).
+ */
+
 import React, { useMemo } from "react";
 import {
   Box,
@@ -16,6 +23,23 @@ import {
   Typography,
 } from "@mui/material";
 
+/**
+ * @component CreateTaskDialog
+ * @description Renders the task creation dialog form for assigning tasks to student members.
+ * @param {Object} props - Component properties
+ * @param {boolean} props.open - Whether the dialog modal is visible
+ * @param {Function} props.onClose - Dismissal callback to close the modal
+ * @param {Function} props.onSubmit - Action callback to dispatch task creation
+ * @param {boolean} props.submitting - Loading state during submission
+ * @param {Object} props.newTask - Task attributes object (title, description, assignedTo, deadline, priority, taskType)
+ * @param {Function} props.setNewTask - State dispatcher for task attributes
+ * @param {Object} props.newTaskRoles - Dictionary mapping member IDs to custom roles
+ * @param {Function} props.setNewTaskRoles - State dispatcher for member roles
+ * @param {string} props.selectedBatch - Currently selected batch filter for member lookup
+ * @param {Function} props.setSelectedBatch - State dispatcher for batch filter
+ * @param {Array<string>} props.batches - List of all batch identifiers
+ * @param {Array<Object>} props.members - List of all candidate member objects
+ */
 const CreateTaskDialog = ({
   open,
   onClose,

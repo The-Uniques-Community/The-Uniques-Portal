@@ -1,3 +1,10 @@
+/**
+ * @file ReportFeed.jsx
+ * @description Chronological activity feed component displaying progress reports and milestone posts with animated transitions.
+ * @architecture Child view of Uniques360Member, displaying reports associated with the active task.
+ * @agent_note Employs Framer Motion animations for report entry cards and renders FeedSkeleton when loading is active.
+ */
+
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Avatar, Box, Chip, CircularProgress, Paper, Typography } from "@mui/material";
@@ -5,6 +12,14 @@ import HistoryIcon from '@mui/icons-material/History';
 import ProgressIcon from '@mui/icons-material/QueryStats';
 import { FeedSkeleton } from "@/components/common/skeletons";
 
+/**
+ * @component ReportFeed
+ * @description Renders a scrollable timeline list of daily member reports with timestamps and progress metrics.
+ * @param {Object} props - Component properties
+ * @param {Array<Object>} props.reports - List of report objects
+ * @param {boolean} props.reportsLoading - Flag indicating report network request in flight
+ * @param {React.RefObject} props.scrollRef - Ref object attached to scroll container to support auto-scrolling
+ */
 const ReportFeed = ({ reports, reportsLoading, scrollRef }) => {
   return (
     <Box 

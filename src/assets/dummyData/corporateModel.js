@@ -1,3 +1,14 @@
+/**
+ * @file corporateModel.js
+ * @description Narrative fixtures defining The Uniques Community's corporate readiness pillars and college-to-corporate bridge model.
+ * @architecture Consumed by corporate partnership landing pages, promotional slide decks, and About Us value cards.
+ * @agent_note Encapsulates key institutional pillars including skill enhancement, project impact, self-sustainability, and student leadership.
+ */
+
+/**
+ * @desc Strategic corporate model pillars outlining community mission statements and student empowerment objectives.
+ * @type {Array<{heading: string, content: string}>}
+ */
 export const data = [
     {
       heading: "Bridging College to Corporate",

@@ -1,3 +1,10 @@
+/**
+ * @file index.jsx
+ * @description Member leave management view for requesting absences, tracking review states, and editing pending leave submissions.
+ * @architecture Uniques Member feature route view, consuming leaveService for CRUD operations on student leave applications.
+ * @agent_note Restricts edit and delete actions strictly to leave requests in 'Pending' status. Validates date chronological ordering before submission.
+ */
+
 import React, { useState, useEffect } from "react";
 import {
   Container,
@@ -38,6 +45,19 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { toast } from "react-toastify";
 import leaveService from "@/services/leaveService";
 
+/**
+ * @component LeaveManagement
+ * @description View component for members to review their submitted leave requests, track approvals, and apply for new absences.
+ * @state {Array} leaves - List of leave request objects retrieved for the current member
+ * @state {boolean} isLoading - Spinner/skeleton loading state for API requests
+ * @state {boolean} openDialog - Controls display of the leave application modal
+ * @state {string|null} editingId - ID of leave request currently being edited (null for new applications)
+ * @state {Object} formData - Form input draft containing type, startDate, endDate, and reason
+ * @api {GET} /api/leaves/my-leaves (via leaveService.getMyLeaves) - Retrieves personal leave history
+ * @api {POST} /api/leaves (via leaveService.submitLeaveRequest) - Submits a new leave request
+ * @api {PUT} /api/leaves/:id (via leaveService.updateLeaveRequest) - Modifies an existing pending leave request
+ * @api {DELETE} /api/leaves/:id (via leaveService.deleteLeaveRequest) - Cancels and removes a pending leave request
+ */
 const LeaveManagement = () => {
   const theme = useTheme();
   
@@ -59,6 +79,10 @@ const LeaveManagement = () => {
     fetchLeaves();
   }, []);
 
+  /**
+   * @desc Fetches member's submitted leave records from the leave service.
+   * @returns {Promise<void>}
+   */
   const fetchLeaves = async () => {
     try {
       setIsLoading(true);
@@ -76,7 +100,10 @@ const LeaveManagement = () => {
     }
   };
 
-
+  /**
+   * @desc Opens modal dialog pre-filled with leave data (for editing) or blank (for new request).
+   * @param {Object|null} [leave=null] - Leave entity to edit or null
+   */
   const handleOpenDialog = (leave = null) => {
     if (leave) {
       setEditingId(leave._id);
@@ -98,6 +125,9 @@ const LeaveManagement = () => {
     setOpenDialog(true);
   };
 
+  /**
+   * @desc Closes leave application modal and clears form state.
+   */
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setEditingId(null);
@@ -109,6 +139,10 @@ const LeaveManagement = () => {
     });
   };
 
+  /**
+   * @desc Validates dates and fields, then submits new or updated leave request.
+   * @returns {Promise<void>}
+   */
   const handleSave = async () => {
     if (!formData.type || !formData.startDate || !formData.endDate || !formData.reason) {
       toast.error("Please fill in all fields");
@@ -141,6 +175,11 @@ const LeaveManagement = () => {
     }
   };
 
+  /**
+   * @desc Prompts confirmation and removes a pending leave request.
+   * @param {string} id - Leave request ID
+   * @returns {Promise<void>}
+   */
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this leave request?")) {
       return;
@@ -159,6 +198,11 @@ const LeaveManagement = () => {
     }
   };
 
+  /**
+   * @desc Resolves semantic MUI badge color for approval status.
+   * @param {string} status - Leave status string
+   * @returns {'success'|'error'|'warning'|'default'} Chip color identifier
+   */
   const getStatusColor = (status) => {
     switch (status) {
       case "Approved":

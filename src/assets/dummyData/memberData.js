@@ -1,3 +1,14 @@
+/**
+ * @file memberData.js
+ * @description Comprehensive mock student member profiles encompassing academic records, skill tags, project portfolios, certifications, and achievements.
+ * @architecture Supplies test data to the member directory (`/members`), Uniques 360 portfolio visualizer, and coordinator oversight tables.
+ * @agent_note Fully mirrors the MongoDB user/member schema, including nested sub-documents for certificates, portfolio projects, social media handles, and disciplinary statuses.
+ */
+
+/**
+ * @desc Array of mock student member profile records conforming to the backend user schema.
+ * @type {Array<Object>}
+ */
 export const members = [
     {
       fullName: "John Doe",

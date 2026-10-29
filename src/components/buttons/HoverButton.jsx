@@ -1,5 +1,19 @@
+/**
+ * @file HoverButton.jsx
+ * @description Morphing "Learn More" call-to-action button with animated circular background expansion on hover.
+ * @architecture Used in marketing sections and landing cards for secondary exploration prompts.
+ * @agent_note Default export is named `LearnMoreButton`. Handles local hover state to expand circle to full width button with brand red fill.
+ */
+
 import { useState } from "react";
 
+/**
+ * @component LearnMoreButton
+ * @description Animated interactive button that morphs a circular icon pill into a full-width colored background on hover.
+ * @param {Object} props - Component properties
+ * @param {Function} [props.onClick] - Click handler callback
+ * @state {boolean} hovered - Tracks mouse hover state to trigger morphing expansion transition
+ */
 export default function LearnMoreButton({onClick}) {
   const [hovered, setHovered] = useState(false);
 

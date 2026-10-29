@@ -1,3 +1,10 @@
+/**
+ * @file index.jsx
+ * @description Member profile management dashboard providing comprehensive CRUD workflows for portfolio data, achievements, certifications, internships, projects, academics, and fine tracking.
+ * @architecture Top-level view for member profiles in the Uniques section, integrating apiClient endpoints for profile retrieval and entity mutations.
+ * @agent_note Handles multipart uploads via /upload/file_upload with AVATAR presets, and normalizes image proxy URLs using getProxyImageUrl.
+ */
+
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -109,6 +116,14 @@ import apiClient from "@/services/apiClient";
 // API base URL
 const API_BASE_URL = BASE_URL;
 
+/**
+ * @component CustomTabPanel
+ * @description Accessible tab panel container rendering children conditionally based on active tab index.
+ * @param {Object} props - Component properties
+ * @param {React.ReactNode} [props.children] - Panel content elements
+ * @param {number} props.value - Currently active tab value index
+ * @param {number} props.index - Index assigned to this specific panel
+ */
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
   return (
@@ -130,6 +145,11 @@ CustomTabPanel.propTypes = {
   value: PropTypes.number.isRequired,
 };
 
+/**
+ * @desc Generates accessibility properties for an accessible MUI tab.
+ * @param {number} index - The tab index position
+ * @returns {Object} Props object with id and aria-controls
+ */
 function a11yProps(index) {
   return {
     id: `simple-tab-${index}`,
@@ -138,6 +158,11 @@ function a11yProps(index) {
 }
 
 // Robust helper to resolve avatar image URLs from fileId, profilePic object, user object, or URL string
+/**
+ * @desc Resolves avatar/profile image URLs from fileId, profilePic objects, or fallback proxy routes.
+ * @param {Object|string|null} fileIdOrUser - User object, image document, or raw string file ID
+ * @returns {string|null} Full proxy URL or direct image URI
+ */
 const getProxyImageUrl = (fileIdOrUser) => {
   if (!fileIdOrUser) return null;
 
@@ -193,6 +218,27 @@ const getProxyImageUrl = (fileIdOrUser) => {
   return null;
 };
 
+/**
+ * @component Index
+ * @description Master Member Profile view displaying tabs for profile overview, projects, certificates, internships, academics, and events.
+ * @state {number} value - Active tab index (0: Overview, 1: Projects, 2: Certifications, etc.)
+ * @state {Object|null} user - Current member profile entity
+ * @state {Object} editedUser - Working draft copy during edit modes
+ * @state {boolean} pageLoading - Global profile retrieval loading flag
+ * @state {Object} editMode - Boolean dictionary tracking edit toggles (profile, skills, bio)
+ * @state {Array} currentAchievement - Achievement entity draft during creation or edit
+ * @state {Array} currentCertification - Certification entity draft
+ * @state {Array} currentProject - Project entity draft
+ * @state {Array} currentInternship - Internship entity draft
+ * @state {Array} currentEvent - Event contribution draft
+ * @state {Array} currentSemester - Academic semester SGPA draft
+ * @api {GET} /api/member/getProfile - Retrieves logged-in member profile data
+ * @api {PUT} /api/member/members/:id/editProfile - Updates profile info, bio, and skills
+ * @api {POST} /upload/file_upload - Multipart upload for profile picture
+ * @api {DELETE} /api/member/members/:id/profilePic - Removes member avatar
+ * @api {PUT} /api/member/members/:id/achievements - Updates achievements array
+ * @api {POST} /api/admin/member/:id/fine - Imposes administrative fine
+ */
 const Index = () => {
   const theme = useTheme();
   const [value, setValue] = useState(0);
