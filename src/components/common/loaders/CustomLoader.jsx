@@ -1,3 +1,10 @@
+/**
+ * @file CustomLoader.jsx
+ * @description Fullscreen modal splash loader mounted via React Portal, displaying branded community logo and progress indicator.
+ * @architecture Used during workspace boot, initialization sequences, and application-level auth checks.
+ * @agent_note Mounts directly onto `document.body` via `createPortal`. Reacts to global dark/light theme mode via `useThemeContext`.
+ */
+
 import React from "react";
 import { createPortal } from "react-dom";
 import { Box, Typography, LinearProgress } from "@mui/material";
@@ -5,6 +12,11 @@ import { useThemeContext } from "@/theme/ThemeProvider";
 import logoCommunity from "@/assets/logos/theuniquesCommunity.png";
 import logoWhite from "@/assets/logos/uniqueswhite.png";
 
+/**
+ * @component CustomLoader
+ * @description Renders a high-priority fullscreen loading overlay with adaptive theme logo, progress bar, and workspace initialization message.
+ * @state Consumes theme context via `useThemeContext` to switch between dark and light logos/backgrounds
+ */
 const CustomLoader = () => {
   const { isDarkMode } = useThemeContext();
 

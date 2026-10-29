@@ -1,3 +1,14 @@
+/**
+ * @file gdpData.js
+ * @description Time-series mock dataset representing multi-country economic indicators across consecutive annual milestones for analytical charting components.
+ * @architecture Supplies structured time-series data to MUI X Charts, Recharts line graphs, and comparative metric visualizations.
+ * @agent_note Data points range from 1990 through 2018, using native JavaScript Date objects on the temporal axis and floating-point numeric metrics.
+ */
+
+/**
+ * @desc Longitudinal time-series data points for multi-line comparative charts.
+ * @type {Array<{date: Date, fr: number, gb: number, dl: number}>}
+ */
 export const dataset = [
     { date: new Date(1990, 0, 1), fr: 28129, gb: 26189, dl: 25391 },
     { date: new Date(1991, 0, 1), fr: 28294.264, gb: 25792.014, dl: 26769.96 },

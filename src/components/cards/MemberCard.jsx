@@ -1,3 +1,10 @@
+/**
+ * @file MemberCard.jsx
+ * @description Public community member showcase card with embedded quick-view modal dialog, social handles, and skills tags.
+ * @architecture Consumed in community/team showcase views. Triggers an in-place MUI modal for quick overview or routes to detail views.
+ * @agent_note Manages an internal MUI Modal state (`open`). Contains social media linkouts and skill tag previews.
+ */
+
 import { useTheme } from "@mui/material/styles";
 import { FaLinkedinIn, FaInstagram } from "react-icons/fa";
 import { GoArrowUpRight } from "react-icons/go";
@@ -8,6 +15,10 @@ import Box from "@mui/material/Box";
 import Button from "@/components/buttons/Button";
 import Modal from "@mui/material/Modal";
 import BorderAllRounded from '@mui/icons-material/BorderAllRounded';
+
+/**
+ * @desc Modal box layout and positioning styles for the member detail dialog.
+ */
 const style = {
   position: "absolute",
   BorderAllRounded:0,
@@ -19,6 +30,20 @@ const style = {
   p: 4,
 };
 
+/**
+ * @component MemberCard
+ * @description Renders a community member profile card displaying photo, name, designation, batch, and social links with interactive quick-view modal dialog.
+ * @param {Object} props - Component properties
+ * @param {string} [props.linkedin] - URL for LinkedIn profile
+ * @param {string} [props.instagram] - URL for Instagram profile
+ * @param {string} [props.twitter] - URL for Twitter/X profile
+ * @param {string} props.fullName - Member's full display name
+ * @param {string} props.batch - Member's batch affiliation (e.g. "The Uniques 2.0")
+ * @param {string} props.position - Community role or designation
+ * @param {string} props.profileImg - Profile image URL or asset source
+ * @param {Function} [props.onClick] - Callback for detail arrow navigation button
+ * @state {boolean} open - Controls MUI Modal visibility for full member details
+ */
 const MemberCard = ({
   linkedin,
   instagram,

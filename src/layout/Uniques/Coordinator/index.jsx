@@ -1,3 +1,10 @@
+/**
+ * @file index.jsx
+ * @description Coordinator portal layout providing student cohort navigation, responsive collapsible drawer, glassmorphic header, and nested route outlet.
+ * @architecture Layout container for all `/coordinator/*` routes. Connects to ThemeProvider, authService, ConfirmationModal, and renders child views via React Router Outlet.
+ * @agent_note Desktop drawer dynamically toggles width between 75px and 240px with content offset adjustments. Drawer list is tagged with `data-lenis-prevent="true"` and stops wheel event bubbling to isolate scrolling from Lenis.
+ */
+
 import React from "react";
 import { useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
@@ -39,7 +46,10 @@ import ClassIcon from "@mui/icons-material/Class";
 import Diversity3Icon from "@mui/icons-material/Diversity3";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 
-// Navigation items with paths relative to /coordinator
+/**
+ * @desc Navigation menu items configuration for coordinator routes.
+ * @type {Array<{segment: string, title: string, icon: React.ReactNode}>}
+ */
 const STUDENT_NAVIGATION = [
   { segment: "", title: "Dashboard", icon: <DashboardIcon /> },
   { segment: "members-overview", title: "Members", icon: <GroupIcon /> },
@@ -57,6 +67,11 @@ const STUDENT_NAVIGATION = [
   { segment: "community", title: "Community", icon: <Diversity3Icon /> },
 ];
 
+/**
+ * @component Branding
+ * @description Renders light or dark themed community logo.
+ * @state Consumes isDarkMode from ThemeContext.
+ */
 function Branding() {
   const { isDarkMode } = useThemeContext();
   return (
@@ -69,6 +84,16 @@ function Branding() {
   );
 }
 
+/**
+ * @component CoordinatorLayout
+ * @description Layout component for coordinator management, hosting sidebar links, top navigation bar, and nested child route Outlet.
+ * @param {Object} props - Component properties.
+ * @param {Function} [props.window] - Optional DOM window getter for iframe contexts.
+ * @state {boolean} drawerOpen - Sidebar expansion toggle.
+ * @state {string} activeItem - Current active route title derived from URL.
+ * @state {boolean} isOpen - Modal visibility state for logout confirmation.
+ * @api authService.logout - Revokes coordinator session on confirmation.
+ */
 function CoordinatorLayout() {
   const { isDarkMode, toggleTheme } = useThemeContext();
   const theme = useTheme();

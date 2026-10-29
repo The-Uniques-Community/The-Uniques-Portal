@@ -1,3 +1,10 @@
+/**
+ * @file index.jsx
+ * @description Financial administration dashboard showcasing community fine metrics, payment rates, batch-wise fine analytics, and transaction logs.
+ * @architecture Entry view for `/admin/accounts` and `/coordinator/accounts`. Integrates with backend fine reporting APIs (`/api/admin/fine/*`), `@/utils/batch/batchesData`, Recharts visual graphs, and the child `FineTable` transaction component.
+ * @agent_note Aggregates batch-wise pending fines in real-time by querying `/api/admin/fine/fines/pending/members` across all active batches, providing graceful fallback arrays upon failure.
+ */
+
 import React, { useState, useEffect } from 'react';
 import ModernStatCard from '@/components/cards/ModernStatCard';
 import FineTable from './components/TransactionTable';
@@ -32,6 +39,17 @@ import LazyRender from '@/components/common/LazyRender';
 
 const API_BASE_URL = `${BASE_URL}/api/admin`;
 
+/**
+ * @component Accounts
+ * @description Main financial console rendering macro KPIs, batch-wise fine bar charts, payment ratio pie charts, and the complete fine management table.
+ * @state {Object} stats - Aggregate financial and member metrics `{ totalMembers, totalFinesIssued, totalAmount, totalPendingAmount, totalPaidAmount, totalWaivedAmount, membersWithPendingFines, paidMembers }`.
+ * @state {Array<Object>} chartData - Batch-wise fine aggregation for bar chart display.
+ * @state {boolean} loading - Loading indicator for fine statistics and batch metrics.
+ * @state {string|null} error - Error message string if data fetching fails.
+ * @api `GET /api/admin/fine/fines/statistics` - Fetches total fines, collections, and waiver statistics.
+ * @api `GET /api/admin/member?limit=1` - Fetches overall member count.
+ * @api `GET /api/admin/fine/fines/pending/members` - Fetches batch-specific outstanding fines.
+ */
 const Accounts = () => {
   const theme = useTheme();
   const location = useLocation();

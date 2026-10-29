@@ -1,3 +1,10 @@
+/**
+ * @file uniques360.jsx
+ * @description Uniques360 Member workspace for tracking assigned tasks, viewing report history, posting daily progress logs, and resolving assignments.
+ * @architecture Serves as the primary member view under Uniques360, orchestrating TaskSidebar, ReportFeed, and ReportComposer.
+ * @agent_note Automatically syncs feed scroll state on report additions and updates both report feed and task list after report submissions.
+ */
+
 import React, { useEffect, useRef, useState } from "react";
 import { Avatar, Box, Button, Chip, Grid, Paper, Typography } from "@mui/material";
 import CompleteIcon from '@mui/icons-material/CheckCircleOutline';
@@ -12,6 +19,22 @@ import ReportFeed from "./components/ReportFeed";
 import ReportComposer from "./components/ReportComposer";
 import { WorkspaceSkeleton } from "@/components/common/skeletons";
 
+/**
+ * @component Uniques360Member
+ * @description Member workspace for reviewing assigned tasks, tracking deadlines and assignees, posting daily updates, and marking tasks finished.
+ * @state {Array} tasks - Tasks assigned to current authenticated student member
+ * @state {Object|null} selectedTask - The currently selected task displayed in the active workspace view
+ * @state {Array} reports - Array of report submission entries for the selected task
+ * @state {string} newReport - Text content of daily update being composed
+ * @state {string|number} progressPercent - Numerical progress completion percent inputted by user
+ * @state {boolean} loading - Global initial fetch state
+ * @state {boolean} reportsLoading - Loading state for task report fetching
+ * @state {boolean} sending - Active submission lock state for daily reports
+ * @api {GET} /api/uniques360/tasks/member/me - Retrieves tasks assigned to logged-in member
+ * @api {GET} /api/uniques360/reports/task/:taskId - Retrieves progress reports for task
+ * @api {POST} /api/uniques360/reports - Submits a new daily report entry
+ * @api {PATCH} /api/uniques360/tasks/:taskId - Marks task status as completed
+ */
 const Uniques360Member = () => {
   const [tasks, setTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
@@ -24,6 +47,10 @@ const Uniques360Member = () => {
   const scrollRef = useRef(null);
   const { isDarkMode } = useThemeContext();
 
+  /**
+   * @desc Fetches tasks assigned to current member and initializes selected task.
+   * @returns {Promise<void>}
+   */
   const fetchTasks = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/api/uniques360/tasks/member/me`, { withCredentials: true });
@@ -41,6 +68,11 @@ const Uniques360Member = () => {
     }
   };
 
+  /**
+   * @desc Fetches activity reports submitted for a given task ID.
+   * @param {string} taskId - Target task identifier
+   * @returns {Promise<void>}
+   */
   const fetchReports = async (taskId) => {
     try {
       setReportsLoading(true);
@@ -74,8 +106,17 @@ const Uniques360Member = () => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [reports]);
 
+  /**
+   * @desc Formats raw status token into human-readable label.
+   * @param {string} status - Raw status string
+   * @returns {string} Formatted label
+   */
   const taskStatusLabel = (status) => (status === "pending" ? "Pending" : status);
 
+  /**
+   * @desc Submits daily progress report and refreshes reports and task status.
+   * @returns {Promise<void>}
+   */
   const handleSubmitReport = async () => {
     if ((!newReport.trim() && progressPercent === "") || !selectedTask) return;
     try {
@@ -97,6 +138,10 @@ const Uniques360Member = () => {
     }
   };
 
+  /**
+   * @desc Sends patch request to mark currently active task completed.
+   * @returns {Promise<void>}
+   */
   const handleMarkComplete = async () => {
     if (!selectedTask) return;
     try {
@@ -120,6 +165,11 @@ const Uniques360Member = () => {
   }
 
   // Define reactive styling conditions based on current selected status configurations
+  /**
+   * @desc Resolves theme color hexadecimal string based on task status and active mode.
+   * @param {string} status - Task status value
+   * @returns {string} Color hex code
+   */
   const getStatusColor = (status) => {
     switch (status) {
       case "completed": return "#16a34a";

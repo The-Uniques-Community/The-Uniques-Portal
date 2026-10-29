@@ -1,3 +1,14 @@
+/**
+ * @file eventsData.js
+ * @description Mock event schedule and detail fixtures covering technical workshops, web3 seminars, and competitive hackathons.
+ * @architecture Supplies test data to public event calendars, homepage featured event banners, and admin event planning tables.
+ * @agent_note Incorporates native JavaScript `Date` instances for `eventDate`, nested guest speaker metadata, and organizing committee rosters.
+ */
+
+/**
+ * @desc Collection of mock community event records with venue, timing, guest speakers, and organizers.
+ * @type {Array<{eventName: string, eventDescription: string, eventBanner: string, eventDate: Date, eventTime: string, eventVenue: string, eventOrganizer: string, eventMembers: Array<{fullName: string, batch: string}>, eventGuests: Array<{guestImage: string, guestName: string, guestDesignation: string, guestCompany: string, guestLinkedin: string}>, eventType: string[], eventStatus: string}>}
+ */
 export const events = [
     {
       eventName: "AI & ML Workshop",

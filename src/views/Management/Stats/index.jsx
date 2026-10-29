@@ -1,3 +1,10 @@
+/**
+ * @file index.jsx
+ * @description Public landing page impact metrics configuration console (revenue generated, partners, projects delivered, community events).
+ * @architecture Routed via `/admin/stats` or `/coordinator/stats`. Reads and updates `@/utils/stats/statsData` (`getStoredStats`, `fetchStats`, `saveStoredStats`, `resetStoredStats`). Dispatches and listens for the `stats-updated` custom window event.
+ * @agent_note Numerical metrics updated here directly power the animated counter numbers on the public landing page "Our Achievements - Making an Impact" section.
+ */
+
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -30,6 +37,17 @@ import {
   DEFAULT_STATS,
 } from "@/utils/stats/statsData";
 
+/**
+ * @component StatsManagement
+ * @description Administrative metrics console with live preview cards and an edit form to synchronize organizational KPI figures with the public portal.
+ * @state {Object} stats - Numerical metrics `{ Earnings, Clients, Projects, Events }`.
+ * @state {boolean} loading - Loading indicator for fetching fresh metrics.
+ * @state {boolean} saving - Spinner state during metrics persistence.
+ * @state {Object} snackbar - Notification feedback state `{ open, message, severity }`.
+ * @api `fetchStats` - Fetches live impact numbers from backend.
+ * @api `saveStoredStats` - Persists updated metrics to backend and local storage.
+ * @api `resetStoredStats` - Reverts metrics back to default baseline values.
+ */
 const StatsManagement = () => {
   const theme = useTheme();
   const [stats, setStats] = useState(() => getStoredStats());

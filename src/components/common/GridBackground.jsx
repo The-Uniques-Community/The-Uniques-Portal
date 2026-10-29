@@ -1,5 +1,17 @@
+/**
+ * @file GridBackground.jsx
+ * @description Interactive canvas-based grid background effect responding to cursor distance and proximity.
+ * @architecture Mounted globally or on landing routes as a ambient interactive visual layer.
+ * @agent_note The canvas rendering loop is currently commented out and returning `null` for performance/design hold. Preserves canvas resize and mouse-proximity calculations for future re-activation.
+ */
+
 import { useEffect, useRef } from 'react';
 
+/**
+ * @component GridBackground
+ * @description Ambient background component for interactive mouse-tracking coordinate grid lines.
+ * @state Canvas and mouse cursor coordinate refs (`canvasRef`, `mouseRef`)
+ */
 const GridBackground = () => {
   const canvasRef = useRef(null);
   const mouseRef = useRef({ x: 0, y: 0 });

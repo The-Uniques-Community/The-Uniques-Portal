@@ -1,3 +1,10 @@
+/**
+ * @file EventInsights.jsx
+ * @description Event operations dashboard providing analytics, milestone progress, urgency tracking, and team allocations for event-type tasks.
+ * @architecture Uniques360 view for event coordinators, pulling coordinator tasks filtered specifically by taskType === 'event'.
+ * @agent_note Computes dynamic stat card aggregates (total, upcoming, completed, urgent) and provides fallback percentage estimation when progressPercent is undefined.
+ */
+
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -40,6 +47,14 @@ import { toast } from "react-toastify";
 
 const BRAND_COLOR = "#ca0019";
 
+/**
+ * @component EventInsights
+ * @description Operational dashboard for monitoring, filtering, and marking event tasks with aggregate status cards and live streams.
+ * @state {Array} tasks - Event-related tasks loaded from coordinator current endpoint
+ * @state {boolean} loading - Network loading status
+ * @api {GET} /api/uniques360/tasks/coordinator/current - Fetches coordinator tasks (filtered for taskType === 'event')
+ * @api {PATCH} /api/uniques360/tasks/:taskId - Marks an event task as completed
+ */
 const EventInsights = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,6 +68,10 @@ const EventInsights = () => {
     lightGray: isDark ? "rgba(255, 255, 255, 0.08)" : "#f3f3f3",
   };
 
+  /**
+   * @desc Fetches coordinator tasks from backend and filters them for event type.
+   * @returns {Promise<void>}
+   */
   const fetchEventTasks = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/api/uniques360/tasks/coordinator/current`, {
@@ -73,6 +92,11 @@ const EventInsights = () => {
     fetchEventTasks();
   }, []);
 
+  /**
+   * @desc Dispatches patch request to mark an event task completed after user confirmation.
+   * @param {string} taskId - ID of the task to complete
+   * @returns {Promise<void>}
+   */
   const handleMarkComplete = async (taskId) => {
     if (!window.confirm("Mark this task as completed?")) return;
     try {
@@ -92,6 +116,11 @@ const EventInsights = () => {
     urgent: tasks.filter(t => t.priority === "high" && t.status !== "completed").length,
   };
 
+  /**
+   * @desc Maps priority level to corresponding brand/theme color token.
+   * @param {string} priority - Priority level string ('high' | 'medium' | 'low')
+   * @returns {string} Theme color or brand color
+   */
   const getPriorityColor = (priority) => {
     switch (priority) {
       case "high": return BRAND_COLOR;
@@ -100,6 +129,11 @@ const EventInsights = () => {
     }
   };
 
+  /**
+   * @desc Resolves progress percentage with heuristic fallback if no explicit percent is recorded.
+   * @param {Object} task - Task object
+   * @returns {number} Percentage value (0-100)
+   */
   const getTaskProgress = (task) => {
     if (typeof task.progressPercent === "number") return task.progressPercent;
     switch (task.status) {
@@ -109,6 +143,11 @@ const EventInsights = () => {
     }
   };
 
+  /**
+   * @desc Extracts up to two initials from a member's full name.
+   * @param {string} fullName - Member name
+   * @returns {string} Capitalized initials or fallback
+   */
   const getInitials = (fullName) => {
     if (!fullName) return "?";
     return fullName

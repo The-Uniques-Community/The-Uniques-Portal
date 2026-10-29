@@ -1,6 +1,22 @@
+/**
+ * @file BlogCard2.jsx
+ * @description Modern Material UI and Tailwind-styled article card alternative with outward arrow action button and tag badges.
+ * @architecture Used in blog listing sections and landing page insights grids as a structured Material UI Card alternative to BlogCard.
+ * @agent_note Combines MUI `@mui/material` components with Tailwind CSS utility overrides using `!important` markers (`!bg-transparent !shadow-none`).
+ */
+
 import ArrowOutward from '@mui/icons-material/ArrowOutward';
 import { Card, CardContent, CardMedia, Typography, Box } from "@mui/material";
 
+/**
+ * @component BlogCard2
+ * @description Renders an interactive blog card with header action, media display, and metadata pill tags.
+ * @param {Object} props - Component properties
+ * @param {string} props.title - Title header of the article
+ * @param {string} [props.subtitle] - Subtitle description or excerpt
+ * @param {string} [props.imgSrc] - Optional image URL for article visual banner
+ * @state None - Pure presentation component
+ */
 export default function BlogCard2({ title, subtitle, imgSrc }) {
   return (
     <Card className="!bg-transparent !shadow-none text-white">

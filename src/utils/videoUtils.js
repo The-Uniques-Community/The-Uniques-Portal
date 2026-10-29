@@ -1,11 +1,14 @@
 /**
- * Video utility functions for embedding YouTube, Vimeo, and direct video sources.
+ * @file videoUtils.js
+ * @description Video URL parsers, format detectors, and secure embed URL generators supporting YouTube, Vimeo, and direct HTML5 video assets.
+ * @architecture Consumed by video dialogs, learning resource previews, and multimedia portfolio players throughout the application.
+ * @agent_note `getYouTubeEmbedUrl` parses short links, watch queries, and YouTube shorts into secure iframe embed URLs with `enablejsapi=1`, origin, and `rel=0` parameters to prevent Error 153.
  */
 
 /**
- * Checks if a URL is a YouTube URL
- * @param {string} url
- * @returns {boolean}
+ * @desc Checks if a given string is a valid YouTube URL.
+ * @param {string} url - Target URL to evaluate.
+ * @returns {boolean} True if the URL matches YouTube domains.
  */
 export const isYouTubeUrl = (url) => {
   if (!url || typeof url !== 'string') return false;
@@ -13,9 +16,9 @@ export const isYouTubeUrl = (url) => {
 };
 
 /**
- * Checks if a URL is a Vimeo URL
- * @param {string} url
- * @returns {boolean}
+ * @desc Checks if a given string is a valid Vimeo URL.
+ * @param {string} url - Target URL to evaluate.
+ * @returns {boolean} True if the URL matches Vimeo domain.
  */
 export const isVimeoUrl = (url) => {
   if (!url || typeof url !== 'string') return false;
@@ -23,9 +26,9 @@ export const isVimeoUrl = (url) => {
 };
 
 /**
- * Checks if a URL points to a direct video file (e.g. .mp4, .webm)
- * @param {string} url
- * @returns {boolean}
+ * @desc Checks if a URL points to a direct video file (e.g. .mp4, .webm, .ogg, .mov).
+ * @param {string} url - Target URL to evaluate.
+ * @returns {boolean} True if the URL ends with a direct video extension.
  */
 export const isDirectVideoUrl = (url) => {
   if (!url || typeof url !== 'string') return false;
@@ -33,11 +36,9 @@ export const isDirectVideoUrl = (url) => {
 };
 
 /**
- * Transforms a YouTube watch, share, short, or embed URL into a standard secure embed URL
- * with enablejsapi, origin, and rel parameters to prevent Error 153.
- *
- * @param {string} url
- * @returns {string}
+ * @desc Transforms various YouTube URL formats (watch, share, short, embed) into an embed URL with API parameters.
+ * @param {string} url - Raw YouTube URL.
+ * @returns {string} Sanitized embeddable YouTube URL.
  */
 export const getYouTubeEmbedUrl = (url) => {
   if (!url || typeof url !== 'string') return '';
@@ -87,9 +88,9 @@ export const getYouTubeEmbedUrl = (url) => {
 };
 
 /**
- * Transforms a Vimeo URL into an embeddable player URL.
- * @param {string} url
- * @returns {string}
+ * @desc Transforms a Vimeo video URL into an embeddable player iframe URL.
+ * @param {string} url - Raw Vimeo URL.
+ * @returns {string} Player embed URL.
  */
 export const getVimeoEmbedUrl = (url) => {
   if (!url || typeof url !== 'string') return '';

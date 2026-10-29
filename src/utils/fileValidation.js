@@ -1,9 +1,17 @@
+/**
+ * @file fileValidation.js
+ * @description Centralized client-side file validation presets, size formatters, and MIME/extension verification utilities.
+ * @architecture Standard utility used across file upload fields, avatars, project attachments, and certificate forms. Integrates with React Toastify for user notifications.
+ * @agent_note Provides preset definitions (AVATAR, IMAGE, RECEIPT, CERTIFICATE, DOCUMENT_OR_IMAGE) with generous size limits (5-10MB). Offers automatic input reset helpers to allow users to retry rejected selections.
+ */
+
 import { toast } from "react-toastify";
 
 /**
- * Standard presets for file upload validation across the frontend.
+ * @desc Standard presets for file upload validation across the frontend.
  * Each preset specifies supported file extensions, MIME types, HTML accept string,
- * relaxed maximum file size limit, and standard user-facing error messages.
+ * maximum file size limit, and standard user-facing error messages.
+ * @type {Object<string, {name: string, extensions: string[], mimeTypes: string[], accept: string, maxSizeBytes: number, maxSizeLabel: string, errorMessage: string}>}
  */
 export const FILE_VALIDATION_PRESETS = {
   AVATAR: {
@@ -61,10 +69,9 @@ export const FILE_VALIDATION_PRESETS = {
 };
 
 /**
- * Formats a byte size into a concise, human-readable string (e.g. "10 MB", "4.2 MB", "500 KB").
- * 
- * @param {number} bytes
- * @returns {string}
+ * @desc Formats a byte size into a concise, human-readable string (e.g. "10 MB", "4.2 MB", "500 KB").
+ * @param {number} bytes - Raw byte count to format.
+ * @returns {string} Formatted human-readable string.
  */
 export const formatFileSize = (bytes) => {
   if (typeof bytes !== "number" || isNaN(bytes) || bytes < 0) return "0 B";
@@ -84,10 +91,9 @@ export const formatFileSize = (bytes) => {
 };
 
 /**
- * Safely resets an HTML file input element value to allow re-selection of the same or corrected file.
+ * @desc Safely resets an HTML file input element value to allow re-selection of the same or corrected file.
  * Accepts an event object, a React ref, or an HTMLInputElement directly.
- * 
- * @param {Event|React.RefObject|HTMLInputElement|null} target
+ * @param {Event|React.RefObject|HTMLInputElement|null} target - Element or event containing file input reference.
  */
 export const resetFileInput = (target) => {
   if (!target) return;
@@ -105,11 +111,10 @@ export const resetFileInput = (target) => {
 };
 
 /**
- * Checks whether a single file matches the allowed extensions and MIME types in a preset.
- * 
- * @param {File} file
- * @param {Object} preset - One of FILE_VALIDATION_PRESETS
- * @returns {boolean}
+ * @desc Checks whether a single file matches the allowed extensions and MIME types in a preset.
+ * @param {File} file - File object to validate.
+ * @param {Object} preset - One of FILE_VALIDATION_PRESETS.
+ * @returns {boolean} True if file type matches preset criteria.
  */
 export const isFileTypeValid = (file, preset) => {
   if (!file || !preset) return false;
@@ -136,11 +141,10 @@ export const isFileTypeValid = (file, preset) => {
 };
 
 /**
- * Checks whether a file is within the maximum size limit defined in the preset.
- * 
- * @param {File} file
- * @param {Object} preset - One of FILE_VALIDATION_PRESETS
- * @returns {boolean}
+ * @desc Checks whether a file is within the maximum size limit defined in the preset.
+ * @param {File} file - File object to validate.
+ * @param {Object} preset - One of FILE_VALIDATION_PRESETS.
+ * @returns {boolean} True if file size is within limits.
  */
 export const isFileSizeValid = (file, preset) => {
   if (!file || !preset) return false;
@@ -150,16 +154,15 @@ export const isFileSizeValid = (file, preset) => {
 };
 
 /**
- * Validates a single file against both type restrictions and file size limits.
+ * @desc Validates a single file against both type restrictions and file size limits.
  * If invalid, displays a toast error, optionally resets the input, and returns false.
- * 
- * @param {File} file
- * @param {Object} preset - One of FILE_VALIDATION_PRESETS
- * @param {Object} [options]
- * @param {boolean} [options.showToast=true]
- * @param {string} [options.customMessage]
- * @param {Event|React.RefObject|HTMLInputElement} [options.inputTarget]
- * @returns {boolean}
+ * @param {File} file - File object to evaluate.
+ * @param {Object} preset - One of FILE_VALIDATION_PRESETS.
+ * @param {Object} [options] - Validation behavior options.
+ * @param {boolean} [options.showToast=true] - Whether to show a toast message on failure.
+ * @param {string} [options.customMessage] - Override error message.
+ * @param {Event|React.RefObject|HTMLInputElement} [options.inputTarget] - Input element to reset on failure.
+ * @returns {boolean} True if valid.
  */
 export const validateFile = (file, preset, options = {}) => {
   const { showToast = true, customMessage = "", inputTarget = null } = options;
@@ -195,15 +198,14 @@ export const validateFile = (file, preset, options = {}) => {
 };
 
 /**
- * Validates a FileList or array of Files against both type restrictions and file size limits.
- * 
- * @param {FileList|File[]} files
- * @param {Object} preset - One of FILE_VALIDATION_PRESETS
- * @param {Object} [options]
- * @param {boolean} [options.showToast=true]
- * @param {string} [options.customMessage]
- * @param {Event|React.RefObject|HTMLInputElement} [options.inputTarget]
- * @returns {{ validFiles: File[], invalidFiles: File[], allValid: boolean }}
+ * @desc Validates a FileList or array of Files against both type restrictions and file size limits.
+ * @param {FileList|File[]} files - Collection of File objects.
+ * @param {Object} preset - One of FILE_VALIDATION_PRESETS.
+ * @param {Object} [options] - Validation behavior options.
+ * @param {boolean} [options.showToast=true] - Whether to show a toast message on failure.
+ * @param {string} [options.customMessage] - Custom error message string.
+ * @param {Event|React.RefObject|HTMLInputElement} [options.inputTarget] - Input element to reset on failure.
+ * @returns {{ validFiles: File[], invalidFiles: File[], allValid: boolean }} Results summary object.
  */
 export const validateFiles = (files, preset, options = {}) => {
   const { showToast = true, customMessage = "", inputTarget = null } = options;

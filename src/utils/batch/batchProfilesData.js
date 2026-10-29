@@ -1,3 +1,10 @@
+/**
+ * @file batchProfilesData.js
+ * @description Cohort batch profiles data manager synchronizing local storage cache with MongoDB backend endpoints, supporting natural sorting, Drive uploads, and real-time custom event broadcasts.
+ * @architecture Data layer serving Community views, Batch Profiles management in Admin/Coordinator portals, and landing page showcases.
+ * @agent_note Broadcasts the `batch-profiles-updated` CustomEvent on the window object on state mutation. Always sanitizes images using `getSafeImageUrl`.
+ */
+
 import apiClient from "@/services/apiClient";
 import { BASE_URL } from "@/config";
 import uniques1 from "@/assets/img/About/uniques1.webp";
@@ -7,10 +14,19 @@ import uniques4 from "@/assets/img/About/uniques4.webp";
 import { getStoredBatches } from "./batchesData";
 import { getSafeImageUrl } from "../imageHelper";
 
+/**
+ * @desc Default initial batch profiles array.
+ * @type {Array<Object>}
+ */
 export const DEFAULT_BATCH_PROFILES = [];
 
 const PROFILES_STORAGE_KEY = "tu_community_batch_profiles";
 
+/**
+ * @desc Sorts batch profile records numerically and lexicographically (e.g. Uniques 1.0, 2.0).
+ * @param {Array<Object>} list - Batch profiles to sort.
+ * @returns {Array<Object>} Naturally sorted profile objects.
+ */
 const sortProfilesNaturally = (list) => {
   return [...list].sort((a, b) => {
     const nameA = a.label || a.title || "";
@@ -22,6 +38,10 @@ const sortProfilesNaturally = (list) => {
   });
 };
 
+/**
+ * @desc Reads cached batch profiles from localStorage, synthesizing entries for new member batches.
+ * @returns {Array<Object>} List of batch profile objects.
+ */
 export const getStoredBatchProfiles = () => {
   try {
     const raw = localStorage.getItem(PROFILES_STORAGE_KEY);
@@ -70,6 +90,10 @@ export const getStoredBatchProfiles = () => {
   }
 };
 
+/**
+ * @desc Fetches batch profile records from the backend API, validates images, caches in localStorage, and dispatches updates.
+ * @returns {Promise<Array<Object>>} Resolves to list of batch profiles.
+ */
 export const fetchBatchProfiles = async () => {
   try {
     const response = await apiClient.get(`${BASE_URL}/api/batches/profiles`);
@@ -95,12 +119,12 @@ export const fetchBatchProfiles = async () => {
 };
 
 /**
- * Uploads a cohort batch profile picture to Google Drive via backend multipart endpoint.
+ * @desc Uploads a cohort batch profile picture to Google Drive via backend multipart endpoint.
  * Returns { fileId, fileUrl, fileName, proxyUrl } so only the 40-byte URL is stored in database.
- * @param {File} file - Image file to upload
- * @param {string} [batchName] - Name of the cohort batch
- * @param {string} [batchId] - Optional existing batch ID to link directly
- * @returns {Promise<{fileId: string, fileUrl: string, fileName: string, proxyUrl: string}>}
+ * @param {File} file - Image file to upload.
+ * @param {string} [batchName="General Batches"] - Name of the cohort batch.
+ * @param {string|null} [batchId=null] - Optional existing batch ID to link directly.
+ * @returns {Promise<{fileId: string, fileUrl: string, fileName: string, proxyUrl: string}>} Uploaded file details.
  */
 export const uploadBatchImage = async (file, batchName = "General Batches", batchId = null) => {
   const formData = new FormData();
@@ -115,6 +139,11 @@ export const uploadBatchImage = async (file, batchName = "General Batches", batc
   return response.data?.file;
 };
 
+/**
+ * @desc Persists the entire list of batch profiles to localStorage cache and syncs with backend database.
+ * @param {Array<Object>} profiles - Full array of profile records to save.
+ * @returns {Promise<boolean>} True if persistence succeeded.
+ */
 export const saveStoredBatchProfiles = async (profiles) => {
   try {
     const toSave = profiles.map((p) => {
@@ -146,6 +175,11 @@ export const saveStoredBatchProfiles = async (profiles) => {
   }
 };
 
+/**
+ * @desc Optimistically updates or appends a single batch profile locally and syncs the single payload to the backend.
+ * @param {Object} updatedProfile - Batch profile object to update.
+ * @returns {Promise<boolean>} True if update succeeded.
+ */
 export const updateSingleBatchProfile = async (updatedProfile) => {
   const current = getStoredBatchProfiles();
   const index = current.findIndex(
@@ -198,6 +232,11 @@ export const updateSingleBatchProfile = async (updatedProfile) => {
   }
 };
 
+/**
+ * @desc Deletes a batch profile by name or ID from backend MongoDB and local storage, triggering a broadcast event.
+ * @param {string} identifier - Identifier or label of the batch to delete.
+ * @returns {Promise<Array<Object>>} Filtered list of remaining batch profiles.
+ */
 export const deleteStoredBatchProfile = async (identifier) => {
   if (!identifier) return getStoredBatchProfiles();
   const cleanId = String(identifier).trim().toLowerCase();
@@ -225,6 +264,10 @@ export const deleteStoredBatchProfile = async (identifier) => {
   return updated;
 };
 
+/**
+ * @desc Purges stored batch profiles from localStorage and triggers a broadcast update.
+ * @returns {Array} Empty array.
+ */
 export const resetStoredBatchProfiles = () => {
   try {
     localStorage.removeItem(PROFILES_STORAGE_KEY);

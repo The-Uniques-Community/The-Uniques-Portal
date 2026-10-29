@@ -1,5 +1,22 @@
+/**
+ * @file CommunityModal.jsx
+ * @description Generic lightweight dialog modal overlay with close button, title banner, and arbitrary children/content rendering.
+ * @architecture Used in community views and public sections for pop-up announcements, guidelines, and message dialogues.
+ * @agent_note Returns `null` when `isOpen` is falsy. Handles backdrop overlay with `fixed inset-0 bg-black bg-opacity-50 z-50`.
+ */
+
 import React from 'react';
 
+/**
+ * @component Modal
+ * @description Renders a centered modal dialog box with backdrop blur and header close action.
+ * @param {Object} props - Component properties
+ * @param {boolean} props.isOpen - Controls visibility of the modal dialog
+ * @param {Function} props.onClose - Callback invoked when the close 'X' button is clicked
+ * @param {string} props.title - Title header text for modal
+ * @param {React.ReactNode} props.content - Body content or elements to display inside modal
+ * @state None - Controlled presentation component
+ */
 const Modal = ({ isOpen, onClose, title, content }) => {
     if (!isOpen) return null;
 

@@ -1,3 +1,10 @@
+/**
+ * @file index.jsx
+ * @description Community batch and cohort profiles administration dashboard enabling coordinators and admins to modify cohort photos, titles, narratives, and add or delete student batches.
+ * @architecture Routed via `/admin/batches` or `/coordinator/batches`. Interacts with `@/utils/batch/batchProfilesData` (`fetchBatchProfiles`, `updateSingleBatchProfile`, `uploadBatchImage`, `deleteStoredBatchProfile`) and `@/utils/batch/batchesData` (`addStoredBatch`, `deleteStoredBatch`, `fetchBatches`). Listens for the custom `batch-profiles-updated` window event.
+ * @agent_note Features drag-and-drop file uploads and paste-from-clipboard image ingestion. If cloud storage fails, `optimizeImageForStorage` provides a compressed client-side canvas fallback (<30KB) to prevent localStorage quota exhaustion.
+ */
+
 import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
@@ -47,7 +54,13 @@ import {
   resetFileInput,
 } from "@/utils/fileValidation";
 
-// Fast client-side image optimizer to prevent localStorage quota issues and speed up rendering
+/**
+ * @desc Fast client-side image optimizer to compress canvas dimensions and quality, preventing localStorage exhaustion and speeding up rendering.
+ * @param {File} file - Selected image file object.
+ * @param {number} [maxWidth=1000] - Maximum allowable pixel width.
+ * @param {number} [quality=0.75] - Compression quality factor for WebP/JPEG encoding.
+ * @returns {Promise<string>} Resolves with data URL representation of the scaled image.
+ */
 const optimizeImageForStorage = (file, maxWidth = 1000, quality = 0.75) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -84,6 +97,32 @@ const optimizeImageForStorage = (file, maxWidth = 1000, quality = 0.75) => {
   });
 };
 
+/**
+ * @component CoordinatorBatches
+ * @description Master cohort administration console offering interactive form inputs, drag-and-drop / paste photo ingestion, live web card rendering preview, and cohort addition/deletion dialogs.
+ * @state {Array<Object>} profiles - Loaded batch profiles with titles, labels, descriptions, and hero photos.
+ * @state {number} selectedIndex - Currently targeted batch index in the selector dropdown.
+ * @state {string} label - Short batch label text.
+ * @state {string} title - Full heading title for the cohort.
+ * @state {string} description - Long narrative description of cohort accomplishments.
+ * @state {string} image - Remote image URL or local blob preview string.
+ * @state {File|null} selectedFile - Raw binary image file awaiting save upload.
+ * @state {Object} snackbar - Alert feedback state.
+ * @state {boolean} addModalOpen - Controls visibility of the new cohort creation dialog.
+ * @state {string} newBatchName - Input value for the newly created batch name.
+ * @state {boolean} deleteModalOpen - Controls visibility of the batch deletion confirmation dialog.
+ * @state {boolean} isDeleting - Loading flag during batch removal.
+ * @state {boolean} isSaving - Loading flag during batch profile saving.
+ * @state {boolean} isDragging - Visual state when dragging a file over the upload zone.
+ * @state {boolean} showUrlInput - Toggle revealing direct image URL text field.
+ * @state {string} imageUrlValue - Remote URL string entered into image URL input.
+ * @api `fetchBatchProfiles` - Loads all cohort profiles from backend storage.
+ * @api `fetchBatches` - Loads list of batch labels.
+ * @api `uploadBatchImage` - Uploads cohort group photo to cloud storage via multipart endpoint.
+ * @api `updateSingleBatchProfile` - Persists changes for the selected batch profile.
+ * @api `deleteStoredBatch` - Deletes batch entry from global batch directory.
+ * @api `deleteStoredBatchProfile` - Deletes batch profile record.
+ */
 const CoordinatorBatches = () => {
   const { isDarkMode } = useThemeContext();
   const fileInputRef = useRef(null);

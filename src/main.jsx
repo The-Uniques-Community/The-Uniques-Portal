@@ -1,3 +1,10 @@
+/**
+ * @file main.jsx
+ * @description Application client bootstrap entry point initializing global styles, service worker teardown, Lenis smooth scrolling, Redux store, and theme providers.
+ * @architecture Entry point for Vite Single Page Application. Wraps App with Redux Provider, MUI ThemeProvider, React Toastify, and ClickSpark UI wrapper.
+ * @agent_note Lenis smooth scrolling has prevent rules for modals, dialogs, and containers tagged with [data-lenis-prevent]. Stale service workers are purged on mount to ensure clean asset delivery in development and staging.
+ */
+
 // import { StrictMode } from "react";
 import "./config.js";
 import { createRoot } from "react-dom/client";
@@ -24,7 +31,10 @@ if (typeof window !== "undefined" && "serviceWorker" in navigator) {
   });
 }
 
-// Initialize Lenis
+/**
+ * @desc Global Lenis smooth scrolling instance configured with automatic requestAnimationFrame and selective scroll containment for modals and dialogs.
+ * @type {Lenis}
+ */
 const lenis = new Lenis({
   autoRaf: true,
   prevent: (node) => {

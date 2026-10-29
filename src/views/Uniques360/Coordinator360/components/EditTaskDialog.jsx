@@ -1,3 +1,10 @@
+/**
+ * @file EditTaskDialog.jsx
+ * @description Dialog modal for editing existing Uniques360 tasks, including status lifecycle, priority, deadline, and member assignments.
+ * @architecture Child component of Uniques360Coordinator, invoked when editing an existing task from TaskTable.
+ * @agent_note Preserves already assigned members in the dropdown list even if a batch filter is actively applied. Ensures deadline values format to YYYY-MM-DD for date inputs.
+ */
+
 import React, { useState, useMemo } from "react";
 import {
   Box,
@@ -16,6 +23,19 @@ import {
   Typography,
 } from "@mui/material";
 
+/**
+ * @component EditTaskDialog
+ * @description Form dialog for modifying task properties, status, priorities, deadlines, and assigned member roles.
+ * @param {Object} props - Component properties
+ * @param {boolean} props.open - Whether the edit modal dialog is open
+ * @param {Function} props.onClose - Modal close handler
+ * @param {Function} props.onSubmit - Submission callback to commit task updates
+ * @param {boolean} props.submitting - Whether update operation is processing
+ * @param {Object} props.task - Currently selected task object to be edited
+ * @param {Function} props.setTask - State dispatcher for updating the selected task draft
+ * @param {Array<Object>} props.members - List of all member profiles for assignment
+ * @param {Array<string>} [props.batches=[]] - List of batch identifiers
+ */
 const EditTaskDialog = ({
   open,
   onClose,
@@ -26,12 +46,10 @@ const EditTaskDialog = ({
   members,
   batches = [],
 }) => {
-  if (!task) return null;
-
   const [selectedBatch, setSelectedBatch] = useState("");
 
-  const assignedIds = task.assignedTo || [];
-  const assignedRoles = task.assignedRoles || {};
+  const assignedIds = task?.assignedTo || [];
+  const assignedRoles = task?.assignedRoles || {};
 
   const filteredMembers = useMemo(() => {
     if (!selectedBatch) return members;
@@ -41,6 +59,8 @@ const EditTaskDialog = ({
       return mBatch === norm || assignedIds.includes(member._id);
     });
   }, [members, selectedBatch, assignedIds]);
+
+  if (!task) return null;
 
   return (
     <Dialog 

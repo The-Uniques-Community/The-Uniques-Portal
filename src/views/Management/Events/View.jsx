@@ -1,3 +1,10 @@
+/**
+ * @file View.jsx
+ * @description Master event detail view featuring live editing, tabbed sections (Overview, Teams/Members, Guests, Gallery, Registration Form Responses), dynamic image uploads, and guest/team assignments.
+ * @architecture Routed via `/:role/events-overview/:id`. Interacts with event APIs, Google Drive file upload services, and guest endpoints. Navigates to budget tracking via `Budget.jsx`.
+ * @agent_note Manages comprehensive tabs and dialogs for guest allocation, member team assignments across 6 functional categories (`VALID_TEAM_TYPES`), custom registration form loading, and Drive-backed gallery preview iframes.
+ */
+
 import { BASE_URL } from "@/config";
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -79,7 +86,17 @@ import PersonAdd from '@mui/icons-material/PersonAdd';
 import ContactMail from '@mui/icons-material/ContactMail';
 import X from '@mui/icons-material/X';
 
-// Image gallery component
+/**
+ * @component Gallery
+ * @description Event photo gallery grid displaying images embedded from Google Drive with upload and delete controls.
+ * @param {Object} props - Component properties.
+ * @param {Array<Object>} props.images - Array of image objects containing `fileId` and `_id`.
+ * @param {Function} props.onAddImage - File upload handler triggered by the file input.
+ * @param {Function} props.onRemoveImage - Handler to remove an image by ID.
+ * @param {boolean} [props.readOnly=false] - Whether upload and removal controls are disabled.
+ * @state None - Pure presentation component.
+ * @api None - Delegates mutations via callbacks.
+ */
 const Gallery = ({ images, onAddImage, onRemoveImage, readOnly }) => {
   return (
     <Box sx={{ mt: 2 }}>
@@ -189,7 +206,37 @@ const Gallery = ({ images, onAddImage, onRemoveImage, readOnly }) => {
   );
 };
 
-// Event view component
+/**
+ * @component EventView
+ * @description Central event administration console allowing organizers to update event details, allocate student teams, coordinate guest appearances, manage the Google Drive photo gallery, and view dynamic registration form submissions.
+ * @state {Object|null} event - Active event record loaded from backend API.
+ * @state {boolean} loading - Global loading indicator during data retrieval or submission.
+ * @state {boolean} editMode - Controls editable input state versus read-only view.
+ * @state {number} tabValue - Currently active tab index (0: Overview, 1: Teams, 2: Guests, 3: Gallery, 4: Registrations).
+ * @state {Object} editedEvent - Staging state for event details before persisting changes.
+ * @state {Array<Object>} gallery - Uploaded gallery photos metadata.
+ * @state {Array<Object>} formResponses - User submissions from the linked event registration form.
+ * @state {boolean} guestDialogOpen - Controls visibility of the guest assignment dialog.
+ * @state {Array<Object>} availableGuests - Master directory of guests eligible for event linking.
+ * @state {Object|null} selectedGuest - Currently selected guest in the assignment dialog.
+ * @state {string} guestTag - Role tag of guest ('chief-guest', 'speaker', 'judge', 'mentor', 'others').
+ * @state {boolean} memberDialogOpen - Controls visibility of the team member assignment dialog.
+ * @state {Array<Object>} availableMembers - Member pool available for team allocation.
+ * @state {string} teamType - Active team type selected for member contribution.
+ * @state {Object} eventTeams - Structure holding members grouped by functional contribution teams.
+ * @state {Array<Object>} teamMembers - Flattened array of members across all event teams.
+ * @api `GET /api/events/:id` - Fetches single event metadata.
+ * @api `PUT /api/events/:id` - Updates core event fields.
+ * @api `GET /api/events/:id/gallery` - Fetches Google Drive gallery images.
+ * @api `POST /upload/event_file_upload` - Uploads media files to Google Drive.
+ * @api `PATCH /api/events/:id/gallery` - Removes image file from event gallery.
+ * @api `GET /api/events/:id/members` - Retrieves functional team member allocations.
+ * @api `POST /api/events/:id/members/team/:teamType/add` - Adds students to event functional teams.
+ * @api `DELETE /api/events/:id/members/team/:memberTeam/members` - Removes student from functional team.
+ * @api `GET /api/guest/get-all-guests` - Fetches guest directory.
+ * @api `GET /api/events/:id/form-responses` - Fetches custom registration responses.
+ * @api `POST /api/events/:id/register` - Registers current user for the event.
+ */
 const EventView = () => {
   const { id } = useParams();
   const navigate = useNavigate();

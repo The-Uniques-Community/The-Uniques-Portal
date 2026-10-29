@@ -1,6 +1,17 @@
+/**
+ * @file statsData.js
+ * @description Community impact metrics data manager providing resilient local storage caching, API synchronization, and real-time custom event broadcasts for key headline counters.
+ * @architecture Supplies headline metrics (Earnings, Clients, Projects, Events) to landing page counters, member/admin dashboards, and statistical overview views.
+ * @agent_note Interacts with `/api/stats` and `/api/stats/update`. Broadcasts `stats-updated` CustomEvents on the window object so all active UI widgets synchronize in real time.
+ */
+
 import apiClient from "@/services/apiClient";
 import { BASE_URL } from "@/config";
 
+/**
+ * @desc Baseline fallback numbers for community headline metrics.
+ * @type {{Earnings: number, Clients: number, Projects: number, Events: number}}
+ */
 export const DEFAULT_STATS = {
   Earnings: 0,
   Clients: 0,
@@ -10,6 +21,10 @@ export const DEFAULT_STATS = {
 
 const STATS_STORAGE_KEY = "tu_community_stats";
 
+/**
+ * @desc Retrieves cached metrics from localStorage or initializes them with default values.
+ * @returns {{Earnings: number, Clients: number, Projects: number, Events: number}} Stored statistics map.
+ */
 export const getStoredStats = () => {
   try {
     const raw = localStorage.getItem(STATS_STORAGE_KEY);
@@ -30,6 +45,10 @@ export const getStoredStats = () => {
   }
 };
 
+/**
+ * @desc Fetches current headline statistics from backend API, updates cache, and dispatches a broadcast update.
+ * @returns {Promise<{Earnings: number, Clients: number, Projects: number, Events: number}>} Current stats metrics.
+ */
 export const fetchStats = async () => {
   try {
     const response = await apiClient.get(`${BASE_URL}/api/stats`);
@@ -50,6 +69,11 @@ export const fetchStats = async () => {
   return getStoredStats();
 };
 
+/**
+ * @desc Persists modified metrics to MongoDB database first, updates local storage cache, and dispatches a window event.
+ * @param {Object} newStats - Updated metrics values.
+ * @returns {Promise<{Earnings: number, Clients: number, Projects: number, Events: number}>} Confirmed saved stats.
+ */
 export const saveStoredStats = async (newStats) => {
   const payload = {
     Earnings: Number(newStats.Earnings) || 0,
@@ -82,6 +106,10 @@ export const saveStoredStats = async (newStats) => {
   return savedData;
 };
 
+/**
+ * @desc Resets all metrics to default zero values across database and localStorage.
+ * @returns {Promise<{Earnings: number, Clients: number, Projects: number, Events: number}>} Default stats.
+ */
 export const resetStoredStats = async () => {
   return await saveStoredStats(DEFAULT_STATS);
 };

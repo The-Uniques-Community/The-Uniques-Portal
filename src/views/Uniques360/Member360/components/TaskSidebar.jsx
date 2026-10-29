@@ -1,9 +1,24 @@
+/**
+ * @file TaskSidebar.jsx
+ * @description Lateral navigation sidebar for Uniques360 Member workspace, organizing tasks by lifecycle status with counts and selection indicators.
+ * @architecture Sub-component of Uniques360Member, providing task selection triggers that switch the active workspace thread.
+ * @agent_note Categorizes tasks into Pending, In Progress, and Completed. Uses Framer Motion layoutId for fluid active selection bar transitions.
+ */
+
 import React, { useMemo } from "react";
 import { Box, Chip, List, ListItemButton, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { motion } from "framer-motion";
 import TaskIcon from '@mui/icons-material/AssignmentOutlined';
 
+/**
+ * @component TaskSidebar
+ * @description Sidebar list component categorizing member tasks with progress tags and animated selection states.
+ * @param {Object} props - Component properties
+ * @param {Array<Object>} props.tasks - List of member task records
+ * @param {Object|null} props.selectedTask - Currently active selected task
+ * @param {Function} props.onSelectTask - Handler called when selecting a task from the list
+ */
 const TaskSidebar = ({ tasks, selectedTask, onSelectTask }) => {
   const theme = useTheme();
   const isLight = theme.palette.mode === "light";

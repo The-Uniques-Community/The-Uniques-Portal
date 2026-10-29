@@ -1,3 +1,10 @@
+/**
+ * @file View.jsx
+ * @description Comprehensive project detail view featuring zoomable media preview, tabbed specifications (Details, Tech Stack & Features, Team & Contributors), fast status modification, and full project edit modal.
+ * @architecture Routed via `/admin/projects-overview/view/:id` or `/coordinator/projects-overview/view/:id`. Uses `@/utils/project/projectsData` (`getProjectById`, `updateProject`, `fetchProjects`, `uploadProjectThumbnail`), and `useBatches` hook for dynamic batch selection.
+ * @agent_note Thumbnail updates invoke `uploadProjectThumbnail` which uploads the file and formats image paths for `/api/image-proxy/:fileId`. Zoom controls operate locally on SVG/raster previews.
+ */
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { ProjectViewSkeleton } from "@/components/common/skeletons";
@@ -66,6 +73,25 @@ import { useBatches } from "@/hooks/useBatches";
 import { BASE_URL } from "@/config";
 import { getSafeImageUrl } from "@/utils/imageHelper";
 
+/**
+ * @component ProjectView
+ * @description Interactive project showcase and administration console supporting zoomable banner inspection, live status changing, and dialog-based metadata updating.
+ * @state {Object|null} project - Active project record.
+ * @state {boolean} loading - Loading indicator flag during data retrieval.
+ * @state {string} activeTab - Selected content tab identifier ('details', 'tech', 'team').
+ * @state {number} zoomLevel - Banner image zoom multiplier (0.75x to 2.5x).
+ * @state {boolean} editOpen - Toggle for the edit project dialog.
+ * @state {boolean} editLoading - Loading state during project mutation.
+ * @state {Object} editForm - Form values for title, description, overview, batch, category, etc.
+ * @state {File|null} selectedEditFile - Staged thumbnail file for upload.
+ * @state {string} imagePreview - Data URL or remote image preview string.
+ * @state {Object} formErrors - Field-level validation error map.
+ * @state {Object} snackbar - Toast feedback notification state.
+ * @api `getProjectById` - Synchronous cache lookup of project.
+ * @api `fetchProjects` - Remote fetch fallback when cache misses.
+ * @api `updateProject` - Persists project edits.
+ * @api `uploadProjectThumbnail` - Uploads project hero media.
+ */
 const ProjectView = () => {
   const { id } = useParams();
   const navigate = useNavigate();

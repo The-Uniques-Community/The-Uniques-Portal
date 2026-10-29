@@ -1,5 +1,20 @@
+/**
+ * @file ShapedCard.jsx
+ * @description Clipped graphic presentation card displaying a decorative corporate slate background and centered message banner.
+ * @architecture Used in feature highlights and promotional landing page sections.
+ * @agent_note Relies on CSS class `corporate-clip` defined in stylesheet rules for custom clip-path clipping.
+ */
+
 import bgImg from '@/assets/img/bg-slate.jpg'
 
+/**
+ * @component ShapedCard
+ * @description Renders a stylized card with clipped background and centered title/content typography.
+ * @param {Object} props - Component properties
+ * @param {string} props.heading - Card header title text
+ * @param {string} props.content - Card descriptive subtext or body
+ * @state None - Pure presentation component
+ */
 const ShapedCard = ({heading, content}) => {
   return (
     <div className='relative w-full h-full'>

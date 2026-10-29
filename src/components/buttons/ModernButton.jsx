@@ -1,3 +1,10 @@
+/**
+ * @file ModernButton.jsx
+ * @description High-end branded Material UI button with laser flare light sweep animations, 3D lift, and dynamic icon transformations.
+ * @architecture Reusable standard action button used in ModernHeader and throughout dashboard view headers for primary actions.
+ * @agent_note Implements custom CSS laser sweep animations using `&::before` pseudo-element and cubic-bezier easing curves.
+ */
+
 import React from "react";
 import { Button } from "@mui/material";
 import { alpha } from "@mui/material/styles";
@@ -5,6 +12,16 @@ import { alpha } from "@mui/material/styles";
 const BRAND_COLOR = "#ca0019";
 const BRAND_HOVER = "#a30014";
 
+/**
+ * @component ModernButton
+ * @description Branded primary action button featuring gradient borders, hover elevation, and diagonal laser flare effect.
+ * @param {Object} props - Component properties
+ * @param {React.ReactNode} props.children - Button label text or content
+ * @param {React.ReactNode} [props.startIcon] - Leading icon element
+ * @param {Function} [props.onClick] - Click handler callback
+ * @param {Object} [props.sx={}] - Material UI sx style overrides
+ * @state None - Pure presentation component with CSS transition micro-interactions
+ */
 const ModernButton = ({ children, startIcon, onClick, sx = {}, ...props }) => {
   return (
     <Button

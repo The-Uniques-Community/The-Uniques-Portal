@@ -1,3 +1,10 @@
+/**
+ * @file ProfileModal.jsx
+ * @description Comprehensive member profile deep-inspection dialog supporting administrative controls, fine imposition, status toggles, and tabbed portfolio details.
+ * @architecture Opened from member cards or dashboard tables. Integrates with administrative backend endpoints for member suspension, fines, and profile updates.
+ * @agent_note Very large modal containing tabbed sections (Overview, Projects, Certifications, Attendance, Fine history). Communicates with backend administrative APIs.
+ */
+
 import * as React from "react";
 import {
   Button,
@@ -57,6 +64,16 @@ import ErrorIcon from "@mui/icons-material/Error";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import userIcon from "@/assets/img/user-icon.png"
+
+/**
+ * @component CustomTabPanel
+ * @description Accessible tab container wrapper for tabbed content pages.
+ * @param {Object} props - Component properties
+ * @param {React.ReactNode} [props.children] - Panel content
+ * @param {number} props.index - Tab index position
+ * @param {number} props.value - Currently selected tab index
+ * @state None - Pure presentation helper
+ */
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
   return (
@@ -78,6 +95,11 @@ CustomTabPanel.propTypes = {
   value: PropTypes.number.isRequired,
 };
 
+/**
+ * @desc Generates accessibility aria attributes for MUI Tab items.
+ * @param {number} index - Tab index
+ * @returns {Object} ARIA attribute object
+ */
 function a11yProps(index) {
   return {
     id: `simple-tab-${index}`,
@@ -85,6 +107,26 @@ function a11yProps(index) {
   };
 }
 
+/**
+ * @component ProfileModal
+ * @description Extensive fullscreen modal dialog providing deep member profile inspection, tabbed activity histories, and administrative actions.
+ * @param {Object} props - Component properties
+ * @param {boolean} props.open - Dialog visibility flag
+ * @param {Function} props.handleClose - Close handler callback
+ * @param {Object} props.user - Member data object
+ * @param {Function} [props.refreshData] - Callback to refresh member records after admin action
+ * @state {boolean} blockLoading - Loading state during member suspend/unblock toggle
+ * @state {number} value - Active tab index (0=Overview, 1=Projects, 2=Certifications, 3=Attendance, etc.)
+ * @state {boolean} fineModalOpen - Controls visibility of the fine imposition sub-dialog
+ * @state {string} fineAmount - Input value for fine amount in INR
+ * @state {string} fineReason - Input reason describing the fine
+ * @state {boolean} loading - Loading state during fine submission
+ * @state {string|null} error - Error message string during validation or API failure
+ * @state {Object} alert - Toast alert feedback state { open, message, severity }
+ * @api PATCH `/api/admin/member/:id/block` - Toggles suspension status
+ * @api POST `/api/admin/member/:id/fine` - Imposes disciplinary monetary fine
+ * @api GET `/api/image-proxy/:fileId` - Resolves proxied profile image
+ */
 const ProfileModal = ({ open, handleClose, user, refreshData }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
@@ -101,9 +143,16 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
     severity: "success",
   });
 
+  /**
+   * @desc Handles tab switching index changes.
+   */
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  /**
+   * @desc Toggles suspension status for the selected member via backend API.
+   */
   const handleToggleBlockStatus = async () => {
     try {
       setBlockLoading(true);
@@ -140,7 +189,11 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
       setBlockLoading(false);
     }
   };
-  // Status badge
+
+  /**
+   * @desc Determines and renders the appropriate status Chip for the member.
+   * @returns {JSX.Element} Status Chip element
+   */
   const getStatusBadge = () => {
     if (user.isSuspended) {
       return (
@@ -166,7 +219,11 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
   };
 
 
-  // Format date
+  /**
+   * @desc Formats an ISO date string into readable short date format.
+   * @param {string|Date} dateString - Input date
+   * @returns {string} Formatted date string
+   */
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
@@ -177,6 +234,11 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
     });
   };
 
+  /**
+   * @desc Resolves image URLs from proxy server or direct source.
+   * @param {string|Object} fileIdOrPic - Image identifier or object
+   * @returns {string|null} Resolved image URL
+   */
   const getProxyImageUrl = (fileIdOrPic) => {
     if (!fileIdOrPic) return null;
     if (typeof fileIdOrPic === "object") {
@@ -195,7 +257,9 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
   };
 
 
-  // Handle opening fine modal
+  /**
+   * @desc Opens the administrative fine modal.
+   */
   const handleOpenFineModal = () => {
     setFineModalOpen(true);
     setFineAmount("");
@@ -203,12 +267,16 @@ const ProfileModal = ({ open, handleClose, user, refreshData }) => {
     setError(null);
   };
 
-  // Handle closing fine modal
+  /**
+   * @desc Closes the administrative fine modal.
+   */
   const handleCloseFineModal = () => {
     setFineModalOpen(false);
   };
 
-  // Handle imposing fine
+  /**
+   * @desc Submits a new administrative monetary fine to the backend.
+   */
   const handleImposeFine = async () => {
     // Validate inputs
     if (!fineAmount || fineAmount <= 0) {

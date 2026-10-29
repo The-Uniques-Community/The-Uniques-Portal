@@ -1,3 +1,10 @@
+/**
+ * @file Calender.jsx
+ * @description Calendar widget for the Management Dashboard providing a date visualization tool for event scheduling rhythm.
+ * @architecture Child component of the Management Dashboard view (`views/Management/Dashboard`). Utilizes MUI X DatePickers with Dayjs adapter.
+ * @agent_note Notice the legacy spelling `Calender`. This is a presentation component with localized Dayjs date adapter; it does not bind to external query state unless extended.
+ */
+
 import * as React from "react";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -6,6 +13,12 @@ import { Box, Paper, Typography, useTheme } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 
+/**
+ * @component Calender
+ * @description Renders a themed Paper surface containing an MUI X DateCalendar for monthly calendar viewing.
+ * @state None - Pure presentation component reading theme tokens.
+ * @api None - No direct API endpoints called.
+ */
 export default function Calender() {
   const theme = useTheme();
 

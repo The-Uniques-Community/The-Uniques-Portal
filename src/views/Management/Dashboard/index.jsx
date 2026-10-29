@@ -1,3 +1,10 @@
+/**
+ * @file index.jsx
+ * @description Master operational dashboard for community management displaying KPI stat cards, banner controls, interactive calendar, event previews, recent member enrollments, fine settlement modal workflows, and supplementary student tracking.
+ * @architecture Primary entry route for `/admin` and `/coordinator`. Integrates sub-components `Banner`, `Calender`, `EventOverView`, `NewMember`, `ModernStatCard`, and `ModernTable`. Calls backend endpoints for members, fines, and event logs.
+ * @agent_note Orchestrates multi-dialog flows for marking fines as paid (`FinePaymentModal`), reviewing receipt uploads (`ReceiptPreviewModal`), inspecting student fine histories (`FineDetailsModal`), and filtering supplementary backlog students by semester.
+ */
+
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { NewMember } from "../dashboardComponents/NewMember";
@@ -80,7 +87,24 @@ import ModernTable from "@/components/tables/ModernTable";
 import { BaseSkeleton } from "@/components/common/skeletons";
 import LazyRender from "@/components/common/LazyRender";
 
-// Fine Payment Modal Component
+/**
+ * @component FinePaymentModal
+ * @description Dialog allowing admins or coordinators to settle a member's fine by uploading a receipt and recording payment instrument details.
+ * @param {Object} props - Component properties.
+ * @param {boolean} props.open - Whether the dialog modal is visible.
+ * @param {Function} props.onClose - Dismissal callback to close the modal.
+ * @param {string} props.memberId - Student identifier whose fine is being paid.
+ * @param {Object} props.fine - Target fine record containing amount, reason, and date.
+ * @param {Function} props.onPaymentComplete - Callback invoked upon successful file upload and fine status patch.
+ * @state {Array<File>} files - Staged payment receipt files.
+ * @state {boolean} loading - Submission loading spinner state.
+ * @state {string} paymentMethod - Selected transaction mode ('upi', 'bank_transfer', 'cash', 'other').
+ * @state {string} reference - Optional transaction ID or note.
+ * @state {string|null} previewUrl - Temporary object URL for receipt image preview.
+ * @state {string} error - Validation or network error message.
+ * @api `POST /upload/fine_file_upload` - Uploads proof-of-payment file.
+ * @api `PATCH /api/admin/fine/members/:memberId/fines/:fineId` - Updates fine status to paid.
+ */
 const FinePaymentModal = ({
   open,
   onClose,
@@ -384,7 +408,16 @@ const FinePaymentModal = ({
   );
 };
 
-// Receipt Preview Modal Component
+/**
+ * @component ReceiptPreviewModal
+ * @description Modal dialog previewing uploaded payment receipts in either PDF format or raster images with an option to open in a new tab.
+ * @param {Object} props - Component properties.
+ * @param {boolean} props.open - Dialog visibility flag.
+ * @param {Function} props.onClose - Modal close handler.
+ * @param {string} props.receiptUrl - Target file URL to preview.
+ * @state None - Pure presentation component.
+ * @api None - No direct API endpoints called.
+ */
 const ReceiptPreviewModal = ({ open, onClose, receiptUrl }) => {
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
@@ -435,7 +468,19 @@ const ReceiptPreviewModal = ({ open, onClose, receiptUrl }) => {
   );
 };
 
-// Add this component inside the index.jsx file
+/**
+ * @component FineDetailsModal
+ * @description Drill-down modal presenting a member's aggregate fine payment summary, tabbed fine listings (All, Pending, Paid), and actions to pay fines or view receipts.
+ * @param {Object} props - Component properties.
+ * @param {boolean} props.open - Whether the modal dialog is open.
+ * @param {Function} props.onClose - Modal close handler.
+ * @param {Object} props.selectedFine - Selected fine payload with member metadata, total dues, and array of fine records.
+ * @param {Function} props.onPayFine - Handler invoked to initiate payment modal for a specific fine.
+ * @param {boolean} props.loading - External processing flag.
+ * @param {Function} props.onViewReceipt - Callback invoked with receipt URL to launch the receipt preview modal.
+ * @state {number} activeTab - Tab filter index (0: All Fines, 1: Pending, 2: Paid).
+ * @api None - Delegates actions to parent callbacks.
+ */
 const FineDetailsModal = ({ open, onClose, selectedFine, onPayFine, loading, onViewReceipt }) => {
   const [activeTab, setActiveTab] = useState(0);
 
@@ -588,6 +633,32 @@ const FineDetailsModal = ({ open, onClose, selectedFine, onPayFine, loading, onV
   );
 };
 
+/**
+ * @component ManagementDashboard
+ * @description Central administrative operations dashboard unifying high-level KPI cards, hero navigation banner, recent student enrollments, interactive calendar widget, upcoming events agenda, and management tables for active fines and supplementary exam backlogs.
+ * @state {Array<Object>} members - Recent member registrations fetched from member API.
+ * @state {boolean} loading - Global loading state during initial metrics and list fetching.
+ * @state {Object} stats - High-level metrics `{ totalMembers, totalFine, totalEvents, totalCampus }`.
+ * @state {Array<Object>} events - Recent and upcoming event list items.
+ * @state {number} tableView - Selected tab view (0: Overdue Fines Table, 1: Supplementary Exams Table).
+ * @state {Array<Object>} fineMembers - Members with positive outstanding fine dues.
+ * @state {Array<Object>} supplementaryMembers - Students with supplementary subjects for the active semester.
+ * @state {number} currentSemester - Selected semester index for supplementary exam filtering (1-8).
+ * @state {boolean} modalOpen - Member profile modal visibility flag.
+ * @state {Object|null} selectedMember - Member data object focused in the profile modal.
+ * @state {boolean} openPaymentModal - Fine payment modal visibility flag.
+ * @state {Object|null} fineToUpdate - Target fine record staged for clearance.
+ * @state {boolean} paymentComplete - Notification toggle for completed payment.
+ * @state {string|null} receiptPreviewUrl - Active receipt URL for modal preview.
+ * @state {boolean} openReceiptPreview - Receipt preview modal visibility flag.
+ * @state {Object|null} selectedFine - Fine record targeted for detailed ledger breakdown.
+ * @state {boolean} openViewModal - Fine breakdown ledger modal visibility flag.
+ * @api `GET /api/admin/member?page=1&limit=10` - Fetches recent members.
+ * @api `GET /api/admin/fine/fines/members` - Fetches members with fine records.
+ * @api `GET /api/admin/fine/fines/statistics` - Fetches aggregate pending fine numbers.
+ * @api `GET /api/events` - Fetches events agenda.
+ * @api `GET /api/admin/member/supplementary/semester/:semester` - Fetches backlog students for the selected semester.
+ */
 const ManagementDashboard = () => {
   const theme = useTheme();
   const location = useLocation();

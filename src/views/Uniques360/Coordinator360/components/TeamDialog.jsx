@@ -1,3 +1,10 @@
+/**
+ * @file TeamDialog.jsx
+ * @description Dialog modal for managing team roster allocations, assigning new members with specific roles, and unassigning members from a task.
+ * @architecture Sub-component of Uniques360Coordinator, invoked when clicking 'Manage Team' on any task entry in TaskTable.
+ * @agent_note Extracts normalized member IDs whether task.assignedTo stores raw IDs or populated objects. Filters available members to avoid duplicate assignments.
+ */
+
 import React from "react";
 import {
   Avatar,
@@ -26,6 +33,24 @@ import {
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import AddTeamIcon from '@mui/icons-material/GroupAddOutlined';
 
+/**
+ * @component TeamDialog
+ * @description Modal allowing coordinators to view currently assigned team members, assign new members with custom roles, and detach members.
+ * @param {Object} props - Component properties
+ * @param {boolean} props.open - Whether dialog is currently visible
+ * @param {Function} props.onClose - Modal close handler
+ * @param {Object|null} props.task - The selected task whose team is being managed
+ * @param {Array<Object>} props.members - List of all member profiles in system
+ * @param {string} props.selectedMemberId - Current member selected in the add dropdown
+ * @param {Function} props.onSelectedMemberChange - Dispatcher for selected member
+ * @param {string} props.selectedRole - Text description of assigned role responsibility
+ * @param {Function} props.onSelectedRoleChange - Dispatcher for role text
+ * @param {string} props.selectedBatch - Currently applied batch filter
+ * @param {Function} props.onSelectedBatchChange - Dispatcher for batch filter
+ * @param {Array<string>} props.batches - List of all batch options
+ * @param {Function} props.onAddMember - Action trigger to attach selected member
+ * @param {Function} props.onRemoveMember - Action trigger to detach member by ID
+ */
 const TeamDialog = ({
   open,
   onClose,

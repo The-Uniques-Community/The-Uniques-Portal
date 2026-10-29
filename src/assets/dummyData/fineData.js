@@ -1,4 +1,14 @@
-// Dummy Data
+/**
+ * @file fineData.js
+ * @description Mock fine and disciplinary tracking fixtures recording infractions, imposition dates, payment amounts, and settlement statuses.
+ * @architecture Used in administrative accounts tables, coordinator compliance ledgers, and student financial status views.
+ * @agent_note Record statuses span 'Completed', 'Pending', and 'Waived', with currency denomination strings and payment channels ('Online', 'Cash').
+ */
+
+/**
+ * @desc Array of mock disciplinary penalty records for testing financial compliance tables.
+ * @type {Array<{name: string, batch: string, fineAmount: string, imposedOn: string, reason: string, status: string, paidVia: string}>}
+ */
 export const fineData = [
     {
       name: "Shahid Miah",

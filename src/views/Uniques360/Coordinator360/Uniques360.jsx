@@ -1,3 +1,10 @@
+/**
+ * @file Uniques360.jsx
+ * @description Uniques360 Coordinator dashboard workspace for tracking operations, managing assignments, reviewing member reports, and coordinating team rosters.
+ * @architecture Connects to Uniques360 coordinator routes, leveraging TaskTable, CreateTaskDialog, EditTaskDialog, ReportsDialog, and TeamDialog child components.
+ * @agent_note Handles task normalization for populated member structures (`item.member._id` vs plain string IDs) across status changes, CRUD operations, and team assignments.
+ */
+
 import React, { useState, useEffect, useMemo } from "react";
 import ModernTable from "@/components/tables/ModernTable";
 import ModernButton from "@/components/buttons/ModernButton";
@@ -46,6 +53,37 @@ const TeamDialog = React.lazy(() => import("./components/TeamDialog"));
 const BRAND_COLOR = "#ca0019";
 const BRAND_HOVER = "#a30014";
 
+/**
+ * @component Uniques360Coordinator
+ * @description Main dashboard view for Uniques360 coordinators to assign tasks, filter metrics, monitor progress, inspect reports, and manage teams.
+ * @state {Array} tasks - List of tasks retrieved for the coordinator
+ * @state {Array} members - Directory list of active members available for task assignments
+ * @state {boolean} loading - Global initial fetch state
+ * @state {boolean} tasksLoading - Spinner indicator for task queries
+ * @state {boolean} submitting - Active submission guard for dialog mutations
+ * @state {boolean} open - Controls visibility of the CreateTaskDialog
+ * @state {Object} newTask - Form payload for creating a new task
+ * @state {Object} newTaskRoles - Mapping of memberId to designated task role
+ * @state {string} selectedBatch - Batch filter currently selected for candidate assignment
+ * @state {boolean} reportsOpen - Controls visibility of the ReportsDialog
+ * @state {Object|null} selectedTask - Task actively being viewed, edited, or staffed
+ * @state {Array} reports - Submission reports submitted by students for the selected task
+ * @state {boolean} reportsLoading - Spinner indicator for report fetching
+ * @state {string} taskTypeFilter - Filter category: 'all' | 'project' | 'event'
+ * @state {string} statusFilter - Filter status: 'all' | 'pending' | 'in-progress' | 'completed'
+ * @state {string} memberFilter - Filter member by MongoDB ObjectId
+ * @state {boolean} editOpen - Controls visibility of the EditTaskDialog
+ * @state {boolean} teamOpen - Controls visibility of the TeamDialog
+ * @api {GET} /api/uniques360/tasks/coordinator/current - Fetch coordinator assigned tasks
+ * @api {GET} /api/admin/member/lookup - Fetch lookup directory of all members
+ * @api {POST} /api/uniques360/tasks - Create and assign a new task
+ * @api {PATCH} /api/uniques360/tasks/:taskId - Update task completion status
+ * @api {DELETE} /api/uniques360/tasks/:taskId - Remove a task
+ * @api {PUT} /api/uniques360/tasks/:taskId - Update existing task details and assignments
+ * @api {GET} /api/uniques360/reports/task/:taskId - Retrieve reports for a task
+ * @api {POST} /api/uniques360/tasks/:taskId/members/remove - Remove a member from a task
+ * @api {POST} /api/uniques360/tasks/:taskId/members - Add a member to a task
+ */
 const Uniques360Coordinator = () => {
   const [tasks, setTasks] = useState([]);
   const [members, setMembers] = useState([]);
@@ -86,6 +124,10 @@ const Uniques360Coordinator = () => {
   const { isDarkMode } = useThemeContext();
 
   // ================= FETCH TASKS =================
+  /**
+   * @desc Fetches current coordinator tasks from the Uniques360 backend service.
+   * @returns {Promise<void>} Resolves after tasks are committed to component state.
+   */
   const fetchTasks = async () => {
     try {
       setTasksLoading(true);
@@ -105,6 +147,10 @@ const Uniques360Coordinator = () => {
   };
 
   // ================= FETCH MEMBERS =================
+  /**
+   * @desc Fetches member directory for lookup when assigning or editing tasks.
+   * @returns {Promise<void>} Resolves when members state is updated.
+   */
   const fetchMembers = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/api/admin/member/lookup`, {
@@ -134,6 +180,10 @@ const Uniques360Coordinator = () => {
   }, []);
 
   // ================= CREATE TASK =================
+  /**
+   * @desc Submits a new task creation request with assigned members and roles.
+   * @returns {Promise<void>} Resolves on task creation completion.
+   */
   const handleCreateTask = async () => {
     try {
       if (!newTask.title.trim()) {
@@ -179,6 +229,12 @@ const Uniques360Coordinator = () => {
   };
 
   // ================= UPDATE STATUS =================
+  /**
+   * @desc Updates the workflow status of an existing task (e.g., mark as completed).
+   * @param {string} taskId - MongoDB ID of the task to update
+   * @param {string} [newStatus="completed"] - Target status string
+   * @returns {Promise<void>}
+   */
   const handleStatusUpdate = async (taskId, newStatus = "completed") => {
     try {
       await axios.patch(
@@ -195,6 +251,11 @@ const Uniques360Coordinator = () => {
   };
 
   // ================= DELETE TASK =================
+  /**
+   * @desc Prompts coordinator confirmation and deletes the specified task.
+   * @param {string} taskId - MongoDB ID of the task to delete
+   * @returns {Promise<void>}
+   */
   const handleDeleteTask = async (taskId) => {
     if (!window.confirm("Are you sure you want to delete this task?")) return;
     try {
@@ -210,6 +271,10 @@ const Uniques360Coordinator = () => {
   };
 
   // ================= UPDATE TASK =================
+  /**
+   * @desc Submits updated task details and re-mapped member role mappings.
+   * @returns {Promise<void>}
+   */
   const handleUpdateTask = async () => {
     try {
       setSubmitting(true);
@@ -238,6 +303,11 @@ const Uniques360Coordinator = () => {
   };
 
   // ================= FETCH REPORTS =================
+  /**
+   * @desc Loads member reports submitted for a specified task.
+   * @param {string} taskId - MongoDB ID of the selected task
+   * @returns {Promise<void>}
+   */
   const fetchReports = async (taskId) => {
     try {
       setReportsLoading(true);
@@ -255,6 +325,12 @@ const Uniques360Coordinator = () => {
   };
 
   // ================= REMOVE MEMBER =================
+  /**
+   * @desc Detaches an assigned member from a task roster.
+   * @param {string} taskId - Target task ID
+   * @param {string} memberId - Member ID to remove
+   * @returns {Promise<void>}
+   */
   const handleRemoveMember = async (taskId, memberId) => {
     try {
       await axios.post(
@@ -278,6 +354,11 @@ const Uniques360Coordinator = () => {
     }
   };
 
+  /**
+   * @desc Resolves semantic MUI color variant based on task completion status.
+   * @param {string} status - Task status string
+   * @returns {'success'|'warning'|'default'} Chip color identifier
+   */
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case "completed": return "success";
@@ -308,6 +389,10 @@ const Uniques360Coordinator = () => {
   });
 
   // Toggles the filter state if clicked multiple times
+  /**
+   * @desc Toggles filtering by status card metric; clears filter if clicked again.
+   * @param {string} targetStatus - Filter value ('all' | 'pending' | 'in-progress' | 'completed')
+   */
   const handleMetricCardClick = (targetStatus) => {
     if (statusFilter === targetStatus) {
       setStatusFilter("all");

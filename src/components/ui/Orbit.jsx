@@ -1,7 +1,20 @@
+/**
+ * @file Orbit.jsx
+ * @description Multi-tier planetary orbit animation component featuring concentric rotating rings of member portraits around a core hub.
+ * @architecture Used on promotional landing pages and community highlight banners.
+ * @agent_note Dynamically resizes container and orbital radii based on window width. Uses `useInView` to pause CSS spin animations when off-screen.
+ */
+
 import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useInView } from "@/hooks/useInView";
 
+/**
+ * @component Orbit
+ * @description Concentric revolving planetary orbital animation displaying student/mentor avatars with viewport-aware animation play state.
+ * @state {number} containerSize - Responsive diameter of the outer orbit bounding container (260px - 640px)
+ * @state Consumes `useInView` to automatically pause keyframe animations when scrolled out of view
+ */
 const Orbit = () => {
   const [containerRef, inView] = useInView({ once: false, rootMargin: "100px 0px" });
   const orbitImages = {

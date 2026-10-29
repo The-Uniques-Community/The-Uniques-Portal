@@ -1,3 +1,10 @@
+/**
+ * @file index.jsx
+ * @description Faculty and instructor management console supporting directory filtering, dual-view (card grid and data table), image uploads, and Formik/Yup creation/editing workflows.
+ * @architecture Primary entry route for `/admin/trainers` and `/coordinator/trainers`. Integrates with trainer CRUD APIs (`/api/admin/trainers/*`), `@/upload/trainer_file_upload`, and dynamic batches via `useBatches`. Displays cards using `@/components/cards/TrainerCardDashboard` and table using `@/components/tables/ModernTable`.
+ * @agent_note Accommodates internal alumni trainers ('uniques' origin with `trainerBatch`) versus guest industry trainers ('external' origin with `designation`). Uploads profile pictures directly to `/upload/trainer_file_upload`.
+ */
+
 import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
@@ -62,6 +69,25 @@ import tu from "@/assets/logos/tu.png";
 import ModernTable from "@/components/tables/ModernTable";
 import { useBatches } from "@/hooks/useBatches";
 
+/**
+ * @component Trainers
+ * @description Master instructors management module providing search filtering, dual view tabs (Profiles card grid vs Manage data table), Formik validation dialog, and deletion confirmation modal.
+ * @state {string} search - Live query text searching trainer names, emails, and skills.
+ * @state {Array<Object>} trainers - Collection of registered trainer profiles.
+ * @state {boolean} loading - Data fetch state indicator.
+ * @state {string} tabValue - Active view tab ('1': Profiles grid, '2': Manage table).
+ * @state {boolean} openDialog - Controls add/edit trainer form dialog.
+ * @state {boolean} deleteDialogOpen - Controls trainer removal confirmation modal.
+ * @state {Object|null} selectedTrainer - Active trainer being edited or deleted.
+ * @state {HTMLElement|null} anchorEl - Menu anchor element for action row options.
+ * @state {string|null} menuTrainerId - Identifier of trainer row menu currently opened.
+ * @state {File|null} selectedImage - Binary avatar file staged for upload.
+ * @api `GET /api/admin/trainers/all-trainers` - Retrieves full trainer catalog.
+ * @api `POST /api/admin/trainers/add-trainer` - Registers new instructor profile.
+ * @api `PUT /api/admin/trainers/update-trainer/:id` - Updates instructor attributes.
+ * @api `DELETE /api/admin/trainers/delete-trainer/:id` - Deletes instructor account.
+ * @api `POST /upload/trainer_file_upload` - Uploads trainer photo.
+ */
 const Trainers = () => {
     const { batches: dynamicBatches } = useBatches();
     const burl = BASE_URL; // Ideally this should come from env or context

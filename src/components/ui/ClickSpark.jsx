@@ -1,5 +1,26 @@
+/**
+ * @file ClickSpark.jsx
+ * @description Interactive canvas particle wrapper that emits radiating spark lines whenever the user clicks within the container.
+ * @architecture Used to wrap interactive buttons, cards, or hero sections to add playful micro-animations.
+ * @agent_note Automatically syncs canvas resolution via `ResizeObserver` and pauses animation when the browser tab is hidden to conserve GPU/CPU cycles.
+ */
+
 import { useRef, useEffect, useCallback } from "react";
 
+/**
+ * @component ClickSpark
+ * @description Canvas-based particle effect that explodes custom spark particles radially from the mouse click coordinate.
+ * @param {Object} props - Component properties
+ * @param {string} [props.sparkColor="#fff"] - Stroke color of the sparks
+ * @param {number} [props.sparkSize=10] - Initial length of each spark streak
+ * @param {number} [props.sparkRadius=15] - Distance sparks travel from origin point
+ * @param {number} [props.sparkCount=8] - Number of radial spark lines generated per click
+ * @param {number} [props.duration=400] - Duration of the spark animation in milliseconds
+ * @param {"linear"|"ease-in"|"ease-in-out"|"ease-out"} [props.easing="ease-out"] - Easing curve algorithm
+ * @param {number} [props.extraScale=1.0] - Distance scale multiplier
+ * @param {React.ReactNode} props.children - Child elements enclosed within the sparkable region
+ * @state Manages particle lists (`sparksRef`), animation frame handles, and canvas resizing
+ */
 const ClickSpark = ({
     sparkColor = "#fff",
     sparkSize = 10,
@@ -47,6 +68,11 @@ const ClickSpark = ({
         };
     }, []);
 
+    /**
+     * @desc Easing interpolation function mapping linear progress (0-1) to an eased value.
+     * @param {number} t - Normalized progress [0, 1]
+     * @returns {number} Eased progress multiplier
+     */
     const easeFunc = useCallback(
         (t) => {
             switch (easing) {
@@ -157,6 +183,10 @@ const ClickSpark = ({
         extraScale,
     ]);
 
+    /**
+     * @desc Spawns a burst of spark particles radiating out from the click coordinate.
+     * @param {React.MouseEvent<HTMLDivElement>} e - Click event
+     */
     const handleClick = (e) => {
         const canvas = canvasRef.current;
         if (!canvas) return;

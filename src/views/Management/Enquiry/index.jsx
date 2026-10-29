@@ -1,3 +1,10 @@
+/**
+ * @file index.jsx
+ * @description Public enquiry management interface handling message triage, debounced search, status lifecycles (new, reviewed, in-progress, resolved, archived), direct email reply dispatch, and deletion.
+ * @architecture Routed via `/admin/enquiry` or `/coordinator/enquiry`. Communicates with backend endpoints at `/api/admin/enquiry/*` for listing, pagination, status patching, email replies, and permanent deletion.
+ * @agent_note Uses debounced input search (500ms) over enquiry names, emails, and message bodies. The reply workflow posts to `/api/admin/enquiry/:id/reply`, automatically sending email responses to visitors via backend mailers.
+ */
+
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -54,6 +61,33 @@ import { format } from "date-fns";
 import { BASE_URL } from "@/config";
 import ModernHeader from "@/components/headers/ModernHeader";
 
+/**
+ * @component EnquiryManagement
+ * @description Renders the enquiry management dashboard featuring tabbed status filters, interactive table, detailed inspection modal, status modification controls, and email reply composer.
+ * @state {Array<Object>} enquiries - Paginated list of user contact inquiries.
+ * @state {boolean} loading - Global loading indicator for data fetch operations.
+ * @state {string} searchTerm - Active query string for text searching.
+ * @state {string} statusFilter - Filter tab selector ('all', 'new', 'reviewed', 'in-progress', 'resolved', 'archived').
+ * @state {Object|null} selectedEnquiry - Enquiry document currently displayed in the detail modal.
+ * @state {boolean} modalOpen - Controls open state for the enquiry detail modal.
+ * @state {string} replyMessage - Outgoing email reply message text.
+ * @state {boolean} replyLoading - Loading spinner state during reply transmission.
+ * @state {boolean} deleteDialogOpen - Confirmation modal state for message deletion.
+ * @state {string|null} deleteId - Staged inquiry ID targeted for deletion.
+ * @state {number} currentPage - Active pagination page number.
+ * @state {number} totalPages - Total pages reported by backend pagination.
+ * @state {number} limit - Number of rows rendered per page (5, 10, 25, 50).
+ * @state {string} filterCriteria - Sorting criteria string (e.g. 'createdAt:desc', 'firstName:asc').
+ * @state {boolean} statusUpdateLoading - Spinner state during status patch.
+ * @state {Object} alertInfo - Toast banner state `{ show, message, severity }`.
+ * @state {string} newStatus - Modified status value in the detail modal.
+ * @state {string} notes - Administrative notes attached to the enquiry.
+ * @api `GET /api/admin/enquiry` - Queries paginated enquiries with status, search, and sorting filters.
+ * @api `GET /api/admin/enquiry/:id` - Fetches single enquiry details.
+ * @api `POST /api/admin/enquiry/:id/reply` - Dispatches email response to the inquirer.
+ * @api `PATCH /api/admin/enquiry/:id/status` - Updates enquiry processing status and admin notes.
+ * @api `DELETE /api/admin/enquiry/:id` - Deletes enquiry record.
+ */
 const EnquiryManagement = () => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";

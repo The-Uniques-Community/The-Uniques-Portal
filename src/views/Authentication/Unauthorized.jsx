@@ -1,3 +1,10 @@
+/**
+ * @file Unauthorized.jsx
+ * @description 401 Unauthorized error view presented when an authenticated user attempts to access a route forbidden by RBAC policies.
+ * @architecture Rendered by Route Guard components when authorization checks fail, routing back to user-appropriate dashboards via getRoleDashboard.
+ * @agent_note Extracts the role from localStorage (`role` or `user.role`) to construct a dynamic return path via getRoleDashboard().
+ */
+
 import React from "react";
 import { Box, Button, Container, Paper, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
@@ -7,6 +14,10 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import { getRoleDashboard } from "@/routes/paths";
 
+/**
+ * @component Unauthorized
+ * @description Renders a 401 Unauthorized warning screen displaying current user role with navigation links to home or role dashboard.
+ */
 const Unauthorized = () => {
   const theme = useTheme();
   const navigate = useNavigate();

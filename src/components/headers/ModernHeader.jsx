@@ -1,3 +1,10 @@
+/**
+ * @file ModernHeader.jsx
+ * @description Standardized top-level dashboard and page header featuring cybernetic vertical accent bar, title highlight, subtitle, and primary action button.
+ * @architecture Serves as the primary header across admin, trainer, and student dashboard views. Also exported via `WorkspaceHeader.jsx`.
+ * @agent_note Supports either an automated `ModernButton` (via `buttonText` and `onButtonClick`) or an explicit custom `action` node.
+ */
+
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import { alpha } from "@mui/material/styles";
@@ -6,6 +13,21 @@ import ModernButton from "@/components/buttons/ModernButton";
 
 const BRAND_COLOR = "#ca0019";
 
+/**
+ * @component ModernHeader
+ * @description Standardized dashboard section header with title, branded vertical glow bar, optional highlight badge, and action CTA.
+ * @param {Object} props - Component properties
+ * @param {string} props.title - Main header title
+ * @param {string} [props.highlight] - Accent word or phrase rendered in brand red
+ * @param {string} [props.subtitle] - Explanatory subtitle or description
+ * @param {string} [props.buttonText] - Text label for automated action button
+ * @param {Function} [props.onButtonClick] - Handler callback for automated action button
+ * @param {React.ReactNode} [props.buttonIcon] - Custom icon for automated action button (defaults to AddIcon)
+ * @param {React.ReactNode} [props.action] - Custom action node that overrides the default button
+ * @param {React.ReactNode} [props.children] - Additional inline content placed below the subtitle
+ * @param {Object} [props.sx] - Material UI sx style overrides applied to root container
+ * @state None - Pure presentation component
+ */
 const ModernHeader = ({
   title,
   highlight,

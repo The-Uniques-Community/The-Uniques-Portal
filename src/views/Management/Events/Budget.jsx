@@ -1,3 +1,10 @@
+/**
+ * @file Budget.jsx
+ * @description Comprehensive event budget tracking, sponsorship pledges, expenditures, receipt uploads, and PDF report export.
+ * @architecture Routed via `/admin/events/:id/budget` or `/coordinator/events/:id/budget`. Connects to REST endpoints for budget CRUD, sponsorship records, and file uploads.
+ * @agent_note Respects role permissions via `isAdmin()` (allocations and category management require admin role). Handles file receipt uploads with `validateFile` and `FILE_VALIDATION_PRESETS.RECEIPT`.
+ */
+
 import { BASE_URL } from "@/config";
 import React, { useState, useEffect, useRef } from "react";
 import { EventBudgetSkeleton } from "@/components/common/skeletons";
@@ -60,7 +67,16 @@ import Visibility from '@mui/icons-material/Visibility';
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-// Budget chart component using simple box charts
+/**
+ * @component BudgetChart
+ * @description Linear progress visualization comparing category budget allocations with actual expenditures, plus sponsorship breakdowns by type.
+ * @param {Object} props - Component properties.
+ * @param {Array<Object>} [props.allocations=[]] - Budget allocation entries per category.
+ * @param {Array<Object>} [props.expenses=[]] - Expense line items.
+ * @param {Array<Object>} [props.sponsors=[]] - Sponsor contributions and pledge records.
+ * @state None - Pure presentation component computed from input props.
+ * @api None - No direct API endpoints called.
+ */
 const BudgetChart = ({ allocations = [], expenses = [], sponsors = [] }) => {
   // Group expenses by category
   const expensesByCategory = {};
@@ -210,7 +226,39 @@ const BudgetChart = ({ allocations = [], expenses = [], sponsors = [] }) => {
     </Box>
   );
 };
-// Event Budget Management component
+/**
+ * @component EventBudget
+ * @description Master event financial console handling budget overview, sponsor management, expense registration, category allocations, and PDF statement generation.
+ * @state {string|null} userRole - Current user role ('admin' or 'coordinator') retrieved from localStorage.
+ * @state {Object|null} event - Event record containing name, venue, dates, and details.
+ * @state {boolean} loading - Global loading state during initial budget/event data retrieval.
+ * @state {Object} budget - Financial aggregates including `totalAllocated`, `totalSpent`, `remaining`, and `currency`.
+ * @state {Array<Object>} sponsors - List of sponsor companies, contact persons, pledges, and payment receipt files.
+ * @state {Array<Object>} expenses - Itemized expense entries with approval/payment statuses and receipt URLs.
+ * @state {Array<Object>} allocations - Category allocations (e.g. food, logistics, gifts).
+ * @state {number} tabValue - Active tab index (0: Overview, 1: Allocations, 2: Sponsors, 3: Expenses).
+ * @state {boolean} uploadingReceipt - State indicator during file upload transactions.
+ * @state {Object|null} currentItemForReceipt - Context pointer `{ id, type }` for the item attaching a receipt.
+ * @state {boolean} budgetDialog - Controls open state for the budget edit modal.
+ * @state {boolean} sponsorDialog - Controls open state for adding a new sponsor modal.
+ * @state {boolean} expenseDialog - Controls open state for creating a new expense entry modal.
+ * @state {boolean} allocationDialog - Controls open state for adding category allocations.
+ * @state {boolean} receiptDialog - Controls open state for uploading receipt files.
+ * @state {boolean} viewReceiptDialog - Controls open state for the embedded Google Drive receipt viewer modal.
+ * @state {string} viewingReceiptUrl - Google Drive file ID or URL being previewed.
+ * @state {boolean} generatingReport - Flag set during jsPDF report generation and rendering.
+ * @api `GET /api/events/:id` - Retrieves event details.
+ * @api `GET /api/events/:id/budget` - Retrieves full budget, expense, allocation, and sponsor collections.
+ * @api `PUT /api/events/:id/budget` - Updates total allocated budget and currency notes.
+ * @api `POST /api/events/:id/sponsors` - Records a new event sponsorship.
+ * @api `DELETE /api/events/:id/sponsors/:sponsorId` - Removes a sponsor pledge and recalibrates remaining balance.
+ * @api `POST /api/events/:id/expenses` - Records a new expense line item.
+ * @api `PATCH /api/events/:id/expenses/:expenseId` - Updates payment status of an expense.
+ * @api `DELETE /api/events/:id/expenses/:expenseId` - Removes an expense line item.
+ * @api `POST /api/events/:id/budget-allocations` - Adds a category allocation limit (Admin only).
+ * @api `DELETE /api/events/:id/budget-allocations/:allocationId` - Deletes a category allocation (Admin only).
+ * @api `POST /upload/budget_file_upload` - Uploads proof-of-payment receipts.
+ */
 const EventBudget = () => {
   const { id } = useParams();
   const navigate = useNavigate();

@@ -1,5 +1,24 @@
+/**
+ * @file BlogCard.jsx
+ * @description Blog post preview card featuring image thumbnail, title, truncated summary, category, read time, and click handler.
+ * @architecture Used in blog feeds, carousels, or landing pages to present bite-sized article cards.
+ * @agent_note Supports snap-scrolling layout contexts (`snap-start scroll-ml-6 shrink-0`). Ensure image URLs are valid or provide fallback handlers if needed.
+ */
+
 import React from "react";
 
+/**
+ * @component BlogCard
+ * @description Renders a blog preview card with hover zoom effects, metadata tags, and selection callback.
+ * @param {Object} props - Component properties
+ * @param {string} props.title - Headline title of the blog post
+ * @param {string} props.description - Brief snippet or summary of the article (line-clamped to 3 lines)
+ * @param {string} props.category - Article category or domain taxonomy
+ * @param {number|string} props.readTime - Estimated read time in minutes
+ * @param {string} props.image - URL or path of the blog hero/cover image
+ * @param {Function} [props.onClick] - Click callback invoked when the card is clicked
+ * @state None - Pure presentation component
+ */
 const BlogCard = ({ title, description, category, readTime, image, onClick }) => {
   return (
     <div

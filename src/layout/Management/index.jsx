@@ -1,3 +1,10 @@
+/**
+ * @file index.jsx
+ * @description Unified management portal layout supporting both Admin and Coordinator roles, featuring role badging, user profile chips, responsive drawer navigation, and dark mode toggling.
+ * @architecture Shared shell for administrative and coordinator workspaces. Integrates with useAuth, ThemeProvider, and React Router Outlet.
+ * @agent_note Supports explicit role prop ('admin' | 'coordinator') or automatically infers role from location.pathname. Uses Lenis scroll containment (`data-lenis-prevent="true"`) on sidebar list.
+ */
+
 /* eslint-disable no-unused-vars */
 import React, { lazy, Suspense } from "react";
 import { useLocation } from "react-router-dom";
@@ -45,7 +52,10 @@ import PersonIcon from "@mui/icons-material/Person";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import BarChartIcon from "@mui/icons-material/BarChart";
 
-// Navigation items with paths relative to the active management portal (/admin or /coordinator)
+/**
+ * @desc Navigation menu configuration for management routes (/admin or /coordinator).
+ * @type {Array<{segment: string, title: string, icon: React.ReactNode}>}
+ */
 const MANAGEMENT_NAVIGATION = [
   { segment: "", title: "Dashboard", icon: <DashboardIcon /> },
   { segment: "members-overview", title: "Members", icon: <GroupIcon /> },
@@ -62,6 +72,11 @@ const MANAGEMENT_NAVIGATION = [
   { segment: "batches", title: "Batches", icon: <ClassIcon /> },
 ];
 
+/**
+ * @component Branding
+ * @description Renders light or dark themed community logo.
+ * @state Consumes isDarkMode from ThemeContext.
+ */
 function Branding() {
   const { isDarkMode } = useThemeContext();
   return (
@@ -74,6 +89,16 @@ function Branding() {
   );
 }
 
+/**
+ * @component ManagementLayout
+ * @description Unified management portal layout supporting admin and coordinator perspectives, with role tags, user profile header, responsive drawer, and Outlet.
+ * @param {Object} props - Component properties.
+ * @param {('admin'|'coordinator')} [props.role] - Explicit role override to dictate base URL path and theme accents.
+ * @state {boolean} drawerOpen - Drawer expansion state.
+ * @state {string} activeItem - Active route item derived from pathname.
+ * @state {boolean} isOpen - Modal visibility state for logout confirmation.
+ * @api authService.logout - Revokes current authentication token on confirmation.
+ */
 export default function ManagementLayout({ role: explicitRole }) {
   const { isDarkMode, toggleTheme } = useThemeContext();
   const theme = useTheme();

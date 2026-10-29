@@ -1,3 +1,10 @@
+/**
+ * @file index.jsx
+ * @description Student member dashboard layout providing member navigation links, responsive drawer, theme toggle, and nested route outlet.
+ * @architecture Layout container for authenticated member views (Dashboard, Create Blog, Uniques 360, Leave Management). Integrates with ThemeProvider, authService, and React Router Outlet.
+ * @agent_note Uses localStorage ("activeItem") to restore active menu state across reloads. Sidebar list incorporates `data-lenis-prevent="true"` and wheel event cancellation to avoid interfering with Lenis smooth scrolling.
+ */
+
 import React, { lazy, Suspense } from "react";
 import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
@@ -30,7 +37,10 @@ import Brightness7Icon from "@mui/icons-material/Brightness7"; // Light Mode Ico
 
 const ConfirmationModal = lazy(() => import("@/components/modals/ConfirmationModal"));
 
-// Navigation items with relative paths
+/**
+ * @desc Navigation menu configuration for authenticated community members.
+ * @type {Array<{segment: string, title: string, icon: React.ReactNode}>}
+ */
 const STUDENT_NAVIGATION = [
   { segment: "", title: "Dashboard", icon: <DashboardIcon /> },
   { segment: "create-blog", title: "Create Blog", icon: <BookIcon /> },
@@ -41,6 +51,11 @@ const STUDENT_NAVIGATION = [
 import { BASE_URL } from "@/config";
 import authService from "@/services/authService";
 
+/**
+ * @component Branding
+ * @description Renders light or dark themed community logo.
+ * @state Consumes isDarkMode from ThemeContext.
+ */
 function Branding() {
   const { isDarkMode } = useThemeContext()
   return (
@@ -53,6 +68,16 @@ function Branding() {
   );
 }
 
+/**
+ * @component DashboardLayoutAppBar
+ * @description Primary student dashboard layout component rendering the collapsible sidebar drawer, glassmorphic top bar, and route Outlet.
+ * @param {Object} props - Component properties.
+ * @param {Function} [props.window] - Optional DOM window getter for iframe contexts.
+ * @state {boolean} drawerOpen - Indicates whether the sidebar drawer is open.
+ * @state {string} activeItem - Current active navigation title initialized from localStorage.
+ * @state {boolean} isOpen - Controls visibility of the logout confirmation modal.
+ * @api authService.logout - Revokes student session on confirmation.
+ */
 function DashboardLayoutAppBar() {
   const { isDarkMode, toggleTheme } = useThemeContext(); // Access dark mode state and toggle function
   const theme = useTheme();

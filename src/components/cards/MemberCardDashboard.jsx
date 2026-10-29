@@ -1,3 +1,10 @@
+/**
+ * @file MemberCardDashboard.jsx
+ * @description Administrative and dashboard member card with status pill badge, social links, action buttons (edit/delete), and lazy-loaded ProfileModal inspection.
+ * @architecture Used across admin/trainer dashboards in Member lists and grids. Bridges member models to ProfileModal inspection and action handlers.
+ * @agent_note Accepts either `user` or `member` prop for backwards compatibility. Uses `preloadComponent` on hover/focus to prime the lazy-loaded `ProfileModal`.
+ */
+
 import React, { useState, lazy, Suspense } from "react";
 import { BASE_URL } from "@/config";
 import { Button, Card, CardContent, Avatar, IconButton, useTheme } from "@mui/material";
@@ -24,6 +31,9 @@ import { preloadComponent } from "@/utils/preload";
 
 const ProfileModal = lazy(() => import("@/components/modals/ProfileModal"));
 
+/**
+ * @desc Sample user data structure used for testing or fallback reference.
+ */
 const sampleUserData = {
   fullName: "John Doe",
   email: "john.doe@example.com",
@@ -59,6 +69,19 @@ const sampleUserData = {
   ],
 };
 
+/**
+ * @component MemberCardDashboard
+ * @description Dashboard representation of a registered member showing avatar, status pill, social icons, and administration triggers.
+ * @param {Object} props - Component properties
+ * @param {Object} [props.user] - Member user entity object
+ * @param {Object} [props.member] - Alternative prop alias for member entity
+ * @param {Function} [props.onEdit] - Callback invoked with the member entity to edit
+ * @param {Function} [props.onDelete] - Callback invoked with the member ID to delete
+ * @param {Function} [props.refreshData] - Callback to refresh upstream member data
+ * @param {Function} [props.onMemberUpdate] - Callback invoked when member profile updates
+ * @state {boolean} open - Controls display of lazy-loaded ProfileModal
+ * @api Interacts with `/api/image-proxy/:fileId` via `getProxyImageUrl`
+ */
 export const MemberCardDashboard = ({
   user,
   member,
@@ -73,6 +96,12 @@ export const MemberCardDashboard = ({
   const [open, setOpen] = useState(false);
 
   const handleClose = () => setOpen(false);
+
+  /**
+   * @desc Normalizes image references (URLs or file IDs) to proxy or direct URLs.
+   * @param {string|Object} fileIdOrPic - Media identifier or object containing url/fileId
+   * @returns {string|null} Resolved image URL or null if invalid
+   */
   const getProxyImageUrl = (fileIdOrPic) => {
     if (!fileIdOrPic) return null;
     if (typeof fileIdOrPic === "object") {

@@ -1,7 +1,27 @@
+/**
+ * @file meteors.jsx
+ * @description MagicUI animated meteor shower effect generating angled shooting star streaks with glowing fading tails.
+ * @architecture Used in hero backgrounds, futuristic cards, or celebratory sections to provide dynamic ambiance.
+ * @agent_note Relies on Tailwind CSS keyframe animation `animate-meteor` and CSS variable `--angle` for custom trajectory angles.
+ */
+
 "use client";;
 import { cn } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
 
+/**
+ * @component Meteors
+ * @description Generates random animated meteor trails falling across the container at a specified angle.
+ * @param {Object} props - Component properties
+ * @param {number} [props.number=20] - Number of meteor streaks to generate
+ * @param {number} [props.minDelay=0.2] - Minimum delay before animation start in seconds
+ * @param {number} [props.maxDelay=1.2] - Maximum delay before animation start in seconds
+ * @param {number} [props.minDuration=2] - Minimum animation travel duration in seconds
+ * @param {number} [props.maxDuration=10] - Maximum animation travel duration in seconds
+ * @param {number} [props.angle=215] - Falling trajectory angle in degrees
+ * @param {string} [props.className] - Additional CSS class names applied to meteor head
+ * @state {Array<Object>} meteorStyles - Generated randomized position, delay, and duration inline style objects
+ */
 export const Meteors = ({
   number = 20,
   minDelay = 0.2,
