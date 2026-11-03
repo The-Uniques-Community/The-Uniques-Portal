@@ -87,7 +87,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
       uppercase: true,
       match: [
-        /^[0-9]{4}(BTCS|BTCED|BTCSD|BCAPU|BCAPTU|BTAIML)[0-9]{3}$/,
+        /^[0-9]{4}(BTCS|BTCED|BTCSD|BCAPU|BCAPTU|BTAIML|BTAI)[0-9]{3}$/,
         "Invalid admission number format",
       ],
     },
@@ -97,7 +97,7 @@ const userSchema = new mongoose.Schema(
     },
     course: {
       type: String,
-      enum: ["B.Tech CSE", "CSD", "BCA", "BTech AI/ML", "B.Tech AI/ML"],
+      enum: ["B.Tech CSE", "CSD", "BCA", "BTech AI/ML", "B.Tech AI/ML", "BTech AI", "B.Tech AI"],
     },
     admissionYear: { type: Number, min: 2000, max: 2100 },
     graduationYear: { type: Number, min: 2000, max: 2100 },

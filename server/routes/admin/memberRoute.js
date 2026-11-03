@@ -20,6 +20,7 @@ import {
   getAdminMemberCounts,
   getMemberLookup,
 } from '../../controller/admin/memberController.js';
+import { makeCoordinator } from '../../controller/admin/adminControllers.js';
 import { getAllMembersWithFines, imposeFine } from '../../controller/admin/fineController.js';
 import verifyToken from '../../middlewares/verifyToken.js';
 import verifyRole from '../../middlewares/verifyRole.js';
@@ -66,6 +67,10 @@ memberAdminRouter.post('/:memberId/fines', imposeFine);
 
 // Update member profile
 memberAdminRouter.put('/:id', updateMemberProfile);
+
+// Role management (Admin only)
+memberAdminRouter.patch('/:id/role', verifyRole(['admin']), makeCoordinator);
+memberAdminRouter.post('/:id/make-coordinator', verifyRole(['admin']), makeCoordinator);
 
 // Delete member
 memberAdminRouter.delete('/:id', deleteMember);

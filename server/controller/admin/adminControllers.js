@@ -5,8 +5,9 @@
  * @agent_note Password hashing runs via bcrypt with 12 salt rounds. When creating or onboarding members, check both email and admno for uniqueness.
  */
 import mongoose from 'mongoose';
-import Member from '../../models/member/memberModel.js'
-import Event from '../../models/member/eventModel.js'
+import User from '../../models/user/userModel.js';
+import Member from '../../models/member/memberModel.js';
+import Event from '../../models/member/eventModel.js';
 import Admin from '../../models/admin/adminModel.js';
 import bcrypt from 'bcryptjs';
 import sendWelcomeCredentialsEmail from '../../services/members/sendWelcomeCredentialsEmail.js';
@@ -358,6 +359,119 @@ export const hashMemberPassword = async (req, res) => {
       success: false,
       message: 'Server error',
       error: error.message
+    });
+  }
+};
+
+/**
+ * @desc    Promote a student member to coordinator or revert back to member
+ * @route   POST /api/admin/makeCoordinator
+ * @route   PATCH /api/admin/member/:id/role
+ * @route   POST /api/admin/member/:id/make-coordinator
+ * @access  Private (Admin only)
+ * @param   {string} [req.params.id] - Target user ObjectId
+ * @body    {string} [req.body.memberId] - Target user ObjectId (alternative)
+ * @body    {string} [req.body.email] - Target user email address
+ * @body    {string} [req.body.admno] - Target user admission number
+ * @body    {string} [req.body.role="coordinator"] - Target role ("coordinator" or "member")
+ * @body    {string} [req.body.designation] - Optional coordinator designation
+ * @returns {Object} JSON response confirming role transition with sanitized user profile
+ */
+export const makeCoordinator = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { memberId, email, admno, role, designation } = req.body || {};
+
+    const targetRole = (role || "coordinator").toLowerCase().trim();
+    if (!["coordinator", "member"].includes(targetRole)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid role. This route only allows assigning "coordinator" or "member" role.',
+      });
+    }
+
+    // Resolve target user by ID, email, or admno
+    let user = null;
+    const resolvedId = id || memberId;
+
+    if (resolvedId) {
+      if (!mongoose.Types.ObjectId.isValid(resolvedId)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid user ID format. Must be a valid MongoDB ObjectId.",
+        });
+      }
+      user = await User.findById(resolvedId);
+    } else if (email && typeof email === "string" && email.trim()) {
+      user = await User.findOne({ email: email.toLowerCase().trim() });
+    } else if (admno && typeof admno === "string" && admno.trim()) {
+      user = await User.findOne({ admno: admno.toUpperCase().trim() });
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide a member ID, email, or admission number to identify the user.",
+      });
+    }
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Member not found",
+      });
+    }
+
+    // Guard: Prevent demoting or modifying an Admin account via this route
+    if (user.role === "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Cannot modify an Administrator account using this route.",
+      });
+    }
+
+    // Prepare update fields
+    const updateFields = {
+      role: targetRole,
+      updatedAt: new Date(),
+    };
+    if (designation !== undefined) {
+      updateFields.designation = typeof designation === "string" ? designation.trim() : "";
+    }
+
+    // Update unified user collection and increment tokenVersion to revoke stale JWT sessions
+    const updatedUser = await User.findByIdAndUpdate(
+      user._id,
+      {
+        $set: updateFields,
+        $inc: { tokenVersion: 1 },
+      },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    // Mirror update to legacy members collection if present
+    if (mongoose.connection.readyState === 1 && mongoose.connection.db) {
+      try {
+        await mongoose.connection.db.collection("members").updateOne(
+          { _id: user._id },
+          { $set: updateFields }
+        );
+      } catch (legacyErr) {
+        console.warn("Notice: Failed to sync legacy members collection:", legacyErr.message);
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `User ${user.fullName || user.email} successfully ${
+        targetRole === "coordinator" ? "promoted to coordinator" : "reverted to member"
+      }`,
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error("Error in makeCoordinator controller:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error updating coordinator role",
+      error: error.message,
     });
   }
 };
