@@ -13,6 +13,7 @@ import {
   unblockMember,
   approveProfile,
   createAdmin,
+  makeCoordinator,
 } from '../../controller/admin/adminControllers.js';
 import verifyToken from '../../middlewares/verifyToken.js';
 import verifyRole from '../../middlewares/verifyRole.js';
@@ -29,5 +30,8 @@ adminRoute.post('/member/add', verifyToken, verifyRole(['admin', 'coordinator'])
 
 // Root superadmin action: admin only
 adminRoute.post('/createAdmin', verifyToken, verifyRole(['admin']), createAdmin);
+adminRoute.post('/makeCoordinator', verifyToken, verifyRole(['admin']), makeCoordinator);
+adminRoute.patch('/member/:id/role', verifyToken, verifyRole(['admin']), makeCoordinator);
+adminRoute.post('/member/:id/make-coordinator', verifyToken, verifyRole(['admin']), makeCoordinator);
 
 export default adminRoute;

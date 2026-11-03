@@ -13,7 +13,9 @@ const validStreams = [
   "CSD",
   "BCA",
   "BTech AI/ML",
-  "B.Tech AI/ML"
+  "B.Tech AI/ML",
+  "BTech AI",
+  "B.Tech AI"
 ];
 
 console.log("Test Suite 1: Stream (Course) Enum Validation");
@@ -45,7 +47,7 @@ assert(invalidErr?.errors?.course, "Expected User model to reject invalid stream
 console.log(`  ✓ User model correctly rejects invalid stream "Civil Engineering"`);
 
 
-// 2. Test User / Member model with valid Roll Number formats (BTCS, BTCED, BTCSD, BCAPU, BCAPTU, BTAIML)
+// 2. Test User / Member model with valid Roll Number formats (BTCS, BTCED, BTCSD, BCAPU, BCAPTU, BTAIML, BTAI)
 console.log("\nTest Suite 2: Admission / Roll Number Validation");
 const validRollNumbers = [
   "2021BTCS001",
@@ -54,7 +56,9 @@ const validRollNumbers = [
   "2024BCAPU004",
   "2024BCAPTU005",
   "2024BTAIML006",
+  "2024BTAI007",
   "2025bcapu007", // Should normalize via uppercase
+  "2025btai008", // Should normalize via uppercase
 ];
 
 for (const roll of validRollNumbers) {
@@ -115,7 +119,7 @@ console.log(`  ✓ Member alias correctly validates new streams and roll numbers
 
 // 4. Test Fine Controller Query Pattern
 console.log("\nTest Suite 4: Fine Controller Query Regex Matching");
-const fineSearchRegex = /^[0-9]{4}(BTCS|BTCED|BTCSD|BCAPU|BCAPTU|BTAIML)[0-9]{3}$/i;
+const fineSearchRegex = /^[0-9]{4}(BTCS|BTCED|BTCSD|BCAPU|BCAPTU|BTAIML|BTAI)[0-9]{3}$/i;
 for (const roll of validRollNumbers) {
   assert(fineSearchRegex.test(roll), `Fine controller regex should match "${roll}"`);
   console.log(`  ✓ Fine controller regex matches "${roll}"`);
@@ -128,7 +132,7 @@ console.log(`  ✓ Fine controller regex correctly rejects non-roll queries`);
 
 // 5. Test Frontend Form Validation Regex Pattern
 console.log("\nTest Suite 5: Frontend Form Validation Regex Matching");
-const frontendRegex = /^[0-9]{4}(BTCS|BTCED|BTCSD|BCAPU|BCAPTU|BTAIML)[0-9]{3}$/i;
+const frontendRegex = /^[0-9]{4}(BTCS|BTCED|BTCSD|BCAPU|BCAPTU|BTAIML|BTAI)[0-9]{3}$/i;
 for (const roll of validRollNumbers) {
   assert(frontendRegex.test(roll), `Frontend regex should match "${roll}"`);
   console.log(`  ✓ Frontend regex matches "${roll}"`);

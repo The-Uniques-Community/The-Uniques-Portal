@@ -26,7 +26,7 @@ export const searchMembers = async (req, res) => {
     
     if (query) {
       // Check if query is an admission number (exact match)
-      if (/^[0-9]{4}(BTCS|BTCED|BTCSD|BCAPU|BCAPTU|BTAIML)[0-9]{3}$/i.test(query)) {
+      if (/^[0-9]{4}(BTCS|BTCED|BTCSD|BCAPU|BCAPTU|BTAIML|BTAI)[0-9]{3}$/i.test(query)) {
         searchCriteria.admno = query.toUpperCase();
       } else {
         // Search by name or email (partial match)
