@@ -65,6 +65,10 @@ const Login = () => {
   // Listen for the message from the popup. The backend sends token, role, and user.
   useEffect(() => {
     const receiveMessage = (event) => {
+      if (event.data?.error) {
+        toast.error(event.data.message || "Google authentication failed. Please check if your account is registered.");
+        return;
+      }
       if (event.data && (event.data.role || event.data.token)) {
         const { token, role, user } = event.data;
         const normalizedRole = (role || user?.role || "member").toLowerCase();

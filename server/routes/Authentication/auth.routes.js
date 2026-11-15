@@ -16,11 +16,62 @@ const router = express.Router();
 
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-router.get(
-  '/google/callback',
-  passport.authenticate('google', { failureRedirect: '/login?error=not-member', session: false }),
-  googleCallback
-);
+/**
+ * @desc Handles Google OAuth authentication failures and informs popup opener window
+ * @route GET /auth/google/failure
+ */
+router.get('/google/failure', (req, res) => {
+  const errorMsg = req.query.message || "Your Google account is not registered. Please contact an administrator.";
+  const targetOrigin = process.env.FRONTEND_URL || process.env.CLIENT_URL || "https://theuniquesportal.vercel.app";
+
+  const htmlResponse = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Login Failed</title>
+      </head>
+      <body>
+        <script>
+          (function() {
+            if (window.opener) {
+              try {
+                window.opener.postMessage({
+                  error: "not-member",
+                  message: ${JSON.stringify(errorMsg)}
+                }, "*");
+              } catch (e) {
+                console.error("Failed to post message to opener:", e);
+              }
+              window.close();
+            } else {
+              window.location.href = "${targetOrigin}/login?error=not-member";
+            }
+          })();
+        </script>
+        <p style="font-family: sans-serif; text-align: center; margin-top: 40px;">
+          ${errorMsg}<br><br>You can close this window.
+        </p>
+      </body>
+    </html>
+  `;
+  return res.status(401).send(htmlResponse);
+});
+
+router.get('/google/callback', (req, res, next) => {
+  passport.authenticate('google', { session: false }, (err, user, info) => {
+    if (err) {
+      console.error("[Google OAuth] Authentication error:", err.message || err);
+      const msg = encodeURIComponent(err.message || "Internal authentication error");
+      return res.redirect(`/auth/google/failure?message=${msg}`);
+    }
+    if (!user) {
+      const msg = encodeURIComponent(info?.message || "Member not found in database");
+      return res.redirect(`/auth/google/failure?message=${msg}`);
+    }
+    req.user = user;
+    return googleCallback(req, res, next);
+  })(req, res, next);
+});
 
 router.post('/emaillogin', emailLogin);
 router.get('/get_user', verifyToken, getCurrentUser);

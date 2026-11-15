@@ -111,26 +111,34 @@ export const findUserById = async (userId) => {
     try {
       const user = await User.findOne(idQuery).select("-password");
       if (user) return user;
-    } catch (_err) {}
+    } catch (_err) {
+      // Ignored: continue fallback lookup
+    }
   }
 
   // 2. Try Member model
   try {
     const member = await Member.findOne(idQuery).select("-password");
     if (member) return member;
-  } catch (_err) {}
+  } catch (_err) {
+    // Ignored: continue fallback lookup
+  }
 
   // 3. Try Admin model
   try {
     const admin = await Admin.findOne(idQuery).select("-password");
     if (admin) return admin;
-  } catch (_err) {}
+  } catch (_err) {
+    // Ignored: continue fallback lookup
+  }
 
   // 4. Try CommunityAdmin model
   try {
     const commAdmin = await CommunityAdmin.findOne(idQuery).select("-password");
     if (commAdmin) return commAdmin;
-  } catch (_err) {}
+  } catch (_err) {
+    // Ignored: continue fallback lookup
+  }
 
   // 5. Direct raw collection fallbacks for split-state or unmigrated databases
   if (mongoose.connection.readyState === 1 && mongoose.connection.db) {
@@ -141,7 +149,9 @@ export const findUserById = async (userId) => {
           delete raw.password;
           return normalizeUserProfilePic(raw);
         }
-      } catch (_e) {}
+      } catch (_e) {
+        // Ignored: continue checking other collections
+      }
     }
   }
 
@@ -172,7 +182,7 @@ export const googleCallback = (req, res, _next) => {
   if (safeUser.password) delete safeUser.password;
   if (safeUser.__v !== undefined) delete safeUser.__v;
 
-  const targetOrigin = process.env.FRONTEND_URL || process.env.CLIENT_URL || "https://the-uniques-portal.vercel.app";
+  const targetOrigin = process.env.FRONTEND_URL || process.env.CLIENT_URL || "https://theuniquesportal.vercel.app";
 
   const htmlResponse = `
     <!DOCTYPE html>
@@ -184,27 +194,24 @@ export const googleCallback = (req, res, _next) => {
         <script>
           (function() {
             if (window.opener) {
-              const configuredTarget = "${targetOrigin}";
-              const target = configuredTarget || window.location.origin;
               try {
                 window.opener.postMessage({
                   token: "${token}",
                   role: "${userRole}",
                   user: ${JSON.stringify(safeUser)}
-                }, target);
-              } catch (e) {
-                // Fallback to wildcard if origin handshake fails across preview domains
-                window.opener.postMessage({
-                  token: "${token}",
-                  role: "${userRole}",
-                  user: ${JSON.stringify(safeUser)}
                 }, "*");
+              } catch (e) {
+                console.error("Failed to post message to opener:", e);
               }
               window.close();
+            } else {
+              window.location.href = "${targetOrigin}";
             }
           })();
         </script>
-        <p>Login successful! You can close this window.</p>
+        <p style="font-family: sans-serif; text-align: center; margin-top: 40px;">
+          Login successful! You can close this window.
+        </p>
       </body>
     </html>
   `;
