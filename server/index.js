@@ -53,6 +53,45 @@ const app = express();
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cookieParser());
+
+// Middleware: Recover original request path if rewritten to /index.js by Vercel edge rules
+app.use((req, res, next) => {
+  const isRewrittenToIndex =
+    req.url === "/index.js" ||
+    req.url.startsWith("/index.js?") ||
+    req.path === "/index.js" ||
+    req.url === "/index" ||
+    req.url.startsWith("/index?") ||
+    req.path === "/index";
+
+  if (isRewrittenToIndex) {
+    const rawForwarded =
+      req.headers["x-forwarded-uri"] ||
+      req.headers["x-matched-path"] ||
+      req.headers["x-vercel-matched-path"] ||
+      req.headers["x-original-uri"] ||
+      req.headers["x-now-route-matches"];
+
+    const queryIndex = req.url.indexOf("?");
+    const queryString = queryIndex !== -1 ? req.url.slice(queryIndex) : "";
+
+    if (rawForwarded && rawForwarded !== "/index.js" && rawForwarded !== "/index") {
+      const targetPath = rawForwarded.includes("?") ? rawForwarded : `${rawForwarded}${queryString}`;
+      req.url = targetPath;
+      req.originalUrl = targetPath;
+    } else if (req.query && (req.query.code || req.query.scope || req.query.iss)) {
+      // Direct recovery for Google OAuth callback if edge proxy stripped original path
+      const targetPath = `/auth/google/callback${queryString}`;
+      req.url = targetPath;
+      req.originalUrl = targetPath;
+    }
+  } else if (req.url.startsWith("/index.js/")) {
+    const targetPath = req.url.slice(9);
+    req.url = targetPath;
+    req.originalUrl = targetPath;
+  }
+  next();
+});
 // Dynamic CORS origin configuration with environment overrides and hardcoded defaults
 const parseEnvOrigins = () => {
   const rawOrigins = process.env.ALLOWED_ORIGINS || process.env.CORS_ORIGINS || "";
@@ -151,6 +190,7 @@ app.use(passport.initialize());
 
 // Decoupled public endpoints (Zero DB dependency)
 app.get("/", (req, res) => res.send("hello its working"));
+app.get("/index.js", (req, res) => res.redirect("/"));
 
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "alive", timestamp: new Date().toISOString() });
@@ -293,6 +333,15 @@ if (fs.existsSync(distPath)) {
     next();
   });
 }
+
+// Structured 404 handler for unmatched routes
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    error: "Not Found",
+    message: `Cannot ${req.method} ${req.originalUrl || req.url}`,
+  });
+});
 
 // Centralized Express error handler to guarantee structured JSON errors instead of HTML 500 stack traces
 app.use((err, req, res, _next) => {
